@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		
+	</head>
+	<body>
+		<div id="box">
+			<input type="button" id="btn" value="点击" @click="show()"/>
+			
+		</div>
+		
+		
+
+		<script src="js/jquery-1.12.2.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<!--<script src="https://unpkg.com/vue/dist/vue.js"></script>-->
+		<script src="js/vue.js"></script>
+		<script type="text/javascript">
+			window.onload=function(){
+				new Vue({
+					el:"#box",
+					data:{
+						
+					},
+					methods:{
+						show:function(){
+							alert("我只是测试")
+						}
+					}
+					
+				})
+			}
+		</script>
+	</body>
+</html>

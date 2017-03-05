@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="js/jquery-1.12.2.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<!--<script src="https://unpkg.com/vue/dist/vue.js"></script>-->
+		<script src="js/vue.js"></script>
+	</head>
+	<body>
+		<div class="app1" style="width: 100%;height: 100px;background: pink;">
+			{{one}}
+		</div>
+		<div id="app2">
+			<span v-bind:title="two">
+				
+			</span>
+			<!--{{two}}-->
+		</div>
+		<div id="app5">
+			
+		</div>
+		<script type="text/javascript">
+			var app=new Vue({
+				el:".app1",//
+				data:{
+					one:"陈康平"
+				}
+			})
+			var app2=new Vue({
+				el:"#app2",
+				data:{
+					two:"我只是来学习的"+new Date()
+				}
+			})
+//			var oApp5=new Vue({
+//				el:"#app5",
+//				data:{
+//					app5:"我只是来测试的"
+//				}
+//			})
+		</script>
+	</body>
+</html>
