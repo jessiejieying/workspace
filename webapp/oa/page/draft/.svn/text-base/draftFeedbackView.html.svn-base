@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html style="padding-bottom: 50px;">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=8,Chrome=1">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/apply.css">
+  <style type="text/css">
+  .common-skin-btn-syle01{color: #fff;border-color: #4786d5;background-color: #5b97e1;}
+  .common-skin-btn-syle01:hover {
+    color: #fff;
+    border-color: #3bd;
+    background-color: #3bd;
+  }
+
+  </style>
+</head>
+
+<body onload="load();"> 
+  <object id="TGPDFPlugIn" classid="clsid:04DDDFAA-0AC0-4D47-9315-9F442F65D403" width="0" height="0">
+     <embed name="TGPDFPlugIn" type="application/nptseal-TGPDFPlugIn" width="0" height="0"></embed>
+  </object>
+<#if documentSignFeedback.id??>
+<div class="form-print" style="padding-top: 30px;width: 720px;" id="showHtml">
+  <table  style="font-size: 16px;width: 100%;border: 1px solid #ef655d;color:#ef655d;">
+    <tr style="height: 48px;">
+      <td  style="width: 130px;text-align:center;vertical-align:middle;border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;">反馈单位</td>
+      <td style="border-bottom:1px solid #ef655d;">
+        <table style="height: 48px;width: 590px;"frame="void">
+          <tr>
+            <td width="180" height="47" style="padding-left:10px;" valign="middle"> <input style="width: 100%;border: 0;background-color:transparent;color:#000;" type="text" id = "fromDept" value = "${documentSignFeedback.signOrg!}"/></td>
+            <td  width="130" style="color:#ef655d;height: 100%;border-right:1px solid #ef655d;border-left: 1px solid #ef655d;text-align: center;vertical-align: middle;">反馈时间</td>
+            <td width="180" height="47" style="vertical-align: middle;padding-left:10px;"> <input style=" width: 100%;border: 0;background-color:transparent;color:#000;" type="text" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" id = "receiveDate" value = "${(documentSignFeedback.feedbackTime?string("yyyy-MM-dd hh:mm:ss"))!}" /></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr >
+      <td  width="130" style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">附件</td>
+      <td  height="60" style="border-bottom:1px solid #ef655d;vertical-align: middle;line-height: 20px;padding-top: 10px;padding-bottom: 10px;padding-left: 10px;"> 
+      		<span class="" id="upload_file" style="color:#f8e313;cursor: pointer;"></span>
+      		<table id="attachment_table" class="bsgrid oa-form-grid oa-form-attachment" style="color:#000!important;" >
+      		</table> 
+      </td>
+    </tr>
+    <tr >
+      <td width="130" style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;">反馈内容</td>
+      <td height="179" style="border-bottom:1px solid #ef655d;vertical-align: middle;"> <textarea style=" width: 100%;height:178px;padding-left: 10px;border: 0;background-color:transparent;font-size: 15px;color:#000;padding-top: 5px;" id="feedbackContent" >${documentSignFeedback.feedbackContent!}</textarea></td>
+    </tr>
+  </table>
+</div>
+ <div style="text-align:center;margin-top:10px;">
+      <!--<div class="button common-skin-btn-syle01 js-add-account"  id="back_reason_meetingInfo">发送</div> -->
+      <div class="button common-skin-btn-syle01 js-add-account"  id="draft__close">关闭</div>
+  </div>
+<#else>
+此反馈不存在
+</#if>
+</body>
+<script id="attachment-data" type="text/template">
+  <% if(datas.length>0){ %>
+  <%_.each(datas, function(item,index,list){%>
+  <tr class=" <% if(index%2) { %>interlaced-th <%}%>">
+    <td><%=index+1%>&nbsp;</td>
+    <td title="<%=item.name%>"><%=item.name%></td>
+    <!--<td title=""><%=item.createBy%></td>-->
+    <td title="">&nbsp;&nbsp;</td>
+    <td>
+     <span>
+      <a href=<%=item.path%> title="下载" class="icon-download js-tr-download"></a>
+      <% if(item.isMyself){ %>
+      <a href="javascript:void(0)" title="删除" data-index="<%=index%>" class="icon-times js-tr-delete"></a>
+      <%}%>
+     </span>
+      <% if(item.name.indexOf("tgw")!= -1){ %>
+	     <span class="js-link-father" data-size="<%=item.size%>" data-name="<%=item.name%>">
+		 <i data-href=<%=item.path%> title="解密" class="icon-unlock-alt js-unlock"></i>
+         </span>
+       <%}%>
+    </td>
+  </tr>
+  <%})%>
+  <%}%>
+</script>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src = "${base}/edenui/common/js/underscore.js"></script>
+<script src = "${base}/form/resources/common/plupload/plupload.full.js"></script>
+<script src="${base}/edenui/common/js/plugins/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="${base}/form/resources/common/js/print.js"></script>
+</html>
+<script>
+//天谷空间开始
+var TGGovDocumentCtrl;    //加密解密控件
+var TGPDFPlugIn;		  //天谷印章控件
+var tempPath;
+function load() {
+    TGPDFPlugIn = getPluginObjcet("TGPDFPlugIn");
+//	TGGovDocumentCtrl = getPluginObjcet("TGGovDocumentCtrl");
+
+    attach_event();
+
+    //fileDecrypt();
+
+    //TGPDFPlugIn.ResizePlugin(0,0,0,0);
+}
+function getPluginObjcet(objname) {
+    if (!isIEBrowser()) {
+        if (document.embeds && document.embeds[objname])
+            return document.embeds[objname];
+    } else return document.getElementById(objname);
+}
+function attach_event() {
+    try {
+        TGPDFPlugIn.attachEvent("OnEventFinish", jsFire_TGPDFPlugInCallback);
+    }
+    catch (e) {
+        return false;
+    }
+    return true;
+}
+
+function jsFire_TGPDFPlugInCallback(eventID, errorCode, result) {
+    switch(eventID)
+    {
+        case 10101:
+            var $linkFather=$thisFatherLink;
+            var dataSize=$linkFather.data("size");
+            var dataName=($linkFather.data("name").toString()).split(".")[0];
+            var outInfo;
+            var outInfoLen;
+            TGPDFPlugIn.GetCurrentDocInfo(1, outInfo, outInfoLen); // 获取当前文件缓存路径
+
+            TGPDFPlugIn.CloseCurrentDoc();
+
+            if(tempPath){    // tempPath是临时文件
+//	     		var str=(tempPath.toString()).split("\");
+//	     	 	TGGovDocumentCtrl.GovDocDecrypt(tempPath, "C:\\Users\\Lina\\Desktop\\6_6.pdf");  // 解密文件
+                //var delJson=encodeURI("{method:'decryptPdf',tableKeyId:'${(meetingInfo.id)!}',name:'"+dataName+".tgw',size:'"+dataSize+"',userid:'${userid}',tableName:'oa_meeting_info'}");
+              var delJson=encodeURI("{method:'decryptPdf',tableKeyId:'${(documentSignFeedback.id)!}',name:'"+dataName+".tgw',size:'"+dataSize+"',userid:'${userid!}',tableName:'oa_document_sign_feedback'}");
+       
+              var location= "http://"+window.location.host+"/${base}/servlet/sealUploadServlet";
+              var destPath = tempPath.substring(0,tempPath.lastIndexOf("."))+"_temp.pdf";
+				
+				var Res = TGPDFPlugIn.DecodeDocument(tempPath, destPath, 0);
+                //var location= "http://192.168.102.133:8081/eden.exchange/servlet/sealUploadServlet";
+                TGPDFPlugIn.UploadFileToServer(location, tempPath, encodeURI(dataName+".pdf"), delJson);
+                window.location.reload();
+            }
+            break;
+        case 11201:
+        	tempPath = result;
+            ShowResultMessage("获取当前文件路径" + errorCode, result)
+            break;
+        case 11202:
+            
+            ShowResultMessage("文档缓存路径" + errorCode, result)
+            break;
+        case 11203:
+            ShowResultMessage("文档总页数" + errorCode, result)
+            break;
+        case 11204:
+            ShowResultMessage("文档当前页码" + errorCode, result)
+            break;
+        case 11205:
+            ShowResultMessage("签章个数" + errorCode, result)
+            break;
+        case 11206:
+            ShowResultMessage("签章信息字符串形式" + errorCode, result)
+            break;
+        case 11207:
+            ShowResultMessage("签章信息文件路径" + errorCode, result)
+            break;
+        case 11300:
+            SignContext = errorCode;
+            ShowResultMessage("签名环境", errorCode)
+            break;
+        case 12600:
+            ShowResultMessage("上传文件" + errorCode, result)
+            alert("解密完成!");
+            break
+        default:
+            if (eventID / 100 == 104) {
+                ShowResultMessage("签名结果" + errorCode, result)
+            }
+            break;
+    }
+}
+function ShowResultMessage(msg, result) {
+    var resultMsg = "";
+    try{
+        resultMsg = TGPDFPlugIn.GetErrorMsg(result);
+    }catch(e){
+
+    }
+}
+function isIEBrowser() {
+    return (navigator.appName.indexOf("Microsoft Internet") != -1);
+}
+//天谷控件结束
+  var project ="${base}";
+  var datas=[];
+  var url=project+"/admin/attachmentInfo/selectByTable.action";
+  var $tableKeyId="${documentSignFeedback.id!}";
+  //增加上传的文件
+  var addFileList=[];
+  //删除的文件
+  var delFileList=[];
+  $(function(){
+    if ($tableKeyId.length > 0) {
+      fileInit();
+    }
+    else{
+      $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+    }
+    $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+    newUploader = new plupload.Uploader({ //实例化一个plupload上传对象
+      runtimes : 'html5,silverlight,flash,html4',
+      browse_button :'upload_file',
+      url : project+"/servlet/uploadServlet",
+      max_file_size:"10M",
+      unique_names :true,
+      filters:[
+        {title : "允许上传的文件", extensions : "*"}
+      ],
+      flash_swf_url : project+'/form/resources/common/plupload/plupload.flash.swf'
+    });
+
+    newUploader.init(); //初始化
+    newUploader.bind('FilesAdded',function(uploader,files){//绑定文件添加进队列事件
+      newUploader.start(); //开始上传
+      for (var i = 0, max= files.length; i<max;i++) {
+        var uploadIsSame=true;
+        var addFileListIsSame=true;
+        for (var j= 0,jmanx=datas.length;j<jmanx;j++) {
+          if((datas[j].name)==(files[i].name)&&(datas[j].size)==(files[i].size)){
+            uploadIsSame=false;
+            break;
+          }
+        }
+        if (uploadIsSame) {
+          datas.push({
+            "createBy":"${Session.userid!}",
+            "createDttm": "",
+            "createDttm2": getNowFormatDate(),
+            "dataValid": files[i].dataValid,
+            "directoryId": files[i].directoryId,
+            "id": files[i].id,
+            "lastUpdateDttm": files[i].lastUpdateDttm,
+            "name": files[i].name,
+            "primaryKey": "",
+            "size": files[i].size,
+            "tableKey": "",
+            "tableKeyId": "",
+            "tableName": "",
+            "isMyself":true
+          });
+
+          //判断是否新增的文件已经存于  addFileList 过滤去重
+          for(var k= 0,kmax=addFileList.length;k<kmax;k++){
+            if((addFileList[k].name)==(files[i].name)&&(addFileList[k].size)==(files[i].size)){
+              addFileListIsSame=false;
+              break;
+            }
+          }
+          if(addFileListIsSame){
+            addFileList.push(JSON.stringify({
+              id: files[i].id,
+              name: files[i].name,
+              size: files[i].size,
+              remark: ""
+            }));
+          }
+        }
+        else{
+          window.parent.layer.msg("请勿上传已有的文件");
+        }
+      }
+      $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+
+    });
+
+    newUploader.bind('UploadProgress',function(uploader,file){//绑定文件上传进度事件
+      $('.'+file.id).find('.progress').find('.percent-bg').css('width',function(){
+        return file.percent+"%";
+      }).html(file.percent+"%");
+    });
+    newUploader.bind('UploadComplete',function(uploader,files){//附件上传完毕后
+      //$('#'+id+'_upload_list').find('.progress').remove();
+      // saveFile();
+    });
+    newUploader.bind('Error', function(up, err) {//上传失败
+      $('.'+err.file.id).remove();
+      layer.msg(err.file.name+"上传失败，请重新上传");
+      up.refresh();
+    });
+    //附件删除
+    $(document).on("click",".js-tr-delete",function(){
+      var delSame=true;
+      var index=parseInt($(this).data("index"));
+
+      for(var k= 0,kmax=delFileList.length;k<kmax;k++){
+        if((delFileList[k].name)==(datas[index].name)&&(delFileList[k].size)==(datas[index].size)){
+          delSame=false;
+          break;
+        }
+
+      }
+      if(delSame){
+        delFileList.push(JSON.stringify({
+          "id":datas[index].id,
+          "size":datas[index].size,
+          "name":datas[index].name
+        }));
+      }
+
+      datas.splice(index,1);
+
+      $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+    });
+    //下载
+    $(document).on("click",".js-tr-download",function(){
+      var $download=$(this).attr("href");
+      if($download.indexOf("javascript:")>-1){
+        window.top.layer.msg("先保存，才能下载");
+      }
+    });
+    
+  //解密
+    $(document).on("click",".js-unlock",function(){
+
+        $this=$(this);
+        $thisFatherLink=$this.closest(".js-link-father");
+        layer.msg("正在解密");
+        //var getAPath=($this.closest(".js-link-father").find(".js-a-path").attr("href")).split("path=");
+        var getAPath=($this.data("href")).split("path=");
+        // fileDecrypt();
+        var windowLocation=(window.location).toString();
+        var windowBase=windowLocation.split("admin")[0]
+        var location= "http://"+window.location.host+"${base}/admin/documentData/sealPdf.action?path="+getAPath[1];
+        TGPDFPlugIn.LoadPDF(encodeURI(encodeURI(location)));   // 加载服务器端加密文件
+    });
+    
+    
+    //关闭窗口
+    $(document).on("click","#draft__close",function(){
+    	var index=parent.layer.getFrameIndex(window.name);
+    	parent.layer.close(index);
+    });
+  });
+  
+  
+  function getNowFormatDate() {
+    var date = new Date();
+    var seperator1 = "-";
+    var seperator2 = ":";
+    var month = date.getMonth() + 1;
+    var strDate = date.getDate();
+    if (month >= 1 && month <= 9) {
+      month = "0" + month;
+    }
+    if (strDate >= 0 && strDate <= 9) {
+      strDate = "0" + strDate;
+    }
+    var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+            + " " + date.getHours() + seperator2 + date.getMinutes()
+            + seperator2 + date.getSeconds();
+    return currentdate;
+  }
+  //会议导入
+  function dataJason(){
+    var xmlData='{';
+    xmlData+='"addFileList":['+addFileList.join(",")+'],';
+    xmlData+='"delFileList":['+delFileList.join(",")+']';
+    xmlData+="}";
+    return xmlData;
+  }
+  function fileInit(){
+    $.ajax({
+      type: 'post',
+      url: url,
+      data: {
+        "tableName": "oa_document_sign_feedback",
+        "tableKey": "id",
+        "tableKeyId": $tableKeyId
+      },
+      dataType: 'json',
+      success: function (data) {
+        datas.length = 0;
+        if (data.result == "success") {
+          var message = data.message;
+          downloadsrc = data.path;
+
+          for (var i = 0, max = message.length; i < max; i++) {
+            if( message[i].remark=="1"){
+            	datas.push({
+                "createBy": message[i].createBy,
+                "createDttm": message[i].createDttm,
+                "createDttm2": message[i].createDttm2,
+                "dataValid": message[i].dataValid,
+                "directoryId": message[i].directoryId,
+                "id": message[i].id,
+                "lastUpdateDttm": message[i].lastUpdateDttm,
+                "name": message[i].name,
+                "path": downloadsrc + message[i].path,
+                "primaryKey": message[i].primaryKey,
+                "size": message[i].size,
+                "tableKey": message[i].tableKey,
+                "tableKeyId": message[i].tableKeyId,
+                "tableName": message[i].tableName,
+                "isMyself":(message[i].createBy)=="${Session.userid!}"?true:false
+              });
+            }
+            else{
+              datas.push({
+                "createBy": message[i].createBy,
+                "createDttm": message[i].createDttm,
+                "createDttm2": message[i].createDttm2,
+                "dataValid": message[i].dataValid,
+                "directoryId": message[i].directoryId,
+                "id": message[i].id,
+                "lastUpdateDttm": message[i].lastUpdateDttm,
+                "name": message[i].name,
+                "path": downloadsrc + message[i].path,
+                "primaryKey": message[i].primaryKey,
+                "size": message[i].size,
+                "tableKey": message[i].tableKey,
+                "tableKeyId": message[i].tableKeyId,
+                "tableName": message[i].tableName,
+                "isMyself":(message[i].createBy)=="${Session.userid!}"?true:false
+              });
+            }
+
+
+
+          }
+          $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+          // $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+        }
+
+
+      },
+      error: function () {
+      }
+    });
+
+  }
+  function closeWin(){
+    window.top.layer.closeAll();
+  }
+//已收批示反馈保存
+function instruction_feedbackSave(){
+  var xmldata = dataJason();
+	var instructionId = $('#instructionId').val();
+	var feedbackContent = $('#feedbackContent').val();
+
+	if(instructionId==""){
+		alert("此待收批示不存在");
+		return;
+	}
+	if(feedbackContent==""){
+		alert("请输入反馈内容");
+		$("#feedbackContent").focus();
+		return;
+	}
+  
+  var r=confirm("确定反馈吗？")
+  if (r==true){
+    	jQuery.post("${base}/admin/instruction/instructionFeedbackSave.action",
+              {
+		    		"instructionId":instructionId,
+			        "feedbackContent":feedbackContent,
+                    "fileJson":xmldata
+              },
+              function(data){
+              	alert(data.result);
+              }   //成功后返回的函数
+      ); 
+  }	
+}
+  
+</script>

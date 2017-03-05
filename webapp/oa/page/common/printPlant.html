@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html style="height: 100%;">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>eden</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <!-- jquery 框架 1.11 -->
+    <script src="${base}/edenui/common/js/jquery.js"></script>
+    <script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+    <script src="${base}/edenui/common/js/avalon/avalon2.js"></script>
+    <script>
+        /**
+         * 空：送印刷厂 1：专项事务，征求意见反馈
+         */
+        var $type=getUrlParam("type");
+        //参数配置表
+        avalon.config({debug: false});
+        var model = avalon.define({
+            $id: "wrap",
+            dataList: [],
+            allCheck:true,
+            listCheckOne:function(e){
+                var checked = e.target.checked;
+                if(checked===false){
+                    model.allCheck=false;
+                }
+                else{
+                    model.allCheck= model.dataList.every(function(value){
+                        return value.check;
+                    });
+                }
+            },
+            listCheckAll:function (e) {
+                var checked = e.target.checked;
+
+                if(checked){
+                    model.dataList.forEach(function(value){
+                        value.check=true;
+                    });
+                }
+                else{
+                    model.dataList.forEach(function(value){
+                        value.check=false;
+                    });
+                }
+
+
+            },
+            send:function(){
+                var result=model.dataList.filter(function(value){
+                    return  value.check
+                });
+
+                if(result.length){
+                     var ids=result.map(function(value){
+                         return value.id
+                     });
+
+                    if($type=="1"){
+                        var url ='${base}/admin/incoming/seekOpinionFeedback.action';
+                        var obj={
+                            'wfId':window.top.globalParams.wfid,
+                            'attacheds':ids.join(("|"))
+                        }
+                        $.post(url,obj,function (data) {
+                            layer.msg(data.message);
+                            setTimeout(function () {
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                            }, 500);
+                        });
+
+                    }else{
+                        var url ='${base}/admin/wfManage/directSend.action';
+                        var obj = {
+                            'step_id': '1647',
+                            'wf_id': window.top.globalParams.wfid,
+                            'flowXml': window.top.doSubmitDataOa(),
+                            'action_id': window.top.globalParams.actionId,
+                            'todo': 'sendPrintCenter',
+                            'dynamic_instance_id': window.top.globalParams.dynamicInstanceId,
+                            'fileIds':ids.join((","))
+                        }
+                        $.post(url, obj, function (data) {
+                            layer.msg("发送成功！");
+                            setTimeout(function () {
+                                window.top.close();
+                            }, 500);
+                        })
+                    }
+
+
+
+                }else{
+                    layer.msg("请至少选择一个文件");
+                }
+
+            },
+            noData:false,
+            noRecord: "加载中..."
+        });
+
+        var page = (function () {
+            var obj = {
+                init: function () {
+                    this.getDataList();
+                },
+                loadStart: function () {
+                    var index = layer.load(2, {
+                        // shade: [0.5, '#000']
+                        //scrollbar: false //0.1透明度的白色背景
+                    });
+                    setTimeout(function () {
+                        obj.loadEnd();
+                    }, 2000);
+                },
+                loadEnd: function () {
+                    layer.closeAll('loading');
+                },
+                getDataList: function () {
+                    page.loadStart();
+                    var url = "${base}/admin/attachmentInfo/selectByTable.action",
+                            obj = {
+                                "tableName": "oa_document_attachment",
+                                "tableKey": "id",
+                                "tableKeyId": window.parent.document.getElementById('filePageId').contentWindow.$tableKeyId
+                            },
+                            dataList = [];
+                    $.post(url, obj, function (data) {
+                        page.loadEnd();
+
+                        if (data.result == "success") {
+
+                            if (data.message.length) {
+
+                                data.message.forEach(function (value) {
+                                    if (value.remark == "1" || value.remark == "2" || value.remark == "3" || value.remark == "4" 
+                                    	|| value.remark == "5" || value.remark == "-1") {
+                                        dataList.push({
+                                            "name": value.name,
+                                            "createTime": value.createDttm2,
+                                            "path": value.path,
+                                            "id": value.id,
+                                            "size": value.size,
+                                            "username": value.username,
+                                            "check":true
+                                        });
+                                    }
+                                });
+
+                                model.dataList = dataList;
+                            }else{
+                                model.noData=true;
+                            }
+
+                        }else{
+                            model.noData=true;
+                        }
+
+                        if(model.dataList.length<1){
+                            model.noData=true;
+                        }
+
+
+                    })
+                }
+            }
+            return obj
+        })();
+        $(function () {
+
+            page.init();
+
+        });
+
+
+        // 获取参数列表
+        function getUrlParam(name) {
+
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)return unescape(r[2]);
+            return null;
+
+        }
+
+    </script>
+</head>
+<body class="ms-controller padding-bottom" ms-controller="wrap">
+<table class="bsgrid oa-form-grid oa-form-attachment"
+       style="width:680px!important;margin: 0 auto!important;margin-top: 60px!important;">
+    <tr style="border-bottom:0">
+        <th width="40">
+            <input type="checkbox" data-duplex-changed="@listCheckAll" ms-duplex-checked="@allCheck" width="40"/>
+        </th>
+        <th width="40">序号</th>
+        <th>文件名称</th>
+        <th width="100">上传用户</th>
+        <th width="150">上传时间</th>
+    </tr>
+    <tr class="" ms-for="($index,el) in @dataList">
+        <td>
+            <input type="checkbox" data-duplex-changed="@listCheckOne" ms-duplex-checked="el.check"  />
+        </td>
+        <td>{{$index+1}}</td>
+        <td ms-attr="{title:el.name}">{{el.name}}</td>
+        <td ms-attr="{title:el.username}">{{el.username}}</td>
+        <td ms-attr="{title:el.createTime}">{{el.createTime}}</td>
+    </tr>
+    <tr ms-if="@noData">
+        <td colspan="5"  style="text-align: center;">暂无数据</td>
+    </tr>
+</table>
+<div class="text-center margin-large-top">
+    <button class="button button-main" ms-click="@send()">发送</button>
+</div>
+</body>
+</html>

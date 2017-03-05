@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>eden</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+    <style>
+        .no-advice {
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+            padding-top: 47px;
+        }
+        .ke-edit-iframe {
+            padding: 20px 0 0 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="form-input-selection js-form-input-selection">
+    <div class="form-input-selection-content js-selection-content">
+        <div class="selection-content on" style="display: block;">
+            <div class="mixed-input">
+                <div class="clearfix">
+                    <div class="mixed-input-left">
+                        <div class="mixed-input-header">常用意见</div>
+                        <div class="mixed-body js-person-advice " id="person_advice">
+                            <#if  hisAdvice?? && (hisAdvice?size>0)>
+                                <ul class="mixed-body-ul js-mixed-ul" id="person_ul" data-mixed=1>
+                                    <#list hisAdvice! as entry>
+                                        <li class="" title="${entry.content!}">${entry.content!}<i
+                                                class="li-close icon-times js-li-close" title="删除"
+                                                id="${entry.id!}"></i></li>
+                                    </#list>
+                                </ul>
+                                <#else>
+                                    <div class="no-advice">暂无常用意见</div>
+                            </#if>
+                        </div>
+                    </div>
+                    <div class="mixed-input-right">
+                        <div class="mixed-input-header">个人意见</div>
+                        <div class="mixed-body js-person-advice" id="hisroty_advice">
+                            <#if  myAdvice?? && (myAdvice?size>0)>
+                                <ul class="mixed-body-ul js-mixed-ul" id="hisroty_ul" data-mixed=1>
+                                    <#list myAdvice! as entry>
+                                        <li class="" title="${entry.content!}">${entry.content!}<i
+                                                class="li-close icon-times js-li-close" title="删除"
+                                                id="${entry.id!}"></i></li>
+                                    </#list>
+                                </ul>
+                                <#else>
+                                    <div class="no-advice">暂无个人意见</div>
+                            </#if>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clear-content mixed-clear-content js-clear-content" data-style=1>清空</div>
+            <div class="mixed-content-result js-mixed-content-result">
+                <textarea class="computer-input" id="adviceArea"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="form-footer">
+        <div class="form-input-selection-sure" id="is_person_advice">加入个人意见</div>
+        <div class="form-input-selection-sure " id="selection_sure">确定</div>
+    </div>
+</div>
+<!-- jquery 框架 1.11 -->
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/form/resources/common/js/edenApi.js"></script>
+<script>
+    var father = window.parent;
+    var project = "${base}";
+    var $inputAdvice = father.inputAdviceObj;
+    var obj = $inputAdvice.adviceContent;
+    var $adviceType = obj.closest("td").data("type");
+    var $adviceId = obj.closest("td").attr("id");
+    var $style = $inputAdvice.style;
+    var $wfid = father.$urlParam("wfId");
+    var $fileName = "wfId" + $wfid + new Date().getTime();
+    var windowLocation = (window.location).toString();
+    var windowBase = windowLocation.split("admin")[0];
+
+    var page = (function () {
+        var result = {
+            init: function () {
+                this.textAreaHtml();
+            },
+            textAreaHtml: function () {
+                if (parseInt($inputAdvice.isImg) < 1) {
+                    $("#adviceArea").val($inputAdvice.content.replace(/<br>/g, "\n").replace(/<BR>/g, "\n"));
+                }
+                $("#adviceArea").focus();
+            }
+        }
+        return result
+    })();
+
+    $(function () {
+        page.init();
+        $("#is_person_advice").click(function () {
+            var adviceHmtl = $("#adviceArea").val().replace(/\n/g, "<br>");
+            var $personAdvice = commonApi.trimAll(adviceHmtl);
+            if ($personAdvice.length < 1) {
+
+                layer.msg('加入个人意见不能为空');
+                return;
+            }
+
+
+            var adviceUrl = project + "/admin/documentData/addCommonAdvice.action";
+            $.post(adviceUrl, {
+                "commonAdvice.content": $personAdvice,
+                "commonAdvice.wfName": father.$urlParam("wfName"),
+                "commonAdvice.type": "2"
+            }, function (data) {
+                var $ul = $("#hisroty_advice ul");
+                if ($ul.length < 1) {
+                    $("#hisroty_advice").html("<ul class='mixed-body-ul js-mixed-ul' id='person_ul' data-mixed=1></ul>");
+                }
+                $("#hisroty_advice ul").prepend("<li title='" + (data.datas.content) + "' class=''>" + (data.datas.content) + "<i class='li-close icon-times js-li-close' title='删除' id='" + (data.datas.id) + "'></i></li>");
+                layer.msg("加入个人意见成功");
+            });
+
+        });
+
+
+        $(document).on("click", "#person_ul li,#hisroty_ul li", function () {
+            var $this = $(this),
+                    $content = $this.text();
+            $this.addClass("on").siblings().removeClass("on");
+            $("#adviceArea").val($content);
+        });
+
+        $(document).on("click", "#person_ul li .js-li-close,#hisroty_ul li .js-li-close", function (event) {
+            event.stopPropagation();
+            var $this = $(this);
+            var $ulId = $this.closest("ul").attr("id");
+            var $advice = $this.closest(".js-person-advice");
+            $.post(project + '/admin/documentData/deleteCommonAdvice.action?' + new Date().getTime(), {'id': $this.attr("id")}, function () {
+                $this.closest("li").remove();
+                layer.msg("已删除");
+                if ($("#" + $ulId + " li").length < 1) {
+                    $advice.html("<div class='no-advice'>暂无个人意见</div>");
+                }
+            })
+        });
+
+        //清空输入内容
+        $(".js-clear-content").click(function () {
+            $("#adviceArea").val('');
+        });
+
+        //确定关闭框框
+        $("#selection_sure").click(function () {
+            //加入个人意见
+            var adviceHmtl = $("#adviceArea").val().replace(/\n/g, "<br>");
+            var $personAdvice = commonApi.trimAll(adviceHmtl);
+            //填入的时候
+            if ($style == "1") {
+                if (obj.find(".js-leader-advice").length < 1) {
+                    obj.html("");
+                }
+            }
+            var inputText = commonApi.trimAll(adviceHmtl);
+            var active = $(".js-tab-ul li");
+            var $con;
+            //编辑的时候
+            if ($style == "2") {
+                var $id = $.trim(obj.attr("id"));
+                var surl = project + "/admin/documentData/editDocumentAdvice.action?" + (new Date().getTime());
+            }
+            $con = inputText;
+            //收文流程和发文流程，可以添加空意见
+            if (window.top.globalParams.djsn == "oa_pg_incoming_form" || window.top.globalParams.djsn == "oa_send_document") {
+
+            } else {
+                if ($con.length < 1) {
+                    layer.msg('意见不能为空');
+                    return;
+                }
+            }
+
+            //填入的时候
+            if ($style == "1") {
+                var adviceSurl = project + "/admin/documentData/addDocumentAdvice.action";
+                var adviceContentData = [];
+                var adviceTimeId = "advice" + ((new Date).getTime());
+                adviceContentData.push({
+                    "adviceType": $adviceType,
+                    "adviceId": adviceTimeId,
+                    "adviceContent": $con
+                });
+                $.post(adviceSurl, {
+                    "wfId": $wfid, contentData: JSON.stringify(adviceContentData), "wfName": father.$urlParam("wfName"),
+                    "commonAdvice.content": $personAdvice,
+                    "commonAdvice.wfName": father.$urlParam("wfName"),
+                    "commonAdvice.type": '1',
+                    "accountName": (window.top.globalParams.loginName),
+                    "dynamicInstanceId": father.$urlParam("dynamicInstanceId")
+                }, function (data) {
+                    var resultData = data.datas[0],
+                            dataId = resultData.id,
+                            dataName = resultData.userName;
+                    obj.append("<div class='js-leader-advice' data-style='word' data-advice='" + adviceTimeId + "' id='" + dataId + "' data-user=''><p class='js-leader-advice-content' style=''><span>" + $con + "</span><i class='js-leader-advice-del icon-trash-o'></i><i class='icon-edit js-leader-advice-edit'></i></p><p class='js-leader-advice-last' >" + dataName + "&nbsp;" + commonApi.getCommonTime(resultData.createDttm) + "</p></div>");
+                    father.updateAddInfor($adviceId);
+                    father.closeWin("dhxPop");
+                });
+            }
+            //编辑的时候
+            else if ($style == "2") {
+                if ($id.length > 1) {
+                    var $accountName = "";
+                    if (window.top.globalParams.djsn == "oa_leader_instruction_form" && window.top.globalParams.wfName == "oa_leader_instruction") {
+                        if ($adviceId == "todoAdvice" && window.top.globalParams.nodeName == "secretariat_deputy_director") {
+                            $accountName = (window.top.globalParams.loginName);
+                        }
+                    }
+                    $.post(surl, {
+                        'id': $id,
+                        'adviceContent': $con,
+                        "wfName": father.$urlParam("wfName"),
+                        "checked": $("#is_person_advice").prop("checked"),
+                        "commonAdvice.content": $personAdvice,
+                        "commonAdvice.wfName": father.$urlParam("wfName"),
+                        "accountName": $accountName
+                    }, function (data) {
+                        if (data.result == "success") {
+                            window.parent.layer.msg(data.message);
+                            obj.find('.js-leader-advice-content span').html($con);
+                            //领导批示审批意见
+                            if (window.top.globalParams.djsn == "oa_leader_instruction_form" && window.top.globalParams.wfName == "oa_leader_instruction") {
+                                if ($adviceId == "todoAdvice" && window.top.globalParams.nodeName == "secretariat_deputy_director") {
+                                    var $time = obj.data("time");
+                                    obj.find('.js-leader-advice-last').html(window.top.globalParams.loginChineseName + "&nbsp;" + $time);
+                                }
+                            }
+                            father.updateAddInfor($adviceId);
+                            father.closeWin("dhxPop");
+                        }
+                        else {
+                            window.parent.layer.msg("修改失败");
+                        }
+                    });
+                }
+                else {
+                    obj.find('.js-leader-advice-content span').html($con);
+                    window.parent.layer.msg("修改成功");
+                }
+            }
+        });
+    })
+
+
+    //个人意见加入
+    function personAdvice() {
+        var adviceHmtl = $("#adviceArea").val().replace(/\n/g, "<br>");
+        var $personAdvice = commonApi.trimAll(adviceHmtl);
+        if ($personAdvice.length < 1) {
+            layer.msg('加入个人意见不能为空');
+            return;
+        }
+        var adviceUrl = project + "/admin/documentData/addCommonAdvice.action";
+        $.post(adviceUrl, {
+            "commonAdvice.content": $personAdvice,
+            "commonAdvice.wfName": father.$urlParam("wfName")
+        }, function (data) {
+        });
+    }
+</script>
+</body>
+</html>

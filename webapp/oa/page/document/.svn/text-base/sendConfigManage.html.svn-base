@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+	<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+</head>
+<body>
+<div class="">
+	<div id="save_btn" class="button common-skin-btn-syle01 margin-small">保存</div>
+</div>
+<div class="oa-form-set-box">
+	<div id="form_add" class="oa-form-set"></div>
+</div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src ="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+
+
+	var $choice;
+	$(function(){
+        setTimeout(page_layout, 0);
+    })
+   
+    function afterSave(){
+	    setTimeout(function(){
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+    }
+	$(function(){
+		$(document).on("click",".js-btn-choice",function(){
+			$choice=$(this).closest(".field-right").find("textarea");
+			var $text=$(this).closest(".field").find(".field-left").text();
+			var win = {text:$text, url:"${base}/admin/myGroup/commonPerChoice.action",width:'900',height:'550', id:"addDocumentSerialNumberWin",'parentIfr':window};
+			window.top.createWindow(win);
+		});
+		 $('#form_add').loadForm({
+			 formInputs: [
+				<#list dataList as dataDict>  
+				 {	 type: 'textareaInput', attr: {
+						 placeholder: '',
+						 style:'x12',
+						 infor: '${dataDict.displayName}',
+						 id: '${dataDict.dictId}',
+						 data:'1',					  
+						 name:'dictMap.${dataDict.dictId}',
+						 value:'${dictMap.get(dataDict.dictId)}'
+				 	}
+				 },
+				 </#list>	
+			 	 
+			 ],
+			 buttons:[]
+		 })	
+		init();
+	$(document).on("click","#save_btn",function(){
+		submit();
+	});
+
+	})
+
+	function init(){
+		$("#document_send_all_reader").closest(".field-right").append("<div class='btn-right js-btn-choice'><span>选择</span></div>");
+		$("#document_send_sigh_leader").closest(".field-right").append("<div class='btn-right js-btn-choice'><span>选择</span></div>");
+		$("#document_send_secretary_reader").closest(".field-right").append("<div class='btn-right js-btn-choice'><span>选择</span></div>");
+
+		$(".form-group").each(function(){
+			var $this=$(this);
+			var $fieldLeft=$this.find(".field-left"),
+							$fieldRight=$this.find(".field-right");
+			$this.find(".field").width($this.width());
+			$fieldRight.width($this.width()-$fieldLeft.width());
+		});
+
+	}
+	function submit(form) {		
+		var url = "${base}/admin/documentDict/sendConfigSave.action";
+		$.post(url, $("form:first").serialize(), function (result) {
+		 	if(result.resultFlag=='true'){					
+		 	}
+		 	layer.msg(result.message);
+		 });
+	}
+	
+	$(window).resize(function(){
+		 setTimeout(page_layout, 0);
+	});
+	
+	function page_layout() {
+	    var ifr_width = $(window).width();
+	    $('#set_bg_image').width(ifr_width-50);
+	}
+
+
+</script>
+</html>

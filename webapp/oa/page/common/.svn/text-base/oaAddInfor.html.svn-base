@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+</head>
+<body>
+<div id="form_add" class="line oa-form-line">
+    <div class="form-group margin-large-top x12 check-success">
+        <div class="field">
+            <label class="field-left text-right">初核人
+                <i class="" style="color: red;">*</i>
+            </label>
+            <div class="field-right" style="position: relative;">
+            <input  type="text" class="input"  value="" id="audit_man">
+         	<button onclick="selectPerson(1)"  class="button button-main" style="position:absolute;top:50%;margin-top:-13px;right:10px;">选择</button>
+        </div>
+        </div>
+    </div>
+    <div class="form-group margin-large-top x12 check-success">
+        <div class="field">
+            <label class="field-left text-right">签发人
+                <i class="" style="color: red;">*</i>
+            </label>
+            <div class="field-right" style="position: relative;">
+            <input  type="text" class="input" value="" id="sign_man">
+            <button onclick="selectPerson(2)" class="button button-main button-lg" style="position:absolute;top:50%;margin-top:-13px;right:10px;">选择</button>
+        </div>
+        </div>
+    </div>
+    <div class="form-group form-group-footer x12 text-center">
+        <div id="save_btn" class="button button-main button-lg">保存</div>
+    </div>
+</div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script>
+
+  var $top=$(window.top.document);
+    $(function(){
+        init();
+        $("#save_btn").click(function(){
+            var $bengin=$("#audit_man"),
+                $issue=$("#sign_man");
+            
+            if($bengin.val().length<1){
+                layer.msg("初核人不能为空!");
+                return;
+            }
+            if($issue.val().length<1){
+                layer.msg("签发人不能为空!");
+                return;
+            }
+
+            $top.find("#AUDIT_MAN").val($("#audit_man").val());
+            $top.find("#SIGN_MAN").val($("#sign_man").val());
+
+            setTimeout(function () {
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+            },500);
+            window.top. oa_wf_tempSave("dataset2");
+
+
+        });
+        
+
+    });
+
+    function selectPerson(type){
+    	var person = '';
+    	if(type =='1'){
+    		person = $("#audit_man").val();
+    	}else if(type == '2'){
+    		person = $("#sign_man").val();
+    	}
+    	var passUrl = "${base}/admin/documentPassRead/selectPerson.action?type="+type+"&person="+window.encodeURI(encodeURI(person));
+    	window.top.addInfor = window.name;
+    	 window.top.createWindow({
+             text: '选择人员',
+             url: passUrl,
+             id: 'dhxPop',
+             width: '900',
+             height: '550',
+             callBack: function (val, text) {
+             }
+         });
+    }
+    
+    function init(){
+        $("#audit_man").val($top.find("#AUDIT_MAN").val());
+        $("#sign_man").val($top.find("#SIGN_MAN").val());
+    }
+
+
+
+</script>
+</html>

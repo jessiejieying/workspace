@@ -1,0 +1,4035 @@
+﻿
+/* 防止用户自定义背景颜色对网页的影响，添加让用户可以自定义字体 */
+html {
+  color: #000;
+  background: #fff;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+
+}
+
+
+/* 内外边距通常让各个浏览器样式的表现位置不同 */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td, hr, button, article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  outline: none;
+}
+
+/* 重设 HTML5 标签, IE 需要在 js 中 createElement(TAG) */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+/* HTML5 媒体文件跟 img 保持一致 */
+audio, canvas, video {
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+}
+
+/* 要注意表单元素并不继承父级 font 的问题 */
+body, button, input, select, textarea {
+  //font: 12px/1.5 \5FAE\8F6F\96C5\9ED1, \5b8b\4f53;
+}
+
+input, select, textarea {
+  font-size: 100%;
+}
+
+textarea {
+  resize: none;
+}
+
+/* 去掉各Table  cell 的边距并让其边重合 */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* IE bug fixed: th 不继承 text-align*/
+th {
+  text-align: inherit;
+}
+
+/* 去除默认边框 */
+fieldset, img {
+  border: 0;
+}
+
+/* ie6 7 8(q) bug 显示为行内表现 */
+iframe {
+  display: block;
+}
+
+/* 去掉 firefox 下此元素的边框 */
+abbr, acronym {
+  border: 0;
+  font-variant: normal;
+}
+
+/* 一致的 del 样式 */
+del {
+  text-decoration: line-through;
+}
+
+address, caption, cite, code, dfn, em, th, var {
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* 去掉列表前的标识, li 会继承 */
+ol, ul, li {
+  list-style: none;
+}
+
+/* 对齐是排版最重要的因素, 别让什么都居中 */
+caption, th {
+  text-align: left;
+}
+
+/* 来自yahoo, 让标题都自定义, 适应多个系统应用 */
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+  font-weight: 500;
+}
+
+q:before, q:after {
+  content: '';
+}
+
+/* 统一上标和下标 */
+sub, sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+/* 让链接在 hover 状态下显示下划线 */
+a:hover {
+  text-decoration: underline;
+}
+
+/* 默认不显示下划线，保持页面简洁 */
+ins, a {
+  text-decoration: none;
+}
+
+/* 清理浮动 */
+.fn-clear:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+
+.fn-clear {
+  zoom: 1; /* for IE6 IE7 */
+}
+
+/* 隐藏, 通常用来与 JS 配合 */
+body .fn-hide {
+  display: none;
+}
+
+/* 设置内联, 减少浮动带来的bug */
+.fn-left, .fn-right {
+  display: inline;
+}
+
+.fn-left {
+  float: left;
+}
+
+.fn-right {
+  float: right;
+}
+
+.fn-center {
+  margin: 0 auto;
+}
+
+.loading_1 {
+  background: url(../images/loading_1.gif) no-repeat 0 0;
+  width: 40px;
+  height: 40px;
+}
+
+.aui_state_focus {
+  display: none;
+}
+
+.aui_state_noTitle {
+  display: block;
+}
+
+.aui_state_lock {
+  display: block;
+}
+
+/*
+	@名称:form
+	@功能:表单样式
+*/
+
+/*默认表单元素样式*/
+.ef_label {
+  font-size: 12px;
+}
+
+.ef_button {
+  border: 0;
+  background-color: #6F99D4;
+  color: #fff;
+  cursor: pointer;
+}
+
+.ef_button:hover {
+  border: 0;
+  background-color: #3ea7ed;
+  color: #fff;
+}
+
+.ef_button2 {
+  background-color: #E1E1E1;
+  color: #000;
+  cursor: pointer;
+  border-left: #CCC solid 1px;
+  border-top: #CCC solid 1px;
+  border-right: #666 solid 1px;
+  border-bottom: #666 solid 1px;
+}
+
+.ef_button2:hover {
+  border-left: #CCC solid 1px;
+  border-top: #CCC solid 1px;
+  border-right: #666 solid 1px;
+  border-bottom: #666 solid 1px;
+  background-color: #fff;
+  color: #646464;
+}
+
+.ef_button3 {
+  background-color: #E55302;
+  color: #fff;
+  cursor: pointer;
+  border-left: 0px;
+  border-top: 0px;
+  border-right: #3C3C3C solid 1px;
+  border-bottom: #3C3C3C solid 1px;
+}
+
+.ef_button3:hover {
+  border-left: 0px;
+  border-top: 0px;
+  border-right: #282426 solid 1px;
+  border-bottom: #282426 solid 1px;
+  background-color: #FFB504;
+  color: #282426;
+}
+
+.ef_button_icons {
+  text-indent: 20px;
+}
+
+.ef_text {
+  border: #A5AEB6 solid 1px;
+  height: 36px;
+}
+
+.ef_textarea {
+  border: #A5AEB6 solid 1px;
+}
+
+.ef_out {
+  position: absolute;
+  left: -3000px;
+}
+
+.ef_table {
+  border: #64A9D7 solid 1px;
+  border-collapse: collapse;
+}
+
+.ef_table td {
+  border-right: 1px solid #64A9D7;
+  border-bottom: 1px solid #64A9D7;
+  font-size: 12px;
+  padding: 3px;
+  color: #4f6b72;
+}
+
+.ef_div {
+  background: none !important;
+}
+
+/*表单设计grid控件样式*/
+.ef_design_grid {
+  border: #64A9D7 solid 1px;
+  background: #fff url(../images/ef_designer_webgrid.png) no-repeat 0px 0px;
+}
+
+/*表单设计upload控件样式*/
+.ef_design_upload {
+  border: #cecece solid 1px;
+  background: #fff url(../images/ef_run_upload.png) no-repeat 0px 0px;
+  width: 380px;
+}
+
+/*表单设计editor控件样式*/
+.ef_design_editor {
+  border: #ccc solid 1px;
+  background: #fff url(../images/ef_designer_editor.png) no-repeat 0px 0px;
+  width: 380px;
+}
+
+/*表单设计tree控件样式*/
+.ef_design_tree {
+  border: #64A9D7 solid 1px;
+  background: #fff url(../images/ef_designer_tree.png) no-repeat 0px 0px;
+}
+
+/*表单设计tree控件*/
+.ef_design_dropdownlist {
+  background: #fff url(../images/ef_design_dropdownlist.gif) no-repeat right center;
+  border: 1px solid #cecece;
+}
+
+.run .ef_design_grid, .run .ef_design_dropdownlist {
+  background: none;
+  display: none;
+}
+
+.run .ef_design_upload {
+  background: none;
+}
+
+.run .ef_design_editor {
+  background: none;
+  border: 0px;
+}
+
+/*表单设计layout控件*/
+/*.ef_design_layout{background:#fff url(../images/ef_designer_layout.png) no-repeat right top;}*/
+
+/* 表单设计页签控件 tab */
+.dynamic-tab-pane-control .tab-pane {
+  position: relative;
+  width: 100%; /* width needed weird IE bug */
+  margin-right: -2px; /* to make room for the shadow */
+}
+
+.dynamic-tab-pane-control .tab-row .tab {
+  width: 90px;
+  height: 25px;
+  background: #9D9D9D;
+  position: relative;
+  top: 0;
+  display: inline;
+  float: left;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 1px 1px 1px 2px;
+  border: 0;
+  color: #fff;
+  z-index: 1;
+  font-size: 12px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.dynamic-tab-pane-control .tab-row .tab a {
+  font-size: 12px;
+  color: #fff;
+  text-decoration: none;
+  line-height: 25px;
+  display: block;
+}
+
+.dynamic-tab-pane-control .tab-row .tab a:hover {
+  background: #D7D7D7;
+}
+
+.dynamic-tab-pane-control .tab-row .tab.selected {
+  background: #64A9D7;
+  z-index: 3;
+}
+
+.dynamic-tab-pane-control .tab-row .tab.selected a {
+  cursor: default;
+  background: #64A9D7;
+}
+
+.dynamic-tab-pane-control .tab-row .tab.selected a:hover {
+  background: #64A9D7;
+}
+
+.dynamic-tab-pane-control .tab-page {
+  border: 1px solid #64A9D7;
+  background: #fff;
+  padding: 0px;
+}
+
+.dynamic-tab-pane-control .tab-row {
+  z-index: 1;
+  white-space: nowrap;
+}
+
+div.tab-pane1 .dynamic-tab-pane-control .tab-row .tab {
+  background-color: #9D9D9D;
+  border: 0;
+  color: #fff;
+  font-size: 12px;
+}
+
+div.tab-pane1 .dynamic-tab-pane-control .tab-row .tab.selected {
+  background-color: #64A9D7;
+}
+
+div.tab-pane1 .dynamic-tab-pane-control .tab-page {
+  border-top: 1px solid #64A9D7;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  background-color: #fff;
+  padding: 0px;
+}
+
+div.tab-pane2 .dynamic-tab-pane-control .tab-row .tab {
+  background-color: #ccc;
+  border: 0;
+  color: #fff;
+  font-size: 12px;
+}
+
+div.tab-pane2 .dynamic-tab-pane-control .tab-row .tab.selected {
+  background-color: #fff;
+  border-top: #686868 solid 1px;
+  border-left: #686868 solid 1px;
+  border-right: #686868 solid 1px;
+  height: 24px;
+  color: #000;
+}
+
+div.tab-pane2 .dynamic-tab-pane-control .tab-page {
+  border-top: 1px solid #686868;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  background-color: #fff;
+  padding: 0px;
+}
+
+div.tab-pane3 .dynamic-tab-pane-control .tab-row .tab {
+  background-color: #fff;
+  border: 0;
+  color: #949494;
+  font-size: 12px;
+}
+
+div.tab-pane3 .dynamic-tab-pane-control .tab-row .tab.selected {
+  background-color: #848484;
+  color: #fff;
+}
+
+div.tab-pane3 .dynamic-tab-pane-control .tab-page {
+  border-top: 1px solid #848484;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  background-color: #fff;
+  padding: 0px;
+}
+
+/* 输出页签控件 tab */
+.tab-pane .tab_header {
+  line-height: 25px;
+  height: 25px;
+  li{
+    float: left;
+    margin-left: 5px;
+    cursor: pointer;
+    width: 90px;
+    height: 25px;
+    background-color: #9D9D9D;
+    overflow: hidden;
+    border: 0;
+    color: #fff;
+    font-size: 12px;
+    white-space: nowrap;
+    text-align: center;
+    .on{
+      background-color: #64A9D7;
+    }
+  }
+}
+
+.tab-pane .tab {
+  display: none;
+}
+
+
+
+.tab-pane .tab-page {
+  display: none;
+  clear: both;
+  border: 1px solid #64A9D7;
+  background: #fff;
+  position: relative;
+  padding: 0px;
+}
+
+.tab-pane .on {
+  display: block;
+}
+
+div.tab-pane1 .tab_header li {
+  background-color: #9D9D9D;
+  border: 0;
+  color: #fff;
+  font-size: 12px;
+  .on {
+    background-color: #64A9D7;
+  }
+
+}
+
+
+
+div.tab-pane1 .tab-page {
+  border-top: 1px solid #64A9D7;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  background-color: #fff;
+  padding: 0px;
+}
+
+div.tab-pane2 .tab_header li {
+  background-color: #ccc;
+  border: 0;
+  color: #fff;
+  font-size: 12px;
+}
+
+div.tab-pane2 .tab_header li.on {
+  background-color: #fff;
+  border-top: #686868 solid 1px;
+  border-left: #686868 solid 1px;
+  border-right: #686868 solid 1px;
+  height: 24px;
+  color: #000;
+}
+
+div.tab-pane2 .tab-page {
+  border-top: 1px solid #686868;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  background-color: #fff;
+  padding: 0px;
+}
+
+div.tab-pane3 .tab_header li {
+  background-color: #fff;
+  border: 0;
+  color: #949494;
+  font-size: 12px;
+  .on {
+    background-color: #848484;
+    color: #fff;
+  }
+}
+
+
+
+div.tab-pane3 .tab-page {
+  border-top: 1px solid #848484;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  background-color: #fff;
+  padding: 0px;
+}
+
+.run .tab-pane {
+  overflow: hidden;
+}
+
+.run .tab-page {
+  display: block;
+  overflow: hidden;
+  position: absolute;
+  left: -9999px;
+}
+
+.run .tab-pane .on {
+  left: 0px;;
+}
+
+.run .tab-pane .tab_header li {
+  margin-left: 5px;
+}
+
+/*新添加到报表运行后的图片类和eform不分皮肤颜色的图片类*/
+.eb_excelone {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -1840px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.eb_exppdf {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -1856px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_find {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -1876px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_firstpage {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -1896px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_lastpage {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -1916px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_nextpage {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -1936px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_pageset {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -1956px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_prevpage {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -1976px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_print {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -1996px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_printall {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2016px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_printdirect {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2036px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.eb_refresh {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2056px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.ef_button_date1 {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2076px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.ef_button_date {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2096px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.ef_open_list1 {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2116px;
+  height: 22px;
+  padding-left: 24px;
+}
+
+.ef_open_list {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2138px;
+  height: 22px;
+  padding-left: 24px;
+}
+
+.ef_open_up {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2160px;
+  height: 25px;
+  padding-left: 27px;
+}
+
+.ef_run_button_color {
+  background: url(../icons/design/ef_button_color.png) no-repeat center center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+}
+
+.ef_run_button_down {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2205px;
+  height: 18px;
+  padding-left: 20px;
+}
+
+.ef_run_button_font {
+  background: url(../icons/design/ef_button_font.png) no-repeat center center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+}
+
+.ef_run_button_notbg {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2323px;
+  height: 20px;
+  padding-left: 23px;
+}
+
+.ef_run_button_up {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2423px;
+  height: 18px;
+  padding-left: 20px;
+}
+
+.ef_run_down {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2441px;
+  height: 10px;
+  padding-left: 16px;
+}
+
+.ef_run_grid_checked {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2451px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.ef_run_grid_gou {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2467px;
+  height: 20px;
+  padding-left: 10px;
+}
+
+.ef_run_grid_uncheck {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2487px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.ef_run_up {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2503px;
+  height: 10px;
+  padding-left: 16px;
+}
+
+.cmdlogin-over {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2513px;
+  height: 21px;
+  padding-left: 68px;
+  width: 66px;
+  border: 0px;
+}
+
+.cmdlogin {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2534px;
+  height: 21px;
+  padding-left: 68px;
+  width: 66px;
+  border: 0px;
+}
+
+/*树控件图片和定位方式图片*/
+.ef_design_static {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2630px;
+  height: 20px;
+  padding-left: 22px;
+}
+
+.ef_tree_blank {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2650px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_tree_close {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2672px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.ef_tree_file {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2688px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.ef_tree_I {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2704px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_tree_L {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2726px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_tree_Lminus {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2748px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_tree_Lplus {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2770px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_tree_open {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2792px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.ef_tree_Rminus {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2808px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_tree_root {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2830px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.ef_tree_Rplus {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2846px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_tree_T {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2868px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_tree_Tminus {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2890px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_tree_Tplus {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2912px;
+  height: 22px;
+  padding-left: 18px;
+}
+
+.ef_design_menuline {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2934px;
+  padding-left: 4px;
+}
+
+.zk_big {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2934px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.zk_small {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2950px;
+  height: 17px;
+  padding-left: 18px;
+}
+
+.zk_title {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2967px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.ef_run_grid_checkdisabled {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2983px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+.ef_run_grid_uncheckdisabled {
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2999px;
+  height: 16px;
+  padding-left: 18px;
+}
+
+/*------------------------------------放工具栏按钮组的table--------------------------*/
+.buttontable {
+  left: 10px;
+  border: 0px;
+}
+
+/*-----------------------------放工具栏按钮组的tr------------------------*/
+/*放按钮的tr*/
+.buttontr {
+  left: 3px;
+}
+
+/*----------------------放工具栏按钮的td-------------------------*/
+
+/*最左边的td*/
+.tdleft {
+  width: 3px;
+}
+
+/*-----------表单工具栏按钮样式-------*/
+/*打印按钮*/
+.buttonselectprint-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -868px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonselectprint {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -679px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*直接打印按钮*/
+.buttondirectprint-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -2038px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttondirectprint {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1975px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*直接打印所以页按钮*/
+.buttondirectprintall-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -2059px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttondirectprintall {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1996px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*打印所有页按钮*/
+.buttonprintall-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -2080px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonprintall {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -2017px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*分页导出excel按钮*/
+.buttonexpexcel-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1912px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonexpexcel {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1849px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*不分页导出excel按钮*/
+.buttonexpexcelall-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1933px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonexpexcelall {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1870px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*导出pdf按钮*/
+.buttonexppdf-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1954px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonexppdf {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1891px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*预览按钮*/
+.buttonprintpreview-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -910px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonprintpreview {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -889px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*工作流工具按钮开始*/
+/*只执行流程动作按钮*/
+.buttonwf_flowsave-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1807px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_flowsave {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1828px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*只执行流程动作按钮1*/
+.buttonwf_flowsave1-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1807px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_flowsave1 {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1828px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*只执行流程动作按钮2*/
+.buttonwf_flowsave2-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1807px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_flowsave2 {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1828px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*只执行流程动作按钮3*/
+.buttonwf_flowsave3-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1807px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_flowsave3 {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1828px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*执行按钮*/
+.buttonwf_save-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1807px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_save {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1828px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*执行按钮1*/
+.buttonwf_save1-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1807px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_save1 {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1828px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*执行按钮2*/
+.buttonwf_save2-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1807px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_save2 {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1828px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*执行按钮3*/
+.buttonwf_save3-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1807px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_save3 {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1828px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/* 暂存按钮*/
+.buttonwf_tempsave-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1765px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_tempsave {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1786px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/* 轨迹按钮*/
+.buttonwf_trace-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1723px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+.buttonwf_trace {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1744px;
+  height: 21px;
+  padding-left: 68px;
+}
+
+/*工作流工具按钮结束*/
+
+/* 查看视图*/
+.buttonseeview-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_run_button_see1.gif);
+}
+
+.buttonseeview {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_run_button_see.gif);
+}
+
+/* 新增视图*/
+.buttonaddview-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -658px;
+}
+
+.buttonaddview {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -637px;
+}
+
+/* 编辑视图*/
+.buttoneditview-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -952px;
+}
+
+.buttoneditview {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1078px;
+}
+
+/* 关闭按钮*/
+.buttonclosewin-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -931px;
+}
+
+.buttonclosewin {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1162px;
+}
+
+/*上移按钮样式*/
+.buttonupmove-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -427px;
+}
+
+.buttonupmove {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -469px;
+}
+
+/*下移按钮样式*/
+.buttondownmove-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -994px;
+}
+
+.buttondownmove {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -973px;
+}
+
+/* 最大化按钮*/
+.buttonmaxwin {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -343px;
+}
+
+.buttonmaxwin-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -322px;
+}
+
+/* 刷新按钮*/
+.buttonrefresh {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -280px;
+}
+
+.buttonrefresh-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -238px;
+}
+
+/* 全选按钮*/
+.buttonselall {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -616px;
+}
+
+.buttonselall-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -574px;
+}
+
+/* 全不选按钮*/
+.buttonnoselall {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -364px;
+}
+
+.buttonnoselall-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -385px;
+}
+
+/*打开窗口新增记录按钮*/
+.buttonopenwinadd {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -637px;
+}
+
+.buttonopenwinadd-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -658px;
+  cursor: hand;
+}
+
+/*新增按钮*/
+.buttonadd {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -637px;
+}
+
+.buttonadd-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -658px;
+  cursor: hand;
+}
+
+/*删除按钮*/
+.buttondel {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1141px;
+}
+
+.buttondel-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1120px;
+  cursor: hand;
+}
+
+/*删除行按钮*/
+.buttondeleterow {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1225px;
+}
+
+.buttondeleterow-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1099px;
+  cursor: hand;
+}
+
+/*修改按钮*/
+.buttonedit {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1078px;
+}
+
+.buttonedit-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -952px;
+  cursor: hand;
+}
+
+/*保存按钮*/
+.buttonsave {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -406px;
+}
+
+.buttonsave-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -259px;
+  cursor: hand;
+}
+
+/*保存新增按钮*/
+.buttonsaveadd {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -532px;
+}
+
+.buttonsaveadd-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -553px;
+  cursor: hand;
+}
+
+/*增加行按钮*/
+.buttonaddrow {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -763px;
+}
+
+.buttonaddrow-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -700px;
+  cursor: hand;
+}
+
+/*第一页按钮*/
+.buttonfirst {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1036px;
+}
+
+.buttonfirst-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1057px;
+  cursor: hand;
+}
+
+/*上一页按钮*/
+.buttonup {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -448px;
+}
+
+.buttonup-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -595px;
+  cursor: hand;
+}
+
+/*下一页按钮*/
+.buttondown {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1183px;
+}
+
+.buttondown-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1204px;
+  cursor: hand;
+}
+
+/*最后页按钮*/
+.buttonlast {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -301px;
+}
+
+.buttonlast-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 75px;
+  height: 21px;
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -1015px;
+}
+
+/*查询按钮*/
+.buttonquery {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -217px;
+}
+
+.buttonquery-over {
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -196px;
+  cursor: hand;
+}
+
+/*查询组第一页按钮*/
+.buttonfirstpage {
+  width: 20px;
+  height: 20px;
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  cursor: hand;
+  BACKGROUND: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2363px;
+}
+
+.buttonfirstpage-over {
+  width: 20px;
+  height: 20px;
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  cursor: hand;
+  BACKGROUND: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2403px;
+}
+
+/*查询组上一页按钮*/
+.buttonuppage {
+  width: 20px;
+  height: 20px;
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  cursor: hand;
+  BACKGROUND: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2343px;
+}
+
+.buttonuppage-over {
+  width: 20px;
+  height: 20px;
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  cursor: hand;
+  BACKGROUND: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2383px;
+}
+
+/*查询组下一页按钮*/
+.buttondownpage {
+  width: 20px;
+  height: 20px;
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  BACKGROUND: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2243px;
+}
+
+.buttondownpage-over {
+  width: 20px;
+  height: 20px;
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  cursor: hand;
+  BACKGROUND: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2283px;
+}
+
+/*查询组最后页按钮*/
+.buttonlastpage {
+  width: 20px;
+  height: 20px;
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  BACKGROUND: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2263px;
+}
+
+.buttonlastpage-over {
+  width: 20px;
+  height: 20px;
+  border-top: 0px;
+  border-left: 0px;
+  border-bottom: 0px;
+  border-right: 0px;
+  cursor: hand;
+  BACKGROUND: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2303px;
+}
+
+/* 日期按钮背景图*/
+.cmdDate {
+  width: 20px;
+  height: 20px;
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2096px;
+}
+
+.cmdDate-over {
+  width: 20px;
+  height: 20px;
+  cursor: hand;
+  background: url(../images/fctoolbarallbgs.gif) no-repeat 0px -2076px;
+}
+
+/*鼠标进入表单属性框的确定按钮样式*/
+.cmdOk-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -511px;
+}
+
+/*鼠标移出表单属性框的确定按钮样式*/
+.cmdOk {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -490px;
+}
+
+/*鼠标进入时表单属性框的取消按钮样式*/
+.cmdClose-over {
+  cursor: hand;
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -826px;
+}
+
+/*鼠标移出表单属性框的取消按钮样式*/
+.cmdClose {
+  BORDER-BOTTOM: 0px;
+  BORDER-RIGHT: 0px;
+  BORDER-LEFT: 0px;
+  BORDER-TOP: 0px;
+  width: 66px;
+  height: 21px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -847px;
+}
+
+/*----------------------commonbox控件事件的按钮样式-----------------------------------------*/
+/*鼠标进入表单属性框的单击按钮样式*/
+.cmdDown-over {
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -156px;
+  height: 20px;
+  padding-left: 19px;
+}
+
+/*鼠标移出表单属性框的的单击按钮样式*/
+.cmdDown {
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -176px;
+  height: 20px;
+  padding-left: 19px;
+}
+
+/*标题颜色如： 位置、样式等标题 color:#0080c0; */
+.label_title {
+  FONT-WEIGHT: bold;
+}
+
+/* label 控件
+.ef_input_label_out{
+	color:#456EFF;
+}*/
+/* text 控件  #456EFF*/
+.ef_input_text_out {
+  border: 1px solid #7B9EBD;
+}
+
+.ef_input_text_over {
+  border: 1px solid #73C3DE;
+}
+
+/*button 样式*/
+.ef_input_button_out {
+  background: url("../images/button.gif") no-repeat 0px -50px;
+  height: 25px;
+  line-height: 25px;
+  border: 0px;
+  font-size: 12px;
+  color: #fff;
+}
+
+.ef_input_button_right_out {
+  background: url("../images/button.gif") no-repeat right 0px; /*no-repeat right 0px;*/
+  height: 25px;
+  line-height: 25px;
+  border: 0px;
+}
+
+.ef_input_button_over {
+  background: url("../images/button.gif") no-repeat 0px -150px;
+  height: 25px;
+  line-height: 25px;
+  border: 0px;
+  font-size: 12px;
+  color: #fff;
+}
+
+.ef_input_button_right_over {
+  background: url("../images/button.gif") no-repeat right -100px;
+  height: 25px;
+  line-height: 25px;
+  border: 0px;
+}
+
+.ef_input_button_down {
+  background: url("../images/button.gif") no-repeat 0px -250px;
+  height: 25px;
+  line-height: 25px;
+  border: 0px;
+  font-size: 12px;
+}
+
+.ef_input_button_right_down {
+  background: url("../images/button.gif") no-repeat right -200px;
+  height: 25px;
+  line-height: 25px;
+  border: 0px;
+}
+
+/* checkbox 控件*/
+.ef_input_checkbox_nocheck_out {
+  background: url("../images/checkbox.png") no-repeat -47px 0px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_checkbox_nocheck_over {
+  background: url("../images/checkbox.png") no-repeat -47px -25px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_checkbox_nocheck_disabled {
+  background: url("../images/checkbox.png") no-repeat -47px -75px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_checkbox_check_out {
+  background: url("../images/checkbox.png") no-repeat -22px 0px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_checkbox_check_over {
+  background: url("../images/checkbox.png") no-repeat -22px -25px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_checkbox_check_disabled {
+  background: url("../images/checkbox.png") no-repeat -22px -75px;
+  width: 20px;
+  height: 20px;
+}
+
+/* checkbox 控件上的文本*/
+.ef_checkbox_label {
+  /*color:#456EFF;*/
+}
+
+/* radio 控件*/
+.ef_input_radio_nocheck_out {
+  background: url("../images/radio.png") no-repeat -47px 0px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_radio_nocheck_over {
+  background: url("../images/radio.png") no-repeat -47px -25px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_radio_nocheck_disabled {
+  background: url("../images/radio.png") no-repeat -47px -75px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_radio_check_out {
+  background: url("../images/radio.png") no-repeat -22px 0px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_radio_check_over {
+  background: url("../images/radio.png") no-repeat -22px -25px;
+  width: 20px;
+  height: 20px;
+}
+
+.ef_input_radio_check_disabled {
+  background: url("../images/radio.png") no-repeat -22px -75px;
+  width: 20px;
+  height: 20px;
+}
+
+/* radio 控件上的文本
+.ef_radio_label{
+	color:#456EFF;
+}*/
+
+/**
+*grid控件的样式
+**/
+/*-----表格滚动条------*/
+/*------------表格滚动条竖向滚动条样式-----------------*/
+/*鼠标进入表格控件的竖向滚动条*/
+.grid_scrolltop-over {
+  POSITION: absolute;
+  top: 0px;
+  padding: 0px;
+  margin: 0px;
+  width: 14px;
+  BORDER-TOP: #A1CFE6 1px solid;
+  border-bottom: #A1CFE6 1px solid;
+  background: url("../images/ef_run_grid_scrolltop1.gif");
+}
+
+/*鼠标移出表格控件的竖向滚动条*/
+.grid_scrolltop {
+  POSITION: absolute;
+  top: 0px;
+  padding: 0px;
+  margin: 0px;
+  width: 14px;
+  BORDER-TOP: #A1CFE6 1px solid;
+  border-bottom: #A1CFE6 1px solid;
+  background: url("../images/ef_run_grid_scrolltop.gif");
+}
+
+/*鼠标单击表格控件的竖向滚动条*/
+.grid_scrolltop-click {
+  POSITION: absolute;
+  top: 0px;
+  padding: 0px;
+  margin: 0px;
+  width: 14px;
+  BORDER-TOP: #A1CFE6 1px solid;
+  border-bottom: #A1CFE6 1px solid; /*cursor : hand ;*/
+  background: url("../images/ef_run_grid_scrolltop2.gif");
+}
+
+/*---------------表格滚动条横向滚动条样式---------------------*/
+/*鼠标进入表格控件的横向滚动条*/
+.grid_scrolldown-over {
+  HEIGHT: 14px;
+  TOP: 0px;
+  POSITION: absolute;
+  LEFT: 0px;
+  BORDER-left: #A1CFE6 1px solid;
+  BORDER-right: #A1CFE6 1px solid;
+  WIDTH: 17px;
+  background: url("../images/ef_run_grid_scrolldown.gif");
+}
+
+/*鼠标移出表格控件的横向滚动条*/
+.grid_scrolldown {
+  HEIGHT: 14px;
+  TOP: 0px;
+  POSITION: absolute;
+  LEFT: 0px;
+  BORDER-left: #A1CFE6 1px solid;
+  BORDER-right: #A1CFE6 1px solid;
+  background: url("../images/ef_run_grid_scrolldown1.gif");
+}
+
+/*鼠标单击表格控件的横向滚动条*/
+.grid_scrolldown-click {
+  /*cursor:hand;*/
+  HEIGHT: 14px;
+  TOP: 0px;
+  POSITION: absolute;
+  LEFT: 0px;
+  BORDER-left: #A1CFE6 1px solid;
+  BORDER-right: #A1CFE6 1px solid;
+  background: url("../images/ef_run_grid_scrolldown2.gif");
+}
+
+/* ----------表格滚动条上下按钮样式----------------------------*/
+/*鼠标进入滚动条的上面按钮时的按钮样式*/
+.grid_scrollshang-over {
+  border: 0px;
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -126px;
+  height: 15px;
+  padding-left: 16px;
+}
+
+/*鼠标进移出滚动条的上面按钮时的按钮样式*/
+.grid_scrollshang {
+  border: 0px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -141px;
+  height: 15px;
+  padding-left: 16px;
+}
+
+/*鼠标进入滚动条的下面按钮时的按钮样式*/
+.grid_scrollxia-over {
+  border: 0px;
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -98px;
+  height: 14px;
+  padding-left: 16px;
+}
+
+/*鼠标进移出滚动条的下面按钮时的按钮样式 */
+.grid_scrollxia {
+  border: 0px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -112px;
+  height: 14px;
+  padding-left: 16px;
+}
+
+/* ---------------表格滚动条左右按钮样式---------------*/
+/*鼠标进入滚动条的左面面按钮时的按钮样式*/
+.grid_scrollleft-over {
+  border: 0px;
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px 0px;
+  height: 14px;
+  padding-left: 16px;
+}
+
+/*鼠标移出滚动条的左面按钮时的按钮样式*/
+.grid_scrollleft {
+  border: 0px;
+  background-repeat: repeat-x;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -70px;
+  height: 14px;
+  padding-left: 16px;
+}
+
+/*鼠标进入滚动条的右面按钮时的按钮样式*/
+.grid_scrollright-over {
+  border: 0px;
+  cursor: hand;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -14px;
+  height: 14px;
+  padding-left: 16px;
+}
+
+/*鼠标移出滚动条的右面按钮时的按钮样式*/
+.grid_scrollright {
+  border: 0px;
+  background: url(../images/ef_runbackground.gif) no-repeat 0px -28px;
+  height: 14px;
+  padding-left: 16px;
+}
+
+/*----------------------------------------------------------*/
+.table_selected_row /*用于SQL语句向导中的选中字段所在行*/  {
+  background-color: #e6e6fa;
+}
+
+.tdfilter {
+  /*progid:DXImageTransform.Microsoft.BasicImage(invert=1);
+    */
+  filter: Invert;
+  background-color: #ffff32;
+}
+
+.tdfilter1 {
+  /*color:#ffffff ;*/
+  background-color: #64A9D7;
+}
+
+/* table的外框的样式 */
+#SKbillsheet #fcwebgriddiv {
+  background-color: #ffffff;
+  BORDER-BOTTOM: 1px solid;
+  BORDER-LEFT: 1px solid;
+  BORDER-RIGHT: 1px solid;
+  BORDER-TOP: 1px solid;
+  BORDER-COLOR: #B8B8B8;
+}
+
+/* table的样式 */
+#SKbillsheet #fcwebgriddiv #t {
+  BACKGROUND-COLOR: #FFFFFF;
+ // FONT-FAMILY: MS Sans Serif;
+  FONT-SIZE: 12px;
+  color: #000000;
+}
+
+/* 表格的首行 BACKGROUND-COLOR:#D6E7FF ; */
+#SKbillsheet #fcwebgriddiv #t .fcGridFirstRow {
+}
+
+/* 表格的首行td    BACKGROUND-COLOR:#B5CCFA;  */
+#SKbillsheet #fcwebgriddiv #t .fcGridFirstRow td {
+  BORDER-BOTTOM: #848284 1px solid;
+  BORDER-LEFT: #848284 1px solid;
+  BORDER-RIGHT: #848284 1px solid;
+  BORDER-TOP: #848284 1px solid;
+  background: #e2f1ff;
+  line-height: 28px;
+  height: 28px;
+}
+
+/* table的td样式 */
+#SKbillsheet #fcwebgriddiv #t td {
+  BORDER-BOTTOM: #DEDBDE 1px solid;
+  BORDER-LEFT: #DEDBDE 1px solid;
+  BORDER-RIGHT: #DEDBDE 1px solid;
+  BORDER-TOP: #DEDBDE 1px solid;
+}
+
+#SKbillsheet #fcwebgriddiv #t .hidden td {
+  display: none;
+}
+
+#SKbillsheet #fcwebgriddiv #t .hidden {
+  display: none;
+}
+
+/* 表格控件内的编辑框 */
+#SKbillsheet #txtMyGrid {
+  BACKGROUND-COLOR: white;
+  BORDER-BOTTOM-STYLE: none;
+  BORDER-LEFT-STYLE: none;
+  BORDER-RIGHT-STYLE: none;
+  BORDER-TOP-STYLE: none;
+}
+
+/* 垂直滚动条的样式 */
+#SKbillsheet #fchtcDiv1 {
+  BACKGROUND-COLOR: #EEEDE5;
+  BORDER-RIGHT: gray 0px solid;
+}
+
+/* 水平滚动条的样式 */
+#SKbillsheet #fchtcDiv2 {
+  BACKGROUND-COLOR: #EEEDE5;
+  BORDER-RIGHT: gray 0px solid;
+}
+
+/*表格右下角的填补块 BACKGROUND-COLOR: #EEEDE5; */
+#SKbillsheet #divconer {
+  BORDER-BOTTOM: 0px solid;
+  BORDER-RIGHT: 0px solid;
+  font-size: 9px;
+}
+
+/* dropdownlist 的编辑框样式 */
+#fc_txtName {
+  border: 1px solid #7B9EBD;
+}
+
+.none_border #fc_txtName {
+  border: 0px solid #7B9EBD;
+}
+
+.only_bottom_border #fc_txtName {
+  border-bottom: 1px solid #7B9EBD;
+  border-top: 0px solid #7B9EBD;
+  border-left: 0px solid #7B9EBD;
+  border-right: 0px solid #7B9EBD;
+}
+
+/* 页签控件 tab */
+.dynamic-tab-pane-control .tab-pane {
+  position: relative;
+  width: 100%; /* width needed weird IE bug */
+  margin-right: -2px; /* to make room for the shadow */
+}
+
+.dynamic-tab-pane-control .tab-row .tab {
+  width: 90px;
+  height: 25px;
+  background: #9D9D9D;
+  position: relative;
+  top: 0;
+  display: inline;
+  float: left;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 1px 1px 1px 2px;
+  border: 0;
+  color: #fff;
+  z-index: 1;
+  font-size: 12px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.dynamic-tab-pane-control .tab-row .tab a {
+  font-size: 12px;
+  color: #fff;
+  text-decoration: none;
+  line-height: 25px;
+  display: block;
+}
+
+.dynamic-tab-pane-control .tab-row .tab a:hover {
+  background: #D7D7D7;
+}
+
+.dynamic-tab-pane-control .tab-row .tab.selected {
+  background: #64A9D7;
+  z-index: 3;
+}
+
+.dynamic-tab-pane-control .tab-row .tab.selected a {
+  cursor: default;
+  background: #64A9D7;
+}
+
+.dynamic-tab-pane-control .tab-row .tab.selected a:hover {
+  background: #64A9D7;
+}
+
+.dynamic-tab-pane-control .tab-page {
+  clear: both;
+  border: 1px solid #64A9D7;
+  background: #fff;
+  z-index: 2;
+  position: relative;
+  top: -2px;
+  font-size: 12px;
+  color: Black;
+  padding: 0px;
+}
+
+.dynamic-tab-pane-control .tab-row {
+  z-index: 1;
+  white-space: nowrap;
+}
+
+/* E表标题行中单元格样式 */
+
+.eb_cell_title {
+  BORDER-BOTTOM: #848284 1px solid;
+  BORDER-LEFT: #848284 1px solid;
+  BORDER-RIGHT: #848284 1px solid;
+  BORDER-TOP: #848284 1px solid;
+  background: url("../images/grid_background.gif");
+}
+
+/* ----单元e表格线条颜色*/
+.eb_cell_border {
+  BORDER-BOTTOM: #848284 1px solid;
+  BORDER-LEFT: #848284 1px solid;
+  BORDER-RIGHT: #848284 1px solid;
+  BORDER-TOP: #848284 1px solid;
+}
+
+/* dropdownlist 控件的下拉出来的表格的样式 border-color:#B8B7B7;	*/
+#fc_list {
+  font-size: 12px;
+}
+
+/* 下拉列表中的表格首行td */
+#fc_list .firstrow td {
+  border-left: 1px solid #B8B7B7;
+  border-top: 2px solid #B8B7B7;
+  border-bottom: 1px solid #B8B7B7;
+  border-right: 1px solid #B8B7B7;
+  FONT-SIZE: 12px;
+  FONT-WEIGHT: bold;
+  height: 20px;
+  background: url(../images/dropdownlist_background.gif);
+}
+
+/*斑马纹,即每隔行的样式   */
+#fc_list .pertworow {
+  background-color: #FAFDFF;
+}
+
+/*找到行的样式*/
+#fc_list .findrow {
+  color: Red;
+}
+
+/*选择行的样式*/
+#fc_list .selectrow {
+  background-color: blue;
+  color: White;
+}
+
+/*iframe的body*/
+
+.actName {
+  FILTER: dropshadow(color=#FFFFFF, offx=1, offy=1, positive=1);
+ // FONT-FAMILY: "宋体";
+  FONT-SIZE: 9pt;
+  width: 100%;
+  COLOR: #0000CC;
+  padding-left: 2px;
+  font-weight: bold;
+}
+
+.btn {
+  BORDER-BOTTOM: #8B8B7A 2px solid;
+  border-right: #8B8B7A 2px solid;
+}
+
+/*交叉表样式*/
+.ct_cap {
+  BACKGROUND-COLOR: #D0B830;
+}
+
+.ct_capstat {
+  BACKGROUND-COLOR: #D0B830;
+  FONT-WEIGHT: BOLD;
+}
+
+.ct_valcol {
+  BACKGROUND-COLOR: #D0B830;
+}
+
+.ct_valrow {
+  BACKGROUND-COLOR: #10B830;
+}
+
+.ct_valstat {
+  BACKGROUND-COLOR: #D0B830;
+  FONT-WEIGHT: BOLD;
+}
+
+/* 页签控件样式 */
+.dynamic-tab-pane-control .tab-page {
+}
+
+.dynamic-tab-pane-control h2 {
+  text-align: center;
+  width: auto;
+}
+
+.dynamic-tab-pane-control h2 a {
+  display: inline;
+  width: auto;
+}
+
+.dynamic-tab-pane-control a:hover {
+  background: transparent;
+}
+
+/**
+*默认字号为12px
+**/
+#SKbillsheet {
+  font-size: 12px !important;
+}
+
+tr.fc_hidden_tr td, tr.fc_hidden_tr th, tr.fc_hidden_tr {
+  display: none;
+}
+
+tr.fc_show_tr td, tr.fc_show_tr th, tr.fc_show_tr {
+  display: inline;
+}
+
+/* div类控件的边框颜色 */
+#SKbillsheet .control-border-color {
+  border-color: #D6D3BD;
+}
+
+/* 验证没通过时的样式 */
+#SKbillsheet .valid-fail-text {
+  border-color: Red;
+}
+
+#SKbillsheet .valid-fail-msg {
+  color: Red;
+}
+
+.redbg {
+  BACKGROUND-COLOR: red;
+}
+
+.formDesignInfo td {
+  line-height: 20px;
+  text-indent: 5px;
+}
+
+/*排序图标*/
+.Aorderstr {
+  background: url(../images/webgrid_up.png) no-repeat right center;
+  text-align: center;
+  padding-right: 14px;
+}
+
+.Borderstr {
+  background: url(../images/webgrid_down.png) no-repeat right center;
+  text-align: center;
+  padding-right: 14px;
+}
+
+.tree_search {
+  height: 30px;
+  min-width: 180px;
+  background: #6E99D4 url(../images/searchBarFormBg.png) no-repeat 0 0;
+}
+
+#cmdActionSet, #cmdAutoSize, #aGenSql {
+  display: none;
+}
+
+.f_l {
+  float: left;
+}
+
+.f_r {
+  float: right;
+}
+
+.clear {
+  clear: both;
+}
+
+h2, h3 {
+  font-weight: bold;
+  text-align: center;
+}
+
+.ti_an {
+  width: 650px;
+  margin: 0 auto;
+  line-height: 1;
+}
+
+.ti_an h2 {
+  font-size: 30px;
+  line-height: 1.5;
+}
+
+.ti_an h3 {
+  font-size: 40px;
+  line-height: 1.5;
+}
+
+.top {
+  text-align: right;
+  margin-top: 10px;
+}
+
+.top input {
+  width: 50px;
+  margin: 0 5px;
+  border: none;
+  border-bottom: 1px solid #000;
+}
+
+.jie_chi input {
+  width: 40px;
+  border: none;
+  border-bottom: 1px solid #000;
+  text-align: center;
+}
+
+table.table_border_1px {
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: -1px;
+}
+
+table.table_border_1px td, table.table_border_1px th {
+  border: 1px solid #000;
+  font-size: 14px;
+  line-height: 1.8;
+  text-align: center;
+  font-weight: bold;
+}
+
+table.table_border_1px thead th {
+  background-color: #fff;
+  line-height: 30px;
+  text-align: center;
+}
+
+table.table_border_1px td {
+  overflow: hidden;
+  line-height: 26px;
+  padding: 0;
+}
+
+.ti_an input {
+  height: 24px;
+}
+
+table.table_border_1px td input {
+  width: 95%;
+  height: 26px;
+  margin-left: 2%;
+  border: 0;
+}
+
+table.table_border_1px td textarea {
+  width: 95%;
+  margin-left: 2%;
+  height: 50px;
+  border: 0;
+}
+
+.sign_area {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  text-align: left;
+}
+
+.sign_area p {
+  line-height: 30px;
+  text-indent: 5px;
+  font-weight: bold;
+}
+
+.sign_area textarea, .sign_area input {
+  position: absolute;
+}
+
+//处理办理单的页面样式
+.oa-only-bill-page {
+
+
+  * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  *:before, *:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  background: #bbe0f0 url("../images/form-bg.jpg") repeat-x center top;
+  background-attachment: fixed;
+  body {
+    padding-top: 35px;
+   // font-family:SimSun,Microsoft YaHei, Verdana, sans-serif,serif;
+    font-size: 14px;
+  }
+
+  .ef_button4 {
+    font-size: 14px;
+   // font-family: '宋体', '微软雅黑', Verdana, sans-serif, serif;
+    color: #fff;
+    position: relative;
+    &:hover {
+      background: #68a2e3;
+    }
+  }
+
+  button {
+    background: #6F99D4;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+
+  .navlist {
+    width: 124px !important;
+    font-weight: bold;
+    z-index: 99;
+    float: left;
+    label {
+      width: 124px !important;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      font-size: 14px;
+     // font-family: '宋体', '微软雅黑', Verdana, sans-serif, serif;
+      background: none;
+      position: relative;
+      color: #fff;
+    }
+  }
+  .tab-pane {
+    margin-top: 31px;
+    .tab_header {
+      height: 28px;
+      line-height: normal;
+      opacity: 0;
+      filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+      ul {
+        text-align: center;
+        position: relative;
+        zoom: 1;
+        top: 4px;
+        &:after {
+          content: ".";
+          display: block;
+          height: 0;
+          clear: both;
+          visibility: hidden;
+        }
+        li {
+          display: inline-block;
+         // font-family: "宋体";
+          float: none !important;
+          cursor: pointer;
+          margin-right: 5px;
+          padding-top: 4px;
+          background-color: #bee9fd;
+          overflow: hidden;
+          border: 0;
+          color: #000;
+          font-size: 14px;
+          white-space: nowrap;
+          text-align: center;
+          width: 92px;
+          height: 26px !important;
+          font-weight: bold;
+          border-top-right-radius: 5px;
+          border-top-left-radius: 5px;
+          .js-notes-tab-numbers{
+            font-style: normal;
+            width: 21px;
+            height: 14px;
+            background: url(../images/note-tip-bg.png) no-repeat;
+            font-size: 12px;
+            color: #fff;
+            line-height: 14px;
+            text-align: center;
+           // font-family: "宋体";
+            display: inline-block;
+            position: relative;
+            left: 0px;
+            margin-left: 5px;
+            top: -1px;
+          }
+        }
+        .on {
+          background-color: #fff;
+          color: #666;
+        }
+        .adviceSHow {
+          display: inline-block !important;
+        }
+      }
+
+      .tab-page {
+        display: none;
+        clear: both;
+        border: 1px solid #64A9D7;
+        background: #fff;
+        position: relative;
+        padding: 0px;
+      }
+    }
+
+    .tab-page {
+      display: none;
+      left: 0;
+      .only-check {
+
+      }
+      #sel_dropdownlist29 {
+        text-transform: none;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 4px;
+        display: inline-block;
+        font-size: 12px;
+        position: absolute !important;
+        top: 10px !important;
+       // font-family: '宋体', '微软雅黑', Verdana, sans-serif, serif;
+        z-index: 21;
+        left: 600px !important;
+        width: 150px !important;
+      }
+    }
+
+    .on {
+      display: block;
+      left: 0;
+    }
+  }
+
+  //income_style 样式
+
+  td .ef_design_dropdownlist {
+    margin: 3px 0 0 3px;
+  }
+  #outer_wrap {
+    width: 760px;
+    height: 650px;
+    margin: 0 auto;
+    background-color: transparent;
+    position: relative;
+  }
+  #outer_wrap h1 {
+    font-size: 20px;
+    text-align: center;
+    padding-top: 10px;
+  }
+  select, input, textarea {
+    outline: none;
+  }
+
+  #laiWen1 {
+    width: 750px;
+    margin: 10px auto;
+  }
+  table.table_border_1px {
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin: 0 auto;
+    margin-top: -1px;
+    td {
+      border: 1px solid #808080;
+      line-height: 40px;
+      height: 40px;
+      .td-text-left {
+        padding: 0 8px;
+        text-align: left;
+        div {
+          padding: 5px 0;
+          height: auto;
+          line-height: 1.2;
+          font-weight: normal;
+          cursor: default;
+
+          &:hover {
+            background: #EAF0F8;
+          }
+          span {
+            padding: 0 3px;
+            color: blue;
+            .list-font {
+              color: #000;
+            }
+          }
+        }
+      }
+
+      select, input {
+        width: 90%;
+        margin: 2px;
+      }
+      textarea {
+        width: 97%;
+        margin: 2px;
+        overflow: auto;
+      }
+    }
+    tr {
+      border: none;
+    }
+
+  }
+  input:disabled {
+    background: #fff;
+  }
+
+  .tdTitle {
+    color: #000;
+    text-align: center;
+    width: 100%;
+    strong {
+      color: #F00;
+    }
+  }
+  #outer_wrap .tab-pane .tab-page {
+    border: 0;
+  }
+  #laiWen_banLi {
+    width: 700px;
+    margin: 0 auto;
+    font-size: 12pt;
+
+    h2 {
+      text-align: center;
+      font-size: 14pt;
+      color: #F00;
+    }
+    table {
+      .table_border_1px {
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin: 0 auto;
+        margin-top: -1px;
+        td {
+          border: 1px solid #f00;
+          line-height: 40px;
+          height: 40px;
+        }
+
+      }
+    }
+    .tdTitle {
+      color: #f00;
+      text-align: center;
+      width: 100%;
+    }
+    .colStyle {
+      color: #f00;
+      text-align: center;
+      width: 20px;
+      line-height: 20px;
+      padding-left: 10px;
+    }
+  }
+
+  #div6 {
+    text-align: center;
+    select, input {
+      margin: 0 10px;
+    }
+  }
+
+  .opinion {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    overflow: auto;
+    li {
+      list-style-type: none;
+      line-height: 20px;
+    }
+
+  }
+
+  .opinion_word {
+    width: 100%;
+    float: left;
+  }
+  .opinion_man {
+    width: 150px;
+    float: right;
+    text-align: right;
+    color: #00F;
+  }
+  .opinion_time {
+    width: 130px;
+    float: right;
+    text-align: right;
+    color: #00F;
+  }
+  #sel_dropdownlist15 {
+    float: left;
+    margin-top: 4px !important;
+    margin-left: 10px !important;
+    display: none;
+  }
+  .oa-only-bill-page-header {
+    top: 0;
+    border: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+    padding-right: 0;
+    margin: 0;
+    position: fixed;
+    opacity: 0;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    z-index: 40;
+    text-align: center !important;
+
+    //测试显示全部按钮
+
+    .oa-page-header-btn, .oa-page-header-btn-son {
+      //display:block!important;
+    }
+    #divListText {
+      display: none !important;
+    }
+    //隐藏办理单页面头部下拉选择
+    .oa-page-header-btn {
+      border-bottom: 1px solid #234e6b;
+      width: 80px;
+      height: 51px;
+      line-height: 51px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      float: left;
+      background: url("../images/oa-only-bill-page-header-bg.png") 100% repeat;
+      position: relative;
+      &:after {
+        content: "";
+        width: 1px;
+        height: 40px;
+        background: url('../images/cut.png') 100% no-repeat;
+        position: absolute;
+        right: 0px;
+        top: 6px;
+      }
+      &:before{
+        content: "";
+        position: relative;
+        top: 4px;
+        margin-right: 4px;
+      }
+    }
+    .oa-page-header-btn-bg {
+      background: #68a2e3;
+    }
+    .oa-page-header-btn-son {
+      border-left: 1px solid #3481b9;
+      border-right: 1px solid #3481b9;
+      border-bottom: 1px solid #9cc6f5;
+      height: 38px;
+      line-height: 38px;
+      background-color: #68a2e3;
+      width: 124px;
+      display: none;
+      text-align: center;
+      &:before{
+        content: "";
+        position: relative;
+        top: 4px;
+        margin-right: 4px;
+      }
+    }
+    .oa-page-header-btn-son-hover {
+      background-color: #9cc6f5;
+    }
+    .navlist-on {
+      overflow: visible !important;
+      height: 380px !important;
+    }
+    .navlist-on .oa-page-header-btn-son {
+      display: block;
+    }
+    select {
+      display: none;
+    }
+    //左侧圆角
+    .oa-page-header-btn-start {
+      border-bottom: none;
+      background: url("../images/button-save.png") 0px -1px no-repeat;
+      &:hover {
+        background: url("../images/button-save-hover.png") 0px -1px no-repeat;
+      }
+    }
+    //右侧圆角
+    .oa-page-header-btn-end {
+      width: 124px;
+      background: url("../images/button-more.png") 0px -1px no-repeat;
+      display: block !important;
+      &:hover {
+        background: url("../images/button-more-hover.png") 0px -1px no-repeat;
+      }
+
+    }
+    //已阅按钮永久隐藏
+    .js-bill-header-looked {
+      display: none !important;
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        left: 12px;
+        top: 15px;
+        background: url(../images/icon.png) -59px 1645px;
+      }
+    }
+    .js-bill-header-send-office {
+      display: inline-block;
+      position: relative;
+      width: 124px !important;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -28px -116px;
+        width: 17px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+    .js-bill-header-send-affairs-office {
+
+      display:none;
+      position: relative;
+      width: 124px !important;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -28px -116px;
+        width: 17px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+    //退文
+    .js-bill-header-more-return-article {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -151px -84px;
+        width: 16px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+
+    //转公文交换按钮
+    .js-bill-header-turn-exange {
+      width: 124px !important;
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -96px -57px;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+
+    .js-bill-header-turn-exange-more {
+      width: 124px !important;
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -96px -57px;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+
+    //保存按钮
+    .js-bill-header-save {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: 0px -116px;
+        width: 18px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+    //错情登记按钮
+    .js-bill-header-wrong {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -28px -88px;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        top: 5px;
+
+      }
+    }
+    //作废按钮
+    .js-bill-header-process-void {
+      position: relative;
+      display: none;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: 0px -29px;
+        width: 21px;
+        height: 20px;
+        display: inline-block;
+      }
+    }
+    //取消
+    .js-bill-header-bill-cancel {
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -177px 0px;
+        width: 14px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+
+    .js-bill-header-cancel-seek-advice {
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -177px 0px;
+        width: 14px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+    .js-bill-header-label-seek-advice,.js-bill-header-label-meeting-notice,.js-bill-header-meeting-notice{
+      text-align: left;
+      padding-left: 23px;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: 0px -143px;
+        width: 16px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+    //发布
+    .js-bill-header-public{
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -108px -116px;
+        width: 17px;
+        height: 16px;
+        display: inline-block;
+      }
+    }
+
+    .js-bill-header-receipt {
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -52px -143px;
+        width: 18px;
+        height: 14px;
+        display: inline-block;
+        top: 2px;
+      }
+    }
+
+    .js-bill-header-seek-advice {
+      width: 124px;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: 0px -143px;
+        width: 16px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+
+    .js-bill-header-meeting-publish {
+      width: 124px;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: 0px -143px;
+        width: 16px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+
+    //正文按钮
+    .js-bill-header-text {
+      display: inline-block;
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        right: 70px;
+        top: 15px;
+        background: url(../images/icon.png) -59px 2280px;
+      }
+
+    }
+    //编辑文档按钮
+    .js-bill-header-text-edit {
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        right: 84px;
+        top: 8px;
+        background: url(../images/icon.png) -59px 1277px;
+      }
+    }
+    //查看按钮
+    .js-bill-header-text-look {
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        right: 80px;
+        top: 8px;
+        background: url(../images/icon.png) -59px 1184px;
+      }
+    }
+    //批阅按钮
+    .js-bill-header-text-marking {
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        right: 80px;
+        top: 8px;
+        background: url(../images/icon.png) -59px 1097px;
+      }
+    }
+    //下载按钮
+    .js-bill-header-text-download, .js-bill-header-text-seal {
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        right: 82px;
+        top: 8px;
+        background: url(../images/icon.png) -59px 1005px;
+      }
+
+
+    }
+    //办结按钮
+    .js-bill-header-handle-end {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -151px 0px;
+        width: 16px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+    //分发按钮
+    .js-bill-header-distribute {
+      display: inline-block;
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        width: 15px;
+        height: 14px;
+        right: 72px;
+        top: 18px;
+        background: url("../images/icon.png") -200px -221px;
+      }
+
+    }
+    //传阅按钮
+    .js-bill-header-distribute-circulation {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: 0px -88px;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        top: 5px;
+        margin-right:5px;
+      }
+    }
+    //停止传阅按钮
+    .js-bill-header-distribute-stop {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -151px -112px;
+        width: 14px;
+        height: 20px;
+        display: inline-block;
+        top:6px;
+        margin-right:8px;
+      }
+    }
+
+    //导出word
+    .js-bill-header-load-word {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -67px -31px;
+        width: 19px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+    .js-bill-header-load-pdf {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -30px -59px;
+        width: 19px;
+        height: 18px;
+        display: inline-block;
+        margin-right:5px;
+      }
+    }
+    //查看流程按钮
+    .js-bill-header-look-process {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -34px 0px;
+        width: 23px;
+        height: 19px;
+        display: inline-block;
+        margin-right: 1px;
+        left: -1px;
+      }
+    }
+
+    //公文送签
+    .js-bill-header-document-delivery{
+      position: relative;
+      display: none;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -108px -116px;
+        width: 23px;
+        height: 19px;
+        display: inline-block;
+        margin-right: 1px;
+        left: -1px;
+      }
+    }
+    //打印按钮
+    .js-bill-header-print {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: 0px 0px;
+        width: 24px;
+        height: 19px;
+        display: inline-block;
+      }
+    }
+    //发送按钮
+    .js-bill-header-send {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -59px -59px;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+    //转发文
+    .js-bill-header-pg-form-incoming-send {
+      width: 100px;
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -28px -88px;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+
+    .js-bill-header-pg-form-send {
+      width: 124px;
+      position: relative;
+      text-align: left;
+      padding: 0 0 0 49px;
+
+      &:before {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        left: 6px;
+        top: 16px;
+        background: url(../images/icon.png) -322px -151px;
+      }
+    }
+    //转会议通知
+    .js-bill-header-pg-send {
+      width: 124px;
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -26px -143px;
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+      }
+    }
+
+    //转批示按钮
+    .js-bill-header-pg-instructions {
+      position: relative;
+      width: 90px;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -83px -88px;
+        width: 18px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+    //关闭按钮
+    .js-bill-header-window-close {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -151px -28px;
+        width: 16px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+    //批示反馈按钮
+    .js-bill-header-feed-back {
+      position: relative;
+      width: 124px;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -82px -116px;
+        width: 16px;
+        height: 17px;
+        display: inline-block;
+        top: 3px;
+      }
+    }
+    //更多按钮
+    .js-bill-header-more {
+      border-bottom: none;
+      position: relative;
+      &:after {
+        content: " ";
+        width: 1px;
+        height: 40px;
+        background: none;
+        position: absolute;
+        right: 0;
+        top: 9px;
+      }
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -31px -29px;
+        width: 22px;
+        height: 18px;
+        display: inline-block;
+      }
+
+    }
+    //收回按钮
+    .js-bill-header-more-take-back {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -124px 0px;
+        width: 17px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+    .js-bill-header-entry-form {
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -124px -84px;
+        width: 17px;
+        height: 17px;
+        display: inline-block;
+      }
+    }
+    //撤回按钮
+    .js-bill-header-more-withdraw {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: 0px -59px;
+        width: 20px;
+        height: 19px;
+        display: inline-block;
+      }
+    }
+    //补办按钮
+    .js-bill-header-more-replace {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -67px 0px;
+        width: 19px;
+        height: 21px;
+        display: inline-block;
+      }
+    }
+    //催办按钮
+    .js-bill-header-more-reminders {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -96px 0px;
+        width: 18px;
+        height: 19px;
+        display: inline-block;
+      }
+    }
+
+    //退回按钮
+    .js-bill-header-more-return {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -124px -28px;
+        width: 17px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+    //转办按钮
+    .js-bill-header-more-turn {
+      position: relative;
+      &:before {
+        content: "";
+        background-image: url(../images/icon.png);
+        background-position: -96px -29px;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+      }
+    }
+  }
+  #divListMore {
+   button{
+      text-align: left;
+      padding-left:20px;
+    }
+    label{
+      text-align: left;
+      padding-left:24px;
+    }
+
+  }
+
+  .billdiv {
+    // z-index: 100;
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    z-index: 20;
+  }
+
+  .advice-area {
+    textarea {
+      border: 1px solid #666;
+      height: 60px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    &:after {
+      display: block;
+      content: ".";
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      clear: both;
+      visibility: hidden;
+    }
+
+    a {
+      display: block;
+      float: left;
+      width: 60px;
+      height: 24px;
+      margin-right: 10px;
+      line-height: 24px;
+      border: 1px solid #999;
+      background: #fff;
+      color: #666;
+      text-align: center;
+      font-size: 14px;
+      text-decoration: none;
+      &:hover {
+        background: #3FF;
+        color: #fff;
+      }
+    }
+
+  }
+
+
+  //二维码生产样式
+  .qrcodeClass{
+    background-color:transparent;
+  //
+  //  opacity: 0.5;
+   // filter: alpha(opacity=50);
+
+  }
+}
+
+//查看传阅 表格
+
+table.oa-read-pass-grid {
+  width: 100% !important;
+  margin-right: 5px;
+  table-layout: fixed;
+  border-collapse: collapse;
+
+  .pass-grid-intable {
+    width: 595px;
+    td {
+      height: 38px;
+    }
+  }
+}
+
+.oa-read-pass-grid {
+  font-size: 12px;
+//  font-family: '宋体', '微软雅黑', Verdana, sans-serif, serif;
+  border: 2px solid #71b8ec;
+  margin-top: 60px;
+
+  th, td {
+    border-bottom: 1px solid #98cef4;
+    border-right: 1px solid #98cef4;
+    background-color: white;
+    text-align: left !important;
+    padding-left: 14px;
+    color: #333;
+    height: 38px;
+    vertical-align: middle;
+
+  }
+  td {
+
+    .lineWrap {
+      word-break: break-all;
+
+    }
+    .lineNoWrap {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+  }
+  th {
+    font-weight: 400;
+  }
+
+  tr {
+    .even_index_row td {
+      background-color: #eef
+    }
+    .row_hover td {
+      background-color: #fff1cc !important
+    }
+    .selected.selected_color td {
+      background-color: #dfe8f6 !important
+    }
+
+    &:hover td {
+      background-color: #dfe8f6 !important;
+    }
+  }
+  .interlaced-th td {
+    background-color: #f2f2f2;
+  }
+  a {
+    color: #f60;
+    text-decoration: none
+  }
+  .lockscreen {
+    position: fixed;
+    z-index: 2014;
+    display: none;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    filter: alpha(opacity=10);
+    opacity: .1;
+    -moz-opacity: .1
+  }
+  .loading_div {
+    position: fixed;
+    z-index: 2015;
+    display: none;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 100%
+  }
+}
+
+//弹出层输入框 样式修改
+.layui-layer-title {
+  background: #4989d8 !important;
+  color: #fff !important;
+  text-align: center;
+  padding: 0 !important;
+}
+
+.layui-layer-rim {
+  border: 0 !important;
+}
+
+.layui-layer-setwin {
+
+  .layui-layer-max {
+    display: none;
+  }
+  .layui-layer-close1 {
+    background-position: 0 -81px !important;
+    &:hover {
+      background-position: -20px -81px !important;
+    }
+  }
+  .layui-layer-min {
+    display: none;
+  }
+}
+
+.layui-layer-content {
+  //border: 1px solid #848484!important;
+  border-bottom: 0 !important;
+  border-top: 0 !important;
+}

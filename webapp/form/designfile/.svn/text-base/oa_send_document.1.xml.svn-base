@@ -1,0 +1,904 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow>
+  <meta name="bs_table"></meta>
+  <meta name="bs_desc_field"></meta>
+  <meta name="bs_id_field"></meta>
+  <initial-actions>
+    <action id="7871" name="初始化">
+      <pre-functions>
+        <function type="class">
+          <arg name="class.chn">将执行者保存到Caller</arg>
+          <arg name="class.name">com.rj.eden.wf.workflow.util.Caller</arg>
+        </function>
+      </pre-functions>
+      <results>
+        <unconditional-result id="1491" old-status="Finished" status="Underway" step="6299"/>
+      </results>
+    </action>
+  </initial-actions>
+  <steps>
+    <step id="7834" name="结束节点">
+    </step>
+    <step id="6299" name="经办人拟稿">
+      <tasks>
+        <task name="[发文流程拟稿]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${caller},${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">6299</arg>
+          <arg name="user">${caller},${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="6014" name="经办人拟稿" view="/fceform/common/run.html%3FnodeName%3DfirstBlood%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <result id="596" old-status="Finished" status="Underway" step="2170">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("2170")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="972" old-status="Finished" status="Underway" step="4906">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("4906")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="7863" old-status="Finished" status="Underway" step="9893">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("9893")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="293" old-status="Finished" status="Underway" step="4516">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("4516")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="5695" old-status="Finished" status="Underway" step="2611">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("2611")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="5320" old-status="Finished" status="Underway" step="2408"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="2408" name="主办处室处长审核">
+      <tasks>
+        <task name="[主办处室处长审核]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">2408</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="1981" name="主办处室处长审核" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <result id="1465" old-status="Finished" status="Underway" step="6299">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("6299")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="2344" old-status="Finished" status="Underway" step="4833">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("4833")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="2684" old-status="Finished" status="Underway" step="6883">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("6883")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="8263" old-status="Finished" status="Underway" step="4906"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="4906" name="秘书处初核">
+      <tasks>
+        <task name="[秘书处初核]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">4906</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="2086" name="秘书处初核" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <result id="2432" old-status="Finished" status="Underway" step="6299">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("6299")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="8329" old-status="Finished" status="Underway" step="2408">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("2408")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="6608" old-status="Finished" status="Underway" step="4516"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="4516" name="秘书处二核">
+      <tasks>
+        <task name="[秘书处二核]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">4516</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="541" name="秘书处二核" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <result id="9099" old-status="Finished" status="Underway" step="6299">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("6299")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="9806" old-status="Finished" status="Underway" step="2408">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("2408")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="2702" old-status="Finished" status="Underway" step="4906">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("4906")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="308" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="5987" name="分管厅领导审签">
+      <tasks>
+        <task name="[分管厅领导审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">5987</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="32" name="分管厅领导审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <unconditional-result id="510" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="9875" name="办公厅主任审签">
+      <tasks>
+        <task name="[办公厅主任审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">9875</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="803" name="办公厅主任审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <unconditional-result id="6193" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="7226" name="秘书长审签">
+      <tasks>
+        <task name="[秘书长审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">7226</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="9325" name="秘书长审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <unconditional-result id="4794" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="9894" name="分管副省长审签">
+      <tasks>
+        <task name="[分管副省长审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">9894</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="7419" name="分管副省长审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <unconditional-result id="873" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="2456" name="省长审签">
+      <tasks>
+        <task name="[省长审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">2456</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="2749" name="省长审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <unconditional-result id="4270" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="6883" name="秘书处送签人员">
+      <tasks>
+        <task name="[秘书处送签人员]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">6883</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="2134" name="秘书处送签人员" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <result id="6340" old-status="Finished" status="Underway" step="2456">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("2456")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="1971" old-status="Finished" status="Underway" step="9894">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("9894")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="2465" old-status="Finished" status="Underway" step="9875">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("9875")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="4204" old-status="Finished" status="Underway" step="5987">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("5987")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="2526" old-status="Finished" status="Underway" step="7226">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("7226")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="2206" old-status="Finished" status="Underway" step="7337">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("7337")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="3234" old-status="Finished" status="Underway" step="1095">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("1095")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="5704" old-status="Finished" status="Underway" step="1103">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("1103")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="761" old-status="Finished" status="Underway" step="5482">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("5482")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="6782" old-status="Finished" status="Underway" step="6383">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("6383")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="7092" old-status="Finished" status="Underway" step="6299">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("6299")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="8165" old-status="Finished" status="Underway" step="2408">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("2408")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="3310" old-status="Finished" status="Underway" step="2053"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="2053" name="秘书处处长复核">
+      <tasks>
+        <task name="[秘书处长复核]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">2053</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="43" name="秘书处处长复核" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <result id="4281" old-status="Finished" status="Underway" step="2611">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("2611")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="4300" old-status="Finished" status="Underway" step="2170"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="2170" name="文件编号填写发文范围，份数">
+      <tasks>
+        <task name="[文件编号填写发文范围，份数]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">2170</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="9931" name="文件编号填写发文范围，份数" view="/fceform/common/run.html%3FnodeName%3DcreateFileNo%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <unconditional-result id="3318" old-status="Finished" status="Underway" step="1647"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="1647" name="定稿排版">
+      <tasks>
+        <task name="[定稿排版]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">1647</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="7114" name="定稿排版" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <result id="9615" old-status="Finished" status="Underway" step="2851">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("2851")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="9342" old-status="Finished" status="Underway" step="2611">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("2611")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <result id="4939" old-status="Finished" status="Underway" step="3122">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("3122")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="6480" old-status="Finished" status="Underway" step="3339"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="2851" name="校对">
+      <tasks>
+        <task name="[校对]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">2851</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="3436" name="校对" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <unconditional-result id="1862" old-status="Finished" status="Underway" step="1647"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="3339" name="机要室加盖电子印章">
+      <tasks>
+        <task name="[机要室加盖电子印章]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">3339</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="2312" name="机要室加盖电子印章" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <results>
+            <result id="1503" old-status="Finished" status="Underway" step="1647">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("1647")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="9985" old-status="Finished" status="Underway" step="3122"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="5796" name="第一读者">
+      <tasks>
+        <task name="[第一读者]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">5796</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="7779" name="第一读者" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <unconditional-result id="5685" old-status="Finished" status="Underway" step="3122"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="3122" name="保密室确认分发范围并下发文件">
+      <tasks>
+        <task name="[保密室确认分发范围并下发文件]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">3122</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="8769" name="保密室确认分发范围并下发文件" view="/fceform/common/run.html%3FnodeName%3Dbms%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <result id="2327" old-status="Finished" status="Underway" step="5796">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("5796")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="6654" old-status="Finished" status="Underway" step="7834"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="4833" name="会签处室负责人审核">
+      <tasks>
+        <task name="[会签处负责人审核]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">动态会签型</arg>
+          <arg name="taskType">3</arg>
+          <arg name="stepId">4833</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="6639" name="会签处室负责人审核" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <pre-functions>
+            <function type="class">
+              <arg name="class.chn">将数据集中的字段信息保存到流程变量中</arg>
+              <arg name="class.name">com.rj.eden.wf.extend.ActionPreFunction</arg>
+            </function>
+          </pre-functions>
+          <results>
+            <result id="4172" old-status="Finished" status="Underway" step="4833">
+              <conditions>
+                <condition type="class">
+                  <arg name="class.chn">未完成动态会签的任务</arg>
+                  <arg name="class.name">com.rj.eden.wf.workflow.util.NotFinishCounterSignResult</arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="8833" old-status="Finished" status="Underway" step="2408"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="9893" name="会签处室负责人审核">
+      <tasks>
+        <task name="[会签处负责人审核]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">动态会签型</arg>
+          <arg name="taskType">3</arg>
+          <arg name="stepId">9893</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="6421" name="会签处室负责人审核" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <results>
+            <result id="3758" old-status="Finished" status="Underway" step="9893">
+              <conditions>
+                <condition type="class">
+                  <arg name="class.chn">未完成动态会签的任务</arg>
+                  <arg name="class.name">com.rj.eden.wf.workflow.util.NotFinishCounterSignResult</arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="4796" old-status="Finished" status="Underway" step="6299"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="1095" name="厅党组分管成员审签">
+      <tasks>
+        <task name="[厅党组分管成员审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">1095</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="6438" name="厅党组分管成员审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <results>
+            <unconditional-result id="1343" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="1103" name="厅党组副书记审签">
+      <tasks>
+        <task name="[厅党组副书记审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">1103</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="7723" name="厅党组副书记审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <results>
+            <unconditional-result id="9302" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="5482" name="厅党组书记审签">
+      <tasks>
+        <task name="[厅党组书记审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">5482</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="5442" name="厅党组书记审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <results>
+            <unconditional-result id="2944" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="7337" name="省政府党组分管成员审签">
+      <tasks>
+        <task name="[省政府党组分管成员审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">7337</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="6286" name="省政府党组分管成员审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <results>
+            <unconditional-result id="511" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="6383" name="省政府党组书记审签">
+      <tasks>
+        <task name="[省政府党组书记审签]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">6383</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="5490" name="省政府党组书记审签" view="/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue/fceform/common/run.html%3FnodeName%3Ddraft%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <results>
+            <unconditional-result id="3261" old-status="Finished" status="Underway" step="6883"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="2611" name="机要室电报编号、下发">
+      <tasks>
+        <task name="[机要室电报编号、下发]${TITLE}" classname="com.rj.eden.wf.workflow.util.GenerateTask">
+          <arg name="username">${executor}</arg>
+          <arg name="taskTypeChn">直接指派型</arg>
+          <arg name="taskType">2</arg>
+          <arg name="stepId">2611</arg>
+          <arg name="user">${executor}</arg>
+          <arg name="signScale">100</arg>
+        </task>
+      </tasks>
+      <actions>
+        <action id="2342" name="机要室电报编号、下发" view="/fceform/common/run.html%3FnodeName%3DcreateFileNo%26djsn%3Doa_send_document%26djtype%3Deden%26is_oa_bill%3Dtrue">
+          <results>
+            <result id="3863" old-status="Finished" status="Underway" step="1647">
+              <conditions>
+                <condition type="beanshell">
+                  <arg name="class.chn"><![CDATA[自定义脚本]]></arg>
+                  <arg name="class.name"><![CDATA[beanshell]]></arg>
+                  <arg name="script"><![CDATA[((String)transientVars.get("STATUS")).equals("1647")]]></arg>
+                </condition>
+              </conditions>
+            </result>
+            <unconditional-result id="3356" old-status="Finished" status="Underway" step="7834"/>
+          </results>
+        </action>
+      </actions>
+    </step>
+  </steps>
+</workflow>

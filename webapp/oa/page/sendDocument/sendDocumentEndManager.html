@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+	<style>
+	.new-time-style{ font-size:14px; line-height:22px; color:#000; float:left; margin-top:4px;}
+	</style>
+</head>
+
+<body style="height: 100%;">
+
+	<!-- 页面载入进度条 begin-->
+	<link rel="stylesheet" href="${base}/edenui/common/js/plugins/pace/themes/silver/pace-theme-loading-bar.css" />
+	<script src="${base}/edenui/common/js/plugins/pace/pace.eden.min.js"></script>
+	<!-- 页面载入进度条 end-->
+
+
+	<div id="grid_wrap"	style="width: 100%; height: 100%; overflow: hidden; display: none;">
+		<div id="toolbar" class="ed-toolbar" style="z-index:8;"> 
+        
+        	<a btn_id="putrecord" class="btn btn-warning toolbar_btn" href="javascript:void(0)"><i class="icon-file icon-white"></i>批量归档</a>
+       
+		  <div class="input-prepend input-append">
+		   <div class="new-time-style"><span>时间：</span></div>
+		    <input id="yearId" style="width: 40px; float:left; margin-right:6px;" class = "span2" onchange="SimpleSearch()" onclick = "WdatePicker({dateFmt:'yyyy',maxDate:'2020-10-01'})" value="年份" type="text" >
+		    <div class="new-time-style"> </div>
+		    <input id="mouthId" style="width: 40px;  margin-right:12px;"  value="月份" type="text" class = "span2" onchange="SimpleSearch()" onclick = "WdatePicker({dateFmt:'MM',maxDate:'2020-10-01'})" >
+		    
+		 <div class="btn-group">
+		    <input type="hidden" val="" id="swungDashId">
+		      <button class="btn dropdown-toggle" data-toggle="dropdown" id="ssearch">机关代字<span class="caret"></span> </button>
+		      <ul class="dropdown-menu">
+		        <li><a value="">机关代字</a></li>
+				  <#list sendDocumentStatusSet as type>
+				<li><a value="${type.dictValue}">${type.displayName}</a></li>
+				</#list>
+		      </ul>
+		    </div>
+		    
+		    
+		    <div class="btn-group">
+		    
+		    
+		    
+		    <input type="hidden" val="" id="typeId">
+		      <button class="btn dropdown-toggle" data-toggle="dropdown" id="typesearch">所有类别<span class="caret"></span> </button>
+		      <ul class="dropdown-menu">
+		        <li><a value="">所有类别</a></li>
+		        <#list sendDocumentTypeSet as type>
+				<li><a value="${type.dictValue}">${type.displayName}</a></li>
+				</#list>
+		      </ul>
+		    </div>
+		    
+		   
+		    <input class="span2" id="search_text" value="" type="text" placeholder="文件标题">
+		    <div class="btn-group">
+		      <button class="btn btn-info" onClick="SimpleSearch()">搜索</button>
+		    </div>
+		  </div>
+		  
+		</div>
+		
+		
+		<div class="ed-grid">
+			<div id="grid"></div>
+		</div>
+		<div class="clearfix">
+			<div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	      </div>
+		</div>
+	</div>
+
+</body>
+
+<#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<script>
+    var layout, treeObj, tree, treeSearch, grid, data, form,tree_form,flowName,flowVersion,user_id;
+    var version='1';
+    var wf_name='oa_send_document';
+    window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+    var baseUrl="${base}/admin/sendDocument/sendDocumentAction!querySendDocument.action?wfType=${wfType!}&dtype=${dtype!}";
+    function init() {
+    	
+        layout = new dhtmlXLayoutObject(document.body, "1C");
+        layout.cells('a').hideHeader();
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        data = new dhtmlXDataStore({
+            url     :baseUrl+"&etc="+new Date().getTime(),
+            datatype:"json"
+        });
+	
+        layout.cells('a').attachObject('grid_wrap');
+
+        grid = new dhtmlXGridObject('grid');
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        grid.setHeader("<input type='checkbox' class='check_all' id='checkAll' onclick='selectAllCheck()'>,文件字号,文件标题,类别,归档,拟稿时间,操作");
+        grid.setColumnIds("check,documentNo,title,dtype,isRecord,draft_date1,operate");
+        grid.setInitWidths("30,100,*,100,100,100,150");
+        grid.setColTypes("ch,ro,ro,coro,coro,ro,link");
+        
+  
+        <#list sendDocumentTypeSet as type>
+      	 grid.getCombo(3).put('${type.dictValue}', '${type.displayName}');
+       </#list>
+  		grid.getCombo(4).put(0, '未归档');
+  		grid.getCombo(4).put(1, '已归档');
+
+        grid.init();
+        grid.enablePaging(true, 15, 999999, 'grid_page', true);
+        grid.setPagingSkin("toolbar");
+        grid.sync(data);
+        page_layout();
+      //  $("#dataValid").val("1");
+        
+    } 
+   
+
+    function toolbar_func(id) {
+        if (id == 'add') {
+        	//initWorkflow(wf_name,"拟稿",version);
+           openSelectWf()
+        }else if (id == 'clean') {
+        	
+        }else if (id == 'edit') {
+            //form.unlock();
+        }else if (id == 'putrecord') {
+        	   var row_id = grid.getCheckedRows(0);
+               if (row_id == '') {
+                   $.dialog.tips('请至少选择一条数据！');
+                   return;
+               }
+               row_id = row_id.split(',');
+               if (row_id.length == 0) return;
+               $.dialog.confirm('你确定要归档这些数据吗？', function () {
+                   var idArr = new Array();
+                   for (var i = 0; i < row_id.length; i++) {
+                       idArr.push(data.item(row_id[i]).id);
+                   }
+                   $.post("${base}/admin/sendDocument/sendDocumentAction!updatePutRecord.action", {"ids":idArr.join(",")},function(result){
+                   	if(result.result="success"){                      
+                          SimpleSearch();
+       				   $.dialog.tips(result.message);
+                   	}
+                   });
+               });
+        	
+        }
+    }
+    
+   	function putrecord(id)
+   	{
+   	  $.post("${base}/admin/sendDocument/sendDocumentAction!updatePutRecord.action", {"ids":id},function(result){
+         	if(result.result="success"){                      
+                SimpleSearch();
+				   $.dialog.tips(result.message);
+         	}
+         });
+   		
+   	}
+    
+    function initOaWf(wfName,addPram)
+    {
+    	var closefun="checkLeave";
+    	oaInitWorkflow(wfName,"拟稿",version,addPram,closefun);
+    	//initWorkflow(wfName,"拟稿",version);
+    }
+    
+    function openSelectWf()
+    {
+    	
+    	var win = {text:"选择流程双击启动", url:"${base}/admin/documentwf/selectWf.action?key=oa_senddocument_wf",width:'270',height:'400', id:"selectWf",'parent_ifr':window}
+        window.top.createWindow(win);
+
+    	
+    }
+
+    function form_mask_init(){
+        var grid_area=$('#grid > div:eq(1) > table');
+        var maskB_height=grid_area.height()+70;
+        var maskB_width=grid_area.width();
+        var maskB_left=grid_area.offset().left;
+        $('#form_maskB').height(maskB_height).width(maskB_width).css('left',maskB_left);
+
+    }
+
+    function page_layout() {
+        var grid_wrap_height = $('#grid_wrap').height();
+        $('#grid').height(grid_wrap_height - 50-40);
+        $('#grid').width($('#grid_wrap').width()-20);
+        if (grid)    grid.setSizes();
+        form_mask_init();
+    }
+
+	function  SimpleSearch(){
+		var title= $("#search_text").val();
+		var swungDash=$("#swungDashId").val();
+		var data_valid=1;
+		
+		var year =$('#yearId').val();
+		var mouth =$('#mouthId').val();
+		if(year=="年份")
+		{
+			year="";
+		}
+		if(mouth=="月份")
+		{
+			mouth="";
+		}
+		var dtype=$("#typeId").val();
+		
+		
+        data.clearAll();
+        var s='&title='+encodeURI(title)+"&data_valid="+data_valid+"&dtype="+dtype+"&year="+year+"&mouth="+mouth+"&swungDash="+swungDash;
+        var url=baseUrl+s+'&etc='+new Date().getTime();
+        window.data.data.url=url;
+        data.load(url);
+        page_layout();
+    }
+
+    function  advancedSearch(){
+    
+    }
+
+    //执行任务
+    function execute(id){
+    	var item=data.item(id);
+    	var task_name='';
+    	//uf_doAction(item.wf_id,wf_name,task_name,version);
+    	uf_doAction_show(item.wfId,wf_name,task_name,version,null);
+    }
+
+	//查看流程图
+	function viewFlow(id){
+		var item=data.item(id);
+		showWfHistory(item.wfId);
+	}
+    $(function () {
+        setTimeout(init, 0);
+        $('#toolbar .toolbar_btn').click(function () {
+            var id = $(this).attr('btn_id');
+            toolbar_func(id);
+        });
+
+        $('#ssearch').next().find('a').click(function(){
+        	$("#swungDashId").val($(this).attr('value'));
+        	$('#ssearch').text($(this).text());
+        	SimpleSearch()
+        }) 
+        
+         $('#typesearch').next().find('a').click(function(){
+        	$("#typeId").val($(this).attr('value'));
+        	$('#typesearch').text($(this).text());
+        	SimpleSearch()
+        })
+        
+        $("#config_left_menu > li").click(function (event) {
+            $("#config_left_menu > li.on").removeClass('on').children('ul').slideUp(200);
+            $(this).addClass('on');
+            $(this).children('ul').slideDown(400);
+        });
+        $("#config_left_menu .level_2 > li").click(function (event) {
+            $("#config_left_menu .level_2 li.on").removeClass('on');
+            $(this).addClass('on')
+            event.stopPropagation();
+        })
+
+        $("#advanced_search_btn").click(function(){
+            $(this).toggleClass('advanced_on');
+            $('#advanced_search_bar').slideToggle(200);
+        });
+
+        $("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+    })
+    
+</script>
+</html>

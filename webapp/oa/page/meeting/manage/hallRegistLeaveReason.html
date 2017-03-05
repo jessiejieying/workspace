@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>Eden</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+<body class="ms-controller" ms-controller="wrap">
+<div class="document-exchange-main" style="width: 725px;">
+
+    <div class="document-exchange-body">
+        <div class="document-exchange-body-main">
+            <div class="document-exchange-body-top" style="padding-top: 6px;">
+                <div class="header clearfix">
+                    <span class="header-left">请假理由：</span>
+                </div>
+                <div class="main-textarea" style="height: 122px;">
+                    <textarea ms-duplex="@reason" style="height: 112px;"></textarea>
+                </div>
+            </div>
+            <div class="layer-choice-pop" style="margin: 0 auto;">
+                <div class="layer-choice-content" style="margin-top: 15px;">
+                    <div class="layer-choice-content-header unit-header clearfix" style="position:relative;">
+                        <span class="header-left">代会人：</span>
+                        <select class="float-left input" ms-duplex="@officeSelect">
+                            <option ms-for="(index,el) in @officeOption" ms-attr="{value:el.id}">{{el.name}}</option>
+                        </select>
+
+                        <div class="float-left">
+                            <input ms-duplex="@searchOffice" type="text" class="tool-bar-input " style="width: 168px;" placeholder="输入搜索内容">
+                        </div>
+                    </div>
+                    <div class="layer-choice-content-body clearfix" style="margin-top:11px;height:100px;">
+                        <div class="body-choice-left">
+                            <ul id="select_choice_left">
+                                <li ms-for="(index,el) in @officeList"
+                                    ms-attr="{'data-id':el.id,'data-account':el.account}" ms-click="@choiceClick(el,index)" ms-visible="el.isShow" ms-class="{selected:el.select}">{{el.name}}
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="body-choice-right" style="height:90px;overflow-y: auto">
+                            <div class="choice-content">
+                            <div class="choice-content-btn" ms-for="(index,el) in @choiceList"
+                                 ms-click="@choiceListDel(el)" ms-attr="{'data-seq':el.seq}">
+                                <span>{{el.name}}</span>
+                                <i class="icon-times"></i>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="document-exchange-body-top js-exchange-body">
+                <div class="header clearfix">
+                    <span class="header-left margin-right">附件：</span>
+                </div>
+                <div class="main main-file" style="height: 107px;">
+                    <ul class="leave-detail-file-ul clearfix" id="fileUl">
+                        <li ms-for="(index,item) in @fileDatas">
+                            <div ms-class="item.style">{{item.name}}
+                            </div>
+                            <div class="li-right">
+                                <a href="javascript:void(0)" title="删除" class="icon-trash-o leaver-icon"
+                                   ms-click="@fileDel(item,index)"></a>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="text-center" ms-if="@fileDatas.length<1">暂无附件列表</div>
+                    <div class="text-right padding-small-right margin-right">
+                        <div id="upload_file" class="upload-file" title="上传附件"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center margin-top">
+                <button class="button button-main" ms-click="@sendSure()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/form/resources/common/plupload/plupload.full.min.js"></script>
+<script src="${base}/edenui/common/js/avalon/avalon2.js"></script>
+<script>
+    var $wfId = getUrlParam('wfId'),
+            $id = getUrlParam('id'),
+            project = "${base}",
+            addList = [];
+    //参数配置表
+    avalon.config({
+        debug: false
+    });
+
+    var model = avalon.define({
+        $id: "wrap",
+        fileDatas: [],
+        waitMeetingDatas: ['111'],
+        //代会人列表
+        officeList: [],
+        //代会人下拉选项
+        officeOption: [],
+        officeSelect: '',
+        //代会人搜索
+        searchOffice: '',
+        choiceList: [],
+        //删除右侧人员
+        choiceListDel: function (obj) {
+
+            model.choiceList.forEach(function (value, index) {
+                if (value.account == obj.account) {
+                    model.choiceList.splice(index, 1);
+                }
+            });
+
+            //清除左侧的选中状态
+
+            model.officeList.forEach(function (value) {
+                if (value.account == obj.account) {
+                    value.select = false;
+                }
+            });
+
+        },
+        // obj：传递对象，idnex：索引值
+        choiceClick: function (obj, index) {
+
+            var isPush = true;
+            if(model.choiceList.length){
+                layer.msg("只能选择一个代会人");
+                return
+            }
+
+            model.choiceList.forEach(function (value) {
+                //是否已经存在列表中
+                if (value.account == obj.account) {
+                    isPush = false;
+                }
+            });
+
+            if (isPush) {
+
+                model.choiceList.push({
+                    "account": obj.account,
+                    "name": obj.name,
+                    "seq": obj.seq
+                });
+
+                model.choiceList.sort(function (a, b) {
+                    return a.seq - b.seq
+                });
+
+
+                model.officeList[index].select = true;
+
+            }
+
+        },
+        reason: "",
+        fileDel: function (content, index) {
+            layer.confirm('是否删除此文件', {
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                var fileUrl = project + "/admin/hallRegist/wfFileUpload.action";
+                var xmldata = "{addFileList:[],delFileList:[{id:'" + content.id + "',name:'" + content.name + "',size:'" + content.size + "',remark:'1'}]}";
+                var obj = {
+                    "id": $id,
+                    "fileJson": xmldata
+                }
+                $.post(fileUrl, obj, function (data) {
+
+                    page.loadEnd();
+                    model.fileDatas.splice(index, 1);
+                    layer.msg("删除成功");
+                })
+            }, function () {
+
+            });
+
+        },
+        sendSure: function () {
+
+            if ($.trim(model.reason).length < 1) {
+                layer.msg("请填写请假理由");
+                return;
+            }
+
+            if(model.choiceList.length<1){
+                layer.msg("请选择一个代会人");
+                return;
+            }
+            var personData=model.choiceList.map(function(value){
+                return value.account
+            });
+
+            var url = "${base}/admin/hallRegist/changeHallRegist.action";
+
+            var obj = {
+                "type": 2,
+                "wfId": $wfId,
+                "reason": model.reason,
+                "person":personData.join(",")
+            }
+            $.post(url, obj, function (data) {
+                if (data.result == "1") {
+                    layer.msg(data.message);
+
+                    setTimeout(function () {
+                        var index = parent.layer.getFrameIndex(window.name);
+                          parent.layer.close(index);
+                    }, 500);
+                }
+            });
+        }
+
+    })
+
+    //代会人搜索
+    model.$watch("searchOffice", function (a) {
+        model.officeList.forEach(function (value) {
+            if (value.name.indexOf(a) > (-1)) {
+                value.isShow = true;
+            }
+            else {
+                value.isShow = false;
+            }
+        });
+    })
+
+    //代会人拉选择
+    model.$watch("officeSelect", function (a) {
+        page.getOfficeList(a);
+    })
+
+    var page = (function () {
+
+        var result = {
+            init: function () {
+                this.getInfor();
+                this.getOfficeOption();
+            },
+            loadStart: function () {
+                var index = layer.load(2, {
+                    // shade: [0.5, '#000']
+                    //scrollbar: false //0.1透明度的白色背景
+                });
+                setTimeout(function () {
+                    page.loadEnd();
+                }, 4000);
+            },
+            getOfficeOption: function () {
+
+                var url = "${base}//admin/sendRange/allOfficesInfo.action?etc=" + new Date().getTime();
+                $.get(url, function (result) {
+                    if (result.success = "true") {
+                        model.officeOption.clear();
+                        var resultData = result.data;
+                        var dataInit = [];
+                        resultData.forEach(function (value) {
+                            dataInit.push({
+                                "id": value.orgId,
+                                "name": value.orgName
+
+                            });
+                        });
+                        model.officeOption = dataInit;
+                        page.getOfficeList(dataInit[0].id);
+
+                    }
+                });
+            },
+            getOfficeList: function (orgId) {
+
+                var selectLeftURL = "${base}//admin/sendRange/selectAccountByOrgId.action?etc=" + new Date().getTime() + "&orgId=" + orgId;
+                page.loadStart();
+                $.get(selectLeftURL, function (result) {
+                    model.officeList.clear();
+                    page.loadEnd();
+                    var resultData = result.data;
+                    var initDatas = [];
+                    resultData.forEach(function (value) {
+                        initDatas.push({
+                            "id": "",
+                            "name": value.name,
+                            "account": value.accountName,
+                            "isShow": true,
+                            "seq": value.sequence,
+                            "select": false
+                        });
+                    });
+
+                    model.officeList = initDatas;
+
+                    //显示已经选中的人
+                    if (model.choiceList.length) {
+                        model.choiceList.forEach(function (val) {
+                            model.officeList.forEach(function (val2) {
+                                if (val2.account == val.account) {
+                                    val2.select = true;
+                                }
+                            });
+                        });
+
+                    }
+
+                });
+            },
+            getStyle: function (name) {
+                var initData = ["li-left", "file-icon"];
+                //pdf
+                if (name.indexOf(".pdf") > (-1)) {
+                    initData.push("file-icon-pdf");
+                }
+                //word
+                else if (name.indexOf(".doc") > (-1)) {
+                    initData.push("file-icon-word");
+                }
+
+                //天谷控件
+                else if (name.indexOf(".tgw") > (-1)) {
+                    initData.push("file-icon-tiangu");
+                }
+
+
+                return initData;
+            },
+            loadEnd: function () {
+                layer.closeAll('loading');
+            },
+            getInfor: function () {
+                var url = "${base}/admin/hallRegist/hallRegistLeaveDetail.action?etc=" + new Date().getTime() + "&wfId=" + $wfId + "&id=" + $id;
+                model.fileDatas.clear();
+                $.getJSON(url, function (data) {
+                    //附件列表
+                    if (data.attachmentInfos.length) {
+                        data.attachmentInfos.forEach(function (value) {
+                            model.fileDatas.push({
+                                "id": value.id,
+                                "name": value.name,
+                                "size": value.size,
+                                "style": page.getStyle(value.name)
+                            });
+
+                        });
+                    }
+                    //请假理由
+                    if (data.leaveReason.leaveReason) {
+                        model.reason = data.leaveReason.leaveReason;
+                    }
+                });
+            },
+            saveFileList: function (infor) {
+                var fileUrl = project + "/admin/hallRegist/wfFileUpload.action";
+                var addFileInfor = [];
+
+                addList.forEach(function (value) {
+
+                    addFileInfor.push("{id:'" + value.id + "',name:'" + value.name + "',size:'" + value.size + "',remark:'1'}");
+                    model.fileDatas.push({
+                        "id": value.id,
+                        "name": value.name,
+                        "size": value.size,
+                        "style": page.getStyle(value.name)
+                    });
+                });
+
+                var xmldata = "{addFileList:[" + addFileInfor.join(",") + "],delFileList:[]}";
+                var obj = {
+                    "id": $id,
+                    "fileJson": xmldata
+                }
+
+                $.post(fileUrl, obj, function (data) {
+                    page.loadEnd();
+                })
+            }
+
+        }
+        return result
+
+    })();
+
+    $(function () {
+
+        page.init();
+
+        //背景材料上传
+        newUploader = new plupload.Uploader({ //实例化一个plupload上传对象
+            runtimes: 'html5,silverlight,flash,html4',
+            browse_button: 'upload_file',
+            url: project + "/servlet/uploadServlet",
+            max_file_size: "10M",
+            unique_names: true,
+            filters: [
+                {title: "允许上传的文件", extensions: "*"}
+            ],
+            flash_swf_url: project + '/form/resources/common/plupload/Moxie.swf',
+            silverlight_xap_url: project + '/form/resources/common/plupload/Moxie.xap'
+        });
+        newUploader.init(); //初始化
+        //绑定文件上传进度事件
+        newUploader.bind('FileUploaded', function (up, file, result) {
+            // fileRespondBot=JSON.parse(result.response);
+        });
+
+        newUploader.bind('FilesAdded', function (uploader, files) {//绑定文件添加进队列事件
+
+
+            //清空增加的队列
+            addList.length = 0;
+
+            var isGoing = false;
+            var isSizeExist = false;
+
+            var fileSize = files.length - 1;
+            isSizeExist = files[fileSize].size ? false : true;
+
+            if (isSizeExist) {
+
+                window.top.layer.msg("控件加载失败，重新加载...");
+                setTimeout(function () {
+                    window.top.layer.closeAll('dialog'); //关闭信息框
+                    window.location.reload();
+                }, 500);
+
+                return;
+            }
+
+            files.forEach(function (value) {
+                addList.push({
+                    "id": value.id,
+                    "name": value.name,
+                    "size": value.size
+                });
+
+                if (model.fileDatas.length) {
+                    model.fileDatas.forEach(function (val) {
+                        if ((val.name == value.name) && (val.size == value.size)) {
+                            isGoing = true;
+                        }
+                    });
+                }
+
+            });
+
+
+            if (isGoing) {
+                window.top.layer.msg("请勿上传已有的文件");
+                return;
+            }
+
+            page.loadStart();
+            newUploader.start(); //开始上传
+
+        });
+
+
+        newUploader.bind('UploadProgress', function (uploader, file) {//绑定文件上传进度事件
+
+
+        });
+        newUploader.bind('UploadComplete', function (uploader, files) {//附件上传完毕后
+
+//            if(fileRespondBot.error=="1"){
+//                window.top.layer.msg(fileRespondBot.message);
+//            }
+//            else{
+//
+//                saveFile("上传成功");
+//
+//            }
+
+            page.saveFileList();
+
+        });
+        newUploader.bind('Error', function (up, err) {//上传失败
+            $('.' + err.file.id).remove();
+            window.top.layer.msg(err.file.name + "上传失败，请重新上传");
+            up.refresh();
+        });
+    })
+
+
+    // 获取参数列表
+    function getUrlParam(name) {
+
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null)return unescape(r[2]);
+        return null;
+
+    }
+
+
+</script>
+</html>

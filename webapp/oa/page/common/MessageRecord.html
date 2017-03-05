@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+	<style type="text/css">
+    .wrongReg-table .grid-father, .wrongReg-table .grid-table-top {
+    height: 450px!important;
+}
+	</style>
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line" style="margin 0 auto;margin-right:15px; height:700px;">
+	    <table class="wrongReg-table" style="width: 842px;margin-left: auto;margin-right: auto;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+				<div class="display-ib" style="margin-bottom:10px;">
+					<input id="subject" type="text" class="tool-bar-input" placeholder="请输入关键字" />
+				</div>
+				<div class="button common-skin-btn-syle01" id="senior_grid_search">搜索</div>
+	              <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                 <!--<th w_check="true" width="46"></th>  --> 
+	                  <th w_index="" width="32">序号</th>
+	                  <th w_index="orgName" width="100">接收单位</th>
+	                  <th w_index="userName" width="73">接收人</th>
+	                  <th w_index="post" width="88">职务</th>
+	                  <th w_index="telphone" width="97">电话</th>
+	                  <th w_index="content" width="200">短信内容</th>
+	                  <th w_index="create_dttm" width="80">发送时间</th>
+	                </tr>
+	              </table>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/form/resources/common/js/tool.js"></script>
+<script src="${base}/form/resources/common/js/edenApi.js"></script>
+<script>
+    var id=$urlParam("id");
+    var type=$urlParam("type");
+	var gridOne;    
+	var selectURL = "${base}/admin/backMeeting/getMessageRecord.action?id="+id+"&type="+type;
+	$(function(){
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "&etc="+new Date().getTime(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+		    	$("#manage_grid tbody tr").each(function(){
+	        		var $this=$(this);
+        			$index=parseInt($this.attr("index"));
+        			$this.find("td").eq(1).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+		      }
+		  });
+
+		
+	});
+
+	
+	
+</script>
+</body>
+</html>

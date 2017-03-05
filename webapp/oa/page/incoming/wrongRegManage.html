@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+        <style>
+            .bsgrid.lockscreen{
+                width: 100%!important;
+            }
+        </style>
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table class="wrongReg-table" style="width: 807px;height:230px;margin-left: auto;margin-right: auto;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table" style="text-align: left;padding-left: 0px;">
+				  <div class="wrong-text-title">错情登记</div>
+				  <div class="js-tool-bar line" >
+					  <div class="tool-bar-li line">
+					  	  <!-- <div class="float-left" style="padding-top: 5px;"><span>错误类型：</span></div> -->
+						  <div class="select-wrapper float-left">
+							   <select>
+							   	<option></option>
+								<#list wrongTypeList as dataDict>                                                                         
+						  			<option value="${dataDict.dictValue}">${dataDict.displayName}</option>
+						   	    </#list>
+							  </select>
+						  </div>
+						  <div class="quantity-wrapper float-left">
+							  <input class="js-numer" placeholder="数量">
+						  </div>
+						  <div class="remark float-left">
+							  <input class="js-remarks" placeholder="备注" type="text">
+							  <i class="icon-plus" id="icon_plus"></i>
+						  </div>
+					  </div>
+	              </div>
+				  <div class="button common-skin-btn-syle01 " id="conform_add">确认添加</div>
+				  <div class="wrong-text-title wrong-reg-table">错情登记表</div>
+	              <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_index="wrongType" width="170">错误类型</th>
+	                  <th w_index="wrongNum" width="60">数量</th>
+	                  <th w_index="wrongRemark" width="290">备注</th>
+	                  <th w_index="regPerson" width="90">登记人</th>
+	                  <th w_index="regTime" width="140">登记时间</th>
+	                  <th w_index="operate" width="50">操作</th>
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+        <script src="${base}/form/resources/common/js/tool.js"></script>
+        <script src="${base}/form/resources/common/js/edenApi.js"></script>
+        <script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+        <script src="${base}/edenui/common/js/underscore.js"></script>
+<script>
+	var gridOne;    
+	var selectURL = "${base}/admin/documentWrongReg/queryWrongReg.action";
+	var version='1';
+    var wfType="${wfType!}";
+    var wfId =$urlParam('wf_id');
+
+
+	$(function(){
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime() + "&wfId=" + wfId,
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+              isProcessLockScreen:false,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+		    	$("tr","#manage_grid").each(function(){
+					var $this=$(this);
+						
+					$("td",this).css({"text-align":"center","padding-left":"0px"});
+					$("td",this).eq(3).css({"text-align":"left","padding-left":"10px"});
+					$("td",this).eq(6).css({"text-align":"left","padding-left":"10px"});
+				});
+		      }
+		  });
+
+		//新追加的toolbar
+		var appendHTML='<div class="tool-bar-li line">'+
+				'<div class="select-wrapper float-left">'+
+				'<select>'+
+				'<#list wrongTypeList as dataDict>'+
+				'<option value="${dataDict.dictValue}">${dataDict.displayName}</option>'+
+				'</#list>'+
+				'</select>'+
+				'</div>' +
+				'<div class="quantity-wrapper float-left">'+
+				'<input class="js-numer" placeholder="数量">'+
+				'</div>' +
+				'<div class="remark float-left">'+
+				'<input class="js-remarks" placeholder="备注" type="text">'+
+				'<i class="icon-minus  float-right"></i>'+
+				'<i class="icon-plus append-plus"></i>'+
+				'</div>' +
+				'</div>';
+
+		$('#icon_plus').on('click',function(){
+			$(this).closest('.js-tool-bar').append(appendHTML);
+			checkLength();
+		});
+
+		$(document).on("click",".icon-minus",function(){
+			$(this).closest('.tool-bar-li').remove();
+		});
+		$(document).on("click",".append-plus",function(){
+			$(this).closest('.js-tool-bar').append(appendHTML);
+			checkLength();
+
+		});
+
+		//判断是否超过3个
+		function checkLength(){
+			var $toolbarFather=$('.js-tool-bar'),
+					$toolbar=$('.tool-bar-li');
+			if($toolbar.length>3){
+				layer.msg('不能超过三个');
+				$toolbar.last().remove();
+			}
+		}
+
+		//select选中其他选项时触发提示备注不能为空
+		var select=$('.select-wrapper select');
+		var input=$('.remark input[type="text"]');
+		
+		$('#conform_add').on('click',function(){
+			var isTrue=true;
+			var listData=[];
+			$(".js-tool-bar .tool-bar-li").each(function(){
+				var $this=$(this),
+				    $select=$this.find("select").val(),
+				    $number=$this.find(".js-numer").val(),
+				    $remark=$this.find(".js-remarks").val();
+				    if($select=="其他"){
+				    	if($remark.length<1){
+				    			layer.msg('错误类型为其他时，备注不能为空！');
+				    			isTrue=false;
+				    			return false;
+				    	}
+				    }
+
+                if($number.length<1){
+                    layer.msg('数量不能为空');
+                    isTrue=false;
+                    return false;
+                }
+                if(!isDigit($number)){
+                    layer.msg('数量必须为数字');
+                    isTrue=false;
+                    return false;
+                }
+
+
+				    listData.push(JSON.stringify({
+				    	"type":$select,
+				    	"number":$number,
+				    	"remark":$remark
+				    }));
+			});
+
+			if(isTrue){
+				var postData= "[" + listData.join(",") + "]";
+				var selectURL = "${base}/admin/documentWrongReg/insertWrongReg.action" + "?etc="+new Date().getTime() + "&wfId=" + wfId + "&WrongReg=" + encodeURI(postData);
+
+				$.post(selectURL, $("form:first").serialize(), function (result) {
+	 			 	if(result.resultFlag=='true'){		
+	 			 		var $toolbarFather=$('.js-tool-bar'),
+						$toolbar=$('.tool-bar-li');
+						if($toolbar.length==2){
+							$toolbar.eq(-1).remove();
+						}
+						if($toolbar.length>2){
+							$toolbar.eq(-1).remove();
+							$toolbar.eq(-2).remove();
+						}
+						$(".js-numer").val("");
+						$(".js-remarks").val("");
+						
+	 			 		
+	 					layOut("#common_table","#grid_table");
+	 					var selectURLTwo = "${base}/admin/documentWrongReg/queryWrongReg.action";
+	 					gridOne.changeUrl(selectURLTwo+ "?etc="+new Date().getTime() + "&wfId=" + wfId);
+	 			 	}
+	 			 	layer.msg(result.message);
+	 			 });
+
+			}
+		});
+		
+	});
+
+	//删除
+	function d(selId){
+		var record = getRecord(selId);
+		if(record == null) {
+			return;
+		}
+		
+		var selectURL = "${base}/admin/documentWrongReg/deleteWrongReg.action" + "?etc="+new Date().getTime() + "&id=" + selId;
+	  	layer.confirm('你确定要删除这些数据吗？', function(index){		   
+		    $.post(selectURL, $("form:first").serialize(), function(result){
+		        if(result.resultFlag=="true"){
+		        	layOut("#common_table","#grid_table");
+ 					var selectURLTwo = "${base}/admin/documentWrongReg/queryWrongReg.action";
+ 					gridOne.changeUrl(selectURLTwo+ "?etc="+new Date().getTime() + "&wfId=" + wfId);
+		            gridOne.refreshPage();
+		        }
+		        layer.msg(result.message);
+		    });
+		    
+		    layer.close(index);
+		});
+	}
+	
+	function getRecord(selId) {
+		var getIndex = -1,getId="#grid_"+selId;
+	    getIndex = $(getId).attr("index");
+	    if(getIndex == -1){
+	    	return null;
+	    }
+		return gridOne.getRowRecord(gridOne.getRow(getIndex));
+	}
+
+
+    function isDigit(s)
+    {
+        var patrn=/^[0-9]{1,20}$/;
+        if (!patrn.exec(s)) return false
+        return true
+    }
+</script>
+</body>
+</html>

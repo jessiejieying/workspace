@@ -1,0 +1,38 @@
+*{margin: 0;padding: 0;font-family: "微软雅黑";}
+a{color: #000000;font-size: 14px;text-decoration: none;line-height: 30px;}
+a:hover{color:#FF4400;}
+.alpha{ filter:alpha(opacity=20);  -moz-opacity:0.2;  -khtml-opacity: 0.2;  opacity: 0.2;  }
+.container{ border: 1px solid #C4D1D5; box-shadow:0px 1px 1px #C6D1D4;}
+.showDiv{width: 240px;min-height: 100px; position: absolute;display: none;z-index: 999;background-color: #ffffcc;padding:5px;}
+/* .showDiv .span1{position: absolute; left: -10px; top: 3px; width: 0; height: 0; font-size: 0; border-width:5px; border-style: dashed solid dashed  dashed ; border-color: transparent  blue transparent  transparent ;}
+.showDiv .span3{position: absolute; left: 250px; top: 3px; width: 0; height: 0; font-size: 0; border-width:5px; border-style: dashed  dashed  dashed solid ; border-color: transparent   transparent  transparent blue ;}
+
+.showDiv .span2{position: absolute; left: -8px; top: 4px; width: 0; height: 0; font-size: 0; border-width: 4px; border-style: dashed solid dashed  dashed; border-color: transparent #FFFFE0 transparent  transparent;}
+.showDiv .span4{position: absolute; left: 250px; top: 4px; width: 0; height: 0; font-size: 0; border-width: 4px; border-style: dashed  dashed  dashed solid; border-color: transparent  transparent  transparent #FFFFE0;}
+ */
+.showDivShow{display: block;border: 1px solid #FA8105; border-width: 1px 0 1px 0; }
+.detailsInfo{font-family: "微软雅黑";font-size: 13px;color: #333333;}
+.detailsInfo span{display: block;width: 100%;float: left;height: 30px;color: #333333;font-size: 16px;}
+.detailsInfo i {display: block;float: left;height:14px;line-height: 14px; padding:2px 0 2px 5px;font-style: normal;}
+.detailsInfo p {display: block;float: left;padding-left:5px; }
+.detailsInfo .line{width: 100%;}
+.detailsInfo .line span{width: auto;color: #666666;font-size: 12px;}
+.detailsInfo .textarea span{width: auto;color: #666666;font-size: 12px;}
+.listTitle{width: 100%;height: 40px;line-height: 40px;font-size: 16px;font-family: "微软雅黑";color: #333333; border-bottom: 1px solid #CCCCCC;background-color: #F9F9F9;padding-left: 5px;}
+.imglist{position: relative;overflow-x: hidden;overflow-y:auto;}
+.img{display: block;float:left; width: 200px;height: 110px;overflow: hidden;position: relative;margin: 0px;border: 1px solid #ffffff;}
+.img:hover{filter:alpha(opacity=90); -moz-opacity:0.9;opacity: 0.9;background-color: #ffffcc;border-style:solid;border-width: 1px; border-color: #FA8105 #ffffcc #FA8105 #ffffcc;}
+.logo{display: block;float: left; width: 90px;height:110px;overflow: hidden;}
+.logo img{display: block; width: 80px; height:80px;padding:5px;}
+.imgRight{display: block;float: left;width: 110px;height: 105px;padding: 5px 0 0 0;}
+.imgRight span{display: block;width: 105px;height: 20px;line-height: 20px;white-space: nowrap;text-overflow: ellipsis;-o-text-overflow: ellipsis;  font-size: 14px;font-weight: bold; color: #333333;margin: 0 5px 5px 0;overflow: hidden; }
+.imgRight i{display: block;max-width: 105px;white-space: nowrap;text-overflow: ellipsis;-o-text-overflow: ellipsis;font-size: 12px;height: 19px;line-height: 19px; color: #666666;overflow: hidden;display:block;font-style: normal;} 
+.imgFunction{ display:none;text-align: center; width: 200px;height: 22px;position: absolute;left: 0px;bottom: 3px; z-index: 20;color: #FFFFFF;font-size: 12px;text-decoration: none;}
+.imgFunction a{display: block; float: right;height: 20px;margin:2px 3px 0 3px; color: #000000;font-size: 12px;text-decoration: none;line-height: 20px;padding: 0 5px 0 5px;}
+.imgFunction a:hover{color:blue;cursor: pointer;}
+.imgFunctionHover{display: block;} 
+.imgDetail{width: 200px;min-height: 400px; position: absolute; z-index: 999;left: 200px;bottom: 20px;}
+
+.update{background-color: #f3ee9d;border-radius: 0.3em;}
+.delete{background-color: #b0f2e8;border-radius: 0.3em;}
+.checkDate{background: #facf98;border-radius: 0.3em;}

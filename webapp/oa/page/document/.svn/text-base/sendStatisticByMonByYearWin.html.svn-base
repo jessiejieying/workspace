@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;" class="statistics">
+  <#include "/aufw/page/include/loading.html">
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+          <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+              <div class="form-group statistics-condition header-group">
+				<span class="header-title">年度:</span>
+				<span id="yearDiv">
+					<input id="year" name="year" class="tool-bar-input margin-left-in" style="cursor: pointer;width: 60px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+				</span>
+                  <span class="span-bold header-title margin-left-out">拟稿处室:</span>
+
+                  <input id="draftDept" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                  <span class="span-bold margin-left-out header-title">文种:</span>
+
+                  <input id="fileType" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                  <div  class="button button-main margin-left-out js-statistics">统计</div>
+				<div id="exportButton" class="button button-main margin-left-in">导出</div>
+              </div>
+			  <div class="statistics-tab">
+				<div class="tab-content-show"><span id="condition"></span><span style="float:right; margin-right: 30px;" id='currtTime'></span></div>
+			  </div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th width="40">序号</th>
+                  <th w_index="monthWin" width="">月份</th>
+                  <th w_index="lastCount" width="150">上一年度</th>
+                  <th w_index="thisCount" width="150">本年度</th>
+                  <th w_index="anIncreaseOf" width="150">比增数</th>
+                  <th w_index="tongbizhi" width="150">同比值</th>
+                </tr>
+              </table>
+            </div>
+          </div> <!--右下-->
+					<!--<div class="grid-table-top" id="grid_table_bot">-->
+						<!--<div class="js-tool-bar"></div>-->
+						<!--<div id="container" class="" style="width: 98%;"></div>-->
+					<!--</div>-->
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script src="${base}/edenui/common/js/jq_plugins/highcharts/highcharts.js"></script>
+  <script>
+  	var gridOne;
+	var selectURL = "${base}/admin/documentStatistics/sendStatisticMonthByYear.action";
+	$(function() {
+		layOut("#common_table", "#grid_table");
+		
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : encodeURI(encodeURI(selectURL + "?etc=" + new Date().getTime()+"&year="+$('#year').val()+"&draftDept="+$('#draftDept').val()+"&sendFileType="+$('#fileType').val())),
+		    row_primary_key: "primaryKey",
+		    autoLoad: true,
+		    pageSizeSelect: true,
+		    pageSize:15,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				$("#currtTime").text(gridData.currentTime);
+				$("#condition").text(gridData.condition);
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("tr","#manage_grid_bot").each(function(){
+					$("td",this).eq(1).css("padding-left","8px");
+					$("td",this).css({"padding-left":"0px","text-align":"center"});
+				});
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+	        		$index=parseInt($this.attr("index"));
+	        		$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+			}
+		});
+
+		//统计功能
+		$(".js-statistics").click(function(){
+			gridOne.changeUrl(encodeURI(encodeURI(selectURL + "?etc=" + new Date().getTime()+"&year="+$('#year').val()+"&draftDept="+$('#draftDept').val()+"&sendFileType="+$('#fileType').val())));
+		});
+		
+		/*$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印", url:"${base}/admin/documentStatistics/sendStatisticByMonByYearPrintWin.action?etc=" + new Date().getTime() +"&year="+$('#year').val(),width:'900',height:'550', id:"sendStatisticByMonByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});*/
+		
+		$(document).on("click","#fileType",function(){
+	    	   var win={"text":"选择文种","url":"${base}/admin/department/openSelectDepartment.action?module=oa_send_document","width":"900","height":"550","parentIfr":window};
+	           window.top.CommonInput=$(this);
+	    	   window.top.createWindow(win);
+
+	    });
+		
+		$(document).on("click","#draftDept",function(){
+	    	   var win={"text":"选择拟稿处室","url":"${base}/admin/department/openSelectDepartment.action?module=oa_send_StatisticsDocument","width":"900","height":"550","parentIfr":window};
+	           window.top.CommonInput=$(this);
+	    	   window.top.createWindow(win);
+
+	     });
+		
+		$(document).on("click", "#exportButton", function() {
+	        window.location = encodeURI(encodeURI("${base}/admin/documentStatistics/sendStatisticMonByYearExport.action?etc="+new Date().getTime()+"&year="+$('#year').val()+"&draftDept="+$('#draftDept').val()+"&sendFileType="+$('#fileType').val()));
+		});
+	});
+	
+
+	function chartHeight() {
+		var $tableTop = $("#grid_table").height(), $bar = $(".js-tool-bar").height();
+		$("#container").height($tableTop - $bar);
+	}
+	
+	</script>
+</body>
+</html>

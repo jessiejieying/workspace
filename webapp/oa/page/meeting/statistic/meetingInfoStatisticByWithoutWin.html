@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+<#include "/aufw/page/include/head.html">
+<style type="text/css">
+.bsgrid td{
+  text-align:center;
+  padding-left:0px;
+}
+</style>
+</head>
+<body style="height: 100%;" class="statistics">
+    <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+            <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+              <div class="form-group statistics-condition header-group">
+                  <span class="span-bold header-title">年度:</span>
+                  <input name="startDate" id="startDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;width: 60px;" onclick="WdatePicker({dateFmt:'yyyy', maxDate:'2025'})" size="19" type="text">
+                  <span class="span-bold header-title margin-left-out">月份:</span>
+                  <input name="startmonth" id="meeting_start_month" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;width: 50px;" onclick="WdatePicker({dateFmt:'M'})" size="19" type="text">
+                  <span class="margin-left-in header-title">至</span>
+                  <input name="endMonth" id="meeting_end_month" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;width: 50px;" onclick="WdatePicker({dateFmt:'M'})" size="19" type="text">
+                  <div id="titleGroup" style="margin-top: 0px">
+	                  <span class="span-bold header-title margin-left-out">审批类型:</span>
+	                  <select id="meetingtype" class="tool-bar-input"  style="width:130px;height:26px;">
+	                      <option value="">全部</option>
+	                      <option value="oa_provincial_meeting_approve">全省性会议审批</option>
+	                      <option value="oa_provincial_meeting_record">全省性会议备案</option>
+	                  </select>
+	                  <div  class="button button-main margin-left-out js-statistics">统计</div>
+	                  <div id="exportButton" class="button button-main js-statistics margin-left-in" >导出</div>
+              		</div>
+              </div>
+                <div class="statistics-tab">
+                    <div class="clearfix">
+                        <div id="" class="tab-btn" style="display:none;">导出</div>
+                    </div>
+
+                    <div class="tab-content-show">
+                        <span id="condition" class="float-left"></span>
+                        <span style="float:right;margin-right:14px;">统计时间：${.now?string("yyyy.MM.dd")}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th width="40">序号</th>
+                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+                  <th w_index="main_org" width="150">申报单位</th>
+                  <th w_index="total" width="60">总计</th>
+                  <#list meetingWithoutDictList as dict>
+                  <th w_index="count${dict_index}">${dict.dictName}</th>
+                  </#list> 
+                </tr>
+              </table>
+            </div>
+          </div> 
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script src="${base}/edenui/common/js/jq_plugins/highcharts/highcharts.js"></script>
+  <script>
+	var gridOne;
+	var selectURL = "${base}/admin/meeting/meetingInfoStatisticByWithout.action";
+	
+	var chart;
+	var condition = "";
+	$(function() {
+		//layOut("#common_table", "#grid_table", "#grid_table_bot");
+		layOut("#common_table", "#grid_table");
+
+	//	chartHeight();
+
+	//统计功能
+		$(".js-statistics").click(function(){
+		    var startDate= $("#startDate").val();
+		    var meetingtype=$("#meetingtype").val();
+		    var start_month=$("#meeting_start_month").val();
+		      var end_month=$("#meeting_end_month").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    }
+		    gridOne.changeUrl(selectURL + symbol + 'start_year=' + startDate  +"&start_month="+start_month+"&end_month="+end_month+"&meetingtype="+meetingtype+'&etc='+new Date().getTime());
+		});
+		//验证起始日期和截止日期
+	     $(document).on("blur","#meeting_start_month",function(){
+     	var start_month=$("#meeting_start_month").val();
+     	var end_month=$("#meeting_end_month").val();
+     	if($.trim(end_month)!=""){
+     	   if($.trim(start_month)!=""){
+     		   if(parseInt(start_month)>parseInt(end_month)){
+     			   layer.msg("起始月份不能大于截止月份");
+     			   return;
+     		   }
+     	   }else{
+     		   layer.msg("请选择起始月份");
+     		   return;
+     	   }
+     	}
+     });
+     $(document).on("blur","#meeting_end_month",function(){
+     	var start_month=$("#meeting_start_month").val();
+     	var end_month=$("#meeting_end_month").val();
+     	if($.trim(end_month)!=""){
+     	   if($.trim(start_month)!=""){
+     		   if(parseInt(start_month)>parseInt(end_month)){
+     			   layer.msg("起始月份不能大于截止月份");
+     			   return;
+     		   }
+     	   }else{
+     		   layer.msg("请选择起始月份");
+     		   return;
+     	   }
+     	}
+     });
+	    //导出功能
+    	$(document).on("click","#exportButton",function(){
+		    var startDate= $("#startDate").val();
+		    var start_month=$("#meeting_start_month").val();
+		      var end_month=$("#meeting_end_month").val();
+		    var meetingtype=$("#meetingtype").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    }
+	        window.location = "${base}/admin/meeting/meetingInfoStatisticByWithoutExport.action" + symbol + 'start_year=' + startDate + "&start_month="+start_month+"&end_month="+end_month+"&meetingtype="+meetingtype+ '&etc='+new Date().getTime();
+		});
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?etc=" + new Date().getTime(),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				$("#condition").html(gridData.condition);
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("tr","#manage_grid_bot").each(function(){
+					$("td",this).eq(1).css("padding-left","0px");					
+				});
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+	        		$index=parseInt($this.attr("index"));
+	        		$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+ 			//	createChart();
+			}
+		});
+
+
+
+		$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印", url:"${base}/admin/documentStatistics/incomingStatisticByYearPrintWin.action?etc=" + new Date().getTime(),width:'900',height:'550', id:"incomingStatisticByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});
+		
+	});
+	
+
+	function chartHeight() {
+		var $tableTop = $("#grid_table").height(), $bar = $(".js-tool-bar").height();
+		$("#container").height($tableTop - $bar);
+	}
+	
+	//屏幕分辨率小于1024，右侧排版 
+    if($(window).width() <= 1024){
+      $("#titleGroup").css({"width":"100%","margin-left":"-10px"});
+    }
+	</script>
+</body>
+</html>

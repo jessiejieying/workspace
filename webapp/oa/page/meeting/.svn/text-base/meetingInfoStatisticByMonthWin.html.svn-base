@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+    <#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;" class="statistics">
+
+  <#include "/aufw/page/include/loading.html">
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+            <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+              <div class="form-group statistics-condition header-group">
+                  <span class="span-bold header-title">年度:</span>
+                  <input name="year" id="year" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+                  <div  class="button button-main js-statistics">统计</div>
+              </div>
+							<div class="statistics-tab">
+								<div class="clearfix">
+									<div id="exportButton" class="tab-btn">导出</div>
+									<div id="print_button" class="tab-btn">打印</div>
+								</div>
+
+								<div class="tab-content-show">统计时间：<span></span></div>
+							</div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th w_check="true" width="30"></th>
+                  <th w_index="month" width="200">月份</th>
+                  <#list meetingLevelDictList as dict>
+                  <th w_index="count${dict_index}" width="200">${dict.dictName}</th>
+                  </#list>
+                  <th w_index="total">总计</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script>
+	var gridOne;
+	var selectURL = "${base}/admin/meeting/meetingInfoStatisticByMonth.action";
+	var time = [  ];
+	var chartReadData = [];
+	var chartDealData = [];
+	var chartTotalData = [];
+	var chart;
+	var condition = "";
+	$(function() {
+
+		layOut("#common_table", "#grid_table");
+
+	//统计功能
+		$(".js-statistics").click(function(){
+		    var year= $("#year").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    }
+		      
+		    gridOne.changeUrl(selectURL + symbol + 'year=' + year + '&etc='+new Date().getTime());
+		});
+
+	    //导出功能
+    	$(document).on("click","#exportButton",function(){
+		    var year= $("#year").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    }
+	        window.location = "${base}/admin/meeting/meetingInfoStatisticByMonthExport.action" + symbol + 'year=' + year + '&etc='+new Date().getTime();
+		});
+
+
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?etc=" + new Date().getTime(),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("tr","#manage_grid_bot").each(function(){
+					$("td",this).eq(1).css("padding-left","8px");					
+				});
+				time = [];
+				chartData = [];
+				var data = gridOne.getAllRecords();
+ 				for(var i = 0,l = data.length; i < l; i++){
+					time[i] = data[i].year;
+					chartReadData[i] = data[i].read;
+					chartDealData[i] = data[i].deal;
+					chartTotalData[i] = data[i].total;
+				} 
+
+			}
+		});
+
+
+		$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印", url:"${base}/admin/documentStatistics/incomingStatisticByYearPrintWin.action?etc=" + new Date().getTime(),width:'900',height:'550', id:"incomingStatisticByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});
+
+	});
+	
+
+	</script>
+</body>
+</html>

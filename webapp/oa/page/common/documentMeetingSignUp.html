@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>Eden</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css" />
+    <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css" />
+    <style>
+    .table-fixed-header {
+        width: 797px !important;
+    }
+    
+    .findSame td {
+        color: red;
+    }
+    
+    .findSame td a {
+        color: red;
+    }
+    
+    #entry_table td {
+        padding-left: 0px;
+        text-align: center;
+    }
+    
+    #leave_table td {
+        padding-left: 0px;
+        text-align: center;
+    }
+    
+    .unit-table {
+        height: 210px;
+        position: relative;
+        overflow-y: scroll;
+        padding-top: 40px;
+        width: 814px;
+    }
+    
+    .meeting-table {
+        height: 140px;
+        position: relative;
+        overflow-y: scroll;
+        width: 814px;
+        ;
+        margin: 0 auto;
+        padding-top: 39px;
+        margin-top: 6px;
+    }
+    
+    .js-room,
+    .js-seat {
+        padding-left: 5px;
+    }
+    
+    .table-fixed-header th {
+        height: 40px;
+    }
+    
+    .table-fixed-header {
+        border-right: 2px solid #71b8ec!important;
+    }
+
+        .bdblue{
+            border: 2px solid #71b8ec!important;
+        }
+        .body-choice-right-only{
+            position: absolute;
+            top: 37px;
+            right: 0px;
+            width: 395px!important;
+            height: 307px!important;
+            overflow: auto;
+            border: 2px solid #71b8ec!important;
+        }
+        .body-choice-right-only{
+
+        }
+
+
+.oa-form-grid td a{
+font-size:14px;
+}
+    </style>
+    <script>
+    var params = {
+        id: window.top.data_dataset2.item(window.top.data_dataset2.first()).id
+    }
+    var gridOne;
+    var messageUrl = "${base}/admin/waitDocument/queryMessageRecord.action";
+
+    //存储右侧的数据
+    var rightData = [];
+    var datas = [];
+    var datasSave = [];
+    var note = '';
+    var project = '${base}';
+
+    var djsn = window.top.globalParams.djsn;
+    </script>
+</head>
+
+<body class="ms-controller document-exchange-body" ms-controller="wrap">
+    <div class="document-exchange-main layer-choice-pop">
+        <div class="searchHtml" ms-visible="@searchHtmlShow">
+            <ul>
+                <li ms-click="@searchHtmlDataClick(el)" ms-for="(index,el) in @searchHtmlData">{{el.content}}</li>
+            </ul>
+        </div>
+        <div class="document-exchange-header">
+            <ul class="document-exchange-header-ul js-exchange-header-ul">
+                <li ms-click="@tabClick(0)" ms-class="{on:@indexShow===0}" ms-if="@sendExist">发送</li>
+                <li ms-click="@tabClick(1)" ms-class="{on:@indexShow===1}" ms-click="" ms-if="@formExist">报名表</li>
+
+            </ul>
+        </div>
+        <!--发送-->
+        <div class="document-exchange-body default-status" ms-class="{active:@indexShow===0}" ms-if="@sendExist" style="position: relative;">
+
+            <div class=" layer-choice-content" style="margin-top: 10px;" id="choiceBot">
+                <div class="layer-choice-content-header unit-header clearfix" style="position:relative;">
+                    <span  class="header-left">选群组</span>
+                    <select class="float-left input" ms-duplex="@groupSelect"  id="unit-select">
+                        <option ms-for="(index,el) in @groupOption"  ms-attr="{value:el.id}">{{el.name}}</option>
+                    </select>
+                    <div class=" float-left" >
+                        <input id="other_search_text" ms-duplex="@searchGroup" type="text" class="tool-bar-input " style="width: 168px;" placeholder="输入搜索内容">
+                    </div>
+                    <span class="margin-left padding-left header-left" >已选（{{@choiceList.length}}）人</span>
+                    <span class="header-clear"  ms-click="@clearAll()">全部清除</span>
+                </div>
+                <div id="choiceBotBody" class="layer-choice-content-body clearfix " style="margin-top:11px;height:100px;border: 0;">
+                    <div class="body-choice-left bdblue">
+                        <ul>
+                            <li ms-for="(index,el) in @groupList" ms-attr="{'data-id':el.id,'data-account':el.account}"  ms-click="@choiceClick(el,index,1)" ms-visible="el.isShow" ms-class="{selected:el.select}">{{el.name}}</li>
+                        </ul>
+
+                    </div>
+
+                    <div class="body-choice-right-only body-choice-right">
+                        <div class="choice-content other-js-choice-content">
+                            <div class="choice-content-btn js-choice-btn" ms-for="(index,el) in @choiceList" ms-click="@choiceListDel(el)" ms-attr="{'data-seq':el.seq}">
+                                <span>{{el.name}}</span>
+                                <i class="icon-times"></i>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <button class="button button-main margin-small-top" ms-click="@choiceAll(1)">全部选择</button>
+            <div class=" layer-choice-content margin-top" style="margin-top: 10px;">
+                <div class="layer-choice-content-header unit-header clearfix" style="position:relative;">
+                    <span  class="header-left">选处室</span>
+                    <select class="float-left input" ms-duplex="@officeSelect" >
+                        <option ms-for="(index,el) in @officeOption"  ms-attr="{value:el.id}">{{el.name}}</option>
+                    </select>
+                    <div class=" float-left" >
+                        <input  ms-duplex="@searchOffice" type="text" class="tool-bar-input " style="width: 168px;" placeholder="输入搜索内容">
+                    </div>
+
+                </div>
+                <div  class="layer-choice-content-body clearfix " style="margin-top:11px;height:100px;border: 0;">
+                    <div class="body-choice-left bdblue">
+                        <ul >
+                            <li ms-for="(index,el) in @officeList" ms-attr="{'data-id':el.id,'data-account':el.account}" ms-click="@choiceClick(el,index,2)" ms-visible="el.isShow" ms-class="{selected:el.select}">{{el.name}}</li>
+                        </ul>
+                    </div>
+                </div>
+                <button class="button button-main margin-small-top" ms-click="@choiceAll(2)">全部选择</button>
+            </div>
+            <div class="document-exchange-body-main">
+                <div class="document-exchange-body-top js-exchange-body">
+                    <div class="header clearfix">
+                        <span class="header-left margin-right">选择文件</span>
+                        <label class="cursor-pointer" style="position: relative;top: 5px;">
+                            <input type="checkbox" style="vertical-align:-2px;" ms-duplex-checked="@fileListCheck" class="margin-small-right" data-duplex-changed="@fileListCheckChange">全选</label>
+                    </div>
+                    <div class="main main-file">
+                        <ul class="file-ul clearfix" id="fileUl">
+                            <li ms-for="(index,item) in @fileDatas">
+                                <label>
+                                    <input ms-duplex-checked="item.check" type="checkbox" ms-attr="{'data-id':item.id,'data-name':item.name,'data-type':item.type,'data-othername':item.othername,'data-otherid':item.otherid}" data-duplex-changed="@fileListCheckOne" class="js-file-check" />
+                                </label>
+                                <a ms-attr="{href:item.path}">{{item.name}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="text-center margin-small-top">
+                    <button class="button button-main" ms-click="@sendSure()" id="sure">发送</button>
+                    <button class="button button-main margin-left"  >取消</button>
+                </div>
+            </div>
+        </div>
+        <!--报名表-->
+        <div class="document-exchange-body default-status" ms-class="{active:@indexShow===1}" ms-if="@formExist">
+            <div class="oa-meeting-entry" style="padding-top: 10px;width:814px;">
+                <h6 class="form-ft-song  font-bold">参会人员名单</h6>
+                <div class="clearfix meeting-table">
+                    <table class="table-fixed-header bsgrid-header" style="position: fixed;left:43px;top:73px;width: 796px;">
+                        <tr class="nodrop nodrag">
+                            <th width="40" class="padding-left8">序号</th>
+                            <th width="100">所属处室</th>
+                            <th width="68">姓名</th>
+                            <th width="76">报名时间</th>
+                            <th width="60">排序</th>
+                        </tr>
+                    </table>
+                    <table id="entry_table" class="bsgrid oa-form-grid  border-top-blue margin-bottom20 centerBlock" style="width:797px !important;">
+                        <tr ms-attr="{id:el.id}" ms-class="{findSame:el.color,'js-body-tr':true}" ms-for="(index,el) in @meetingEntryList.dataJoin">
+                            <td style="width: 40px;"><span class="js-sequence">{{el.seq}}</span></td>
+                            <td style="width: 100px;" ms-attr="{title:el.orgName}">{{el.orgName}}</td>
+                            <td style="width: 68px;" ms-attr="{title:el.name}">{{el.name}}</td>
+                            <td style="width: 76px;" ms-attr="{title:el.registDatee}">{{el.registDate}}</td>
+                            <td style="width: 60px;" title="">
+                                <select ms-attr="{'data-index':index}" class="serialNumber js-datajoin-Change" ms-duplex="index">
+                                    <option selected="selected" ms-attr="{value:$index}" ms-for="($index,$el) in @meetingEntryList.dataJoin">{{$index+1}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr ms-if="@meetingEntryList.dataJoin.length<1">
+                            <td colspan="12" style="text-align: center;padding-left: 0;">暂无数据</td>
+                        </tr>
+                    </table>
+                </div>
+                <br/>
+                <h6 class="form-ft-song  font-bold">请假人员名单</h6>
+                <div class="clearfix meeting-table">
+                    <table class="table-fixed-header bsgrid-header" style="position: fixed;left:43px;top:251px;width: 796px;">
+                        <tr class="nodrop nodrag">
+                            <th width="40" class="padding-left8">序号</th>
+                            <th width="100">所属处室</th>
+                            <th width="68">姓名</th>
+                            <th width="76">请假时间</th>
+                            <th width="60">排序</th>
+                        </tr>
+                    </table>
+                    <table id="leave_table" class="bsgrid oa-form-grid  border-top-blue margin-bottom20 centerBlock" style="">
+                        <tr ms-attr="{id:el.id}" ms-class="{findSame:el.color,'js-body-tr':true}" ms-for="(index,el) in @meetingEntryList.dataLeave" style="cursor:pointer;" onclick="trOnclik(this);">
+                            <td style="width: 40px;"><span class="js-sequence">{{el.seq}}</span></td>
+                            <td style="width: 100px;" ms-attr="{title:el.orgName}">{{el.orgName}}</td>
+                            <td style="width: 68px;" ms-attr="{title:el.name}">{{el.name}}</td>
+                            <td style="width: 76px;" ms-attr="{title:el.registDate}">{{el.registDate}}</td>
+                            <td style="width: 60px;" title="">
+                                <select ms-attr="{'data-index':index}" class="serialNumber js-dataleave-Change" ms-duplex="index">
+                                    <option ms-attr="{value:$index}" ms-for="($index,$el) in @meetingEntryList.dataLeave">{{$index+1}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr ms-if="@meetingEntryList.dataLeave.length<1">
+                            <td colspan="12" style="text-align: center;padding-left: 0;">暂无数据</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="clearfix centerBlock" style="width:814px;margin: 0 auto;margin-top:10px;">
+                    <h6 class="form-ft-song margin-bottom font-bold">报名情况</h6>
+                    <table id="report_table" class="bsgrid oa-form-grid  border-top-blue margin-bottom20 centerBlock" style="width:814px!important;">
+
+                        <tr class="">
+                            <td width="105" class="font-bold">未报名人员<span ms-if="@meetingEntryList.toSignCount>0">({{@meetingEntryList.toSignCount}})</span></td>
+                            <td ms-attr="{title:@meetingEntryList.toFeedbackOrg}">{{@meetingEntryList.toFeedbackOrg}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="text-center margin-top margin-bottom" ms-if="@isFinish" style="">
+                    <div class="button button-main" ms-click="@meetingSave()" id="save">保存</div>
+                    <div ms-if="@meetingEntryList.toFeedbackOrg.length>1" class="button button-main margin-left " id="cuiban_meetingInfo" ms-click="@meetingReminders()">催报</div>
+                    <div class="button button-main margin-left" ms-click="@meetingExport()" id="export">导出</div>
+                </div>
+            </div>
+        </div>
+        <!--签收反馈情况-->
+        <div class="document-exchange-body default-status" ms-class="{active:@indexShow===2}" ms-if="@feedBackExist">
+            <div class="clearfix centerBlock padding-top document-exchange-body-top " style="margin:0 auto;">
+                <div class="clearfix margin-bottom">
+                    <span class="float-left h26 font-bold">未签收单位</span>
+                    <button ms-if="@noSignList.length>0" ms-click="@feedBackMessageTip()" class="button button-main margin-left float-lfet">短信提醒</button>
+                    <button ms-if="@isWithdraw" class="button button-main margin-left float-lfet" ms-click="@serviceWithdrawal">撤回</button>
+                    <span class="float-right h26">{{@noSignCount}}家</span>
+                </div>
+                <table id="common_table" style="width: 100%;" class="border-top-blue">
+                    <tr>
+                        <!-- 右侧 -->
+                        <td class="ver-top">
+                            <div class="">
+                                <div class="js-grid-father grid-father unit-table">
+                                    <table class="table-fixed-header bsgrid-header" style="position: fixed;left:43px;top:90px;width: 797px;">
+                                        <tr>
+                                            <th width="45">
+                                                <input ms-duplex-checked="@noSignListCheckAll" data-duplex-changed="@noSignListCheckAllChange" class="standard-checkbox" type="checkbox" />
+                                            </th>
+                                            <th width="47" class="padding-left0" style="padding-left:0px;text-align: center!important;">序号
+                                            </th>
+                                            <th width="337" style="padding-left:0px;text-align: center !important;">单位
+                                            </th>
+                                            <th width="162" style="padding-left:0px;text-align: center !important;">联系人</th>
+                                            <th width="204" style="padding-left:0px;text-align: center!important;">联系电话</th>
+                                        </tr>
+                                    </table>
+                                    <table class="bsgrid" style="border-top: 2px solid #71b8ec;">
+                                        <tr ms-for="(index,el) in @noSignList">
+                                            <td width="45" style="padding-left: 0;text-align: center">
+                                                <input class="standard-checkbox " type="checkbox" ms-duplex-checked="el.check" data-duplex-changed="@noSignListOneChange" value="" />
+                                            </td>
+                                            <td width="47" style="padding-left: 0;text-align: center">{{index+1}}</td>
+                                            <td width="337" style="padding-left: 0;text-align: center">{{el.signOrg}}</td>
+                                            <td width="162">{{el.person}}</td>
+                                            <td>{{el.phone}}</td>
+                                        </tr>
+                                        <tr ms-if="@noSignList.length<1">
+                                            <td colspan="5" style="text-align: center;padding-left: 0;">暂无数据</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="clearfix centerBlock " style="margin:0 auto;">
+                <div class="clearfix  padding-top">
+                    <span class="float-left h26 font-bold ">已签收单位</span>
+                    <button ms-if="@hasSignList.length>0" ms-click="@instructionToFb()" class="button button-main margin-left float-lfet">附件汇总</button>
+                    <span class="float-right h26">{{@hasSignCount}}家</span>
+                </div>
+                <table class="border-top-blue margin-top">
+                    <tr>
+                        <!-- 右侧 -->
+                        <td class="ver-top">
+                            <div class="js-grid-father grid-father unit-table">
+                                <table class="table-fixed-header bsgrid-header" style="position: fixed;left:43px;top:347px;width: 797px;">
+                                    <tr>
+                                        <th width="40">
+                                            <input ms-duplex-checked="@hasSignListCheckAll" data-duplex-changed="@hasSignListCheckAllChange" class="standard-checkbox" type="checkbox" />
+                                        </th>
+                                        <th width="40" style="text-align: center!important;padding-left:0px!important;">序号
+                                        </th>
+                                        <th width="100" style="padding-left:0px;text-align: center !important;">单位
+                                        </th>
+                                        <th width="200" style="padding-left:0px;text-align: center !important;">签收或者反馈情况
+                                        </th>
+                                        <th style="padding-left:0px;text-align: center !important;">反馈内容
+                                        </th>
+                                    </tr>
+                                </table>
+                                <table class="bsgrid" id="second_table">
+                                    <tr ms-for="(index,el) in @hasSignList">
+                                        <td width="40">
+                                            <input type="checkbox" ms-duplex-checked="el.check" data-duplex-changed="@hasSignListOneChange" value="" />
+                                        </td>
+                                        <td width="40" style="padding-left: 0;text-align: center;">{{index+1}}</td>
+                                        <td width="100" style="padding-left:0px;text-align: center !important;" class="lineNoWrap" ms-attr="{title:el.unit}" ms-html="el.unit"></td>
+                                        <td width="200" class="lineNoWrap" ms-attr="{title:el.situation}">{{el.situation}}</td>
+                                        <td class="lineNoWrap" ms-attr="{title:el.content}">{{el.content}}</td>
+                                    </tr>
+                                    <tr ms-if="@hasSignList.length<1">
+                                        <td colspan="5" style="text-align: center;padding-left: 0;">暂无数据</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/bsgrid/grid.zh-CN.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/bsgrid/grid.extend.min.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<script src="${base}/edenui/common/js/avalon/avalon2.js"></script>
+<script>
+var $advice = getUrlParam('advice');
+var $noAccount = '';
+
+var undistinguishData = [];
+var isShowNumber = false;
+
+var stepParam = 'step100';
+
+//全部的单位数据
+var allUnitData = [];
+
+var messageData = "";
+
+var mailMessageData = {
+    'sendRange': [],
+    'telphones': [],
+    'content': '',
+    //单次为1，多次为2
+    'taskType': 1,
+    //多次的时间间隔
+    'cycleHour': 1,
+    'messageType': 2
+}
+var mailMessageDataDirect = {
+    'sendRange': [],
+    'telphones': [],
+    'content': '',
+    'messageType': 2
+}
+
+//发送短信内容
+var mailMessage = {
+    "accounts": "",
+    'telphones': "",
+    'content': ""
+}
+
+//参数配置表
+avalon.config({
+    debug: false
+});
+var model = avalon.define({
+    $id: "wrap",
+    //群组列表
+    groupList:[],
+    //群组下拉选项
+    groupOption:[],
+    groupSelect:'',
+    //群组搜索
+    searchGroup:'',
+
+    //处室列表
+    officeList:[],
+    //群主下拉选项
+    officeOption:[],
+    officeSelect:'',
+    //处室搜索
+    searchOffice:'',
+    //选中的人
+    choiceList:[],
+    //删除右侧人员
+    choiceListDel:function(obj){
+
+        model.choiceList.forEach(function(value,index){
+            if(value.account==obj.account){
+                model.choiceList.splice(index,1);
+            }
+        });
+
+        //清除左侧的选中状态
+
+        model.groupList.forEach(function(value){
+            if(value.account==obj.account){
+                value.select=false;
+
+            }
+        });
+
+            model.officeList.forEach(function(value){
+                if(value.account==obj.account){
+                    value.select=false;
+                }
+            });
+
+    },
+
+    //1是群组，2是处室
+    choiceAll:function(type){
+
+        var choiceListData=model.choiceList.map(function(value){
+            return value.account;
+        });
+
+        if(type=="1"){
+            model.groupList.forEach(function(value){
+                if(choiceListData.indexOf(value.account)<0){
+                    model.choiceList.push({
+                        "account":value.account,
+                        "name":value.name,
+                        "seq":value.seq
+                    });
+
+                }
+                value.select=true;
+            });
+        }
+        else if(type=="2"){
+            model.officeList.forEach(function(value){
+                if(choiceListData.indexOf(value.account)<0){
+
+                    model.choiceList.push({
+                        "account":value.account,
+                        "name":value.name,
+                        "seq":value.seq
+                    });
+
+                }
+                value.select=true;
+            });
+        }
+
+    },
+    // obj：传递对象，idnex：索引值，num：1、群组，2、处室
+    choiceClick:function(obj,index,num){
+
+        var isPush=true;
+        model.choiceList.forEach(function(value){
+
+            //是否已经存在列表中
+            if(value.account==obj.account){
+                isPush=false;
+            }
+        });
+
+        if(isPush){
+
+            model.choiceList.push({
+                "account":obj.account,
+                "name":obj.name,
+                "seq":obj.seq
+            });
+
+            model.choiceList.sort(function(a,b){
+                return a.seq- b.seq
+            });
+
+
+            if(num=="1"){
+                model.groupList[index].select=true;
+            }
+            else if(num=="2"){
+                model.officeList[index].select=true;
+            }
+
+        }
+
+    },
+    clearAll:function(){
+
+        model.choiceList.clear();
+
+        model.officeList.forEach(function(value){
+            value.select=false;
+        });
+        model.groupList.forEach(function(value){
+            value.select=false;
+        });
+
+    },
+    fileDatas: [],
+    indexShow: 0,
+    //未识别单位
+    undistinguishData: [],
+    //是否存在报名表
+    formExist: false,
+    meetingEntryList: {
+        //参会人员名单
+        dataJoin: [],
+        //请假人员名单
+        dataLeave: [],
+        //已上报单位
+        hasFeedbackOrg: '',
+        hasSignCount: 0,
+        //未上报单位
+        toFeedbackOrg: '',
+        toSignCount: 0
+    },
+    //搜索区域弹出层
+    searchHtmlData: [],
+    searchHtmlShow: false,
+    searchHtmlDataClick: function(obj) {
+
+        var testText = $("#distinguish_text").val();
+        var dataPush = testText.replace(/，/g, ",").replace(/、/g, ",").replace(/;/g, ",").replace(/；/g, ",").split(",");
+
+        dataPush[dataPush.length - 1] = obj.content;
+        $("#distinguish_text").val(dataPush.join(",") + ",").focus();
+
+        model.searchHtmlShow = false;
+
+    },
+    distinguishChange: function() {
+        var testText = $("#distinguish_text").val();
+        var dataPush = testText.replace(/，/g, ",").replace(/、/g, ",").replace(/;/g, ",").replace(/；/g, ",").split(",");
+
+        var $val = dataPush[dataPush.length - 1];
+        var searchData = [];
+        //暂存输入单位
+        window.top.toExchangeHtml = $("#distinguish_text").val();
+
+        model.searchHtmlData.length = 0;
+        if ($val.length) {
+            allUnitData.forEach(function(value) {
+
+                if ((value.name).indexOf($val) === 0) {
+
+                    searchData.push({
+                        'content': value.name
+                    })
+                }
+            });
+
+            model.searchHtmlData = searchData;
+            if (searchData.length) {
+                model.searchHtmlShow = true;
+            }
+
+        }
+    },
+    sendExist: true,
+    feedBackExist: true,
+    isFinish:true,
+    //附件列表全选项
+    fileListCheck: false,
+    fileListCheckChange: function(e) {
+        var checked = e.target.checked;
+
+        if (checked) {
+            model.fileDatas.forEach(function(value) {
+                value.check = true;
+            });
+        } else {
+            model.fileDatas.forEach(function(value) {
+                value.check = false;
+            });
+        }
+    },
+    fileListCheckOne: function(e) {
+        var checked = e.target.checked;
+        if (checked === false) {
+            model.fileListCheck = false;
+        } else {
+            model.fileListCheck = model.fileDatas.every(function(value) {
+                return value.check;
+            });
+        }
+    },
+    //单位选择
+    mainSendClick: function() {
+
+        //单位识别隐藏
+        model.searchHtmlShow = false;
+
+        isShowNumber = true;
+
+        var url = project + "/admin/commonDispatch/documentMeetingSignUpChoice.action";
+        var father = $(this).closest(".js-exchange-body");
+        window.top.ExchangeChoice = window.name;
+        window.top.createWindow({
+            text: '转公文交换',
+            url: url,
+            id: 'dhxPop',
+            width: '900',
+            height: '550',
+            callBack: function(val, text) {}
+        });
+    },
+    //会议报名表保存
+    meetingSave: function() {
+
+        var joinList = [],
+            leaveList = [];
+        $("#entry_table .js-body-tr").each(function() {
+            var $this = $(this);
+            joinList.push(JSON.stringify({
+                "id": $this.attr("id"),
+                "sequence": $this.find(".js-sequence").html(),
+                "room": $this.find(".js-room").val(),
+                "seat": $this.find(".js-seat").val()
+            }));
+        });
+        $("#leave_table .js-body-tr").each(function() {
+            var $this = $(this);
+            leaveList.push(JSON.stringify({
+                "id": $this.attr("id"),
+                "sequence": $this.find(".js-sequence").html(),
+                "room": $this.find(".js-room").val(),
+                "seat": $this.find(".js-seat").val()
+            }));
+        });
+        var xmlData = '{';
+        xmlData += '"joinList":[' + joinList.join(",") + '],';
+        xmlData += '"leaveList":[' + leaveList.join(",") + ']';
+        xmlData += "}";
+
+        var obj = {
+            'dataJson': xmlData
+        }
+
+        var url = "${base}/admin/hallRegist/meetingSignManageSave.action";
+        $.post(url, obj, function(data) {
+            layer.msg(data.result);
+        });
+    },
+
+    //会议报名表导出
+    meetingExport: function() {
+        window.location = "${base}/admin/hallRegist/meetingSignExport.action?wfId=" + (window.top.globalParams.wfid) + "&etc=" + new Date().getTime();
+    },
+
+    //编辑短信
+    editMessage: function() {
+        var messageUrl = project + '/admin/commonDispatch/sendMessagePop.action';
+        var iframe = layer.open({
+            type: 2,
+            title: '短消息',
+            area: ['810px', '474px'],
+            fix: true, //不固定
+            maxmin: true,
+            content: messageUrl,
+            scrollbar: false,
+            fullPage: false,
+            success: function(layero, index) {}
+        });
+    },
+    //已经签收的
+    hasSignList: [],
+    hasSignCount: 0,
+    hasSignListCheckAll: true,
+    //未签收的
+    noSignList: [],
+    noSignCount: 0,
+    isWithdraw: false,
+    noSignListCheckAll: true,
+    noSignListCheckAllChange: function(e) {
+        var checked = e.target.checked;
+
+        if (checked) {
+            model.noSignList.forEach(function(value) {
+                value.check = true;
+            });
+        } else {
+            model.noSignList.forEach(function(value) {
+                value.check = false;
+            });
+        }
+    },
+    noSignListOneChange: function(e) {
+        var checked = e.target.checked;
+        if (checked === false) {
+            model.noSignListCheckAll = false;
+        } else {
+            model.noSignListCheckAll = model.noSignList.every(function(value) {
+                return value.check;
+            });
+        }
+    },
+    hasSignListCheckAllChange: function(e) {
+        var checked = e.target.checked;
+
+        if (checked) {
+            model.hasSignList.forEach(function(value) {
+                value.check = true;
+            });
+        } else {
+            model.hasSignList.forEach(function(value) {
+                value.check = false;
+            });
+        }
+    },
+    hasSignListOneChange: function(e) {
+        var checked = e.target.checked;
+        if (checked === false) {
+            model.hasSignListCheckAll = false;
+        } else {
+            model.hasSignListCheckAll = model.hasSignList.every(function(value) {
+                return value.check;
+            });
+        }
+    },
+    instructionToFb: function() {
+        var idData = [];
+
+        model.hasSignList.forEach(function(value) {
+            if (value.check) {
+                idData.push(value.id);
+            }
+        });
+
+        if (idData.length < 1) {
+            layer.msg('请至少选择一条数据');
+            return;
+        }
+
+
+        var obj = {
+            "ids": idData.join(","),
+            "wfId": window.top.wfId,
+            "documentId": params.id
+        };
+
+        var url = "${base}/admin/draftSignFeedBack/summaryAttachment.action";
+        $.post(url, obj, function(result) {
+            layer.msg(result.message);
+        });
+
+    },
+    //撤回
+    serviceWithdrawal: function() {
+
+        mailMessageDataDirect.sendRange.length = 0;
+        var dataDirect = [];
+        model.noSignList.forEach(function(value) {
+            if (value.check) {
+                dataDirect.push({
+                    'name': value.person,
+                    'id': "",
+                    'post': value.post,
+                    'tel': value.phone,
+                    'unit': value.signOrg
+                });
+            }
+        });
+        mailMessageDataDirect.sendRange = dataDirect;
+        if (mailMessageDataDirect.sendRange.length) {
+            var messageUrl = '${base}/admin/commonDispatch/sendMessageCancelPop.action?advice=' + $advice;
+            var iframe = layer.open({
+                type: 2,
+                title: '短消息',
+                area: ['810px', '474px'],
+                fix: true, //不固定
+                maxmin: true,
+                content: messageUrl,
+                scrollbar: false,
+                fullPage: false,
+                success: function(layero, index) {
+
+                }
+            });
+
+        } else {
+            layer.msg('请至少选择一个单位');
+        }
+    },
+    //会议报名
+    meetingSignView: function(meetingId, signOrg) {
+        window.top.createWindow({
+            'text': '查看会议报名',
+            'id': 'meetingId',
+            'url': "${base}/admin/meeting/meetingSignView.action?meetingId=" + (meetingId) + "&signOrg=" + (signOrg),
+            'width': '900',
+            'height': '570',
+            'parent_ifr': window
+        });
+
+    },
+    meetingReminders: function() {
+
+        var obj = {
+            "accounts": $noAccount
+        }
+        var groupUrl = "${base}/admin/sendRange/selectOrgInfo.action?etc=" + new Date().getTime();
+        $.post(groupUrl, obj, function(data) {
+
+            if (data.datas.length) {
+
+                mailMessageDataDirect.sendRange.length = 0;
+                var dataDirect = [];
+                data.datas.forEach(function(value) {
+
+                    dataDirect.push({
+                        'name': value.name ? value.name : '',
+                        'id': "",
+                        'post': value.post ? value.post : '',
+                        'tel': value.number ? value.number : '',
+                        'unit': value.unit ? value.unit : ''
+                    });
+
+                });
+                mailMessageDataDirect.sendRange = dataDirect;
+
+                var messageUrl = '${base}/admin/commonDispatch/sendMessageDirectPop.action';
+                var iframe = layer.open({
+                    type: 2,
+                    title: '短消息',
+                    area: ['810px', '474px'],
+                    fix: true, //不固定
+                    maxmin: true,
+                    content: messageUrl,
+                    scrollbar: false,
+                    fullPage: false,
+                    success: function(layero, index) {
+
+                    }
+                });
+
+            }
+
+
+
+        });
+
+    },
+    feedBackMessageTip: function() {
+
+        mailMessageDataDirect.sendRange.length = 0;
+        var dataDirect = [];
+        model.noSignList.forEach(function(value) {
+            if (value.check) {
+                dataDirect.push({
+                    'name': value.person,
+                    'id': "",
+                    'post': value.post,
+                    'tel': value.phone,
+                    'unit': value.signOrg
+                });
+            }
+        });
+        mailMessageDataDirect.sendRange = dataDirect;
+        if (mailMessageDataDirect.sendRange.length) {
+            var messageUrl = '${base}/admin/commonDispatch/sendMessageDirectPop.action';
+            var iframe = layer.open({
+                type: 2,
+                title: '短消息',
+                area: ['810px', '474px'],
+                fix: true, //不固定
+                maxmin: true,
+                content: messageUrl,
+                scrollbar: false,
+                fullPage: false,
+                success: function(layero, index) {
+
+                }
+            });
+
+        } else {
+            layer.msg('请至少选择一个单位');
+        }
+    },
+    //发送确认
+    sendSure: function() {
+    	
+        var fileName = [];
+        var fileId = [];
+
+        
+        var fileUpload = $(".js-file-check");
+
+        if (fileUpload.length) {
+
+            fileUpload.each(function() {
+                var $this = $(this);
+
+                if ($this.prop("checked")) {
+                    if ($this.data("type") == "file") {
+                        fileName.push($this.data("name"));
+                        fileId.push($this.data("id"));
+                    }
+                }
+            });
+        }
+
+        if(model.choiceList.length<1){
+            layer.msg("请至少选择一个单位");
+            return
+        }
+        var objAccounts=model.choiceList.map(function(value){
+            return value.account;
+        });
+        layer.msg("发送中...");
+        var mainData = [];
+        var ccData = [];
+        var obj = {
+            "fileName": fileName.join("|"),
+            "attachIds": fileId.join("|"),
+            "billName": '',
+            "billPath": '',
+            "billDocName": '',
+            "billDocPath": '',
+
+            "accounts": objAccounts.join(","),
+            "wfId": (window.top.globalParams.wfid)
+
+        }
+
+        var url = "";
+        url = project + "/admin/hallRegist/saveHallRegist.action?ect" + new Date().getTime();
+
+        $.post(url, obj, function(data) {
+            layer.msg(data.message);
+            //从公文交换系统获取数据，延迟相应
+            setTimeout(function() {
+                page.getFeedList();
+            }, 800);
+
+
+        });
+
+
+    },
+
+    tabClick: function(index) {
+        model.indexShow = index;
+    },
+    wrapMain: {
+        sendNum: 10,
+        isOtherText: false,
+        sendRange: [],
+        sendRangeGroup: [],
+        //用于显示弹出层群组和单位的选择
+        choicePop: {
+            group: [],
+            unit: []
+        },
+        fileDatas: []
+    }
+})
+
+//群组下拉选择
+model.$watch("groupSelect", function (a) {
+     page.getGroupList(a);
+})
+
+//群组搜索
+model.$watch("searchGroup", function (a) {
+
+   model.groupList.forEach(function(value){
+       if(value.name.indexOf(a)>(-1)){
+           value.isShow=true;
+       }
+       else{
+           value.isShow=false;
+       }
+   });
+})
+
+//处室下拉选择
+model.$watch("officeSelect", function (a) {
+    page.getOfficeList(a);
+})
+
+//处室搜索
+model.$watch("searchOffice", function (a) {
+    model.officeList.forEach(function(value){
+        if(value.name.indexOf(a)>(-1)){
+            value.isShow=true;
+        }
+        else{
+            value.isShow=false;
+        }
+    });
+})
+
+var page = (function() {
+
+    var result = {
+        init: function() {
+           // this.getMessage();
+           // this.getAllUnit();
+            this.getFileList();
+            this.getFeedList();
+            this.getMeetingEntryFormList();
+            this.getTextUnit();
+            this.isFormExist();
+            this.getGroupOption();
+            this.getOfficeOption();
+            this.setStatus();
+
+        },
+        setStatus:function () {
+          if(window.top.globalParams.wfs=="finish"){
+              model.indexShow=1;
+              model.sendExist=false;
+              model.isFinish=false;
+          }
+
+
+        },
+        loadStart:function(){
+            var index = layer.load(2,{
+                // shade: [0.5, '#000']
+                //scrollbar: false //0.1透明度的白色背景
+            });
+            setTimeout(function(){
+                page.loadEnd();
+            },2000);
+        },
+        loadEnd:function(){
+            layer.closeAll('loading');
+        },
+        getGroupOption:function(){
+
+            var url="${base}/admin/myGroup/queryMyGroup.action?etc="+new Date().getTime()+"&myGroup.dataValid=1&myGroup.groupType=2";
+
+            $.get(url, function (result) {
+                if(result.success="true"){
+                    model.groupOption.clear();
+                    var resultData=result.data;
+                    var dataInit=[];
+                    resultData.forEach(function(value){
+                        dataInit.push({
+                            "id":value.groupId,
+                            "name":value.groupName
+                        });
+                    });
+                    model.groupOption=dataInit;
+                    page.getGroupList(dataInit[0].id);
+                }
+            });
+        },
+        getGroupList:function(groudId){
+
+            var selectLeftURL="${base}/admin/myGroup/queryMyGroupEmp.action?etc="+new Date().getTime()+"&myGroupEmp.dataValid=1&myGroupEmp.empType=2&myGroupEmp.groupId="+groudId;
+            page.loadStart();
+            $.get(selectLeftURL, function (result) {
+                model.groupList.clear();
+                page.loadEnd();
+                var resultData=result.data;
+                var initDatas=[];
+                resultData.forEach(function(value){
+                    initDatas.push({
+                        "id": value.id,
+                        "name":value.empName,
+                        "account":value.accountName,
+                        "isShow":true,
+                        "seq":value.sequence,
+                        "select":false
+
+                    });
+                });
+
+                model.groupList=initDatas;
+
+                //显示已经选中的人
+                if(model.choiceList.length){
+                    model.choiceList.forEach(function(val){
+                        model.groupList.forEach(function(val2){
+                            if(val2.account==val.account){
+                                val2.select=true;
+                            }
+                        });
+                    });
+
+                }
+
+            });
+        },
+
+        getOfficeOption:function(){
+
+            var url="${base}//admin/sendRange/allOfficesInfo.action?etc="+new Date().getTime();
+            $.get(url, function (result) {
+                if(result.success="true"){
+                    model.officeOption.clear();
+                    var resultData=result.data;
+                    var dataInit=[];
+                    resultData.forEach(function(value){
+                        dataInit.push({
+                            "id":value.orgId,
+                            "name":value.orgName
+
+                        });
+                    });
+                    model.officeOption=dataInit;
+                    page.getOfficeList(dataInit[0].id);
+
+
+                }
+            });
+        },
+        getOfficeList:function(orgId){
+
+
+            var selectLeftURL="${base}//admin/sendRange/selectAccountByOrgId.action?etc="+new Date().getTime()+"&orgId="+orgId;
+                page.loadStart();
+            $.get(selectLeftURL, function (result) {
+                model.officeList.clear();
+                page.loadEnd();
+                var resultData=result.data;
+                var initDatas=[];
+                resultData.forEach(function(value){
+                    initDatas.push({
+                        "id":"",
+                        "name":value.name,
+                        "account":value.accountName,
+                        "isShow":true,
+                        "seq":value.sequence,
+                        "select":false
+                    });
+                });
+
+                model.officeList=initDatas;
+
+                //显示已经选中的人
+                if(model.choiceList.length){
+                    model.choiceList.forEach(function(val){
+                        model.officeList.forEach(function(val2){
+                            if(val2.account==val.account){
+                                val2.select=true;
+                            }
+                        });
+                    });
+
+                }
+
+            });
+        },
+        isFormExist: function() {
+            //会议通知环节显示
+            if (window.top.globalParams.djsn === "oa_meeting_info" && window.top.globalParams.wfName === "oa_meeting_notification_approval") {
+                model.formExist = true;
+            } else {
+                model.formExist = false;
+            }
+
+            model.formExist = true;
+        },
+        getTextUnit: function() {
+            $("#distinguish_text").val(window.top.toExchangeHtml);
+        },
+        //获取会议报名表
+        getMeetingEntryFormList: function() {
+
+            var meetingUlr = "${base}/admin/hallRegist/meetingHallRegist.action?ect" + new Date().getTime() + "&wfId=" + (window.top.globalParams.wfid);
+
+            $.getJSON(meetingUlr, function(data) {
+
+//                 model.meetingEntryList.hasFeedbackOrg = data.hasFeedbackOrg;
+//                 model.meetingEntryList.hasSignCount = data.hasSignCount;
+                model.meetingEntryList.toFeedbackOrg = data.toFeedbackOrg;
+                model.meetingEntryList.toSignCount = data.toSignCount;
+                $noAccount = data.noRegistAccount;
+                messageData = (data.messageMail).replace(/<br>/g, "").replace(/\n/g, "");
+                mailMessageData.content = data.messageMail.replace(/<br>/g, "\n");
+                mailMessageDataDirect.content = data.messageMail.replace(/<br>/g, "\n");
+
+                //参会人员名单
+                if (data.dataJoin.length) {
+                    var dataJoinInit = [];
+                    data.dataJoin.forEach(function(value, index) {
+                        dataJoinInit.push({
+                            'seq': (index + 1),
+                            'id': value.id,
+                            'name': value.name,
+                            'orgName': value.orgName,
+                            'registDate': value.registDate
+                        });
+                    });
+                    model.meetingEntryList.dataJoin.length = 0;
+                    model.meetingEntryList.dataJoin = dataJoinInit;
+                }
+                //参会人员名单
+                if (data.dataLeave.length) {
+                    var dataLeaveInit = [];
+                    data.dataLeave.forEach(function(value, index) {
+                        dataLeaveInit.push({
+                            'seq': (index + 1),
+                            'id': value.id,
+	                        'name': value.name,
+	                        'orgName': value.orgName,
+	                        'registDate': value.registDate
+                        });
+                    });
+                    model.meetingEntryList.dataLeave.length = 0;
+                    model.meetingEntryList.dataLeave = dataLeaveInit;
+                }
+            });
+        },
+        isCheck: function(string) {
+
+            if (string.indexOf('pdf') > (-1) || string.indexOf('tgw') > (-1)) {
+                return true
+            }
+
+            return false
+        },
+        //对象数组去重,data：传入的数组，main：主键
+        uniqMore: function(data, main) {
+            var destData = [],
+                getData = data,
+                testData = [];
+
+            getData.forEach(function(value) {
+                //导入未存在的数组
+                if (testData.indexOf(value[main]) < 0) {
+                    testData.push(value[main]);
+                    var upIndex = destData.length;
+                    destData[upIndex] = {};
+                    for (var i in value) {
+                        destData[upIndex][i] = value[i];
+                    }
+
+                }
+
+            });
+
+            return destData;
+
+        },
+        //获取短信内容  此方法预留
+        getMessage: function() {
+            var wfid = (window.top.globalParams.wfid);
+            
+            var url = "${base}/admin/hallRegist/meetingHallRegist.action?ect" + new Date().getTime() + "&wfId=" + wfid;
+            $.post(url, function(data) {
+                messageData = (data.mailMessage).replace(/<br>/g, "").replace(/\n/g, "");
+                mailMessageData.content = data.mailMessage.replace(/<br>/g, "\n");
+                mailMessageDataDirect.content = data.mailMessage.replace(/<br>/g, "\n");
+
+            });
+
+        },
+        //获取所有单位  此方法预留
+        getAllUnit: function() {
+            //groupType 1是全部组织，2是全部人员
+            var url = project + "/admin/sendRange/allOrgInfo.action?groupType=1";
+            $.getJSON(url, function(data) {
+
+                var getData = data.data;
+
+                getData.forEach(function(value) {
+
+                    allUnitData.push({
+                        "id": value.emp_id,
+                        "name": value.emp_name,
+                        "seq": value.org_seq
+                    });
+                });
+                allUnitData.sort(function(a, b) {
+                    return (a.seq) - (b.seq)
+                });
+
+            });
+        },
+        getFeedList: function() {
+            model.hasSignList.length = 0;
+            model.noSignList.length = 0;
+            var url = '${base}/admin/sendRange/selectAllSignFreeback.action?documentId=' + (params.id) + '&wfName=' + (window.top.globalParams.wfName);
+            $.getJSON(url, function(data) {
+
+                var noSignList = [],
+                    hasSignList = [];
+                model.hasSignCount = data.hasSignCount;
+                model.noSignCount = data.noSignCount;
+
+                if (data.hasSignList.length < 1 && data.noSignList.length > 0) {
+                    model.isWithdraw = true;
+                }
+
+                if (data.hasSignList.length) {
+                    data.hasSignList.forEach(function(value) {
+                        hasSignList.push({
+                            'content': value.content,
+                            'id': value.id,
+                            'situation': value.situation,
+                            'unit': value.unit,
+                            'check': true
+                        });
+                    });
+                    //已签收单位存在的情况下，撤回按钮不显示
+
+                }
+
+                if (data.noSignList.length) {
+                    var noSignPost = [];
+                    data.noSignList.forEach(function(value) {
+                        noSignPost.push(value.signOrg);
+                    });
+
+                    var obj = {
+                        "grounpName": '',
+                        "grounpId": '',
+                        "unitName": noSignPost.join(","),
+                        "unitId": ''
+                    }
+                    var groupUrl = "${base}/admin/sendRange/selectOrgInfo.action?etc=" + new Date().getTime();
+                    $.post(groupUrl, obj, function(data) {
+
+                        if (data.datas.length) {
+                            data.datas.forEach(function(value) {
+                                noSignList.push({
+                                    'signOrg': value.unit ? value.unit : '',
+                                    'phone': value.number ? value.number : '',
+                                    'person': value.name ? value.name : '',
+                                    'check': true,
+                                    'post': value.post ? value.post : ''
+                                });
+                            });
+
+                        }
+                        model.noSignList = noSignList;
+                    });
+
+                }
+                model.hasSignList = hasSignList;
+
+            });
+        },
+        //获取文件列表
+        getFileList: function() {
+
+            var wfid = (window.top.globalParams.wfid);
+            var wfName = (window.top.globalParams.wfName);
+
+            var url = project + "/admin/sendRange/allAttachMentByWfId.action?etc" + new Date().getTime() + "&wfId=" + wfid + "&wfName=" + wfName;
+
+            $.post(url, function(result) {
+
+                if (result.data) {
+
+                    result.data.forEach(function(value) {
+                        model.fileDatas.push({
+                            "id": value.id,
+                            "name": value.name,
+                            "path": value.path,
+                            "type": "file",
+                            "check": page.isCheck(value.name),
+                            "otherid": "",
+                            "othername": ""
+                        });
+                    });
+                    //是否全选选中
+                    model.fileListCheck = model.fileDatas.every(function(value) {
+                        return value.check;
+                    });
+                }
+
+            });
+
+
+        }
+    }
+    return result
+
+})();
+
+$(function() {
+
+    page.init();
+
+    $(document).on("change", ".js-datajoin-Change", function(a, b) {
+
+        var $this = $(this),
+            index = $this.data("index"),
+            $index = parseInt($(this).val());
+
+        model.meetingEntryList.dataJoin[index].seq = ($index + 1);
+
+        model.meetingEntryList.dataJoin[$index].seq = (index + 1);
+
+        model.meetingEntryList.dataJoin.sort(function(a, b) {
+            return a.seq - b.seq;
+        });
+
+
+    });
+    $(document).on("change", ".js-dataleave-Change", function() {
+
+        var $this = $(this),
+            index = $this.data("index"),
+            $index = parseInt($(this).val());
+
+        model.meetingEntryList.dataLeave[index].seq = ($index + 1);
+
+        model.meetingEntryList.dataLeave[$index].seq = (index + 1);
+
+        model.meetingEntryList.dataLeave.sort(function(a, b) {
+            return a.seq - b.seq;
+        });
+
+    });
+
+})
+
+
+// 获取参数列表
+function getUrlParam(name) {
+
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]);
+    return null;
+
+}
+
+function trOnclik(obj){
+	var win = {
+			text:"请假原因", 
+			url:"${base}/admin/hallRegist/hallRegistLeaveView.action?id="+ obj.id,
+		    width:'900',
+		    height:'550', 
+		    id:"leaveView",
+		    parentIfr:window};
+	window.top.createWindow(win);
+}
+
+</script>
+
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>Eden</title>
+    <script src="${base}/edenui/common/js/jquery.js"></script>
+    <script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+    <SCRIPT ID=clientEventHandlersJS LANGUAGE=javascript>
+
+        //获取浏览器的临时目录
+      //  var fso = new ActiveXObject("Scripting.FileSystemObject");
+        var qrCodeNameStr="";
+      var destSrc = "C:";
+    
+        var fatherPage=$(window.parent.document);
+        //信息配置表
+        var inforParam;
+        var loop=false;
+        
+       var TGPDFPlugIn;
+
+       //收文
+       if(window.top.globalParams.djsn==="oa_pg_incoming_form"){
+           inforParam={
+               fileTitle:fatherPage.find("#FILE_TITLE").val(),
+               fileNum:fatherPage.find("#FILE_CHAR").val().length?fatherPage.find("#FILE_CHAR").val():"无",
+               secret:"无  ",
+               hurry:fatherPage.find("#URGENT_DEGREE").val().length?fatherPage.find("#URGENT_DEGREE").val():"无  ",
+               filecreatedate:fatherPage.find("#INCOMING_DATE").val().replace("00:00:00","").replace(/-/g,""),
+               mainUnit:"",
+               fileName:fatherPage.find("#sel_dropdownlist29").find("option:selected").text(),
+               sendDept:"来文单位",
+               fileCode:fatherPage.find("#SERIAL_NUMBER").val().length?fatherPage.find("#SERIAL_NUMBER").val():"1234567890"
+
+           }
+       }
+
+       //发文
+       else if(window.top.globalParams.djsn==="oa_send_document"){
+
+
+           inforParam={
+               fileTitle:fatherPage.find("#TITLE").val(),
+               fileNum:fatherPage.find("#DOCUMENT_NO").val().length?fatherPage.find("#DOCUMENT_NO").val():"无",
+               secret:"无  ",
+               hurry:fatherPage.find("#DEAL_LEVEL").val().length?fatherPage.find("#DEAL_LEVEL").val():"无  ",
+               filecreatedate:getTime(),
+               mainUnit:fatherPage.find("#main_unit").val(),
+               fileName:fatherPage.find("#sel_dropdownlist29").find("option:selected").text(),
+               sendDept:"浙江省人民政府办公厅",
+               fileCode:"1234567890"
+
+           }
+
+
+       }
+        var wfId=window.top.globalParams.wfid;
+
+        function button1_onclick() {
+
+
+        	//alert("制作时间"+getTime());
+        	//alert("Senddept"+inforParam.sendDept);
+        	//alert("Filename"+inforParam.fileName);
+        	
+        	//alert("MainSenddept"+inforParam.mainUnit);
+        	//alert("Secret"+inforParam.secret);
+        	
+        	//alert("Hurry"+inforParam.hurry);
+        	//alert("Filecreatedate"+inforParam.filecreatedate);
+        	//alert("Barcode"+inforParam.fileCode);
+        	//alert("Filenum"+inforParam.fileNum);
+        	
+        	
+            Pdf4171Create1.Ver="GB0626-2005";
+
+            //条码制作时间,当前浏览器获取本地时间
+            Pdf4171Create1.BarCreatedate=getTime();
+
+            //条码制作单位
+            Pdf4171Create1.BarCreateDept="浙江省人民政府办公厅";
+
+            //条码编号
+             Pdf4171Create1.Barcode=inforParam.fileCode;
+
+            //发文机关
+            Pdf4171Create1.Senddept=inforParam.sendDept;
+
+           // 文种
+            Pdf4171Create1.Filename=inforParam.fileName;
+
+            //文号
+            Pdf4171Create1.Filenum=inforParam.fileNum;
+
+            //主送单位
+            Pdf4171Create1.MainSenddept=inforParam.mainUnit;
+
+            //文件标题
+            Pdf4171Create1.FileTitle=inforParam.fileTitle;
+
+            //密集程度
+            Pdf4171Create1.Secret=inforParam.secret;
+
+            //紧急程度
+            Pdf4171Create1.Hurry=inforParam.hurry;
+
+            //成文日期，收文为收文日期，发文为签收日期
+
+            Pdf4171Create1.Filecreatedate=inforParam.filecreatedate;
+
+
+            try{
+
+
+                //生产tif图片
+                Pdf4171Create1.CreateBarcodeToBmp(destSrc+"\\"+wfId+".bmp");
+                Pdf4171Create1.CreateBarcodeToTif(destSrc+"\\"+wfId+".tif");
+
+
+            }catch(e){
+
+                closePage();
+            }
+
+           loop=true;
+           upLoadFile();
+
+        }
+
+        function window_onload() {
+            qrCodeName();
+            TGPDFPlugIn = getPluginObjcet("TGPDFPlugIn");
+
+            attach_event();
+
+            try{
+				//alert(11);
+                button1_onclick();
+
+            }catch(e){
+
+                closePage();
+            }
+
+        }
+
+        function upLoadFile(){
+            var serverUrl = "http://" +window.location.host + "${base}/servlet/sealUploadServlet";
+
+
+            var destpath=destSrc+"\\"+wfId+".tif";
+            var delJson=encodeURI("{method:'qrCode',tableKeyId:'"+(window.top.globalParams.qrCode.tableKey)+"',name:'"+(window.top.globalParams.qrCode.name)+"',size:'"+(window.top.globalParams.qrCode.size)+"',userid:'${userid}'}");
+
+            var Res = TGPDFPlugIn.UploadFileToServer(serverUrl,destpath, encodeURI(qrCodeNameStr+".tif"), delJson);
+            
+          //  alert("正在上传");
+          //  ShowResultMessage("UploadFileToServer", Res);
+
+//            $("#qr_code").text("二维码生成成功！");
+
+        //    var billPageId=$(window.top.frames["billPageId"].document);
+         //   var imgHtml="<img src='c:\\"+wfId+".tif' alt=''/>";
+        //    billPageId.find("#createQRCode").html(imgHtml);
+          //  setTimeout(function(){
+
+            //closePage();
+
+           // },300);
+
+        }
+
+        function closePage(){
+
+			
+            window.top.document.getElementById('filePageId').contentWindow.location.reload();
+
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index); //再执行关闭
+        }
+
+        function getTime(){
+            var date = new Date();
+            var seperator1 = "";
+            var seperator2 = ":";
+            var month = date.getMonth() + 1;
+            var strDate = date.getDate();
+            if (month >= 1 && month <= 9) {
+                month = "0" + month;
+            }
+            if (strDate >= 0 && strDate <= 9) {
+                strDate = "0" + strDate;
+            }
+            var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
+
+            return currentdate;
+        }
+
+        function attach_event() {
+            try {
+                TGPDFPlugIn.attachEvent("OnEventFinish", jsFire_TGPDFPlugInCallback);
+            }
+            catch (e) {
+                return false;
+            }
+            return true;
+        }
+
+
+        function getPluginObjcet(objname) {
+            if (!isIEBrowser()) {
+                if (document.embeds && document.embeds[objname])
+                    return document.embeds[objname];
+            }
+            else {
+                return document.getElementById(objname);
+            }
+        }
+
+        function isIEBrowser() {
+            var isAtLeastIE11 = !!(navigator.userAgent.match(/Trident/) && !navigator.userAgent.match(/MSIE/));
+
+            if (isAtLeastIE11) {
+                return true;
+            }
+
+            return (navigator.appName.indexOf("Microsoft Internet") != -1);
+        }
+
+        //设置项目;
+        function SetProjectInfo() {
+            var Res = TGPDFPlugIn.SetProjectInfo(document.form1.projectname.value, document.form1.projectpassword.value);
+            ShowResultMessage("SetProjectInfo", Res);
+        }
+
+        //隐藏关键字
+        function SetHideKeywords() {
+            var Res = TGPDFPlugIn.SetHideKeywords(document.form1.keywords.value);
+            ShowResultMessage("SetHideKeywords", Res);
+        }
+
+        //加载本地PDF文档
+        function OnLoadPDF() {
+            var Res = TGPDFPlugIn.LoadPDF(document.form1.localFilePath.value);
+
+            ShowResultMessage("OnLoadPDF", Res);
+        }
+
+        //加载网络PDF文档
+        function OpenWebFile() {
+
+            var windowLocation=(window.location).toString();
+            var windowBase=windowLocation.split("admin")[0];
+            //alert(windowLocation.split("admin")[0]);
+//         	alert(JSON.stringify(_parentWin.sealPageParam));
+            var location=windowBase+"admin/documentData/sealPdf.action?path="
+            var pdfPath=location+_parentWin.sealPageParam.sealDownlUrl;
+
+            var Res = TGPDFPlugIn.LoadPDF(encodeURI(encodeURI(pdfPath)));
+            //ShowResultMessage("OpenWebFile", Res);
+        }
+
+        function ShowResultMessage(msg, result) {
+            
+            var resultMsg = "";
+            try{
+                resultMsg = TGPDFPlugIn.GetErrorMsg(result);
+            }catch(e){
+
+            }
+
+        }
+
+        function jsFire_TGPDFPlugInCallback(eventID, errorCode, result) {
+        	//alert(eventID);
+            switch(eventID)
+            {
+                case 11201:
+                    ShowResultMessage("获取当前文件路径" + errorCode, result)
+                    break;
+                case 11202:
+                    document.form1.filepath.value = result;
+                    ShowResultMessage("文档缓存路径" + errorCode, result)
+                    break;
+                case 11203:
+                    ShowResultMessage("文档总页数" + errorCode, result)
+                    break;
+                case 11204:
+                    ShowResultMessage("文档当前页码" + errorCode, result)
+                    break;
+                case 11205:
+                    ShowResultMessage("签章个数" + errorCode, result)
+                    break;
+                case 11206:
+                    ShowResultMessage("签章信息字符串形式" + errorCode, result)
+                    break;
+                case 11207:
+                    ShowResultMessage("签章信息文件路径" + errorCode, result)
+                    break;
+                case 11300:
+                    SignContext = errorCode;
+                    ShowResultMessage("签名环境", errorCode)
+                    break;
+                case 12600:
+                	//alert("loop:"+loop);
+                	if(loop){
+                		loop = false;
+                        var destpath=destSrc+"\\"+wfId+".bmp";
+                        
+                        var serverUrl = "http://" +window.location.host + "${base}/servlet/sealUploadServlet";
+                        var delJson=encodeURI("{method:'qrCode',tableKeyId:'"+(window.top.globalParams.qrCode.tableKey)+"',name:'"+(window.top.globalParams.qrCode.name)+"',size:'"+(window.top.globalParams.qrCode.size)+"',userid:'${userid}'}");
+                        var Res = TGPDFPlugIn.UploadFileToServer(serverUrl,destpath, encodeURI(qrCodeNameStr+".bmp"), delJson);
+                	}else{
+                		closePage();
+                	}
+                   
+                    break;
+                default:
+                    if (eventID / 100 == 104) {
+                        ShowResultMessage("签名结果" + errorCode, result)
+                    }
+                    break;
+            }
+        }
+        function qrCodeName(){
+            if(window.top.globalParams.djsn=="oa_pg_incoming_form"){
+                qrCodeNameStr=fatherPage.find("#SERIAL_NUMBER").val();
+            }
+            else if (window.top.globalParams.djsn=="oa_send_document"){
+                qrCodeNameStr=fatherPage.find("#DOCUMENT_NO").val();
+            }
+        }
+
+
+    </SCRIPT>
+</head>
+<body onload="return window_onload()">
+<p style="text-align: center;padding-top: 15px;" id="qr_code"></p>
+<div class="" style="display: none">
+<P>
+    <OBJECT id=Pdf4171Create1 width="0" height="0" style="WIDTH: 130px; HEIGHT: 32px;"
+            classid=clsid:FDE0D05A-7FDD-4D65-B964-8798E9E88781><PARAM NAME="BSenddept" VALUE=""><PARAM NAME="Barcode" VALUE=""><PARAM NAME="Ver" VALUE="GB0626-2005"><PARAM NAME="Filename" VALUE=""><PARAM NAME="Filenum" VALUE=""><PARAM NAME="FileTitle" VALUE=""><PARAM NAME="MainSenddept" VALUE=""><PARAM NAME="Secret" VALUE=""><PARAM NAME="Hurry" VALUE=""><PARAM NAME="Senddegree" VALUE=""><PARAM NAME="FileCreatedate" VALUE=""><PARAM NAME="BarCreatedate" VALUE=""><PARAM NAME="BarCreatedept" VALUE=""><PARAM NAME="Other" VALUE=""><PARAM NAME="BFilecode" VALUE=""><PARAM NAME="BSenddept" VALUE=""><PARAM NAME="BFilename" VALUE=""><PARAM NAME="BMainsenddept" VALUE=""><PARAM NAME="BTitle" VALUE=""><PARAM NAME="BSecret" VALUE=""><PARAM NAME="BCreatefiledate" VALUE=""><PARAM NAME="BBarcreatedept" VALUE=""></OBJECT>
+</P>
+<P>
+    <OBJECT id=Pdf417Read1 width="0" height="0" style="LEFT: 202px; WIDTH: 90px; TOP: 15px; HEIGHT: 45px"
+            classid=clsid:7E944F89-34F2-4240-83B6-38D0B8E16926 VIEWASTEXT><PARAM NAME="_ExtentX" VALUE="2381"><PARAM NAME="_ExtentY" VALUE="1191"></OBJECT>
+</P>
+
+
+<p>
+    <INPUT type="button" value="生成图片" id=button1 name=button1 LANGUAGE=javascript onclick="return button1_onclick()">
+</p>
+<p class="margin-large-top">
+    <button onclick="upLoadFile()">
+        上传图片
+    </button>
+</p>
+
+<object id="TGPDFPlugIn" classid="clsid:04DDDFAA-0AC0-4D47-9315-9F442F65D403" width="1200" height="900">
+    <embed name="TGPDFPlugIn" type="application/nptseal-TGPDFPlugIn" width="1200" height="900"></embed>
+</object>
+</div>
+
+</body>
+
+<script>
+
+</script>
+</html>

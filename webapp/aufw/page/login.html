@@ -1,0 +1,266 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset = "utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>${sysinfo.sysName}</title>
+  <link rel = "stylesheet" type = "text/css" href = "${base}/edenui/common/css/base.css">
+  <link rel = "stylesheet" type = "text/css" href = "${base}/edenui/common/css/login.css">
+  <link rel = 'shortcut icon' href = '${base}/aufw/resources/favicon.ico' type = 'image/x-icon'/>
+  <script>
+    if (window.location.href != window.top.location.href)  window.top.location.href = window.location.href
+  </script>
+</head>
+<body class="show-check">
+<div class = "login_area">
+  <div class = "inputs_wrap">
+    <form id = "login_form" name = "form1" class="" method = "post" action = "logon.action">
+      <div class="form-group">
+				<div class="field clearfix">
+				<label class="field-left">用户名</label>
+				<div class="field-right" style="position: relative;">
+        <input name = "accountInfo.accountName" type = "text" class = "input accountName" id = "accountInfo.accountName" data-validate="required:请输入用户名" placeholder="请输入用户名">
+					</div>
+				</div>
+      </div>
+      <div class="form-group">
+				<div class="field clearfix">
+					<label class="field-left">密码</label>
+					<div class="field-right" style="position: relative;">
+        <input name = "accountInfo.accountPwd" type = "password" class = "input accountPwd" id = "accountInfo.accountPwd" placeholder="请输入密码" data-validate="required:请输入密码" value = "">
+						</div>
+      </div>
+				</div>
+      <div class="form-group form-group-btn">
+        <div class="field clearfix ">
+          <label class="field-left"></label>
+          <div class="field-right login_btn">
+            <input  type="submit" class="input" value="登录" >
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!--暂时隐藏-->
+<!--<div class = "copyRight">-->
+  <!--<span>${sysinfo.copyright}-技术支持&nbsp;&nbsp;www.rongji.com</span>-->
+<!--</div>-->
+<!-- jquery 框架 1.9 -->
+<script src = "${base}/edenui/common/js/jquery.js"></script>
+<!-- jquery插件：弹出层、提示2  -->
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+
+<script src = "${base}/edenui/common/js/jq_plugins/cookie/jquery.cookie.js"></script>
+<#-->
+<#if checked?? && checked>
+  <script src = "../aufw/resources/common/js/pony.js"></script>
+  <script src = "../aufw/resources/common/js/front.js"></script>
+</#if>
+</#-->
+
+<script>
+  var base = '${base}';
+  //设置cookie
+  function setCookie(name,value)
+  {
+    var Days = 30;
+    var exp = new Date();
+    exp.setTime(exp.getTime() + Days*24*60*60*1000);
+    document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+  }
+  //读取cookies
+  function getCookie(name)
+  {
+    var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+    if(arr=document.cookie.match(reg)) return unescape(arr[2]);
+    else return null;
+  }
+  //删除cookie
+  function delCookie(name)
+  {
+    var exp = new Date();
+    exp.setTime(exp.getTime() - 1);
+    var cval=getCookie(name);
+    if(cval!=null) document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+  }
+
+
+  var error_num = 0;
+  $(function () {
+    var image = new Image();
+    image.src = $('#loginLogoImg').attr('src');
+    image.onload = function () {
+              //如果logo图高度大于50，设置logo图top值
+              if (image.height > 50) {
+                $('#loginLogoArea').css('top', '-100px');
+              }
+            }
+
+            <#if checked ?? &&	checked >
+    new JCore.CheckCode($('#checkCode'), '${base}/CheckCode.svl', 0);
+    </#if>
+
+
+
+    //记住密码功能
+    var c_user_name , c_user_password ;
+    $('#rememberPassword').click(function(){
+      if($('#rememberPassword').attr("checked")=="checked"){
+        setCookie("rememberPassword","1");
+      }else{
+        setCookie("rememberPassword","0");
+        delCookie("c_user_name");
+        delCookie("c_user_password")
+      }
+    })
+
+    var rememberPassword = getCookie("rememberPassword");
+
+
+    if(rememberPassword == 1){
+      c_user_name = getCookie("c_user_name");
+      c_user_password = getCookie("c_user_password");
+      if(c_user_name){
+        $('.accountName').val(c_user_name);
+        $('.accountPwd').val(c_user_password);
+      }
+      $('#rememberPassword').attr("checked","true");
+    }else{
+      delCookie("c_user_name");
+      delCookie("c_user_password")
+    }
+
+    //记住密码功能结束
+
+
+
+
+    $('.accountName').focus(
+            function () {
+              if ($(this).val() == this.defaultValue) {
+                if(c_user_name){
+                  $('.accountName').val(c_user_name);
+                }else{
+                  $(this).val('');
+                }
+              }
+            }).blur(
+            function () {
+              if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+              } else {
+                $('#id_tips').hide();
+              }
+            });
+
+    $('#password_word').click(function () {
+      $(this).hide();
+      $('.accountPwd').focus();
+    });
+
+
+
+    $('.accountPwd').focus(
+            function () {
+              if ($(this).val() == "") {
+                if(c_user_password){
+                  $('.accountPwd').val(c_user_password);
+                }else{
+                  $('#password_word').hide();
+                }
+              }
+            }).blur(
+            function () {
+              if ($(this).val() == '') {
+                $('#password_word').show();
+              } else {
+                $('#pwd_tips').hide();
+              }
+            });
+
+    window.setInterval(function () {
+      var password = $('.accountPwd').val();
+      if (password != '') {
+        $('#password_word').hide();
+      }
+    }, 100);
+
+
+
+    $('#login_form input').keydown(function (event) {
+      if (event.keyCode == 13) {
+        $('#login_btn').click();
+      }
+    });
+
+    $('#login_form').submit(function () {
+      var user_name = $('.accountName').val();
+      var user_password = $('.accountPwd').val();
+      var check_code = $('.check_code').val();
+      var check = $('body').hasClass('show_check');
+      if (user_name == "请输入用户名" | user_name == "") {
+        $('#id_tips').show();
+        $('.accountName').focus();
+        return false;
+      }
+      if (user_password == "") {
+        $('#pwd_tips').show();
+        $('.accountPwd').focus();
+        return false;
+      }
+      if (check && check_code == "") {
+        $('#check_tips').show();
+        $('.check_code').focus();
+        return false;
+      }
+
+      //$.dialog.tips(user_name+'--'+user_password+'---'+check_code)
+      //去后台验证
+      jQuery.post("${base}/logon/ajaxLogon.action", {"accountInfo.accountName":user_name, "accountInfo.accountPwd":user_password, "checkCode":check_code}, function (data) {
+        if (data["success"] == "true") {
+          c_user_name = getCookie("c_user_name");
+          c_user_password = getCookie("c_user_password");
+          setCookie("c_user_name", user_name);
+          setCookie("c_user_password", user_password);
+          window.location.href = "${base}/admin/console/index.action";
+        } else {
+          error_num++;
+          layer.msg(data.error.errorMsg);
+          $('#check_img').click();
+        }
+      });
+
+      $('#check_tips').hide();
+
+      return false;
+
+    });
+
+
+  })
+
+  function loadExtentFile(filePath, fileType){
+    if(fileType == "js"){
+      var oJs = document.createElement('script');
+      oJs.setAttribute("type","text/javascript");
+      oJs.setAttribute("src", filePath);  //文件的地址
+      document.getElementsByTagName("head")[0].appendChild(oJs);//绑定
+    }else if(fileType == "css"){
+      var oCss = document.createElement("link");
+      oCss.setAttribute("rel", "stylesheet");
+      oCss.setAttribute("type", "text/css");
+      oCss.setAttribute("href", filePath);
+      document.getElementsByTagName("head")[0].appendChild(oCss);//绑定
+    }else if(fileType == "less"){
+      var oLess = document.createElement("link");
+      oLess.setAttribute("rel", "stylesheet/less");
+      oLess.setAttribute("type", "text/css");
+      oLess.setAttribute("href", filePath);
+      document.getElementsByTagName("head")[0].appendChild(oLess);//绑定
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="form-group header-group">
+                        <span class="header-title">会议名称:</span>
+                        <input id="subject" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                        <div class="button button-main margin-left-in" id="senior_grid_search">搜索</div>
+						<div class="button js-level-search margin-left-in">高级搜索<i class="li-icon-arrow-down"></i></div>
+					</div>
+                    <div class="level-searh form-group header-group" style="display: none;">
+                        <span class="header-title">退文时间:</span>
+                        <input name="startBackTime" id="startBackTime" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', maxDate:'#F{$dp.$D(\'endBackTime\')||\'2025-10-01 00:00:00\'}'})" size="19" type="text">
+                        <span class="header-title margin-left-in">至</span>
+                        <input id="endBackTime" style="cursor: pointer;height:26px;" size="19" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startBackTime\')}',maxDate:'2025-10-01 00:00:00'})" name="endBackTime" type="text">
+                        <span class="header-title margin-left-out">申报单位:</span>
+                        <input id="mainOrg" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                        <span class="header-title margin-left-out">退文理由:</span>
+                        <select id="backReason"	class="input margin-left-in"	style="width: 100px;" name="age">
+                            <option value="" title="全部理由">全部理由</option>
+                            <#list backReasonDictList! as entry>
+                                <option value="${entry.dictValue!}" title="${entry.displayName!}">${entry.displayName!}</option>
+                            </#list>
+                            <option value="0">其它理由</option>
+                        </select>
+                        <input id="backReasonRemark" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                    </div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+					  <th width="40">序号</th>
+	                  <th w_index="subject" width="" >会议名称</th>
+	                  <th w_index="mainOrg" width="150" w_type="method" w_method="view" w_align="center">申报单位</th>
+	                  <th w_index="backReason" width="300" w_type="method" w_method="view">退文理由</th>
+	                  <th w_index="backTime" width="140">退文时间</th>
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+<script src="${base}/oa/resource/js/oa_common.js"></script>			
+
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/meeting/queryMeetingInfo.action?wfType=${wfType!}";
+	
+	var version='1';
+    var wf_name='oa_provincial_meeting';//全省性会议
+    var wf_name2='oa_meeting_program_approval';//省政府会议
+    var wfType="${wfType!}";
+
+  
+	$(function(){
+		initLink();
+	    selectURL=selectURL+"&link="+JSON.stringify(link);
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "&etc="+new Date().getTime(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	  gridOne.initGrid();
+		        	$("#manage_grid tbody tr").each(function(){
+		        		changeTable(this);
+		        		var $this=$(this);
+		        		 $("td",this).eq(1).css("padding-left","8px");
+		        			$index=parseInt($this.attr("index"));
+		        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+		        			if($this.find("td").eq(2).html()!=undefined){
+		        				$this.find("td").eq(6).html($this.find("td").eq(6).html().replace("T"," "));
+		        			}
+		        	});
+		      }
+		  });
+	});
+	
+    //执行任务
+    function execute(id){
+    	var task_name = "";
+		var item = getRecord(id);
+		uf_doAction(item.wfId,wf_name,task_name,version,null);
+
+    }
+
+    //已退会议查看
+    function view(id){
+    	if(id=="" || id==null || id=="undefined"){
+    		layer.msg("退文会议ID值为空，无法查看会议退文详细理由");
+    		return;
+    	}
+    	var win={text:"全省性会议审批备案退文详情单",url:"${base}/admin/backMeeting/showDetailBackReasonMeetingInfo.action?meetingInfo.id="+id,width:"900",height:"600","parentIfr":window};
+    	window.top.createWindow(win);
+
+    }
+    function titleOnclik(id) {
+		view(id);
+	}
+
+
+  //全省性会议登记
+  function provincialMeeting_add(){
+  	initWorkflow(wf_name,"",version);
+  }
+
+  //省政府会议登记
+  function meetingProgram_add(){
+  	initWorkflow(wf_name2,"",version);
+  }
+
+  //工具条搜索 异步交互
+  $(document).on("click","#grid_search",function(){
+      var clu = $("#search").val();
+      var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+      var symbol = "?";
+      if(selectURL.indexOf("?")>0){
+      	symbol = "&";
+      }
+      gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+  });
+
+  //工具条高级搜索 展开
+  $(document).on("click",".js-level-search",function(){
+      girdTable(this);
+	  $('.li-icon-arrow-down').toggleClass('li-icon-arrow-top');
+  });
+
+  //工具条高级搜索 异步交互
+  $(document).on("click","#senior_grid_search",function(){
+      var subject= $("#subject").val();
+      var startBackTime= $("#startBackTime").val();
+      var endBackTime= $("#endBackTime").val();
+      var backReason = $("#backReason").val();
+      var backReasonRemark = $("#backReasonRemark").val();
+      if(backReason == 0){
+    	  backReason = backReasonRemark;
+      }
+      //alert(backReason);
+      var mainOrg = $("#mainOrg").val();
+      var symbol = "?";
+      if(selectURL.indexOf("?")>0){
+      	symbol = "&";
+      }
+      
+      gridOne.changeUrl(selectURL + symbol + 'subject=' + window.encodeURI(subject) + '&startBackTime=' + startBackTime + '&endBackTime=' + endBackTime + '&backReason=' + window.encodeURI(backReason) + '&mainOrg=' + window.encodeURI(mainOrg) + '&etc='+new Date().getTime());
+  });
+</script>
+
+</html>

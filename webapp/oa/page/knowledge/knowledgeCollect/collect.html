@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+    <head>
+    <meta charset="utf-8">
+    <title>知识收集</title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+    <script>
+        setSkinsCss("listCss,iconCss");
+    </script>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    </head>
+
+    <body style="height:100%;">
+
+<!--  body 的style  应属性加上 height:100%;   是为了计算页面高度   -->
+
+<div id="tree_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+      <div id="tree_search" class="tree_search"></div>
+      <div id="tree" style="width:100%; padding-top: 3px;"></div>
+    </div>
+
+<!-- tree_wrap 这个 div 用于放置 左侧树和搜索树的工具栏 -->
+
+<div id="grid_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+      <div id="grid_toolbar" style="height:30px; width:100%;">
+    <ul id="grid_toolbar_ul" class="toolbar_ul">
+    	 <@f.operateRight operate="/admin/knowledgeCollect!insert.action">
+          <li btn_id="add" class="add_icon"><a href="javascript:void(0)">新增</a></li>
+         </@f.operateRight >
+         <@f.operateRight operate="/admin/knowledgeCollect!delete.action">
+          <li btn_id="delete" class="delete_icon"><a href="javascript:void(0)">删除</a></li>
+           </@f.operateRight >
+           <li>
+           	<select name="" id="search">
+        		<option value="knowledge.title">标题</option>
+        		<option value="knowledge.author">作者</option>
+   			</select>
+           </li>
+          <li>
+        <input id="search_text" class="search_text" value="请输入关键字" name="" type="text">
+      </li>
+          <li>
+        <input class="search_btn search_icon" name="" onClick="SimpleSearch()" value="查 找" type="button">
+      </li>
+          <li id="advanced_search_btn" class="advanced_search">高级查找</li>
+        </ul>
+        <div id="advanced_search_bar" class="advanced_search_bar">
+        <table cellpadding="0" cellspacing="0" border="0" align="center">
+           <tr>
+            <td><label for="title">标题：</label><input  id='title' name="title" type="text" value=""></td>
+           	<td><label for="author">作者：</label><input  id='author' name="author" type="text" value=""></td>
+            <td><label for="data1">上传时间：</label><input  id='data1' name="data1" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" value="">到：</label><input  id='data2' name="data2" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" value=""></td>
+           </tr>
+           <tr>
+           	<td><label for="status">状态：</label>
+           		<select  id='status' name="status">
+                    <option value="">全部</option>
+           			<#if statusList?exists>
+           			 <#list statusList as dist>
+           				<option value="${dist.dictValue}">${dist.displayName}</option>
+					 </#list>
+					</#if>
+				</select>
+           	</td>
+            <td><input class="search_btn search_icon" name="advancedSearch" onClick="advancedSearch()" value="查 找" type="button"></td>
+           </tr>
+         </table>
+        </div>
+  </div>
+      <div id="grid" style="width:100%;"></div>
+      <div id="grid_page" class="grid_page" style="width:100%;height:18px; padding-top:10px;"></div>
+    </div>
+</body>
+    <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+    <script>
+    var layout,treeObj,tree,treeSearch,grid,data,form,form2,tabbar,option,sendUrl,knowledgeId;
+    var version='1';
+    var wf_name='meeting_manage';
+    
+	 window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+    <!--    设置dhtmlx各组件用到的图片的的路径-->
+    function init() {       //初始化 方法
+        layout = new dhtmlXLayoutObject(document.body, "1C");     //添加一个 3L的layout
+        layout.cells('a').hideHeader();         //隐藏 cell a 的 标题 ， b c 同理
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        <!-- 为layout添加监听事件    -->
+        <!-- onResizeFinish 为在layout大小变了之后触发 -->
+        <!-- onPanelResizeFinish 为在layout中一块区域大小变了之后触发 -->
+		
+        data = new dhtmlXDataStore({
+            url: "${base}/admin/knowledgeCollect/selectKnowledge.action?etc="+new Date().getTime(),
+            datatype: "json"
+        });     //添加一个 为DataStore
+	
+        layout.cells('a').attachObject('grid_wrap');
+        // 在 layout的 cell b上添加 ID为 grid_wrap 的div
+        grid = new dhtmlXGridObject('grid');
+        // 把 grid 添加到  ID为 grid的div中
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        //设置 grid上 图片的路径
+        grid.setHeader(" ,标题,作者,上传时间,分类,状态,操作");
+        //设置 grid每列的标题
+        grid.setColumnIds("check,title,author,uploadTime,knowledgeTypeName,status,operate");
+        //设置 grid每列的数据  对应 json中的哪条数据
+        grid.setInitWidths("30,*,100,150,80,80,150");
+        //设置 每列的宽度
+        grid.setColTypes("ch,ro,ro,ro,ro,co,link");
+        //设置每列的 类型
+        <#if statusList??>
+	        <#list statusList as dataDict>
+	   			 grid.getCombo(5).put(${dataDict.dictValue}, '${dataDict.displayName}');
+			</#list>
+		</#if>
+        grid.init();
+        // 初始化grid
+        grid.enablePaging(true,15,999, 'grid_page', true);
+        //添加 grid的分页
+        //grid.enablePaging(fl, pageSize, pagesInGrp, parentObj, showRecInfo, recInfoParentObj)
+/*          @参数: fl - true|false - 是否分页
+        *   @参数: pageSize - 每页的行数
+        *   @参数: pagesInGrp - 可见的页面的数量
+        *   @参数: parentObj - 放置分页的 div的ID
+        *   @参数: showRecInfo - true|false - enable|disable showing of additional info about paging state
+        *   @参数: recInfoParentObj - ID or container which will be used for showing paging state
+*/
+
+        grid.setPagingSkin("toolbar");   //设置 分页的皮肤
+        grid.sync(data);                // grid从 DataStore中同步数据
+	
+	
+		var formData = [
+			{ type:"settings", position:"label-left", labelWidth:"65", inputWidth:50 },
+			{
+				type:"fieldset", label:"知识信息", inputWidth:"660", offsetLeft:10,
+				list:[
+					{
+						type:"hidden", offsetTop:5, list:[
+						{ type:"hidden", name:"id", value:"" },
+						{ type:"input", name:"title", value:"", label:"标题:", inputWidth:200 ,required:true},
+						{ type:"newcolumn", offset:40},
+						{ type:"select", name:"knowledgeType", value:"", label:"类型:", inputWidth:200, options:[
+						<#if typeList?exists>
+							<#list typeList as dist>
+								{text:'${dist.displayName}', value:'${dist.dictValue}'}
+								<#if dist_has_next>
+										,
+										</#if> 
+							</#list>
+						</#if>
+						]  }
+					]
+					},
+					{
+						type:"hidden", offsetTop:5, list:[
+						{ type:"input", name:"author", value:"", label:"作者:", inputWidth:200},
+						{ type:"newcolumn", offset:40},
+						{ type:"template", name:"uploadTime", format: dateType1, value:"", label:"上传时间:", inputWidth:200 },
+					]
+					}	
+					,
+					{
+						type:"hidden", offsetTop:5, list:[
+						{ type:"input", name:"summary", value:"", rows:4,label:"简介:", inputWidth:515}
+					]
+					},
+					{
+						type:"hidden", offsetTop:5, list:[
+						  { type:"eUpload", name:"eUpload", servlet:'${base}/servlet/uploadServlet?directoryId=d8be33d3145c4205895d43c83921bbbb',label:"附件:",inputHeight:72, inputWidth:515}
+					]
+					},
+					{ type:"newcolumn", offset:40},
+					{
+						type:"hidden", offsetTop:5, list:[
+						 {type:"label",labelWidth:230},
+						 {type:"newcolumn"},
+						 {type:"button",value:"确认",name:"send"}
+					]
+					}
+					]
+			}
+			];
+				 
+	    var formData2=[
+            { type:"settings", position:"label-left", labelWidth:"65", inputWidth:50 },
+            {
+                type:"fieldset", label:"审核信息", inputWidth:"660", offsetLeft:10,
+                list:[
+                    {
+                        type:"hidden", offsetTop:5, list:[
+                        { type:"input", name:"opinion", value:"", rows:4,label:"审核意见:", inputWidth:515}
+                    ]
+                    },
+                    {
+                        type:"hidden", offsetTop:5, list:[
+                        { type:"input", name:"auditor", value:"${userName!}", label:"审核人:", inputWidth:200},
+                        { type:"newcolumn", offset:40},
+                        { type:"template", name:"approveTime", format: dateType1, value:"", label:"审核时间:", inputWidth:200 },
+                    ]
+                    }   
+                    ,
+                    {
+                        type:"hidden", offsetTop:5, list:[
+                        { type:"select", name:"auditStatus", value:"", label:"审核结果:", inputWidth:200, options:[
+                        <#if auditStatusList?exists>
+                            <#list auditStatusList as dist>
+                                {text:'${dist.displayName}', value:'${dist.dictValue}'}
+                                <#if dist_has_next>
+                                        ,
+                                        </#if> 
+                            </#list>
+                        </#if>
+                        ]  },
+                        { type:"newcolumn", offset:40},
+                        { type:"select", name:"fileType", value:"", label:"文件类型:", inputWidth:200, options:[
+							<#if fileTypeList?exists>  
+								<#list fileTypeList as dist>
+								 {text:'${dist.displayName}', value:'${dist.dictValue}'}
+								 <#if dist_has_next>,
+								 </#if>
+								</#list>
+							</#if>
+                        ]}
+                    ]
+                    },
+                    { type:"newcolumn", offset:40},
+                    {
+                        type:"hidden", offsetTop:5, list:[
+                         {type:"label",labelWidth:230},
+                         {type:"newcolumn"},
+                         {type:"button",value:"确认",name:"send"}
+                    ]
+                    }
+                    ]
+            }
+            ];
+		dhxWins = new dhtmlXWindows();
+		dhxWins.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		w1 = dhxWins.createWindow("w1", 20, 30, 700,400);
+		w1.setText("知识管理");	
+		w1.center();
+		dhxWins.attachEvent('onClose', function (win) {
+			w1.hide();
+		});
+		w1.hide(); 
+		form = w1.attachForm(formData);//returns a dhtmlxForm object 
+		
+		form.setSkin('dhx_terrace');
+		form.disableItem('send');
+		
+		form.bind(grid);
+	
+		form.attachEvent('onButtonClick', function (id) {
+			if(id=='send'){
+                if(option=="add"){
+                    sendUrl="${base}/admin/knowledgeCollect/insert.action";
+                }
+				if(option=="update"){
+					sendUrl="${base}/admin/knowledgeCollect/update.action";
+				}
+			    var id = form.getItemValue("id");
+                var title = form.getItemValue("title");
+                var knowledgeType = form.getItemValue("knowledgeType");
+                var author = form.getItemValue("author");
+                var uploadTime = form.getItemValue("uploadTime");
+                var summary = form.getItemValue("summary");
+                var eUpload = form.getItemValue("eUpload");
+                $.post(sendUrl,{"knowledge.id":id,"knowledge.title":title,"knowledge.knowledgeType":knowledgeType,"knowledge.author":author,"knowledge.uploadTime":uploadTime,"knowledge.summary":summary,"eUpload":eUpload},function(result){
+                   if(result.result=="success"){
+                        SimpleSearch();
+                        form.disableItem('send');
+                        w1.hide();
+                   }
+					//$.dialog.tips(data.xmlDoc.reponseText);
+					$.dialog.tips(result.message);
+				});
+		   }
+	    });
+        w2 = dhxWins.createWindow("w1", 20, 30, 700, 320);
+        w2.setText("知识审批"); 
+        w2.center();
+        dhxWins.attachEvent('onClose', function (win) {
+            w2.hide();
+            clearForm2();
+        });
+        w2.hide(); 
+        form2 = w2.attachForm(formData2);//returns a dhtmlxForm object    
+        form2.setSkin('dhx_terrace');
+        form2.disableItem('send');
+        form2.attachEvent('onButtonClick', function (id) {
+            if(id=='send'){
+                var opinion = form2.getItemValue("opinion");
+                var auditor = form2.getItemValue("auditor");
+                var approveTime = form2.getItemValue("approveTime");
+                var fileType = form2.getItemValue("fileType");
+                var auditStatus = form2.getItemValue("auditStatus");
+               $.post("${base}/admin/knowledgeCollect/update.action",{"knowledge.opinion":opinion,"knowledge.auditor":auditor,"knowledge.approveTime":approveTime,"knowledge.fileType":fileType,"knowledge.status":auditStatus,"knowledge.id":knowledgeId},function(result){
+                   if(result.result=="success"){
+                        SimpleSearch();
+                        form2.disableItem('send');
+                        w2.hide();   
+                        clearForm2();
+                        $.dialog.tips("审核知识成功")
+                   }
+                   $.dialog.tips(result.message);
+               });
+            }
+        });
+        page_layout();      // 调用page_layout方法   ,方法的声明在下面
+        
+        $("select[name='auditStatus']").change(function(){
+        	var auditStatusValue= $("select[name='auditStatus']").val();
+        	auditStatusChange(auditStatusValue);
+        });
+    }
+	
+    function auditStatusChange(val){
+    	if(val=="1"){
+    		form2.showItem("fileType");
+    	}else{
+    		form2.hideItem("fileType");
+    	}
+    }
+    
+	function  SimpleSearch(){
+		data.clearAll();
+		var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+		var clu = $("#search").val();
+		var url = '${base}/admin/knowledgeCollect/selectKnowledge.action?'+clu+'='+window.encodeURI(value)+"&etc="+new Date().getTime();
+		window.data.data.url = url;
+		data.load(url);
+    }
+
+    function  advancedSearch(){
+		data.clearAll();
+		var title = $("#title").val();
+		var author = $("#author").val();
+		var data1 = $("#data1").val();
+		var data2 = $("#data2").val();
+		var status = $("#status").val();
+	    var s = "knowledge.title="+window.encodeURI(title)+"&knowledge.author="+window.encodeURI(author)+"&data1="+data1+"&data2="+data2+"&knowledge.status="+status;
+		var url = '${base}/admin/knowledgeCollect/selectKnowledge.action?'+s+"&etc="+new Date().getTime();
+		window.data.data.url = url;
+		data.load(url);
+    }
+
+	
+
+	
+	
+	searchBarCommon('advanced_search_bar',60,'advanced_search_btn','grid_toolbar','grid');
+
+
+
+
+    function toolbar_func(id){           // grid上面 的那些按钮的 功能
+        if (id == 'add') {
+			addId=new Date();
+			var add_data={
+				id:addId
+			};
+			option="add";
+			data.add(add_data,0);
+            w1.show();
+			grid.selectRowById(addId);
+            form.resetAttachList("eUpload");
+			form.enableItem("send");
+        }
+        if (id == 'delete') {
+            var row_id = grid.getCheckedRows(0);
+            if (row_id == '') {
+                $.dialog.tips('请至少选择一条数据！');
+                return;
+            }
+            row_id = row_id.split(',');
+            if (row_id.length == 0) return;
+			$.dialog.confirm('你确定要删除这些数据吗？', function () {
+				var idArr = new Array();
+				for (var i = 0; i < row_id.length; i++) {
+					idArr.push(data.item(row_id[i]).id);
+				}
+				$.post("${base}/admin/knowledgeCollect/delete.action", {"knowledge.id":idArr.join(",")},function(result){
+					if(result.result="success"){         
+						for (var i = 0; i < row_id.length; i++) {           
+							data.remove(row_id[i]);
+						}
+					}
+					$.dialog.tips(result.message);
+				});
+			});
+
+        }
+    }
+	
+	function d(id) {       //删除 grid中的一行数据
+        grid.selectRowById(id);
+        $.dialog.confirm('你确定要删除这条数据？', function () {
+           
+            $.post("${base}/admin/knowledgeCollect/delete.action?", {"knowledge.id":id}, function(result){
+            	if(result.result=="success"){
+            		 data.remove(id);
+            	}
+                    $.dialog.tips(result.message);
+            });
+        });
+        form.disableItem("send");
+    }
+
+	function e(id) {      //编辑 grid中的一行数据
+        var status = data.item(id).status;
+        if (status===0) {
+            w1.show();
+            option = "update";
+            grid.selectRowById(id);
+            form.setAttachList('eUpload',{'tableName':'oa_knowledge_info_tb','tableKey':'id','tableKeyId':id});
+            form.setItemFocus("title");
+            form.enableItem("send");
+        }else{
+            $.dialog.tips("该知识不能修改！");
+        }
+        
+    }
+    function ap(id) {
+        var status = data.item(id).status;
+        knowledgeId = id;
+        if(status==0){
+            w2.show();
+            addForm2(data.item(id));
+            form2.setItemFocus("opinion");
+            form2.enableItem("send");
+        }else{
+            $.dialog.tips("该知识已审核！");
+        }
+    }
+
+    
+    function addForm2(item){
+    	form2.setItemValue("opinion",item.opinion);
+    	if(item.auditor==null)
+    		form2.setItemValue("auditor","${userName!}");
+    	else
+    		form2.setItemValue("auditor",item.auditor);
+    	form2.setItemValue("approveTime",item.approveTime);
+    	form2.setItemValue("auditStatus",item.auditStatus);
+    	form2.showItem("fileType",item.fileType);
+    	if(item.auditStatus==1||item.auditStatus==-1)
+    	auditStatusChange(item.auditStatus);
+    	auditStatusChange(1);
+    }
+    
+    function clearForm2(){
+    	form2.setItemValue("opinion","");
+    	form2.setItemValue("auditor","");
+    	form2.setItemValue("approveTime","");
+    	form2.setItemValue("auditStatus",1);
+    	form2.showItem("fileType");
+    }
+    
+    function page_layout() {                 // page_layout为控制页面布局的方法 ，  用于自适应窗口的大小
+        var grid_wrap_height = $('#grid_wrap').height();  //得到 ID为  grid_wrap 的div的高度
+        $('#grid').height(grid_wrap_height - 33 -35);    //设置  ID为  grid 的div的高度
+        if(grid)    grid.setSizes();                   // 如果grid 存在，则 让 grid 适应下窗口的大小
+
+    }
+    $(function () {
+        setTimeout(init, 0);                        //在 页面加载好后，触发init方法；
+		$('#grid_toolbar_ul li').last().addClass('last');   //为grid上面的一排按钮中的最后一个li添加一个为‘last’的class
+        $('#grid_toolbar_ul li').click(function(){       //那些按钮 点击之后 触发 toolbar_func 方法
+            var id=$(this).attr('btn_id');
+            toolbar_func(id);
+        });
+		
+		$("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+
+		
+    })
+</script>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title></title>
+    <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/js/dhtmlxscheduler.js" type="text/javascript" charset="utf-8"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js" type="text/javascript" charset="utf-8"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <link rel="stylesheet" href="${base}/aufw/resources/common/scheduler/dhtmlxscheduler_dhx_terrace.css" type="text/css" charset="utf-8">
+    <link rel="stylesheet" href="${base}/aufw/resources/common/artDialog/skins/default.css" type="text/css" charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    
+	
+	<style type="text/css" media="screen">
+		html, body {
+			margin: 0px;
+			padding: 0px;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		#my_form label {
+			width: 200px;
+		}
+
+		.dhx_wrap_section label {
+			margin: 0 5px 0 20px;
+		}
+
+		.time_style1 {
+			width: 115px;
+			text-indent: 5px;
+		}
+
+		.time_style2 {
+			width: 20px;
+		}
+
+		.event_title {
+			width: 65px;
+			font-size: 14px;
+			text-align: right;
+			font-weight: bold;
+			color: #747473;
+			padding-left: 10px;
+			float: left;
+		}
+
+		.event_title_input input {
+			width: 570px;
+			font-size: 14px;
+			margin-left: 10px;
+			border-width: 0;
+		}
+
+		#my_form .time_style1, #my_form .time_style2 { color: #000; }
+
+		#remind_option { display: none; }
+		
+		.form-header{
+		  height: 40px;
+		  padding-right: 12px;
+		  background: #CC1717;
+		}
+		
+		.form-header a{
+		  display: block;
+		  float: right;
+		  color: #fff;
+		  font-size: 22px;
+		  font-family:"微软雅黑";
+		}
+		
+		.form-header a:hover{
+		  text-decoration:none;
+		}
+	</style>
+	<script type="text/javascript" charset="utf-8">
+		/**
+		 * 传入Date对象，返回减去的分钟数
+		 * @param {string} date
+		 * @param {string=} plus      分钟数 可选
+		 * @return {*}   string   2013-06-19 00:00
+		 */
+		function format_date(date, plus) {    //plus 减少的分钟数
+			if(typeof date  !='object') return date;
+			if (plus) {
+				var old_time = date.getTime();
+				var s = parseInt(plus) * 60 * 1000;
+				old_time = old_time - s;
+				date = new Date(old_time);
+			}
+			var year = date.getFullYear();
+			var month = date.getMonth() + 1;
+			if (month.toString().length == 1)   month = '0' + month;
+			var day = date.getDate();
+			if (day.toString().length == 1)   day = '0' + day;
+			var hour = date.getHours();
+			if (hour.toString().length == 1)   hour = '0' + hour;
+			var min = date.getMinutes();
+			if (min.toString().length == 1)   min = '0' + min;
+			var time = year + '-' + month + '-' + day + ' ' + hour + ':' + min;
+			return time;
+		}
+
+		/**
+		 * 2013-06-19 00:00 变成 Date对象
+		 * @param string
+		 * @return {Date}
+		 */
+		function toDate(string) {
+
+			var year = string.slice(0, 4);
+			var month = string.slice(5, 7);
+			month = parseInt(month) - 1;
+			var day = string.slice(8, 10);
+			var hour = string.slice(11, 13);
+			var min = string.slice(14, 16);
+			return new Date(year, month, day, hour, min);
+
+		}
+
+		function init() {
+
+			scheduler.config.xml_date = "%Y-%m-%d %H:%i";
+			scheduler.config.details_on_dblclick = true;
+			scheduler.config.details_on_create = true;
+			scheduler.config.multi_day = true;
+			scheduler.init('scheduler_here',null,'week');
+			scheduler.setLoadMode("month");
+			scheduler.load("showSchedule.action?etc="+new Date().getTime(),"json"); 
+			scheduler.attachEvent("onXLE", function (){
+			  });
+
+		}
+
+
+		scheduler.showLightbox = function (id) {
+			var ev = scheduler.getEvent(id);
+			scheduler.startLightbox(id, $("#my_form")[0]);
+			
+			var name="${accountName!}";
+			var createBy=ev.createBy;
+			if(createBy)
+			{
+				if(name!=createBy) //不是当前人
+				{
+					$('#saveId').hide();
+					$('#delId').hide();
+				}else{
+					$('#saveId').show();
+					$('#delId').show();
+				}
+				
+			}else{ //新增时
+				$('#saveId').show();
+				$('#delId').hide();
+			}
+			$("#text").focus();
+			$("#text").val(ev.text);
+			$("#nameId").val(ev.createBy);
+            $("#id").val(ev.primaryKey);
+            $("#task_no").val(ev.task_no);
+			$("#start_date").val(format_date(ev.start_date) || "");
+			$("#end_date").val(format_date(ev.end_date) || "");
+			if(ev.remind_date==null)  ev.remind_date=ev.start_date;
+			$("#remind_date").val(format_date(ev.remind_date) || format_date(ev.start_date, 5));
+			$("#details").val(ev.details || "");
+			var is_remind=ev.is_remind;
+			if(is_remind=='true'||is_remind==true){
+				$('#is_remind').attr('checked',true);
+				$('#remind_option').show();
+			}else{
+				$('#is_remind').attr('checked',false);
+				$('#remind_option').hide();
+			}
+			var remind_type=ev.remind_type;
+			if(remind_type!=undefined){
+				$('#remind_type').val(remind_type);
+			}
+			$('#remind_info').val(ev.remind_info);
+		};
+
+		function save_form() {
+            var url="updateSchedule.action";
+			var ev = scheduler.getEvent(scheduler.getState().lightbox_id);
+			ev.text = $("#text").val();
+			ev.details = $("#details").val();
+			ev.start_date = toDate($("#start_date").val());
+			ev.end_date = toDate($("#end_date").val());
+			ev.is_remind=$('#is_remind').is(':checked');
+			ev.remind_date=$('#remind_date').val();
+			ev.remind_type=$('#remind_type').val();
+			ev.remind_info=$('#remind_info').val();
+            var id=$("#id").val();
+            if(id==""){
+                url="addSchedule.action";
+            }
+            $.post(url,$("form:first").serialize(),function(data){
+                $.dialog.tips(data["message"]);
+
+				scheduler.clearAll();
+    			scheduler.load("showSchedule.action?etc="+new Date().getTime(),"json"); 
+           });
+			scheduler.endLightbox(true, $("#my_form")[0]);
+		}
+		function close_form() {
+			scheduler.endLightbox(false, $("#my_form")[0]);
+		}
+
+		function delete_event() {
+			
+			
+			 $.dialog.confirm('你确定要删除吗？', function () {
+					var ev = scheduler.getEvent(scheduler.getState().lightbox_id);
+					var event_id = scheduler.getState().lightbox_id;
+					$.post("deleteSchedule.action", {"id":event_id,"task_no":ev.task_no}, function(data){
+		                $.dialog.tips(data["message"]);
+		            });
+					scheduler.endLightbox(false, $("#my_form")[0]);
+					scheduler.deleteEvent(event_id);
+		        });
+			 
+			 
+			 
+		
+		}
+
+		function show_data() {
+			alert(scheduler.toJSON());
+
+		}
+		
+		$(function () {
+			$('#is_remind').click(function () {
+				var status = $(this).is(':checked');
+				if (status) {
+					$('#remind_option').show();
+				} else {
+					$('#remind_option').hide();
+				}
+			});
+			$('#remind_type').change(function(){
+				var nowType=$('#remind_type').val();
+				var tpsSPan=$('#remind_info');
+
+				var date=toDate($('#remind_date').val());
+				var week=['0','1','2','3','4','5','6'];
+				switch (nowType){
+					case '0' :{
+						tpsSPan.val('');
+						break;
+					}
+					case '1' :{
+						tpsSPan.val('1|'+date.getHours()+'|'+date.getMinutes());
+
+						break;
+					}
+					case '2' :{
+						tpsSPan.val('2|'+date.getDay()+'|'+date.getHours()+'|'+date.getMinutes());
+
+						break;
+					}
+					
+					case '3' :{
+						tpsSPan.val('3|'+date.getDate()+'|'+date.getHours()+'|'+date.getMinutes());
+
+						break;
+					}
+				}
+			})
+		});
+
+	</script>
+</head>
+<body onload="init();" style="height:100%;width:100%;">
+<div id="test" style="position:absolute; top:3px; left:200px; z-index:80;">
+	<!--  input name="" value="数据" onClick="show_data()" type="button">-->
+	
+</div>
+<div id="my_form" class="dhx_cal_light dhx_cal_light_wide" style=" display:none; height: 420px; top: 100px; left: 313px;">
+<div class="form-header clearfix"><a href="javascript:void(0)" title="关闭" onclick="close_form()">x</a></div>
+    <form id="sch_form" method="post" action="addSchedule.action">
+    <div class="dhx_cal_ltitle">
+		<div class="event_title">
+			<label for="text">标题：</label>
+		</div>
+		<div
+				class="event_title_input">
+			<input type="text" name="schedule.text" value="" id="text">
+		</div>
+		<div class="dhx_close_icon"></div>
+	</div>
+	<div class="dhx_cal_larea" style="height: 251px;">
+		<div class="dhx_wrap_section">
+			<div style="width: 65px;" class="dhx_cal_lsection">
+                <input class="time_style1" type="hidden" id="id" name="schedule.id">
+               <input class="time_style1" type="hidden" id="task_no" name="schedule.task_no">
+                
+				<label style="margin:0;" for="details">事件内容：</label>
+			</div>
+			<div class="dhx_cal_ltext">
+				<textarea style="width:640px; height:200px;" name="schedule.details" id="details"></textarea>
+			</div>
+		</div>
+		<div class="dhx_wrap_section">
+		      <label style="margin-left:25px;" for="start_date">创建人:</label>
+		      <input id="nameId" type="text" readonly="readonly">
+			<label style="margin-left:25px;" for="start_date">开始时间:</label>
+			<input class="time_style1" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'})" name="schedule.start_date" value="" id="start_date">
+			<label for="end_date">结束时间:</label>
+			<input class="time_style1" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'})" name="schedule.end_date" value="" id="end_date">
+		</div>
+	</div>
+	<div class="dhx_wrap_section">
+		<label><input id="is_remind" name="schedule.is_remind" type="checkbox" value="true">是否提醒</label>
+           <span id="remind_option">
+			  <label for="remind_date">提醒时间:</label>
+       <input class="time_style1" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'})" name="schedule.remind_date" value="" id="remind_date">
+		 <label for="remind_type">重复:</label>
+       <select id="remind_type" name="schedule.remind_type">
+	       <option value="0">不重复</option>
+	       <option value="1">每天</option>
+	       <option value="2">每周</option>
+	       <option value="3">每月</option>
+       </select>
+		 </span>
+		<input class="time_style1" type="text" id="remind_info" name="schedule.remind_info">
+
+	</div>
+	<div id="saveId" class="dhx_btn_set dhx_left_btn_set dhx_save_btn_set">
+		<div dhx_button="1" class="dhx_save_btn"></div>
+		<div onclick="save_form()">保存</div>
+	</div>
+	<div class="dhx_btn_set dhx_left_btn_set dhx_cancel_btn_set">
+		<div dhx_button="1" class="dhx_cancel_btn"></div>
+		<div onclick="close_form()">关闭</div>
+	</div>
+	<div id="delId" class="dhx_btn_set dhx_right_btn_set dhx_delete_btn_set" style="float:right;">
+		<div dhx_button="1" class="dhx_delete_btn"></div>
+		<div  onclick="delete_event()">删除</div>
+	</div>
+        </form>
+</div>
+<div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
+	<div class="dhx_cal_navline">
+		<div class="dhx_cal_prev_button">&nbsp;</div>
+		<div class="dhx_cal_next_button">&nbsp;</div>
+		<div class="dhx_cal_today_button"></div>
+		<div class="dhx_cal_date"></div>
+		<div class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
+		<div class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
+		<div class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+	</div>
+	<div class="dhx_cal_header"></div>
+	<div class="dhx_cal_data"></div>
+</div>
+</body>
+</html>

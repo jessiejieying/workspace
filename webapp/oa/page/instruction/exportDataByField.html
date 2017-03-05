@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+    <#include "/aufw/page/include/head.html">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+</head>
+<body style="height: 100%;" class="statistics export-data-by-field">
+
+    <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+          <div class="grid-table-top" id="grid_table" style="">
+            <div class="js-tool-bar">
+			<div class="form-group statistics-condition header-group padding-bottom-0">
+				<span class="header-title">统计选项:</span>
+				<span id="fromStartDateDiv" class="tool-bar-input margin-left-in margin-top">
+				<#list statisticType! as type>
+				   <#if type_index=0>
+				        <label for="statisticType_${type_index}" class="cursor-pointer float-left margin-left-in" >
+                            <input type="radio" name="statisticType" value="${type_index}"  class="js-radio-check margin-top0" id="statisticType_${type_index}" checked>${type}</label>
+				    <#else>
+						<label for="statisticType_${type_index}" class="cursor-pointer float-left margin-left-in" >
+                            <input class="js-radio-check margin-top0" type="radio" name="statisticType" value="${type_index}"  id="statisticType_${type_index}">${type}</label>
+				   </#if>
+				</#list>
+				</span>
+				<div class="button button-main js-statistics margin-left-out" id="instruction_field">字段选择</div>
+				<div class="button button-main js-statistics margin-left-in" id="instruction_statistic">统计</div>
+				<div class="button button-main js-statistics margin-left-in" id="exportButton">导出</div>
+				<br/>
+               </div>
+               <!-- 按年份查询 -->
+			   <div id="statisticType0" class="statisticTypeStyle header-group">
+				    <span class="span-bold header-title">指定年份:</span>
+				    <div class="input-father margin-left-in margin-top0">
+				   		<span id="yearDiv">
+							<input id="year0" name="year0" class="tool-bar-input margin-left-in" style="cursor: pointer;width: 60px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+						</span>
+                        <span class="header-title margin-left-in">年</span>
+						<select id="select0" class="tool-bar-input margin-left-in">
+							<option value="1-12">全年</option>
+						    <option value="1-6">上半年</option>
+						    <option value="7-12">下半年</option>
+						</select>
+					</div>
+					<span class="header-title margin-left-out"> 批示领导:</span>
+					<input id="instructionLeader0" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+				</div>
+				<!-- 按季度查询 -->
+				<div id="statisticType1" class="statisticTypeStyle header-group" style="display:none;">
+				    <span class="span-bold header-title">指定季度:</span>
+				    <div class="input-father margin-left-in margin-top0">
+						<span id="yearDiv">
+							<input id="year1" name="year1" class="tool-bar-input margin-left-in" style="cursor: pointer;width: 60px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+						</span>
+                        <span class="header-title margin-left-in">年</span>
+						<select id="select1" class="tool-bar-input margin-left-in">
+						    <option value="1-3">第一季度</option>
+						    <option value="4-6">第二季度</option>
+						    <option value="7-9">第三季度</option>
+						    <option value="10-12">第四季度</option>
+						</select>
+					</div>
+					<span class="header-title margin-left-out"> 批示领导:</span>
+					<input id="instructionLeader1" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+				</div>
+			    <!-- 按月份查询 -->
+				<div id="statisticType2" class="statisticTypeStyle header-group" style="display: none;">
+				   <span class="span-bold header-title">指定月份:</span>
+				   <div class="input-father margin-left-in margin-top0">
+						<span id="yearDiv">
+							<input id="year2" name="year2" class="tool-bar-input margin-left-in" style="cursor: pointer;width: 60px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+						</span>
+                        <span class="header-title margin-left-in">年</span>
+						<select id="select2" class="tool-bar-input margin-left-in">
+                            <option value="1">1月</option>
+						    <option value="2">2月</option>
+						    <option value="3">3月</option>
+						    <option value="4">4月</option>
+                            <option value="5">5月</option>
+                            <option value="6">6月</option>
+                            <option value="7">7月</option>
+                            <option value="8">8月</option>
+                            <option value="9">9月</option>
+                            <option value="10">10月</option>
+                            <option value="11">11月</option>
+                            <option value="12">12月</option>
+                        </select>
+					</div>
+					<span class="header-title margin-left-out"> 批示领导:</span>
+					<input id="instructionLeader2" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+				</div>
+				 <!-- 按日期范围查询 -->
+				<div id="statisticType3" class="statisticTypeStyle header-group" style="display: none;">
+				    <span class="span-bold header-title">日期范围:</span>
+				    <div class="input-father margin-left-in margin-top0">
+						<input  name="year3" id="year3" class="Wdate tool-bar-input" style="cursor: pointer;height: 26px;line-height: 26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"	size="19" type="text">
+						<span class="header-title margin-left-in">至</span>
+						<input  name="select3" id="select3" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height: 26px;line-height: 26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"	size="19" type="text">
+					</div>
+					<span class="header-title margin-left-out"> 批示领导:</span>
+					<input id="instructionLeader3" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+				</div>
+			<div class="statistics-tab">
+				<div class="clearfix">
+					<div id="exportButton" class="tab-btn" style="display:none;">导出</div>
+                </div>
+				<div class="tab-content-show">统计时间: ${.now ?string("yyyy.MM.dd")}<span></span></div>
+			</div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                     <th w_index="id" w_hidden="true" class="hidden"></th>
+                     <th width="40">序号</th>
+                     <th w_index="instructionLeader"  w_align="center" width="75">批示人</th>
+                     <th w_index="instructionDateNew"  w_align="center" width="75">批示时间</th>
+                     <th w_index="instructionOrder"  w_align="center" width="110">批示序号</th>
+                     <th w_index="fromDept"  w_align="center" width="90">来文单位</th>
+                     <th w_index="fromTitle" >来文标题</th>
+                    <th w_index="instructionContent" >批示内容</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+      <script type="text/template" id="exportFieldHtml">
+          <div id="exportFieldHtmlIn" class="export-choice-content">
+          </div>
+          <div class="text-center bot">
+              <div  class="button button-main" id="sure_field_selection" style="">确定</div>
+          </div>
+        </script>
+  <script type="text/template" id="exportField">
+            <%_.each(exportField, function(item){%>
+            <label class="field-selection-label">
+                <input type="checkbox" class="js-field-selection" data-field="<%=item.field%>" data-name="<%=item.name%>"/><%=item.name%>
+            </label>
+            <%});%>
+
+  </script>
+  <script src="${base}/edenui/common/js/jq_plugins/highcharts/highcharts.js"></script>
+  <script src = "${base}/edenui/common/js/underscore.js"></script>
+  <script src="${base}/edenui/common/js/json2.js"></script>
+  <script>
+ 
+	var gridOne;
+	var selectURL = "${base}/admin/instruction/exportDataByField.action";
+	var time = [  ];
+	var chartReadData = [];
+	var chartDealData = [];
+	var chartTotalData = [];
+	var exportField=[];
+    //目标字段
+    var destExportField=[];
+	var chart;
+	var condition = "";
+	var indexs="";
+	var count=[];
+	$(function() {
+		var date=new Date();
+		year=date.getFullYear();
+		$("#year0").val(year);
+		
+		
+		layOut("#common_table", "#grid_table");
+
+        $(".js-radio-check").change(function(){
+            var index=$(".js-radio-check").index($(this));
+            $(".statisticTypeStyle").hide().eq(index).show();
+        });
+
+        //字段选择
+        $("#instruction_field").click(function(){
+
+            var message = layer.open({
+                type: 1,
+                title: "字段选择",
+                area: ["651px", "321px"],
+                content: $("#exportFieldHtml").html(),
+                success: function (layero, index) {
+                    $("#exportFieldHtmlIn").html(_.template($('#exportField').html()));
+
+                    $("#sure_field_selection").click(function(){
+
+                        destExportField.length=0;
+
+                        $(".js-field-selection").each(function(){
+                            var $this=$(this);
+                            if($this.prop("checked")){
+                                destExportField.push({
+                                    "name":$this.data("name"),
+                                    "field":$this.data("field")
+                                });
+                            }
+                        });
+                        layer.closeAll("page");
+                    });
+
+                }
+            });
+        });
+
+	    //统计功能
+    	$(document).on("click","#report_total",function(){
+	        var startYearV = $("#startYear").val();
+	        var endYearV = $("#endYear").val();
+	        var symbol = "?wfName=oa_leader_instruction";
+	        if(selectURL.indexOf("?")>0){
+	        	symbol = "&wfName=oa_leader_instruction";
+	        }
+	        gridOne.changeUrl(selectURL + symbol + '&startYear=' + window.encodeURI(startYearV) +'&endYear=' + window.encodeURI(endYearV) + '&etc='+new Date().getTime());
+		});
+        
+	    
+	    //领导批示统计功能
+	    $(document).on("click","#instruction_statistic",function(){
+	    	//统计开始时，先清空所有的历史数据
+	    	indexs="";
+	    	count=[];
+	    	var val=$(":radio[name='statisticType']:checked").val();
+	    	if(val==undefined || val=="undefined" || val==""){
+	    		layer.msg("请选择统计类型");
+	    		return;
+	    	}
+	        var start_date,end_date;
+	        if(val==3){
+		    	start_date=$("#year"+val).val();
+		    	end_date  =$("#select"+val).val();
+	        }else{
+	    	    var year=$("#year"+val).val();
+	    	    if(year=="undefined" || year==undefined || year==""){
+	    		    var date=new Date();
+	    		    year=date.getFullYear();
+	    	    }
+	    	    var month_region=$("#select"+val).val();
+	    	    if(month_region.indexOf("-")!=-1){
+	    		    var month=month_region.replace(/\s+/g,"").split("-");
+	    	        start_date=year+"-"+(month[0].length==1?"0"+month[0]:month[0])+"-"+"01";
+	    	        var date= new Date(year,month[1],0); 
+	    	        end_date  =year+"-"+(month[1].length==1?"0"+month[1]:month[1])+"-"+date.getDate();
+	            }else{
+	        	    var flag=false;
+	        	    var months=["1","3","5","7","8","10","12"];
+	        	    for(var i=0;i<months.length;i++){
+	        		    if(month_region==months[i]){
+	        			    flag=true;
+	        			    break;
+	        		    }
+	        	     }
+		        	 start_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-01";
+		        	 var days="30";
+		        	 if(true){
+		        		 days="31";
+		        	 }
+	        	   	 end_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-"+days;
+	          	}
+	      	}
+	        
+	        var symbol = "?wfName=oa_leader_instruction";
+    	    if(selectURL.indexOf("?")>0){
+	            symbol = "&wfName=oa_leader_instruction";
+	        }
+    	    var $instructionLeader = $("#instructionLeader"+val).val();
+    	    symbol = symbol + '&instructionLeader=' + window.encodeURI($instructionLeader);
+	        var type=$("#search_file_type").val();
+
+	        gridOne.changeUrl(selectURL + symbol + '&startDate=' + window.encodeURI(start_date) +'&endDate=' + window.encodeURI(end_date) + '&etc='+new Date().getTime()+"&field="+JSON.stringify(destExportField)+"&type="+type);
+	    });
+	    
+	    //导出功能
+    	$(document).on("click","#exportButton",function(){
+    		var val=$(":radio[name='statisticType']:checked").val();
+	    	if(val==undefined || val=="undefined" || val==""){
+	    		layer.msg("请选择统计类型");
+	    		return;
+	    	}
+	       	var start_date,end_date;
+	      	if(val==3){
+	    	  	start_date=$("#year"+val).val();
+	    	  	end_date  =$("#select"+val).val();
+	      	}else{
+	    	  	var year=$("#year"+val).val();
+	    	  	if(year=="undefined" || year==undefined || year==""){
+	    		  	var date=new Date();
+	    		  	year=date.getFullYear();
+	    	  	}
+	    	  	var month_region=$("#select"+val).val();
+	    		if(month_region.indexOf("-")!=-1){
+	    		 	var month=month_region.replace(/\s+/g,"").split("-");
+	    	     	start_date=year+"-"+(month[0].length==1?"0"+month[0]:month[0])+"-"+"01";
+	    	     	var date= new Date(year,month[1],0); 
+	    	     	end_date  =year+"-"+(month[1].length==1?"0"+month[1]:month[1])+"-"+date.getDate();
+	          	}else{
+	        	  	var flag=false;
+	        	  	var months=["1","3","5","7","8","10","12"];
+	        	  	for(var i=0;i<months.length;i++){
+	        		  	if(month_region==months[i]){
+	        			  	flag=true;
+	        			  	break;
+	        		  	}
+	        	  	}
+	        	 	start_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-01";
+	        	 	var days="30";
+	        	 	if(true){
+	        		 	days="31";
+	        	 	}
+	        	   	end_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-"+days;
+	          	}
+	      	}
+	      	var symbol = "?wfName=oa_leader_instruction";
+    	  	if(selectURL.indexOf("?")>0){
+	        	symbol = "&wfName=oa_leader_instruction";
+	      	}
+    	  	var $instructionLeader = $("#instructionLeader"+val).val();
+    	    symbol = symbol + "&instructionLeader=" + window.encodeURI($instructionLeader);
+	      	var type=$("#search_file_type").val();
+	      	window.location = "${base}/admin/instruction/exportDataByFieldExport.action" + symbol + '&startDate=' + window.encodeURI(start_date) +'&endDate=' + window.encodeURI(end_date) +  "&merge="+indexs+'&etc='+new Date().getTime()+"&field="+JSON.stringify(destExportField)+"&type="+type;
+		});
+	    
+	    
+        var startDate=new Date().getFullYear()+"-01-01";
+        var month=(new Date().getMonth())+1;
+        month=month.length==1 ? "0"+month:month;
+        var day=new Date().getDate();
+        day=day.length==1 ? "0"+day:day;
+        var   endDate=new Date().getFullYear()+"-"+month+"-"+day;
+        
+        
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?wfName=oa_leader_instruction"+"&startDate="+startDate+"&endDate="+endDate+"&etc="+new Date().getTime(),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+			},
+			processUserdata:function(userdata,options){
+				if(userdata!=null && userdata!=undefined && userdata!=''&& userdata!="undefined"){
+					initTable(userdata,options);
+				}
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+					$("#manage_grid_bot thead tr th").each(function(index){
+					    if($(this).attr("w_align")){
+					    	 $("td",$this).eq(index).css({"text-align":"center","padding-left":"0px"});
+					    }
+					});
+	        		    $("td",this).eq(0).css("padding-left","8px");
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+
+
+                    var girdRecord=gridOne.getAllRecords();
+
+                girdRecord.forEach(function(value,index){
+
+                    if(value.color){
+                        $("#manage_grid_bot tbody tr:eq("+index+") td").css({"background":value.color});
+                    }
+
+                });
+			}
+		});
+
+		$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印",url:"${base}/admin/documentStatistics/incomingStatisticByYearPrintWin.action?etc=" + new Date().getTime(),width:'900',height:'550', id:"incomingStatisticByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});		
+
+       initExportField("${fields!}");
+	});
+
+	function initExportField(fileds){
+		var fieldName=fileds.split(";");
+		fieldName.forEach(function(value){
+			var field=value.split("|");
+			exportField.push({
+				"name":field[0],
+				"field":field[1]
+			});
+		}); 
+	}
+	//加载数据时，重新渲染表格 
+	function initTable(userdata,options){
+
+        var $manageGridBotTr=$('#manage_grid_bot tr');
+        var $manageGridBotFixTr=$('#manage_grid_bot_fixedHeader tr');
+
+		$('#manage_grid_bot_fixedHeader tr th').remove();
+
+		$('#manage_grid_bot tr th').remove();
+
+        $manageGridBotFixTr.append(' <th w_index="id" w_hidden="true" class="hidden" width="30px"></th>');
+        $manageGridBotFixTr.append('<th width="40">序号</th>');
+        $manageGridBotTr.append(' <th w_index="id" w_hidden="true" class="hidden" width="30px"></th>');
+
+        $manageGridBotTr.append('<th width="40">序号</th>');
+		 for(var i=0;i<userdata.length;i++){
+             $manageGridBotFixTr.append('<th w_index="' + userdata[i].fieldValue+ '" w_align="center">' + userdata[i].fieldName + '</th>');
+		 }
+
+		 for(var i=0;i<userdata.length;i++){
+             $manageGridBotTr.append('<th w_index="' + userdata[i].fieldValue+ '" w_align="center">' + userdata[i].fieldName + '</th>');
+		 }
+		 options.columnsModel = $.fn.bsgrid.initColumnsModel(options);
+	}
+	</script>
+</body>
+</html>

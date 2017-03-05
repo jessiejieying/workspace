@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=8,Chrome=1">
+    <link rel='shortcut icon' href='/eden.oa/aufw/resources/favicon.ico' type='image/x-icon' />
+    <title id="htmlTitle">页面加载中。。。</title>
+    <link rel="stylesheet"  type="text/css" href="../../resources/common/css/run.css">
+    <link rel="stylesheet"  type="text/css" href="../../resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet"  type="text/css" href="../../resources/common/css/base.css">
+
+    <link rel="stylesheet" type="text/css" href="../../resources/skins/default/css/formOther.css">
+    <script>
+        //设置base的路径
+        var base=window.location.toString();
+        base = base.split('/');
+        base = '/' + base[3];
+        //   没有项目名称的时候
+        // var base="";
+    </script>
+
+
+    <script src="../../../edenui/common/js/jquery.js"></script>
+    <script src="../../../edenui/common/js/jquery_migrate.min.js"></script>
+    <script src="../../../edenui/common/js/jq_plugins/layer/layer.v.js"></script>
+
+    <script src="../../resources/common/dhtmlx/dhtmlx.js"></script>
+
+    <script src="../../resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+
+    <script src="../../resources/common/dhtmlx/eden.js"></script>
+    <script src="../../../edenui/common/js/plugins/dhtmlx/eden.js"></script>
+    <script src="../../resources/common/js/tool.js"></script>
+    <script src="../../resources/common/js/edenApi.js"></script>
+
+    <script src="../../resources/common/js/commonEvent.js"></script>
+
+    <script src="../../resources/common/js/MicrosoftAjax.js"></script>
+
+    <script src="../../resources/common/My97DatePicker/WdatePicker.js"></script>
+    <script src="../../resources/common/artDialog/jquery.artDialog.js"></script>
+
+    <script src="../../resources/common/js/temp.js"></script>
+    <!--具体项目自定义js文件-->
+
+    <script type="text/javascript">
+        //设置是否已经发送 true为未发送，全局判断
+        var global={
+            isSendOut:true,
+            loginUser:"eden"
+        }
+        //加载loading
+        loadStart();
+        var edenWins;
+        var pageDs = [];
+        var project =base;
+        var baseUrl = project + '/form';
+        var attachServlet = project + '/admin/attachmentInfo/selectByTable.action';
+        var dhtmlxBase = project + '/form/resources/common/dhtmlx';
+        var djsn = QueryURL.GetValue('djsn');
+        var djtype = QueryURL.GetValue('djtype');
+        var wfName = QueryURL.GetValue('wfName');
+        var path = '';
+        var jsLibPath = baseUrl + '/resources/common/js/';
+
+        $(function () {
+
+
+            $.get(baseUrl + "/fceformext/xml/billtype.xml", function (xml) {     //得到djtype对应的路径
+
+                var hasFindDjType = false;
+                $(xml).find('tr').each(function (i) {
+
+                    var text = $(this).children('td:eq(2)').text();
+
+                    var cPath = $(this).children('td:eq(3)').text()
+                    if (text == djtype) {
+                        hasFindDjType = true;
+                        path = baseUrl + '/' + cPath + djsn + '.htm';
+                        var oaPath=window.location.href;
+
+                        //判断办理单页面，添加对应的样式
+
+//                        if((oaPath.indexOf("is_oa_bill=true"))>-1){
+//
+//
+//                            $("html").addClass("oa-only-bill-page");
+//                            $(".js-unneed-css").remove();
+//
+//
+//                        }
+                        $('body').load(path + ' #SKbillsheet', function (text) {
+
+                            //取消顶部按钮默认的样式
+//
+//                            if($("html").hasClass("oa-only-bill-page")){
+//
+//                                var pageHeader = $(".oa-only-bill-page-header");
+//                                var styleButton=pageHeader.find("button"),
+//                                        styleLabel=pageHeader.find("label"),
+//                                        styleDiv=pageHeader.find("div");
+//                                pageHeader.attr("style","");
+//                                styleButton.each(function(){
+//                                    var isHide=false;
+//                                    var $this=$(this);
+//
+//                                    $this.attr("style","");
+//
+//                                });
+//                                styleLabel.each(function(){
+//                                    var isHide=false;
+//                                    var $this=$(this);
+//
+//                                    $this.attr("style","");
+//
+//                                });
+//                                styleDiv.each(function(){
+//                                    var isHide=false;
+//                                    var $this=$(this);
+//                                    $this.attr("style","");
+//
+//                                });
+//                                if(djsn=="oa_meeting_info"){
+//                                    if(wfName=="oa_meeting_program_approval"){
+//                                        //显示
+//                                        $("#buttonChangeTo").show();
+//                                    }else{
+//                                        //隐藏
+//                                        $("#buttonChangeTo").hide();
+//                                    }
+//                                }
+//
+//
+//                            }
+
+
+                            //加载loading
+//                            if($(".oa-only-bill-page").length>0){
+//                                loadStart();
+//                                setTimeout(function(){
+//                                    loadEnd();
+//                                }, 3000);
+//                            }
+
+                            var pgBeforeLoad = undToSp($('#SKbillsheet').attr('BLONopenBefore'));
+                            var pgAfterLoad = undToSp($('#SKbillsheet').attr('BLONopen'));
+                            var jsLib = undToSp($('#SKbillsheet').attr('jslib'));
+                            if (jsLib.length > 1) {
+                                jsLib = jsLib.split('\r\n');
+                                for (var i = 0; i < jsLib.length; i++) {
+                                    var o = undToSp(jsLib[i]);
+                                    if (o.length > 1)    $.getScript(jsLibPath + o);
+                                }
+                            }
+                            if (pgBeforeLoad.length > 1) {
+                                eval(pgBeforeLoad);
+                            }
+
+                            dhxWins = new dhtmlXWindows();      //添加 dhtmlXWindows 对象
+                            global.window_num = 0;
+                            dhxWins.setImagePath(project + "/form/resources/common/dhtmlx/imgs/");
+                            dhxWins.attachEvent("onContentLoaded", function (win) {
+                                var id = win.getId();
+                                if (window[id + '_parent_ifr']) {             //传入window对象给新的iframe，用于iframe之间的数据传递
+                                    var newWindow = $(win).find('iframe')[0].contentWindow;
+                                    newWindow.ParentIframe = window[id + '_parent_ifr'];
+                                }
+                                if (window[id + '_callBack']) {             //传入 回调函数 给新的iframe，
+                                    var newWindow = $(win).find('iframe')[0].contentWindow;
+                                    newWindow.edenCallBack = window[id + '_callBack'];
+                                }
+                                if (window[id + '_afterLoad']) {             //传入 前置函数 给新的iframe，
+                                    var newWindow = $(win).find('iframe')[0].contentWindow;
+                                    newWindow.edenAfterLoad = window[id + '_afterLoad'];
+                                }
+                            });
+
+                            if (text.match('HTTP Status 404') != null) {                     //如果未找到页面
+                                var text = '在' + djtype + '分类下，未找到 ' + djsn + '.htm ！';
+                                var html = '<div style="font-size: 20px;line-height: 50px; text-align: center; width: 100%;"><p>' + text + '</p><p>具体路径为：' + baseUrl + '/' + cPath + djsn + '.htm' + '</p></div>'
+                                $('body').html(html);
+                            }
+                            var dom = $(text);
+                            dom.filter('script').each(function () {                      //添加 用户自定义 函数
+                                if ($(this).attr('id') == 'userFunc') {
+                                    var script = $('<script id="userFunc">' + $(this).html() + '<\/script>');
+                                    $('body').append(script);
+                                }
+                            });
+
+                            var addReg = /(.|\s)*<div id='addHtml'>([.\s]*)/gim;
+                            var addHtml = text.replace(addReg, '$2');
+
+
+                            addHtml = addHtml.replace(/\s<\/div>\s<\/body><\/html>/gim, '');
+                            $('body').append(addHtml);
+                            //添加 附加页面元素
+                            parse_page();
+
+                            if (pgAfterLoad.length > 1 || window.edenAfterLoad) {
+                                var totalDataCtrl = needLoadDataList.length;
+
+                                var pgLoadStatus = window.setInterval(function () {
+                                    if (totalDataCtrl == hasLoadedCtrlNum) {
+                                        eval(pgAfterLoad);
+                                        try {
+                                            eval('(' + edenAfterLoad + ')()');             //执行window 的前置函数
+                                        } catch (e) {
+
+                                        }
+
+                                        clearInterval(pgLoadStatus);
+                                    }
+
+                                }, 500);
+
+
+                            }
+
+                        });
+
+                        return false;
+                    }
+                });
+                if (hasFindDjType == false) {
+                    var html = '<div style="font-size: 20px;line-height: 50px; text-align: center; width: 100%;"><p>没有' + djtype + '这个分类</p></div>'
+                    $('body').html(html);
+                }
+            });
+
+            //窗口改变的时候
+            $(window).resize(function(){
+
+                if($(".oa-only-bill-page-header").length>0){
+                    var pageHeader = $(".oa-only-bill-page-header");
+                    pageHeader.css({"marginLeft": (-pageHeader.width() / 2), "left": "50%"});
+                }
+
+
+            });
+
+
+
+        })
+
+
+        //页面加载完成之后
+
+
+        $(window).load(function() {
+
+            //加载inframe页面
+
+//        loadDroplistDataAndNotePage('notediv');
+//        loadAttachmentPage('attachmentdiv');
+//        loadRecordPage('recorddiv');
+//
+
+        });
+
+        function parse_page() {
+
+            if (!$('#SKbillsheet')) return;
+
+            var wrap = $('#SKbillsheet');
+
+            var htmlTitle = wrap.attr('caption');
+            document.title = htmlTitle;
+            var items = wrap.attr('contxml');
+
+            var authXml = undToSp(wrap.attr('roleXml'));
+            items = newXml(items);
+
+            var run_items = [];
+
+            $(items).find('root').children().each(function (i) {                  //加载普通控件
+                var tagName = this.tagName;
+
+                var num = $(this).find('id').length;
+                for (var i = 0; i < num; i++) {
+                    var id = $(this).find('id').eq(i - 1).text();
+
+                    switch (tagName) {
+                        case 'label':
+                        {
+
+                            parseLabel(id);
+                            break;
+                        }
+                        case 'text':
+                        {
+                            parseText(id);
+                            break;
+                        }
+                        case 'textarea':
+                        {
+                            parseTextarea(id);
+                            break;
+                        }
+                        case 'editor':
+                        {
+                            parseEditor(id);
+                            break;
+                        }
+                        case 'img':
+                        {
+                            parseImg(id);
+                            break;
+                        }
+                        case 'radio':
+                        {
+                            parseRadio(id);
+                            break;
+                        }
+                        case 'checkbox':
+                        {
+                            parseCheckbox(id);
+                            break;
+                        }
+                        case 'button':
+                        {
+                            parseButton(id);
+                            break;
+                        }
+                        case 'tab':
+                        {
+
+                            parseTab(id);
+                            break;
+                        }
+                        case 'page':
+                        {
+                            parsePage(id);
+                            break;
+                        }
+                        case 'upload':
+                        {
+                            parseUpload(id);
+                            break;
+                        }
+                        case 'grid':
+                        {
+                            parseGrid(id);
+                            break;
+                        }
+                        case 'tree':
+                        {
+                            parseTree(id);
+                            break;
+                        }
+                        case 'checkboxlist':
+                        {
+                            parseCheckboxList(id);
+                            break;
+                        }
+                        case 'listbox':
+                        {
+                            parseListBox(id);
+                            break;
+                        }
+                        case 'radiolist':
+                        {
+                            parseRadioList(id);
+                            break;
+                        }
+                        case 'dropdownlist':
+                        {
+
+                            parseSelect(id);
+                            break;
+                        }
+                    }
+
+                }
+
+            });
+
+
+
+            $(items).find('root').children().each(function (i) {                  //加载datastore
+                var tagName = $(this)[0].tagName;
+                var num = $(this).find('id').length;
+
+                if (tagName == 'dataset') {
+                    for (var i = 0; i < num; i++) {
+                        var id = $(this).find('id').eq(i - 1).text();
+                        pageDs.push(id);
+
+                    }
+                }
+
+            });
+
+            function _pds(num) {
+
+
+                for (var dsi = 0; dsi < pageDs.length; dsi++) {
+                    var dsId = pageDs[dsi];
+                    var order = $('#' + dsId).attr('opensortno');
+                    if (order != num) continue;
+                    var pageSize = -1;
+                    for (var j = 0; j < needLoadDataList.length; j++) {
+                        var arr = needLoadDataList[j];
+                        if (arr[1] == dsId && arr[2] == 'grid') {
+                            pageSize = $('#' + arr[0]).attr('bodyrows');
+                            var isPage = $('#' + arr[0]).attr('isPage');
+                            if (isPage == '否') pageSize = -1;
+
+                            window[dsId + 'PagingInfo'] = {'pageSize': pageSize, 'start': 1};
+                        }
+
+                    }
+
+                    parseDataset(dsId, pageSize, 1);
+                }
+            }
+
+            for (var numi = 1; numi < 10; numi++) {                //根据 dataset 加载顺序 加载dataset
+
+                _pds(numi);
+            }
+
+
+            if (asyncList.length > 0) {                          //选中了 异步加载的控件  一次加载它们
+                var asyncXml = '<root>';
+                for (var i = 0; i < asyncList.length; i++) {
+                    var obj = asyncList[i];                        //[控件ID,类型,sql]
+                    if (obj[1] == 'listBox') {
+                        asyncXml += '<root key="fillcombox" ><sql>' + obj[2] + '</sql></root>';
+                    } else if (obj[1] == 'checkboxList' || obj[1] == 'radioList') {
+                        asyncXml += '<root key="fc_select" ><sql>' + obj[2] + '</sql><pageno>1</pageno><pagesize>-1</pagesize></root>';
+                    } else if (obj[1] == 'select') {
+                        asyncXml += '<root key="sqltoxml" ><sql>' + obj[2] + '</sql></root>';
+                    }
+                }
+                asyncXml += '</root>';
+
+                $.ajax({
+                    type: "POST",
+                    url: "/form/servlet/WebBill?key=loadingBatchAction",
+                    processData: false,
+                    async: false, //同步加载数据。发送请求时锁住浏览器。 在所有数据加载好后才触发 验证权限
+                    data: asyncXml,
+                    contentType: 'utf-8',
+                    success: function (response) {
+
+                        if (response.match('errInfo') != null) {
+                            alert(response);
+                        } else {
+                            var valArr;
+                            var trueValArr = [];
+                            valArr = response.substring(6, response.length - 7);
+                            valArr = valArr.replace(/<\/root>/g, '');
+                            valArr = valArr.split('<root>');
+
+                            for (var i = 0; i < valArr.length; i++) {
+                                var arr = valArr[i];
+                                if (arr != '') {
+                                    trueValArr.push(valArr[i]);
+                                }
+                            }
+
+                            for (var i = 0; i < asyncList.length; i++) {
+                                var ctrl = asyncList[i];
+                                if (ctrl[1] == 'listBox') {
+                                    $('#' + ctrl[0]).append(trueValArr[i]);
+                                } else if (ctrl[1] == 'checkboxList') {
+                                    var xml = trueValArr[i];
+                                    xml = '<root>' + xml + '</root>';
+                                    xml = newXml(xml);
+                                    var tempValue = '';
+                                    var tempText = '';
+                                    $(xml).find('record').each(function () {
+                                        tempValue += $(this).children().eq(0).text() + ',';
+                                        tempText += $(this).children().eq(1).text() + ',';
+                                    })
+                                    tempValue = tempValue.substr(0, tempValue.length - 1);
+                                    tempText = tempText.substr(0, tempText.length - 1);
+                                    $('#' + ctrl[0]).attr({'tempvalue': tempValue, 'temptext': tempText});       //更新控件上的属性，赋值、取值时会用到
+                                    _parseCheckboxList(ctrl[0], tempText.split(','), tempValue.split(','));
+
+                                } else if (ctrl[1] == 'radioList') {
+                                    var xml = trueValArr[i];
+                                    xml = '<root>' + xml + '</root>';
+                                    xml = newXml(xml);
+                                    var tempValue = '';
+                                    var tempText = '';
+                                    $(xml).find('record').each(function () {
+                                        tempValue += $(this).children().eq(0).text() + ',';
+                                        tempText += $(this).children().eq(1).text() + ',';
+                                    })
+                                    tempValue = tempValue.substr(0, tempValue.length - 1);
+                                    tempText = tempText.substr(0, tempText.length - 1);
+                                    $('#' + ctrl[0]).attr({'tempvalue': tempValue, 'temptext': tempText});       //更新控件上的属性，赋值、取值时会用到
+                                    _parseRadioList(ctrl[0], tempText.split(','), tempValue.split(','));
+                                } else if (ctrl[1] == 'radioList') {
+                                    var xml = trueValArr[i];
+                                    xml = '<root>' + xml + '</root>';
+
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (authXml.length > 1) {
+                parseAuthXml(authXml);
+            }
+        }
+
+    </script>
+</head>
+<body class="run">
+</body>
+</html>

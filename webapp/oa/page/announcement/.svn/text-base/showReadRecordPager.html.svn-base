@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+    <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+    <script>
+        //setSkinsCss("listCss,iconCss");
+    </script>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/freshtop/css/gice.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+<style>
+
+.consum_block .save_btn {
+height: 30px;
+width:80px;
+float: none;
+line-height: 30px;
+color: #fff;
+padding: 0 20px;
+border: none;
+cursor: pointer;
+text-align: center;
+
+}
+
+.consum_block .nodisabledBtn {
+
+background-color: #0B91CE;
+
+}
+.consum_block .nodisabledBtn:HOVER {
+
+background-color: #46ABDA;
+
+}
+.consum_block .disabledBtn {
+
+background-color: #D4D0C8;
+
+}
+.consum_block .disabledBtn:HOVER  {
+
+background-color: #D4D0C8;
+
+}
+
+
+
+
+.billline_inline_right{margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid #E6E6E6; width: 100%}
+</style>
+    </head>
+
+<body style="height:100%;overflow:auto;">
+	<div class="consum_wrap">
+	
+	
+		<div class="clearfix consum_block" >
+		<div class="consum_inline clearfix" style="float: none;">
+		
+		<div class="billline_inline_right clearfix">
+			<label for="consumAsset">已阅记录</label>
+			<div id="gridId" style="width:600px;height: 320px;margin-bottom: 10px">
+			</div>
+		  <div id="grid_page" class="grid_page" style="width:100%;height:18px; padding-top:10px;"></div>
+		
+		</div>
+	</div>
+	
+ <div class="clearfix" ></div>
+	
+	</div>
+	
+	</div>
+	
+
+</body>
+    <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+
+<script>
+	var announcementId="${announcementId}";
+   var grid,data;
+
+	function init() {  
+		
+		 data = new dhtmlXDataStore({
+				url:"${base}/admin/announcement/selectReadRecord.action?announcementId="+announcementId+"&etc="+new Date().getTime(),
+				datatype:"json"
+			});
+		
+		grid = new dhtmlXGridObject('gridId');
+		// 把 grid 添加到  ID为 grid的div中
+		grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		//设置 grid上 图片的路径
+		grid.setHeader("查阅人,所属部门,阅读时间");
+		//设置 grid每列的标题
+		grid.setColumnIds("readerUser,readerDeptName,createDttm");
+		//设置 grid每列的数据  对应 json中的哪条数据
+		grid.setInitWidths("200,200,*");
+		//设置 每列的宽度
+		grid.setColTypes("ro,ro,ro");
+		
+		grid.init();
+		
+	       grid.enablePaging(true, 15, 999999, 'grid_page', true);
+		 grid.setPagingSkin("toolbar");
+
+		 grid.sync(data); 
+		 
+		
+
+	}
+
+    $(function(){
+    
+    	
+    	init();
+    	layout();
+    	$(window).resize(function(){
+    		layout();
+    	});
+    	
+    	
+    });
+    
+    function layout(){
+    	$('#remark').width($('.consum_wrap').width()-84);	
+    }
+    
+
+
+    
+
+
+
+  
+   
+    
+</script>
+</html>

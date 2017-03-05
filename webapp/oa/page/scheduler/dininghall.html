@@ -1,0 +1,167 @@
+<!DOCTYPE html >
+<html style="height:100%;width:100%;">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title></title>
+	<script src="${base}/oa/page/scheduler/js/dhtmlxscheduler.js" type="text/javascript" charset="utf-8"></script>
+    <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+      <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    
+	<link rel="stylesheet" href="${base}/oa/page/scheduler/css/dhtmlxscheduler_dhx_terrace.css" type="text/css" media="screen"
+	      title="no title" charset="utf-8">
+	<style type="text/css" media="screen">
+		html, body {
+			margin: 0px;
+			padding: 0px;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		#my_form label {
+			width: 200px;
+		}
+
+		.dhx_wrap_section label {
+			margin: 0 5px 0 20px;
+		}
+
+		.time_style1 {
+			width: 115px;
+			text-indent: 5px;
+		}
+
+		.time_style2 {
+			width: 20px;
+		}
+
+		.event_title {
+			width: 65px;
+			font-size: 14px;
+			text-align: right;
+			font-weight: bold;
+			color: #747473;
+			padding-left: 10px;
+			float: left;
+		}
+
+		.event_title_input input {
+			width: 570px;
+			font-size: 14px;
+			margin-left: 10px;
+			border-width: 0;
+		}
+
+		#my_form .time_style1, #my_form .time_style2 { color: #000; }
+
+		#remind_option { display: none; }
+	</style>
+	<script type="text/javascript" charset="utf-8">
+		function format_date(date, plus) {    //plus 减少的分钟数
+			if(typeof date  !='object') return date;
+
+			if (plus) {
+				var old_time = date.getTime();
+				var s = parseInt(plus) * 60 * 1000;
+				old_time = old_time - s;
+				date = new Date(old_time);
+			}
+
+
+			var year = date.getFullYear();
+			var month = date.getMonth() + 1;
+			if (month.toString().length == 1)   month = '0' + month;
+			var day = date.getDate();
+			if (day.toString().length == 1)   day = '0' + day;
+			var hour = date.getHours();
+			if (hour.toString().length == 1)   hour = '0' + hour;
+			var min = date.getMinutes();
+			if (min.toString().length == 1)   min = '0' + min;
+			var time = year + '-' + month + '-' + day + ' ' + hour + ':' + min;
+			return time;
+		}
+
+		function toDate(string) {
+
+			var year = string.slice(0, 4);
+			var month = string.slice(5, 7);
+			month = parseInt(month) - 1;
+			var day = string.slice(8, 10);
+			var hour = string.slice(11, 13);
+			var min = string.slice(14, 16);
+			return new Date(year, month, day, hour, min);
+
+		}
+
+		function init() {
+			scheduler.config.xml_date = "%Y-%m-%d %H:%i";
+			scheduler.config.details_on_dblclick = true;
+			scheduler.config.details_on_create = true;
+			scheduler.config.multi_day = true;
+			scheduler.config.scroll_hour = 9 ;
+			scheduler.init('scheduler_here',null,'month');
+			scheduler.load("${base}/admin/mealApproveManager/selectByDininghall.action?place=${id}","json");
+            //scheduler.load("${base}/oa/page/scheduler/dininghall.json","json");
+            //    scheduler.showLightbox("1261150564");
+            //});
+		}
+
+
+		scheduler.showLightbox = function (id) {
+			var ev = scheduler.getEvent(id);
+			if(ev.approveId == null){
+				//initWorkflow("oa_meal_approve","预定登记",1);
+				$.dialog.tips("此处不能预定");
+
+				/*window.top.createWindow({
+                'text':'预定登记',
+                'id':'workflow',
+                'url':'${base}/form/fceform/common/run.html?djsn=oa_meal_approve_init&djtype=TT&time='+new Date(),
+                'width':'800',
+                'height':'620',
+                parent_ifr:window
+				});*/
+				//setTimeout(function(){window.location.reload()},1000);
+			}else{
+				var approveId = ev.approveId;
+				window.top.createWindow({
+                'text':'预定查看',
+                'id':'workflow',
+				'url':'${base}/form/fceform/common/run.html?id='+approveId+'&djsn=oa_meal_approve_scheduler&djtype=dininghall',
+                'width':'582',
+                'height':'540'
+				});
+			}
+		};
+
+		function close_form() {
+			scheduler.endLightbox(false, $("#my_form")[0]);
+		}
+
+	</script>
+</head>
+<body onLoad="init();" style="height:100%;width:100%;">
+<div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
+	<div class="dhx_cal_navline">
+		<div class="dhx_cal_prev_button">&nbsp;</div>
+		<div class="dhx_cal_next_button">&nbsp;</div>
+		<div class="dhx_cal_today_button"></div>
+		<div class="dhx_cal_date"></div>
+		<div class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
+		<div class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
+		<div class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+	</div>
+	<div class="dhx_cal_header"></div>
+	<div class="dhx_cal_data"></div>
+</div>
+</body>
+</html>

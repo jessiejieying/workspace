@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+    <#include "/aufw/page/include/head.html">
+    <style>
+        .cursor-pointer{
+            cursor: pointer;
+            position:relative;
+            top: 1px;
+        }
+        .cursor-pointer input{
+            vertical-align: -2px;
+        }
+    </style>
+</head>
+<body style="height: 100%;" class="statistics">
+    <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+          <div class="grid-table-top" id="grid_table" style="">
+            <div class="js-tool-bar">
+			<div class="form-group statistics-condition header-group padding-bottom-0">
+				<span class="header-title">统计选项:</span>
+				<div id="fromStartDateDiv" class="tool-bar-input margin-left-in">
+				<#list statisticType as type>
+				   <#if type_index=0>
+				        <label for="statisticType_${type_index}" class="cursor-pointer float-left" >
+                        <input  type="radio" name="statisticType" value="${type_index}"  class="js-radio-check margin-top0" id="statisticType_${type_index}" checked>${type}</label>
+				   <#else>
+				       <label for="statisticType_${type_index}" class="cursor-pointer float-left margin-left-in" > <input  class="js-radio-check margin-top0" type="radio" name="statisticType" value="${type_index}"  id="statisticType_${type_index}">${type}</label>
+				   </#if>
+				</#list>
+				</div>
+				<div  class="button button-main margin-left-out js-statistics" id="instruction_statistic" >统计</div>
+				<div id="exportButton" class="button button-main margin-left-in js-statistics">导出</div>
+            </div>
+            	<!-- 按年份查询 -->
+			    <div id="statisticType0" class="statisticTypeStyle header-group">
+			    	<div  class="button button-main margin-left-in js-statistics" id="instruction_statistic_merge">合并</div>
+				    <span class="span-bold header-title" style="padding-left: 10px;"> 指定年份:</span>
+				    <div class="input-father margin-left-in margin-top0">
+				   		<span id="yearDiv">
+							<input id="year0" name="year0" class="tool-bar-input margin-left-in" style="cursor: pointer;width: 60px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+						</span>
+                        <span class="header-title margin-left-in">年</span>
+						<select id="select0" class="tool-bar-input margin-left-in">
+							<option value="1-12">全年</option>
+						    <option value="1-6">上半年</option>
+						    <option value="7-12">下半年</option>
+						</select>
+					</div>
+				 </div>
+				<!-- 按季度查询 -->
+				<div id="statisticType1" class="statisticTypeStyle header-group" style="display:none;">
+					<div  class="button button-main margin-left-in js-statistics" id="instruction_statistic_merge">合并</div>
+				    <span class="span-bold header-title" style="padding-left: 10px;"> 指定季度:</span>
+				    <div class="input-father margin-left-in margin-top0">
+						<span id="yearDiv">
+							<input id="year1" name="year1" class="tool-bar-input margin-left-in" style="cursor: pointer;width: 60px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+						</span>
+                        <span class="header-title margin-left-in">年</span>
+						<select id="select1" class="tool-bar-input margin-left-in">
+						    <option value="1-3">第一季度</option>
+						    <option value="4-6">第二季度</option>
+						    <option value="7-9">第三季度</option>
+						    <option value="10-12">第四季度</option>
+						</select>
+					</div>
+				</div>
+			    <!-- 按月份查询 -->
+				<div id="statisticType2" class="statisticTypeStyle header-group" style="display: none;">
+				<div  class="button button-main margin-left-in js-statistics" id="instruction_statistic_merge">合并</div>
+				   <span class="span-bold header-title" style="padding-left: 10px;"> 指定年份:</span>
+				   <div class="input-father margin-left-in margin-top0">
+						<span id="yearDiv">
+							<input id="year2" name="year2" class="tool-bar-input margin-left-in" style="cursor: pointer;width: 60px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+						</span>
+                        <span class="header-title margin-left-in">月</span>
+						<select id="select2" class="tool-bar-input margin-left-in">
+						    <option value="1">1月</option>
+						    <option value="2">2月</option>
+						    <option value="3">3月</option>
+						    <option value="4">4月</option>
+						    <option value="5">5月</option>
+						    <option value="6">6月</option>
+						    <option value="7">7月</option>
+						    <option value="8">8月</option>
+						    <option value="9">9月</option>
+						    <option value="10">10月</option>
+						    <option value="11">11月</option>
+						    <option value="12">12月</option>
+						</select>
+					</div>
+				</div>
+				 <!-- 按日期范围查询 -->
+				<div id="statisticType3" class="statisticTypeStyle header-group" style="display: none;">
+				   <div  class="button button-main margin-left-in js-statistics" id="instruction_statistic_merge">合并</div>
+				   <span class="span-bold header-title " style="padding-left: 10px;">日期范围:</span>
+				   <div class="input-father margin-left-in margin-top0">
+						<input  name="year3" id="year3" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height: 26px;line-height: 26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"	size="19" type="text">
+						<span class="header-title margin-left-in">至</span>
+						<input  name="select3" id="select3" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height: 26px;line-height: 26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"	size="19" type="text">
+					</div>
+				</div>
+                <div class="statistics-tab">
+				<div class="clearfix">
+                    <div id="exportButton" class="tab-btn" style="display:none;">导出</div>
+                </div>
+                    <div class="tab-content-show">统计时间:${.now ?string("yyyy.MM.dd")}<span></span></div>
+			</div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th w_check="true" width="30"></th>
+                  <th width="40">序号</th>
+                  <th w_index="fromTitle" width="240">来文标题</th>
+                  <th w_index="instructionLeader" width="60" w_align="center">批示人</th>
+                  <th w_index="instructionDateNew" width="100" w_align="center">批示时间</th>
+                  <th w_index="instructionOrder" width="120" w_align="center">批示序号</th>
+                  <th w_index="fromDept" width="120" w_align="center">来文单位</th>
+                  <th w_index="instructionContent" width="50%">批示内容</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script>
+    var $tempLocalTion;
+	var gridOne;
+	var selectURL = "${base}/admin/instruction/statisticAndMergeInstruction.action";
+	var time = [  ];
+	var chartReadData = [];
+	var chartDealData = [];
+	var chartTotalData = [];
+	var chart;
+	var condition = "";
+	var indexs="";
+	var count=[];
+	$(function() {
+		layOut("#common_table", "#grid_table");
+
+        $(".js-radio-check").change(function(){
+            var index=$(".js-radio-check").index($(this));
+            $(".statisticTypeStyle").hide().eq(index).show();
+
+        });
+
+	    //统计功能
+    	$(document).on("click","#report_total",function(){
+	        var startYearV = $("#startYear").val();
+	        var endYearV = $("#endYear").val();
+	        var symbol = "?wfName=oa_leader_instruction";
+	        if(selectURL.indexOf("?")>0){
+	        	symbol = "&wfName=oa_leader_instruction";
+	        }
+	        gridOne.changeUrl(selectURL + symbol + '&startYear=' + window.encodeURI(startYearV) +'&endYear=' + window.encodeURI(endYearV) + '&etc='+new Date().getTime());
+		});
+        
+	    
+	    //领导批示统计功能
+	    $(document).on("click","#instruction_statistic",function(){
+	    	//统计开始时，先清空所有的历史数据
+	    	indexs="";
+	    	count=[];
+	    	var val=$(":radio[name='statisticType']:checked").val();
+	    	if(val==undefined || val=="undefined" || val==""){
+	    		layer.msg("请选择统计类型");
+	    		return;
+	    	}
+	        var start_date,end_date;
+	        if(val==3){
+	    		start_date=$("#year"+val).val();
+	    	    end_date  =$("#select"+val).val();
+	      	}else{
+	    	  	var year=$("#year"+val).val();
+	    	  	if(year=="undefined" || year==undefined || year==""){
+	    		  	var date=new Date();
+	    		  	year=date.getFullYear();
+	    	  	}
+	    	  	var month_region=$("#select"+val).val();
+	    	 	if(month_region.indexOf("-")!=-1){
+	    		 	var month=month_region.replace(/\s+/,"").split("-");
+	    	     	start_date=year+"-"+(month[0].length==1?"0"+month[0]:month[0])+"-"+"01";
+	    	     	var date= new Date(year,month[1],0); 
+	    	    	end_date  =year+"-"+(month[1].length==1?"0"+month[1]:month[1])+"-"+date.getDate();
+	          	}else{
+	        	  	var flag=false;
+	        	  	var months=["1","3","5","7","8","10","12"];
+	        	  	for(var i=0;i<months.length;i++){
+	        		  	if(month_region==months[i]){
+	        			  	flag=true;
+	        			  	break;
+	        		  	}
+	        	  	}
+	        	 	start_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-01";
+	        	 	var days="30";
+	        	 	if(true){
+	        		 	days="31";
+	        	 	}
+	        	   	end_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-"+days;
+	          	}
+	      	}
+	      	var symbol = "?wfName=oa_leader_instruction";
+    	  	if(selectURL.indexOf("?")>0){
+	        	symbol = "&wfName=oa_leader_instruction";
+	        }
+	      	gridOne.changeUrl(selectURL + symbol + '&startDate=' + window.encodeURI(start_date) +'&endDate=' + window.encodeURI(end_date) + '&etc='+new Date().getTime());
+	    });
+	    //导出功能
+    	$(document).on("click","#exportButton",function(){
+    		var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+// 	        if(checkedRowsRecoreds.length != 1) {
+// 	         	layer.msg('请选择一条数据');
+// 	         	return
+// 	        }
+    		var val=$(":radio[name='statisticType']:checked").val();
+	    	if(val==undefined || val=="undefined" || val==""){
+	    		layer.msg("请选择统计类型");
+	    		return;
+	    	}
+	       	var start_date,end_date;
+	      	if(val==3){
+	    	  	start_date=$("#year"+val).val();
+	    	  	end_date  =$("#select"+val).val();
+	      	}else{
+	    	  	var year=$("#year"+val).val();
+	    	  	if(year=="undefined" || year==undefined || year==""){
+	    			var date=new Date();
+	    		  	year=date.getFullYear();
+	    	  	}
+	    	  	var month_region=$("#select"+val).val();
+	    	  	if(month_region.indexOf("-")!=-1){
+	    	 	  	var month=month_region.replace(/\s+/g,"").split("-");
+	    	     	start_date=year+"-"+(month[0].length==1?"0"+month[0]:month[0])+"-"+"01";
+	    	     	var date= new Date(year,month[1],0); 
+	    	     	end_date  =year+"-"+(month[1].length==1?"0"+month[1]:month[1])+"-"+date.getDate();
+	          	}else{
+	        	  	var flag=false;
+	        	  	var months=["1","3","5","7","8","10","12"];
+	        	  	for(var i=0;i<months.length;i++){
+	        		  	if(month_region==months[i]){
+	        			  	flag=true;
+	        			  	break;
+	        		  	}
+	        	  	}
+	        	  	start_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-01";
+	        	  	var days="30";
+	        	  	if(true){
+	        		 	days="31";
+	        	  	}
+	        	 	end_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-"+days;
+	          	}
+	      	}
+	      	var symbol = "?wfName=oa_leader_instruction";
+    	  	if(selectURL.indexOf("?")>0){
+	        	symbol = "&wfName=oa_leader_instruction";
+	        }
+	        window.location = "${base}/admin/instruction/statisticAndMergeInstructionExport.action" + symbol + '&startDate=' + window.encodeURI(start_date) +'&endDate=' + window.encodeURI(end_date) +  "&merge="+indexs+'&etc='+new Date().getTime();
+		});
+        var startDate=new Date().getFullYear()+"-01-01";
+        var month=(new Date().getMonth())+1;
+        month=month.length==1 ? "0"+month:month;
+        var day=new Date().getDate();
+        day=day.length==1 ? "0"+day:day;
+        var   endDate=new Date().getFullYear()+"-"+month+"-"+day;
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?wfName=oa_leader_instruction"+"&startDate="+startDate+"&endDate="+endDate+"&etc="+new Date().getTime(),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+					$("#manage_grid_bot thead tr th").each(function(index){
+					    if($(this).attr("w_align")){
+					    	 $("td",$this).eq(index).css({"text-align":"center","padding-left":"0px"});
+					    }
+					});
+        		    $("td",this).eq(1).css("padding-left","8px");
+        			$index=parseInt($this.attr("index"));
+        			$this.find("td").eq(2).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+				var girdRecord=gridOne.getAllRecords();
+                girdRecord.forEach(function(value,index){
+                    if(value.color){
+                        $("#manage_grid_bot tbody tr:eq("+index+") td").css({"background":value.color});
+                    }
+                });
+                if($tempLocalTion != null){
+					setTimeout(function(){
+			      		document.getElementById('manage_grid_bot_fixedDiv').scrollTop = $tempLocalTion;
+			 		}, 800);
+				}
+			}
+		});
+
+		$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印", url:"${base}/admin/documentStatistics/incomingStatisticByYearPrintWin.action?etc=" + new Date().getTime(),width:'900',height:'550', id:"incomingStatisticByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});		
+        //领导批示相似数据合并功能
+        $(document).on("click","#instruction_statistic_merge",function(){
+        	var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+//             if(checkedRowsRecoreds.length != 1) {
+//             	layer.msg('请选择一条数据');
+//             	return
+//             }
+
+			var temp = '';
+			for(var i = 0; i < checkedRowsRecoreds.length; i ++){
+				if(temp == ''){
+					temp = checkedRowsRecoreds[i].sequence;
+				}else{
+					temp = temp + ',' + checkedRowsRecoreds[i].sequence;
+				}
+			}
+
+// 			indexs = temp;
+//         	return;
+        	
+        	
+//     	   	var indexNew=gridOne.getCheckedRowsIndexs();
+//     	   	count.push(indexNew.length);
+//     	   	var content=gridOne.getCheckedRowsRecords();
+     	  	if(temp==null || temp==undefined || temp=="undefined" || temp==""){
+     		  	layer.msg("请选择选择需要合并的数据");
+     		  	return;
+     	  	}
+     	  	if(temp.length<2){
+     		  	layer.msg("合并至少要选择两行");
+     		  	return;
+     	  	}
+     	  	indexs=new String(indexs);
+     	  	indexs=indexs.replace("\\s+","");
+    	   	if(indexs!=null && indexs!="" && indexs!=undefined && indexs!="undefined"){
+    		   	indexs=indexs+"|"+temp;
+    	   	}else{
+    		   	indexs=temp;
+    	   	}
+	    	var val=$(":radio[name='statisticType']:checked").val();
+	    	if(val==undefined || val=="undefined" || val==""){
+	    		layer.msg("请选择统计类型");
+	    		return;
+	    	}
+	       	var start_date,end_date;
+	      	if(val==3){
+	    	  	start_date=$("#year"+val).val();
+	    	  	end_date  =$("#select"+val).val();
+	      	}else{
+	    	  	var year=$("#year"+val).val();
+	    	  	if(year=="undefined" || year==undefined || year==""){
+	    		  	var date=new Date();
+	    		  	year=date.getFullYear();
+	    	  	}
+	    	  	var month_region=$("#select"+val).val();
+	    	  	if(month_region.indexOf("-")!=-1){
+		    	  	var month=month_region.replace("\\s+","").split("-");
+		    	  	start_date=year+"-"+(month[0].length==1?"0"+month[0]:month[0])+"-"+"01";
+		    	  	var date= new Date(year,month[1],0); 
+		    	  	end_date  =year+"-"+(month[1].length==1?"0"+month[1]:month[1])+"-"+date.getDate();
+	    	  	}else{
+	        	  	var flag=false;
+	        	  	var months=["1","3","5","7","8","10","12"];
+	        	  	for(var i=0;i<months.length;i++){
+	        		  	if(month_region==months[i]){
+	        			  	flag=true;
+	        			  	break;
+	        		  	}
+	        	  	}
+	        	  	start_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-01";
+	        	  	var days="30";
+	        	  	if(true){
+	        		 	days="31";
+	        	  	}
+	        	 	end_date=year+"-"+(month_region.length==1 ? "0"+ month_region:month_region)+"-"+days;
+	          	}
+	    	  	var symbol = "?wfName=oa_leader_instruction";
+	    	 	if(selectURL.indexOf("?")>0){
+		        	symbol = "&wfName=oa_leader_instruction";
+		        }
+	      	}
+	      	
+	      	$tempLocalTion = $("#manage_grid_bot_fixedDiv").scrollTop();
+
+	      	gridOne.changeUrl(selectURL + symbol + '&startDate=' + window.encodeURI(start_date) +'&endDate=' + window.encodeURI(end_date) + "&merge="+indexs+'&etc='+new Date().getTime());
+	      	
+	      	
+        });
+	});
+	
+	</script>
+</body>
+</html>

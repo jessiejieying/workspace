@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="oa-index-html">
+<head>
+    <#include "/aufw/page/include/head.html">
+</head>
+<body ms-controller="wrap" >
+    <div class="index-content js-index-content " style="margin-top:40px;">
+        <h3 class="content-header  clearfix">
+            <span class="float-left"><i class="icon-file-text header-icon"></i>待办</span>
+            <div class="header-right">
+                <span ms-click="preTopFirst()" class="header-first">首页</span>
+                <span class="header-num" ms-text="params.top.curPage+'/'+params.top.total"></span>
+                <i ms-click="preTop()" class="arrow-icon-left" ms-class="arrow-icon-left-disabled:($model.params.top.curPage<2)"></i>
+                <i class="arrow-icon-right" ms-class="arrow-icon-right-disabled:$model.params.top.curPage>=$model.params.top.total"  ms-click="nextTop()"></i>
+            </div>
+        </h3>
+        <ul class="avalon-init-hide" ms-class="avalon-init-show:true">
+            <li ms-repeat="vmTop" ms-attr-class="el.urgency">
+                <div class="dot"></div>
+                <div  class="li-left" ms-attr-title="el.title" ms-html="'<span  class='+el.difftime+'></span>'+'['+el.type+'] '+el.title" ms-click="billClick(el)"></div>
+                <div class="li-right" ms-text="el.time"></div>
+                <div class="li-mid" ms-attr-title="el.unit" ms-text="el.unit"></div>
+        </ul>
+        <div class="no-data" ms-if="vmTop.size()<1" ms-text="vmTopTip"></div>
+    </div>
+    <div class="index-content js-index-content " style="margin-top: 20px;margin-bottom: 20px;">
+        <h3 class="content-header  clearfix">
+            <span class="float-left"><i class="icon-book header-icon"></i>待阅</span>
+            <div class="header-right">
+                <span ms-click="preBotFirst()" class="header-first">首页</span>
+                <span class="header-num" ms-text="params.bot.curPage+'/'+params.bot.total"></span>
+                <i class="arrow-icon-left" ms-class="arrow-icon-left-disabled:($model.params.bot.curPage<2)" ms-click="preBot()"></i>
+                <i class="arrow-icon-right" ms-class="arrow-icon-right-disabled:($model.params.bot.curPage>=$model.params.bot.total)" ms-click="nextBot()"></i>
+            </div>
+        </h3>
+        <ul class="avalon-init-hide" ms-class="avalon-init-show:true">
+            <li ms-repeat="vmBot" class="clearfix" >
+                <div class="dot"></div>
+                <div  class="li-left" ms-attr-title="el.title" ms-text="'['+el.type+'] '+el.title" ms-click="billClickBot(el)"></div>
+                <div class="li-right" ms-text="el.time"></div>
+                <div class="li-mid" ms-text="el.unit"></div>
+        </ul>
+        <div class="no-data" ms-if="vmBot.size()<1" ms-text="vmBotTip"></div>
+    </div>
+    <script src = "${base}/edenui/common/js/jquery.js"></script>
+    <script src = "${base}/edenui/common/js/underscore.js"></script>
+    <script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+    <!--表单、流程，基于jquery的方法-->
+    <script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+    <script src="${base}/oa/resource/js/task.js"></script>
+    <script src="${base}/edenui/common/js/common.js"></script>
+    <script src="${base}/edenui/common/js/avalon/avalon.js"></script>
+    <script>
+        var topURL="${base}/admin/wfManage/getCurrentTask.action?etc="+new Date().getTime();
+        var botURl="${base}/admin/documentPassRead/getCurrentNoRead.action?etc="+new Date().getTime();
+        var version='1';
+        var wf_name='oa_pb_incoming_message';
+        //初始化显示数量
+        var pageCount=5;
+        var globalIndex={
+            init:function(){
+                this.indexLayout();
+                this.getListTop(1);
+                this.getListBot(1);
+            },
+            indexLayout:function(){
+                var $window=$(window),
+                        $height=Math.floor($window.height()/2)-60;
+                $(".js-index-content").height($height);
+                pageCount=parseInt(($height-43)/28);
+                // pageCount=2;
+            },
+            loadStart:function(){
+                var index = layer.load(2,{
+                    // shade: [0.5, '#000']
+                    //scrollbar: false //0.1透明度的白色背景
+                });
+                setTimeout(function(){
+                    globalIndex.loadEnd();
+                },2000);
+            },
+            loadEnd:function(){
+                layer.closeAll('loading');
+            },
+            //是否超期
+            timeLimit:function(time){
+                var resultTime="";
+                if(time){
+                    var getTime=parseInt(time);
+                    //不超期
+                    if(getTime>=4){
+                        resultTime="";
+                    }
+                    //黄灯
+                    else if(getTime>=0&&getTime<=3){
+                        resultTime="oaHandleYellow";
+                    }
+                    //红灯
+                    else {
+                        resultTime="oaHandleRed";
+                    }
+                }
+                return resultTime;
+            },
+            //待办列表
+            getListTop:function(num){
+                globalIndex.loadStart();
+                $.post(topURL,{
+                    "page.curPage":num,
+                    "page.count":pageCount
+                },function(data){
+
+                    var result=data.datas;
+                    if(result){
+                        model.vmTop.clear;
+                        model.params.top.total=Math.ceil(data.totalCount/pageCount);
+                        var resultData=[];
+
+                        if(result.length<1){
+                            model.params.top.curPage=0;
+                        }
+                        result.forEach(function(value){
+                            resultData.push({
+                                "id":value.wf_id,
+                                "title":value.title?(value.title.replace(/<br>/g,"")):"无标题",
+                                "unit":value.stepName,
+                                "time":value.sign_date.split("T")[0],
+                                "wfId":value.wf_id,
+                                "version":value.version,
+                                "wfName":value.wf_name,
+                                "type":globalIndex.wfNameToType(value),
+                                "urgency":value.urgency?"clearfix li-urgency":"clearfix",
+                                "difftime":globalIndex.timeLimit(value.difftime)
+                            });
+                        });
+                        if(resultData.length<1){
+                            model.vmTopTip="暂无待办数据";
+                        }
+                        model.vmTop=resultData;
+                    }
+                    globalIndex.loadEnd();
+                });
+            },
+            //待阅列表
+            getListBot:function(num){
+                globalIndex.loadStart();
+                $.post(botURl,{
+                    "page.curPage":num,
+                    "page.count":pageCount
+                },function(data){
+                    var result=data.datas;
+                    if(result){
+                        model.vmBot.clear;
+                        model.params.bot.total=Math.ceil(data.totalCount/pageCount);
+                        var resultData=[];
+                        if(result.length<1){
+                            model.params.bot.curPage=0;
+                        }
+                        result.forEach(function(value){
+                            resultData.push({
+                                "id":value.wf_id,
+                                "title":value.title?(value.title.replace(/<br>/g,"")):"无标题",
+                                "unit":value.create_by?value.create_by:"",
+                                "time":value.create_dttm.split("T")[0],
+                                "wfId":value.wf_id,
+                                "show_url":value.show_url,
+                                "type":globalIndex.wfNameToType(value)
+                            });
+                        });
+                        if(resultData.length<1){
+                            model.vmBotTip="暂无待阅数据";
+                        }
+                        model.vmBot=resultData;
+
+                    }
+                    globalIndex.loadEnd();
+                });
+            },
+            //wfname转文件类型
+            wfNameToType:function(obj){
+                var str=obj.wf_name;
+                var dataStr=str.toString();
+
+                //收文
+                if(dataStr=="oa_pg_incoming_document"){
+                    dataStr="收文";
+                    var $billName=obj.bill_name?obj.bill_name:"";
+                    if($billName=="阅件"){
+                        dataStr="收文阅件";
+                    }
+                }
+                //发文
+                else if(dataStr=="oa_send_document"){
+                    dataStr="发文";
+                }
+                //全省性会议审批
+                else if(dataStr=="oa_provincial_meeting_approve"){
+                    dataStr="全省性会议审批";
+                }
+
+                //全省性会议备案
+                else if(dataStr=="oa_provincial_meeting_record"){
+                    dataStr="全省性会议备案";
+                }
+                //会议方案
+                else if(dataStr=="oa_meeting_program_approval"){
+                    dataStr="会议方案";
+                }
+                //会议通知
+                else if(dataStr=="oa_meeting_notification_approval"){
+                    dataStr="会议通知";
+                }
+                //批示办理
+                else if(dataStr=="oa_leader_instruction"){
+                    dataStr="批示办理";
+                }
+                //批示反馈
+                else if(dataStr=="oa_leader_instruction_fb"){
+                    dataStr="批示反馈";
+                }
+                //专项事务
+                else if(dataStr=="oa_sptrain_audit"){
+                    dataStr="专项事务";
+                }
+                //其他
+                else{
+                    dataStr="其他";
+                }
+
+                return dataStr;
+            }
+        }
+
+        var model = avalon.define({
+            $id: "wrap",
+            vmTop:[],
+            vmBot:[],
+            vmTopTip:"加载中...",
+            vmBotTip:"加载中...",
+            params:{
+                top:{
+                    "curPage":1,
+                    "total":1
+                },
+                bot:{
+                    "curPage":1,
+                    "total":1
+                }
+            },
+            //待办跳转
+            billClick:function(item){
+                var task_name="";
+                uf_doAction(item.wfId, item.wfName, task_name, item.version, null);
+            },
+            //待阅跳转
+            billClickBot:function(item){
+                var project = window.top.base;
+                var surl=project+item.show_url+"&wfs=read";
+                window.open(surl,"_blank");
+            },
+            preTopFirst:function(){
+                if(model.params.top.curPage>1){
+                    model.params.top.curPage=1;
+                    globalIndex.getListTop(model.params.top.curPage);
+                }
+                else{
+                    layer.msg("已经是第一页了！");
+                }
+            },
+            preTop:function(){
+                if(model.params.top.curPage>1){
+                    model.params.top.curPage--;
+                    globalIndex.getListTop(model.params.top.curPage);
+                }
+                else{
+                    layer.msg("已经是第一页了！");
+                }
+            },
+            nextTop:function(num){
+
+                if(model.params.top.curPage<model.params.top.total){
+                    model.params.top.curPage++;
+                    globalIndex.getListTop(model.params.top.curPage);
+
+                }
+                else{
+
+                    layer.msg("已经是最后一页了！")
+                }
+
+            },
+            preBotFirst:function(){
+                if(model.params.bot.curPage>1){
+                    model.params.bot.curPage=1;
+                    globalIndex.getListBot(model.params.bot.curPage);
+                }
+                else{
+                    layer.msg("已经是第一页了！");
+                }
+            },
+            preBot:function(){
+                if(model.params.bot.curPage>1){
+                    model.params.bot.curPage--;
+                    globalIndex.getListBot(model.params.bot.curPage);
+                }
+                else{
+                    layer.msg("已经是第一页了！");
+                }
+
+            },
+            nextBot:function(){
+                if(model.params.bot.curPage<model.params.bot.total){
+                    model.params.bot.curPage++;
+                    globalIndex.getListBot(model.params.bot.curPage);
+                }
+                else{
+                    layer.msg("已经是最后一页了！")
+                }
+            }
+        });
+        $(function(){
+            globalIndex.init();
+        });
+    </script>
+</html>

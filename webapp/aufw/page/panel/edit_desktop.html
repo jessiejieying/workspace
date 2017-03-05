@@ -1,0 +1,460 @@
+﻿<!DOCTYPE html>
+<html style="overflow:hidden;">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+	<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+	<link rel="stylesheet" attr="skins" type="text/css" href="${base}/aufw/resources/skins/${accountInfo.uiTopic!sysinfo.mySkin}/css/index.css">
+</head>
+
+<body>
+<div style="clear: both;"></div>
+<div id="all_icons" class="all_icons">
+	<div id="icon_or_screen" class="icon_or_screen">
+		<ul>
+			<li class="on" show="icon">图标设置</li>
+			<li show="screen">分屏设置</li>
+		</ul>
+	</div>
+	<div id="set_icon" class="set_icon">
+		<div class="choose_module fn-left">
+			<div id="scroll_up" class="scroll_up"></div>
+			<div id="modules" class="modules">
+				<ul>
+				</ul>
+			</div>
+			<div id="scroll_down" class="scroll_down"></div>
+		</div>
+        <div class="icon_module_container fn-left">
+		<ul id="icon_module" class="icons">
+		</ul>
+        </div>
+	</div>
+	<div id="set_screen" style="display:none;" class="set_screen">
+		<ul>
+			<!-- li>1
+				<span title="删除这个桌面" class="remove"></span>
+			</li>
+			<li>2
+				<span title="删除这个桌面" class="remove"></span>
+			</li>
+			<li>3
+				<span title="删除这个桌面" class="remove"></span>
+			</li-->
+			<#list 1..myDesktopCount as t>
+				<li>${t} <span title="删除这个桌面" class="remove"></span>
+				</li>
+			</#list>
+			<li class="add">+</li>
+		</ul>
+	</div>
+    <div class="btn_style_container">
+   <!-- <span id="cancel_btn" class="fn-right btn_style_2">取消</span>-->
+        <span id="cancel_btn" class="btn_style_minute"/>取消未保存操作</span>
+        <input type="button" id="save_btn" value="保存" class="btn_style" />
+        
+    </div>
+</div>
+</body>
+<script src="${base}/aufw/resources/common/js/jquery.js"></script>
+<script src="${base}/aufw/resources/common/js/jDragSort.min.js"></script>
+<script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+<script>
+var win_width = $(window).width();//当前页面宽度
+var win_height = $(window).height();//当前页面高度
+var ifr = $(window.top.document).find('iframe#iframe_start').contents();
+//var iframeContent=  $(window.top.document).find('iframe#iframe_start')[0].contentWindow;
+
+var module_structure = ${moduleInfoStructureJson};
+function getType(o) {      //返回 传入参数的类型
+	var _t;
+	return ((_t = typeof(o)) == "object" ? o == null && "null" || Object.prototype.toString.call(o).slice(8, -1) : _t).toLowerCase();
+}
+function extend(destination, source) {      //复制对象或数组
+	for (var p in source) {
+		if (getType(source[p]) == "array" || getType(source[p]) == "object") {
+			destination[p] = getType(source[p]) == "array" ? [] : {};
+			arguments.callee(destination[p], source[p]);
+		}
+		else {
+			destination[p] = source[p];
+		}
+	}
+}
+var module_temp = [];  //用于取消操作
+extend(module_temp, module_structure);
+function layout() {           //布局
+	win_width = $(window).width();//当前页面宽度
+	win_height = $(window).height();//当前页面高度
+
+	$('.set_icon,.set_screen,.icon_module_container').height(win_height - 110);
+	$('.icon_module_container').width(win_width - 140);
+	$('.modules').height(win_height - 70);
+}
+function create_temp() {
+	window.screen_temp = $('#set_screen').clone();
+}
+
+function refresh() {                          //在桌面数量、顺序变化后，刷新本页面及图标页面
+	$('#set_screen ul li:not(.add)').each(function (i) {
+		$(this).html((i + 1) + '<span title="删除这个桌面" class="remove"></span>');
+	});
+	ifr.find('#swap_num li').each(function (i) {
+		$(this).text(i + 1);
+	})
+}
+
+function module_html(i) {                     //生成哪些按钮   --参数i为第几个大模块  从0开始
+	alert("module_html")
+	var wrap = $('#icon_module');
+	var modules = module_structure[i].children;
+	wrap.hide();
+	wrap.empty();
+	for (var j = 0; j < modules.length; j++) {
+		if(modules[j].icon_src==''){             //没设置模块图标时，使用默认图标
+			modules[j].icon_src='default';
+		}
+		if (modules[j].has_added == 'true') {
+			wrap.append('<li seq1="' + i + '" seq2="' + j + '" module_id="' + modules[j].module_id + '" open_type="' + modules[j].openType + '" module_url="' + modules[j].module_url + '" icon_src="' + modules[j].icon_src + '"  icon_color="' + modules[j].icon_color + '" >' +
+					'<img attr="skins" src="${base}/aufw/resources/skins/${accountInfo.uiTopic!"default"}/icons/deep/' + modules[j].icon_src + '.png">' +
+					'<p class="name">' + modules[j].module_name + '</p>' +
+					'<p title="这个图标在第' + modules[j].screen_num + '屏" class="remove"><span>' + modules[j].screen_num + '</span>移除</p>' +
+					'</li>');
+		} else {
+			wrap.append('<li seq1="' + i + '" seq2="' + j + '" module_id="' + modules[j].module_id + '" open_type="' + modules[j].openType + '" module_url="' + modules[j].module_url + '" icon_src="' + modules[j].icon_src + '"  icon_color="' + modules[j].icon_color + '" >' +
+					'<img attr="skins" src="${base}/aufw/resources/skins/${accountInfo.uiTopic!"default"}/icons/deep/' + modules[j].icon_src + '.png">' +
+					'<p class="name">' + modules[j].module_name + '</p>' +
+					'<p title="添加图标到当前这屏" class="add">添加</p>' +
+					'</li>');
+		}
+	}
+	wrap.slideDown(200);
+}
+
+function get_now_structure() {               //得到当前页面 各添加、取消 按钮的状态
+	var structure = '{icons:[';
+	for (var i = 0; i < module_structure.length; i++) {
+		for (var j = 0; j < module_structure[i].children.length; j++) {
+			var m = module_structure[i].children[j];
+			structure += '{"module_id":"' + m.module_id + '","has_added":"' + m.has_added + '","screen_num":"' + m.screen_num + '"},';
+		}
+	}
+	structure = structure.substring(0, structure.length - 1)
+	structure += ']}';
+	return structure;
+}
+
+function get_now_screen() {                  //得到当前桌面上 存在的 图标的信息
+	var ul = ifr.find('#swap_wrap ul');
+	var screen_num = ul.length;
+	var data = '{"screen_count":"' + screen_num + '", "icons":[';
+	var num = 0;
+	ul.each(function (i) {
+		$(this).find('li').each(function (j) {
+			if ($(this).hasClass('delete')) return;
+			var id = $(this).attr('id');
+			var icon_type = 0;
+			if ($(this).hasClass('big')) {
+				icon_type = 1;
+			}
+			id = id.substr(9);
+			num++;
+			data += '{"screen":"' + (i + 1) + '","index":"' + (j + 1) + '","icon_type":"' + icon_type + '","module_id":"' + id + '"},';
+		});
+	});
+	data = data.substring(0, data.length - 1);
+	if (num == 0) {
+		data += '[]}';
+	} else {
+		data += ']}';
+	}
+	return data;
+}
+
+function update_now_structure() {              //在添加桌面或删除桌面后更新 模块图标数据
+	var x = eval('(' + get_now_screen() + ')');
+	var icons = [];
+	for (var i = 0; i < x.icons.length; i++) {
+		var module_id = x.icons[i].module_id;
+		var screen_index = x.icons[i].screen;
+		icons.push({module_id:module_id, screen_index:screen_index});
+	}
+	for (var i = 0; i < module_structure.length; i++) {
+		for (var j = 0; j < module_structure[i].children.length; j++) {
+			if (icons.length == 0) {
+				module_structure[i].children[j].has_added = 'false';
+			} else {
+				for (var k = 0; k < icons.length; k++) {
+					if (module_structure[i].children[j].module_id == icons[k].module_id) {
+						module_structure[i].children[j].has_added = 'true';
+						module_structure[i].children[j].screen_num = icons[k].screen_index;
+						break;
+					} else {
+						module_structure[i].children[j].has_added = 'false';
+					}
+				}
+			}
+		}
+	}
+	$('#modules li.on').click();
+}
+
+function click_func() {                        //注册点击事件
+	$('#scroll_up').click(function () {         //向上滚动 显示 模块 （左侧）
+		var $ul = $('#modules ul')
+		var now_top = $ul.css("margin-top");
+		now_top = parseInt(now_top);
+		var top = now_top + 90;
+
+		if (now_top == 0) {
+			return;          //已经在 最上面了
+		} else if (top > 0) {
+			top = 0;             //不超出最大 滚动距离
+		}
+		$ul.animate({"margin-top":top}, 500);
+	});
+
+	$('#scroll_down').click(function () {         //向下滚动 显示 模块 （左侧）
+		var $ul = $('#modules ul')
+		var total_height = $ul.height();         //UL的高度
+		var wrap_height = $('#modules').height(); //  容器的 高度
+		var now_top = $ul.css("margin-top");
+		now_top = parseInt(now_top);
+		var max = wrap_height - total_height;  // 最多可以 向上滚多少
+		var top = now_top - 90;
+		if (max > 0) {
+			return;            //所有的模块 都显示了  无须滚动
+		} else if (top < max) {
+			top = max - 2;          //不超出最大 滚动距离
+		}
+		$ul.animate({"margin-top":top}, 500);
+	});
+
+
+	$('#modules li').click(function () {                    //切换 显示 模块的图标
+		$('#modules li.on').removeClass('on');
+		$(this).addClass('on');
+		var i = $(this).attr('module_id');
+
+		module_html(i);
+
+
+	});
+
+
+	$('#set_screen ul li.add').click(function () {        //添加 桌面
+		var len = $('#set_screen ul li').length;
+		alert(len)
+		var html = '<li>' + len + '<span title="删除这个桌面" class="remove"></span></li>';
+		$(this).before(html);
+		var num_list = ifr.find('#swap_num');
+		num_list.find('li').removeClass('on');
+		num_list.append('<li class="on">' + len + '</li>');   //  添加 切换桌面 的数字
+		var screen_wrap = ifr.find('#swap_wrap');
+		var ul_width = screen_wrap.find('ul:eq(0)').width();
+		var ul_height = screen_wrap.find('ul:eq(0)').height();
+		screen_wrap.width(ul_width * len);
+		screen_wrap.attr('now_panel', len);
+		screen_wrap.append('<ul class="ui-sortable" style="width: ' + ul_width + 'px; height: ' + ul_height + 'px;"></ul>');
+		screen_wrap.animate({"margin-left":-ul_width * (parseInt(len) - 1)}, 500, "easeOutBack");
+		window.has_changed = true;
+	});
+
+	$('#set_screen ul li').live('mouseover', function () {           //显示  删除 桌面 按钮
+		$(this).find('.remove').show();
+	});
+	$('#set_screen ul li').live('mouseout', function () {           //隐藏 删除 桌面 按钮
+		$(this).find('.remove').hide();
+	});
+
+	$('#set_screen ul li .remove').live('click', function () {       //删除桌面 功能
+		var $this=$(this);
+		var total_num = $('#set_screen ul li').length;
+		if (total_num < 3) {
+			$('#test').html('这是最后一个桌面了!');
+			setTimeout(function () {
+				$('#test').html('')
+			}, 2000);
+			return;
+		}
+		$.dialog.confirm('确定删除这个桌面？', function () {
+			$this.parent().remove();
+			var num = $this.parent().text();            //当前删的是第几屏
+			var screen_wrap = ifr.find('#swap_wrap');
+			var ul_width = screen_wrap.find('ul:eq(0)').width();
+			var num_list = ifr.find('#swap_num');
+			var on_num = parseInt(num) - 2;
+			if (on_num == -1) {                           //如果 删除的是第一屏
+				num_list.children('li').eq(0).remove();   //  删除 切换桌面 的数字
+				num_list.find('li').removeClass('on');
+				num_list.find('li').eq(0).addClass('on');
+				screen_wrap.width(ul_width * (total_num - 1));
+				screen_wrap.children('ul').eq(0).remove();    //删除 桌面
+				screen_wrap.animate({"margin-left":0}, 500, "easeOutBack");
+				screen_wrap.attr('now_panel', 1);
+				refresh();
+			} else {
+				num_list.children('li').eq(on_num + 1).remove();   //  删除 切换桌面 的数字
+				num_list.find('li').removeClass('on');
+				num_list.find('li').eq(on_num).addClass('on');
+				screen_wrap.width(ul_width * (total_num - 1));
+				screen_wrap.children('ul').eq(on_num + 1).remove();    //删除 桌面
+				screen_wrap.animate({"margin-left":-ul_width * on_num}, 500, "easeOutBack");
+				screen_wrap.attr('now_panel', on_num + 1);
+				refresh();
+			}
+			update_now_structure();       //更新当前按钮的结构
+			window.has_changed = true;
+		});
+
+	});
+
+
+	$('#set_screen ul').sortable({             // 当chrome 安装了Gestures for Chrome 拖拽不了  此插件有BUG
+
+		start :function (event, ui) {
+
+		},
+		stop  :function (event, ui) {
+			var total_html = '';
+			var wrap = ifr.find('#swap_wrap');
+			$('#set_screen ul li:not(.add)').each(function () {
+				var text = $(this).text();
+				var this_ul = wrap.find('ul').eq(parseInt(text) - 1);
+				var html = wrap.find('ul').eq(parseInt(text) - 1).html();
+				var style = this_ul.attr('style');
+				html = '<ul class="ui-sortable" style="' + style + '">' + html + '</ul>'
+				total_html += html;
+			})
+			wrap.html(total_html);
+			refresh();
+			window.has_changed = true;
+		},
+		cancel:'.add'
+
+	});
+
+	$('#icon_or_screen ul li').click(function () {        //切换显示 图标设置、分屏设置
+		var show = $(this).attr('show');
+		$('#set_icon,#set_screen').hide();
+		$('#set_' + show).show();
+		$('#icon_or_screen ul li.on').removeClass('on');
+		$(this).addClass('on');
+	});
+
+	$('#icon_module li .add').live('click', function () {        // 图标点击之后 向桌面添加 图标
+		var $this = $(this).parent();
+		var seq1 = $this.attr('seq1');
+		var seq2 = $this.attr('seq2');
+		var html = '';
+		var module_id = module_structure[seq1].children[seq2].module_id;
+		var open_type = module_structure[seq1].children[seq2].open_type;
+		var module_url = module_structure[seq1].children[seq2].module_url;
+		var module_name = module_structure[seq1].children[seq2].module_name;
+		var icon_src = module_structure[seq1].children[seq2].icon_src;
+		if(icon_src=='') icon_src='default';       //没设置模块图标时，使用默认图标
+		var icon_color = module_structure[seq1].children[seq2].icon_color;
+		var icon_type = module_structure[seq1].children[seq2].icon_type;
+		if (icon_type == 0) {
+			icon_type = 'small';
+		} else {
+			icon_type = 'big';
+		}
+		html = '<div class="change"></div>' +
+				'<div class="nav_card_msg">' +
+				'<p></p>' +
+				'<p></p>' +
+				'<p></p>' +
+				'</div>' +
+				'<div class="nav_card_icon">' +
+				'<img attr="skins" src="${base}/aufw/resources/skins/${accountInfo.uiTopic!"default"}/icons/light/' + icon_src + '.png">' +
+				'</div>' +
+				'<div class="nav_card_name">' + module_name + '</div>';
+		var now_panel = ifr.find('#swap_wrap').attr('now_panel');
+		var num = parseInt(now_panel) - 1;
+		var n = ifr.find('#nav_icon_' + module_id).length;
+		if (!n) {
+			ifr.find('#swap_wrap ul').eq(num).append('<li class="' + icon_type + ' not_saved color_' + icon_color + '"  id="nav_icon_' + module_id +'"  open_type="' + open_type+ '" module_url="' + module_url + '">' + html + '</li>');
+
+		} else {
+			var li = ifr.find('#nav_icon_' + module_id);
+			li.removeClass('delete');
+//			var html = li.clone();
+//			li.remove();
+//			ifr.find('#swap_wrap ul').eq(num).append(html);
+
+
+		}
+		$(this).removeClass('add').addClass('remove').html('<span>' + (num + 1) + '</span>移除').attr('title', '这个图标在第' + (num + 1) + '屏');
+
+		//iframeContent.metro.init();
+		module_structure[seq1].children[seq2].has_added = 'true';
+		module_structure[seq1].children[seq2].screen_num = num + 1;
+		window.has_changed = true;
+
+	});
+
+	$('#icon_module li .remove').live('click', function () {        // 图标点击之后 向桌面 删除 图标
+		var $this = $(this).parent();
+		var seq1 = $this.attr('seq1');
+		var seq2 = $this.attr('seq2');
+		var id = $this.attr('module_id');
+		ifr.find('#nav_icon_' + id).addClass('delete');
+		//iframeContent.metro.init();
+		$(this).removeClass('remove').addClass('add').text('添加').attr('title', '添加图标到当前这屏');
+		module_structure[seq1].children[seq2].has_added = 'false';
+		window.has_changed = true;
+	});
+
+	$('#save_btn').click(function () {
+		var icons_data = get_now_structure();
+		var icons_screen = get_now_screen();
+		jQuery.post("saveDesktop.action", {"desktopStructureStr":icons_screen, "moduleInfoStructureStr":icons_data}, function (data) {
+			$.dialog.tips(data["message"]);
+			window.top.$.dialog.tips('保存成功。');
+			window.top.dhxWins.window('edit_nav_icon').close();
+		});
+		extend(module_temp, module_structure);     //更新 用于取消的数据
+		create_temp();
+		ifr.find('#save_icons').click();
+		window.has_changed = false;
+		
+		
+
+	});
+
+	$('#cancel_btn').click(function () {
+		if (window.has_changed == false) {
+			return;
+		}
+		extend(module_structure, module_temp);      //从用于取消的数据中 还原
+		module_html(0);
+		$('#set_screen').replaceWith(screen_temp);
+		click_func();
+		create_temp();
+		ifr.find('#cancel_icons').click();
+		window.has_changed = false;
+	});
+}
+
+$(function () {
+	window.setTimeout(layout, 0);
+	window.setTimeout(create_temp, 100);
+	for (var i = 0; i < module_structure.length; i++) {
+		if (i == 0) {
+			$('#modules > ul').append('<li class="on" module_id="' + i + '">' + module_structure[i].module_name + '</li>');
+		} else {
+			$('#modules > ul').append('<li module_id="' + i + '">' + module_structure[i].module_name + '</li>');
+		}
+	}
+	module_html(0);              //生成 第一模块的图标
+	click_func();               //注册点击事件
+
+})
+
+$(window).resize(function () {
+	layout();
+});
+</script>
+</html>

@@ -1,0 +1,362 @@
+﻿<!doctype html>
+<html style="height:100%;">
+<head>
+
+ <meta charset="utf-8">
+    <title>知识广场</title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+    <script>
+        setSkinsCss("listCss,iconCss");
+    </script>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+     <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+<style>
+*{ margin:0; padding:0;}
+li{ list-style:none;}
+a{ text-decoration:none; outline:none;}
+.clearfix:after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+.clearfix {
+   zoom:1;
+}
+body{background-color:#f1f1f1;}
+.top{ width:100%; height:0; background-color:#09345d;overflow:hidden;display:none;}
+.top_box{  height:88px; margin:0 auto; overflow:hidden;}
+.title{ display:block; float:left; font-size:26px; font-family:"微软雅黑"; color:#fff; line-height:88px; letter-spacing:4px; margin-left:15px; margin-right:110px; }
+.search_box{ float:left; margin-top:27px;}
+.search01{ width:398px; height:33px; background-color:#fff; border:1px solid #eaeaea; font-size:14px; line-height:33px; font-family:"微软雅黑";}
+.search_btn01{ border:none; vertical-align:middle; margin-top:-4px;}
+
+.container{ overflow:hidden;}
+.left{ width:0; float:left;height:100%;display:none;overflow:hidden; background-image:url(${base}/oa/page/knowledge/knowledgeSquare/images/left_bg.png); background-repeat:repeat-y; background-position:center;}
+.left_box{ width:0;  background-color:#fff; margin:0 auto; padding-top:15px;}
+.left_search{ width:0; margin:0 auto;}
+.search02{ width:146px; height:22px;border:1px solid #eaeaea; }
+.search_btn02{ border:none; vertical-align:middle; margin-top:-3px;}
+.left_tree{ width:170px; height:auto; margin:0 auto;}
+
+
+.middle{float:left;overflow:hidden; background-color:#fff;height:100%;}
+.Classification{ height:auto; margin-left:25px; margin-top:20px;}
+.Classification ul{ overflow:hidden;}
+.Classification ul li{ float:left; border-radius:4px; background-color:#e8e8e9; margin-right:15px; margin-bottom:12px;}
+.Classification ul li a{ display: block; font-size:12px; font-family:"微软雅黑"; color:#4e4e4e; line-height:24px; text-align:center; margin:0 8px; }
+.Classification ul li a:hover{ color:#fff;}
+.Classification ul li:hover{background-color:#6d8ead; }
+.Classification ul li.Selected{background-color:#6d8ead; }
+.Classification ul li a.Selected{ color:#fff;}
+.middle_content{ width:100%;}
+.M_title{height:22px; border-bottom:2px solid #09345d; overflow:hidden;}
+.M_titletext{float:left; font-size:14px; font-family:"微软雅黑"; color:#09345d; line-height:22px; margin-left:10px;}
+.page{float:right;}
+.page a{ float:left; font-size:14px; font-family:"微软雅黑"; color:#09345d; line-height:22px; margin-right:10px;}
+.page a:hover{ color:#09F;}
+.M_content{ height:auto; margin-top:15px;}
+.M_content ul li{ height:26px; background-image:url(${base}/oa/page/knowledge/knowledgeSquare/images/list_line.png); background-repeat:repeat-x; background-position:bottom; overflow:hidden;}
+.M_content ul li a{ display:block; font-size:12px; line-height:26px;height:26px;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;}
+.link01{ color:#2d64b3; float:left; margin-left:10px;}
+.link01:hover{ text-decoration:underline;}
+.list_R{ float:right; width:40px; height:auto;}
+.Download{ float:left; width:26px;background-image:url(${base}/oa/page/knowledge/knowledgeSquare/images/download_icon.png); background-repeat:no-repeat; background-position:left center; padding-left:13px; margin-right:10px; }
+.Collect{ float:left; margin-right:5px; color:#6a8eaf;}
+.Collect:hover{ text-decoration:underline;}
+.Comment{ float:left; color:#6a8eaf;}
+.Comment:hover{ text-decoration:underline;}
+
+
+.right{ width:205px; height:100%;overflow:hidden; background-color:#fbfbfb; float:left;}
+.R_title{ width:189px; height:30px; border-radius:8px; background-color:#2c6aa6;  margin:0 auto;margin-top:18px;}
+.R_title a{ display:block; font-size:16px; font-family:"微软雅黑"; color:#fff; line-height:30px; text-align:center;}
+.Ranking{ width:189px; height:auto; margin:0 auto; margin-top:20px;}
+.Ranking_title a{ font-size:14px; color:#09345d; font-family:"微软雅黑"; margin-left:10px; line-height:27px;}
+.R_content{ width:187px; height:163px; border:1px solid #eaeaea; border-radius:8px; background-color:#fff;}
+.R_content li{ width:170px; height:26px; background-image:url(${base}/oa/page/knowledge/knowledgeSquare/images/list_line.png); background-repeat:repeat-x; background-position:bottom; margin:0 auto; overflow:hidden;}
+.R_content li a{ display:block; float:left; font-size:12px; color:#4d4d4d; line-height:26px; margin-left:7px;width:116px;height:26px;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;}
+.R_content li span{ display:block; float:right; font-size:12px; color:#6a8eaf; line-height:26px;}
+.R_content li a:hover{ text-decoration:underline;}
+</style> 
+<meta charset="utf-8">
+<title>知识广场</title>
+</head>
+
+<body style="height:100%;">
+<div class="top">
+	<div class="top_box">
+    	<a class="title">知识广场</a>
+        <div class="search_box">
+        	<input id="selectTitle" class="search01" ><input  class="search_btn01" type="image" src="${base}/oa/page/knowledge/knowledgeSquare/images/search_btn01.png" onclick="simpleSelect();">
+        </div>
+    </div>	
+</div>
+
+<div class="container">
+	<div class="left">
+    	<div class="left_box">
+        	<div id = "tree_wrap" style = "width:100%; height:100%; overflow: hidden;">
+				<div id = "tree_search"  class = "tree_search" style = "height:30px; min-width:200px;"></div>
+				<div id = "tree" style = "width:100%; padding-top: 3px;"></div>
+			</div>
+        </div>
+    </div>
+    
+   	<div class="middle">
+    	<div class="Classification">
+        	<ul>
+            	<li class="Selected"><a href="javascript:void(0)" class="Selected" onclick="selectType('','')"><span>全部</span></a></li>
+            	<#list typeList as dataDict> 
+            		<li><a href="javascript:void(0)"  onclick="selectType('type',${dataDict.dictValue})"><span>${dataDict.displayName}</span></a></li>
+            	</#list>
+            	<#list fileTypeList as dataDict> 
+            		<li><a href="javascript:void(0)" onclick="selectType('fileType',${dataDict.dictValue})"><span>${dataDict.displayName}</span></a></li>
+            	</#list>
+            	
+            	
+            </ul>
+        </div>
+        <div class="middle_content">
+        	<div class="M_title clearfix">
+            	<div class="M_titletext"><a>全部</a></div>
+                <div class="page clearfix"><a href="javascript:void(0)"  onclick="previous()">上一页 </a> <a href="javascript:void(0)" onclick="next()">下一页</a></div>
+            </div>
+            <div class="M_content">
+            	<ul id="content">
+                	
+                	
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="right">
+    	<div class="R_title"><a>知识分享榜</a></div>
+        <div class="Ranking">
+        	<div class="Ranking_title"><a>点击排行</a></div>
+            <ul id="clickRank" class="R_content">
+            	
+            </ul>
+        </div>
+        <div class="Ranking">
+        	<div class="Ranking_title"><a>收藏排行</a></div>
+            <ul id="collectRank" class="R_content">
+            </ul>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript">
+	var layout,treeObj,tree,treeSearch,grid,data,data2,form,option,sendUrl,knowledgeId;
+	window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+	var baseDataURL="${base}/admin/knowledgeSquare/selectForSquare.action?a=1";
+	var pageCount=14;
+	var currentPage=0;
+	var totalCount=0;
+	var orgId="";
+	var type="";
+	var typeId="";
+	var title="";
+	$(function(){
+		tree = new dhtmlXTreeObject("tree", "100%", "100%", 'root');
+		tree.setImagePath(window.dhx_globalImgPath+"/csh_dhx_terrace/");
+		tree.enableSmartXMLParsing(true);
+		tree.setSkin('dhx_skyblue');
+		tree.enableTreeLines(true);
+
+		tree.loadJSON("${base}/admin/org/showAuOrgTree.action?idMark=org_code_tree&etc=" + new Date().getTime());
+		tree.attachEvent("onXLE", function (tree, id) {
+			var rootsAr = tree.getSubItems(id);//.split(",");
+			tree.openItem(rootsAr);
+		});
+
+		tree.attachEvent("onSelect", function (id) {
+			window.orgId=id;
+			clearPage();
+			loadContext();
+		});
+		treeSearch = new treeSearchBar('tree_search', tree);
+		
+		
+		$('.Classification a').bind('click',function(){
+			$(this).parent('li').siblings('li').removeClass('Selected');
+			$('.Classification a').removeClass('Selected');	
+			$(this).parent('li').addClass('Selected');
+			$(this).addClass('Selected');	
+			$('.M_titletext a').eq(0).html($(this).children('span').eq(0).html());
+		});	
+		loadContext();
+		leaderboard(0,$("#clickRank"));
+		collectLeaderboard(2,$("#collectRank"));
+		
+		$('.container').height($(window).height()-$('.top').outerHeight(true));
+		$('.left_box').height($(window).height()-$('.top').outerHeight(true)-11);
+		
+		layout();
+		$(window).resize(function(){
+			layout();
+		});
+		
+		
+	});
+	
+	
+	function selectType(type,typeId){
+		window.type=type;
+		window.typeId=typeId;
+		clearPage();
+		loadContext();
+	}
+	
+	
+	function clearPage(){
+		window.currentPage=0;
+		window.totalCount=0;
+	}
+	function previous(){
+		if(currentPage<=0){
+			return;
+		}else{
+			currentPage=currentPage-1;
+		}
+		loadContext();
+	}
+	function next(){
+		if(totalCount<=(currentPage+1)*pageCount){
+			return;
+		}else{
+			currentPage=currentPage+1;
+		}	
+		loadContext();
+	}
+	
+	function loadContext(){
+		jQuery.post(baseDataURL+"&etc="+new Date().getTime(), 
+    			{"orgId":orgId,  "type":type,"typeId":typeId,"pageCount":pageCount,"posStart":currentPage*pageCount ,"title":title}, function (loader) {
+    				fillContext(loader);
+		},"json");      		
+	}
+	
+	function fillContext(jsonData){
+		if(jsonData.result=="success"){
+			totalCount=jsonData.totalCount;
+			$("#content").empty();
+			var data=jsonData.data;
+			for(var key in data){
+				var item=data[key];
+				var ele="<li><a href='javascript:void(0)' class='link01' onclick='clickKnowledge(&quot;"+item.id+"&quot;,&quot;"+item.title+"&quot;)'>"+item.title+"</a>";
+				ele+="<div class='list_R'>";
+				ele+="<a href='javascript:void(0)' class='Collect' onclick='collect(&quot;"+item.id+"&quot;,&quot;"+item.title+"&quot;)'>收藏</a> </div></li>";
+				$("#content").append(ele);
+			}
+			
+			$('#content li a').each(function(){
+				$(this).width($(this).parent('li').width()-$(this).siblings('.list_R').width()-20);
+			});
+			
+		}else{
+			$.dialog.tips(jsonData.message);
+		}	
+	}
+	
+	function leaderboard(status,obj){
+		$.post("${base}/admin/count/countByMap.action?etc="+new Date().getTime(),{"status":status},function(jsonData){
+			fillLeaderboard(jsonData,obj);
+     	});
+	}
+	
+	function collectLeaderboard(status,obj){
+		$.post("${base}/admin/collect/countByMap.action?etc="+new Date().getTime(),{},function(jsonData){
+			fillLeaderboard(jsonData,obj);
+     	});
+	}
+	
+	function fillLeaderboard(jsonData,obj){
+		if(jsonData.result=="success"){
+			obj.empty();
+			var data=jsonData.data;
+			for(var key in data){
+				if(Number(key)>=5){
+					break;
+				}
+				var item=data[key];
+				var ele="<li><a onclick=clickKnowledge("+"'"+item.knowledgeId+"','"+item.knowledgeTitle+"') href='javascript:void(0)'>"+(Number(key)+1)+"."+item.knowledgeTitle+"</a><span>("+item.num+")</span></li>";
+				obj.append(ele);
+			}
+		}
+	}
+	
+	
+	function collect (id,title) {
+        $.post("${base}/admin/collect/insert.action?etc="+new Date().getTime(),{"knowledgeCollect.KnowledgeId":id,"knowledgeCollect.knowledgeTitle":title},function(result){
+            if(result.result=="success"){
+            	$.dialog.tips("收藏成功")
+            }else{
+            	$.dialog.tips(result.message);
+            }  
+        });
+    }
+	
+	function comment (id) {
+		$.dialog.tips("未定义");
+	}
+	
+	function clickKnowledge(id,title){
+ 		 $.post("${base}/admin/count/insert.action?etc="+new Date().getTime(),{"knowledgeCount.KnowledgeId":id,"knowledgeCount.knowledgeTitle":title,"knowledgeCount.status":0},function(result){
+            // $.dialog.tips(result.message);
+     	}); 
+		 window.top.createWindow(
+					{   id      :'viewKnowledgeWin',
+						text    : "详情",
+						url     : "${base}/admin/knowledgeSquare/viewKnowledgePage.action?knowledge.id="+id+"&etc="+new Date().getTime(),
+						width   :'650',
+						height  :'500',
+						parent_ifr : window
+					}
+				);
+	}
+	function simpleSelect(){
+		title=$("#selectTitle").val();
+		clearPage();
+		loadContext();
+	}
+	
+	
+	function layout(){		
+		
+		$('.container').width($(window).width());
+		if($('.container').width()<980){
+			//$('.container').width(980)
+		}
+		$('.middle:first').width($(window).width()-$('.left:first').width()-$('.right:first').width());
+		if($('.middle:first').width()<563){
+			$('.middle:first').width(563);
+		}
+		$('.top').width($('.container').width());
+		
+		$('#content li a').each(function(){
+			$(this).width($(this).parent('li').width()-$(this).siblings('.list_R').width()-20);
+		});
+	}
+	
+</script>
+</body>
+</html>

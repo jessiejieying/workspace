@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+<title>Eden</title>
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+	<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css" id="style_css"/>
+</head>
+<body>
+ <form action="" class="wait-form">
+ 	<h1 style="margin-left: 30px;margin-right: 30px;">${(detail.subject)!}</h1>
+ 	<div class="form-print-header" style="float:right;margin-right: 70px;margin-bottom: 10px;">
+		<span class="header-right" style="color: #ef655d;">会议编号：
+			<input class="td-text-left" type="text" style="border: none;" id="backNo" value="${(detail.docNum)!}">
+		</span>
+	</div>
+ <table class="wait-table">
+ 	<tr>
+ 		<td class="td-left" height="50">会议时间</td>
+ 		<td>
+ 			<table class="intable">
+				<tr>
+					<td class="td-text-left" style="text-align: left;padding-left: 0px;" id="radioId">						
+						<lable>${(detail.stateDate)!}</lable>
+					</td>
+					<td class="td-mid" width="108" height="50">地点</td>
+ 					<td width="256">
+ 						<input id="fileChar" type="text" class="td-input" value="${(detail.location)!}">
+ 					</td>
+				</tr>
+ 			</table>
+ 		</td>
+ 	</tr>
+ 	<tr>
+ 		<td class="td-left" height="50">会议类型</td>
+ 		<td style="text-align: left;padding-right: 20px;">
+			<span>${(detail.meetingType)!}</span>
+ 		</td>
+ 	</tr>
+ 	<tr>
+        <td class="td-left">会议议题</td>
+        <td style="padding-left: 20px;">
+            <textarea id="unit_reason" style="text-align: left;height:60px;padding-top: 10px;">${(detail.content)!}</textarea>
+        </td>
+    </tr>
+ 	<tr>
+ 		<td class="td-left" height="50">附件信息</td>
+ 		<td style="text-align: left;padding-top: 15px;padding-bottom: 15px;">
+ 			<#list attachmentInfos as obj>
+		     	<a class="file-icon" href="${(obj.path)!}" data-name="${(obj.name)!}" style="padding-right: 20px;display: block"><font color="blue">${(obj.name)!}</font></a>
+		    </#list>
+ 		</td>
+ 	</tr>
+<!--  	<tr> -->
+<!--  		<td class="td-left" height="50">备&nbsp; 注</td> -->
+<!--  		<td style="text-align: left;padding-right: 20px;padding-top:9px;padding-bottom: 9px;line-height: 17px;"> -->
+<!--  			<span>${(detail.remark)!}</span> -->
+<!--  		</td> -->
+<!--  	</tr> -->
+<!--  	<tr> -->
+<!--  		<td class="td-left" height="50">请假理由</td> -->
+<!--  		<td style="text-align: left;padding-right: 20px;padding-top: 9px;padding-bottom: 9px;line-height: 17px;	"> -->
+<!--  			<span>${(detail.leaveReason)!}</span> -->
+<!--  		</td> -->
+<!--  	</tr> -->
+ 	<tr>
+ 		<td class="td-left" height="50">报名情况</td>
+ 		<td>
+ 			<table class="intable">
+ 				<tr>
+ 					<td class="td-text-left" style="text-align: left;padding-left: 0px;" id="">						
+						<#if '0'== detail.status >
+			 				<span>未报名</span></td>
+		 					<td class="td-mid" width="108" height="50">当前时间</td>
+		 					<td width="256" style="text-align: left;">
+		 						<span>${.now?string("yyyy-MM-dd HH:mm")}</span>
+		 					</td>
+			 			</#if>
+					    <#if '1'== detail.status >
+					    	<span>已报名</span></td>
+		 					<td class="td-mid" width="108" height="50">报名时间</td>
+		 					<td width="256" style="text-align: left;">
+		 						<span>${(detail.registDate)!}</span>
+		 					</td>
+					    </#if>
+					    <#if '2'== detail.status >
+					    	<span>已请假</span></td>
+		 					<td class="td-mid" width="108" height="50">请假时间</td>
+		 					<td width="256" style="text-align: left;">
+		 						<span>${(detail.registDate)!}</span>
+		 					</td>
+					    </#if>
+ 				</tr>
+ 			</table>
+ 		</td>
+ 	</tr>
+ </table>
+  <div class="text-center margin-large-top" style="margin-bottom: 45px;">
+ 	  <div class="button common-skin-btn-syle01 js-add-account"  id="regist">报名</div>
+	  <div class="button common-skin-btn-syle01 js-add-account"  id="leave">请假</div>
+<!--       <div class="button common-skin-btn-syle01 js-add-account"  id="mesage_record">短息记录</div> -->
+  </div>
+ 
+ </form>
+<div id="form_add" ></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+
+<script>
+    function afterSave(){
+	    setTimeout(function(){
+	    	parentIfr.gridOne.refreshPage();
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+    }
+    
+    function init(){
+ 		
+    }
+
+	$(function(){
+	   //点击报名
+	   $(document).on("click", "#regist", function(){
+		   var url = "${base}/admin/hallRegist/changeHallRegist.action?type=1&wfId=${(detail.wfId)!}";
+		   $.post(url, function(data){
+			   window.top.layer.msg(data.message);
+			   afterSave();
+		   });
+		   
+	   });
+	   
+	   //点击请假
+	   $(document).on("click", "#leave", function(){
+           var win = {
+               text: "请假详情",
+               url: "${base}/admin/hallRegist/hallRegistLeaveReason.action?wfId=${(detail.wfId)!}&id=${(detail.id)!}",
+               width: '815',
+               height: '550',
+               id: "leaveDetail",
+               parentIfr: window
+           };
+           window.top.createWindow(win);
+		   
+	   });
+		   
+	});
+	
+    //附件信息文件添加图标
+    function classStyle(){
+        var arrSpan = [];
+        for (var i = 0; i < $(".file-icon").length; i++) {
+            arrSpan.push($(".file-icon").eq(i).data("name"))
+        }
+        $.each(arrSpan,function(i,item){
+            if(item.indexOf(".doc") > -1){
+                $(".file-icon").eq(i).addClass("file-icon-word");
+            }else if(item.indexOf(".pdf") > -1){
+                $(".file-icon").eq(i).addClass("file-icon-pdf");
+            }else if(item.indexOf(".tgw") > -1){
+                $(".file-icon").eq(i).addClass("file-icon-tiangu");
+            }else{
+                return ""
+            }
+        });
+
+    }
+    
+    classStyle();
+    
+</script>
+</html>

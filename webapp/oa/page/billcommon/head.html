@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=8,chrome=1" />
+    <META NAME="GENERATOR" Content="Microsoft Visual Studio 6.0">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+  <script type="text/javascript">
+    var billUrl="${base}";
+    var usercellphoneNumber="${(billData.user.phoneNumber)!}";
+    window.top.globalParams.cellphone="${(billData.user.cellphoneNumber)!}";
+    var userName="${(billData.user.userName)!}";
+
+    //var loginName="${(billData.accountName)!}";
+    //登录名
+    window.top.globalParams.loginName="${(billData.accountName)!}";
+    window.top.globalParams.loginChineseName="${(billData.name)!}";
+
+
+    //发文独有
+    var fileNumber="${(billData.dataset1.document_no)!}";
+
+    var billFileType="${billData.billType!}";
+
+    var sendOrgName="${(billData.orginfo.orgName)!}";
+
+    window.top.globalParams.myOrgName="${(billData.orginfo.orgName)!}";
+    //浙政发校对
+
+    var sendProofreading="${billData.shortPhone!}";
+
+
+    //用户角色，一个用户会有多个角色
+    window.top.globalParams.roleId="${billData.role!}";
+
+  </script>
+
+
+</head>

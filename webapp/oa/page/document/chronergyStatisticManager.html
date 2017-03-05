@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+<#include "/aufw/page/include/head.html">
+</head>
+<body style="height:100%;">
+<#include "/aufw/page/include/loading.html">
+
+<form id="form1">
+<div style="display: none; width: 100%; height:100%;" id="right_top">
+	<div id="chart_wrap" class="fieldset_style">
+		<div class="area_name">时效性</div>
+		<div id="chart_toolbar_ul" class="ed-toolbar">
+
+        
+
+			<select name="module" id="stypeId" style="width:100px;" onchange="search()">
+                <option value="dept">按部门统计</option>
+                  <option value="user">按用户统计</option>
+                    <option value="wfstep">按流程统计</option>
+           
+              
+              
+			</select>
+			<select name="wfname" id="wfnameId" style="width:200px;display: none;" onchange="search()">
+			
+               
+           	 	<#list wfTypeMap?keys as key>
+				 <option value="${key}">${wfTypeMap.get(key)}</option>
+				</#list>
+		       
+              
+              
+			</select>
+          <input type="button" class="btn btn-info toolbar-btn" onClick="exportExcel()" style="margin-left: 10px" value="导出">
+
+		</div>
+		<div id="chartDiv" class="chartDiv"></div>
+	</div>
+</div>
+</form>
+
+<div style="display: none; width: 100%; height: 100%;" id="right_bottom">
+	<div id="grid_wrap" class="fieldset_style">
+		<div class="area_name">列表</div>
+    <div id="grid" style="width:100%; height:200px;"></div>
+	 <div id="grid_page" class="grid_page" style="width:100%;height:18px; padding-top:10px;"></div>
+	</div>
+</div>
+<div id="test" style="position:absolute; top:0; left:0; z-index:999;"></div>
+</body>
+<#include "/aufw/page/include/script.html">
+
+<script src="${base}/edenui/common/js/plugins/cnDate/cnDate.js"></script>
+
+<!--[if IE]><script type="text/javascript" src="${base}/edenui/common/js/plugins/dhtmlx/excanvas.js"></script><![endif]-->
+<script>
+    var layout,left_obj,right_top_obj,barChart,data,grid;
+    var ajaxPath="${base}/admin/documentStatistics/getChronergyStatistics.action?";
+	var stypeMap={'dept':'部门','user':'用户','wfstep':'流程节点'}; //查询条件对应名称
+
+    window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+    function init() {
+        layout = new dhtmlXLayoutObject(document.body, "2E");
+        layout.cells('a').hideHeader();
+        layout.cells('b').hideHeader();
+
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+
+        right_top_obj=layout.cells("a").attachObject('right_top');
+ 
+
+        barChart =  new dhtmlXChart({
+            view:"bar",
+            container:"chartDiv",
+            value:"#cuttime#",
+            tooltip:"#base#",
+            gradient:"falling",
+            color:"#ffba02",
+            radius:0,
+            //alpha:0.5,
+           
+            xAxis:{
+                template:"#base#" ,
+                title :""
+            },
+            yAxis:{
+                
+                title :"平均办理时间",
+                template:''
+            }
+        })
+
+        data = new dhtmlXDataStore({
+            url :ajaxPath+"dateformat=1&stype=dept&etc="+new Date().getTime(),
+            datatype:"json"
+        });
+
+       barChart.load(ajaxPath+"stype=dept&etc="+new Date().getTime(),"json");
+        barChart.attachEvent("onItemClick", function(id) {
+            var con=$("#condition").val();
+            var date = barChart.get(id);
+            var uu="";
+         /*    if(con!="")  {
+                 uu= 'queryChartBizlogH.action?'+con+'&date2='+date.byX+'&etc='+new Date().getTime();
+            } else {
+                 uu= 'queryChartBizlogH.action?date2='+date.byX+'&etc='+new Date().getTime();
+            }
+            data.clearAll();
+            window.data.data.url=uu;
+            data.load(uu); */
+            
+            return true;
+        });
+        grid=layout.cells("b").attachObject('right_bottom');
+        grid = new dhtmlXGridObject('grid');
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        grid.setHeader("部门,平均办理时间（单位：秒）");
+        grid.setColumnIds("base,cuttime");
+        grid.setInitWidths("300,*");
+        grid.setColTypes("ro,ro");
+        grid.init();
+        grid.enablePaging(true,40,2, 'grid_page', true);
+        grid.setPagingSkin("toolbar");
+        grid.sync(data);
+
+        page_layout();
+    }
+    
+    
+           function search(){
+        	
+               var stype= $("#stypeId").val();
+               var wfName=$("#wfnameId").val();
+               var s="stype="+stype+'&etc='+new Date().getTime();
+               if(stype=="wfstep")
+               {
+            	  s+= "&wfName="+wfName;
+            	  $("#wfnameId").show(); 
+               }else{
+            	   $("#wfnameId").hide(); 
+               }
+               barChart.clearAll();
+               barChart.load(ajaxPath+s,"json")
+               data.clearAll();
+               var   uu=ajaxPath+s+"&dateformat=1&etc="+new Date().getTime();
+               window.data.data.url=uu;
+               data.load(uu);
+               $(".hdrcell").eq(0).html(stypeMap[stype]); //替换第一个表格头名称
+
+           }
+       
+           
+       	function  exportExcel(){
+    		
+	       	 var stype= $("#stypeId").val();
+	         var wfName=$("#wfnameId").val();
+	         var s="stype="+stype+'&isExcel=1&etc='+new Date().getTime();
+	         if(stype=="wfstep")
+	         {
+	      	  s+= "&wfName="+wfName;
+	      	  $("#wfnameId").show(); 
+	         }else{
+	      	   $("#wfnameId").hide(); 
+	         }
+	    		
+            var keyString ="base,cuttime";
+    		var valueString=stypeMap[stype]+",平均办理时间";
+            var excelFieldStr="&keyString="+encodeURI(keyString)+"&valueString="+encodeURI(valueString);
+            var url=ajaxPath+s+excelFieldStr+'&etc='+new Date().getTime();
+            location.href=url;
+          
+        }
+           
+    function page_layout() {
+        var right_top_height = $('#right_top').height();
+        var right_top_width = $('#right_top').width();
+        var right_bottom_height = $('#right_bottom').height();
+        var right_bottom_width = $('#right_bottom').width();
+        $('#chart_wrap').height(right_top_height - 60).width(right_top_width-50);
+        $('#chartDiv').width(right_top_width-50);
+        $('#grid_wrap').height(right_bottom_height - 50).width(right_bottom_width-50);
+        $('#grid').height(right_bottom_height - 78);
+        if(right_top_height<340){
+            $('#chartDiv').height(right_top_height - 100);
+        }else{
+            $('#chartDiv').height(260);
+        }
+        if(grid)    grid.setSizes();
+        if(barChart){
+            barChart.refresh();
+        }
+
+    }
+
+    $(function () {
+        setTimeout(init, 0);
+        $("#date1").val(CnDate().type5);
+        $("#config_left_menu > li").click(function (event) {
+            $("#config_left_menu > li.on").removeClass('on').children('ul').slideUp(200);
+            $(this).addClass('on');
+            $(this).children('ul').slideDown(400);
+        });
+        $("#config_left_menu .level_2 > li").click(function (event) {
+            $("#config_left_menu .level_2 li.on").removeClass('on');
+            $(this).addClass('on')
+            event.stopPropagation();
+        })
+        
+    })
+</script>
+</html>

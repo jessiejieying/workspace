@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/list.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/icon.css">
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+</head>
+<body>
+<div id="set_tips_sound" class="fieldset_style set_tips_sound">
+	<div class="area_name">资产信息</div>
+	<form class="register_form" method="post" action="${base}/admin/org/addOrg.action">
+		<input type="hidden" value="" name="orgTree.orgId"/>
+		<input type="hidden" value="B00001" name="parentTree.orgId"/>
+		<table width="100%" style="table-layout:fixed;">
+			<tr>
+				<td style="width:70px;"><span style="color:red">* </span>资产编号：</td>
+				<td style="width:230px;"><input type="text" id="assetsNum"  value="" name="assetsRegister.assetsNum" class="inputxt"/><a onclick="selectAsset()" style="cursor:pointer;"><img style="vertical-align :middle;" src='${base}/aufw/resources/skins/freshtop/icons/dark_add.png' /></a></td>
+				<td style="width:70px;"></td>
+				<td style="width:230px;">
+				
+					
+				</td>
+			</tr>
+			
+			
+			
+			
+			<tr>
+				<td><span style="color:red">* </span>资产名称：</td>
+				<td  >
+					<input type="text" id="assetsName"  value="" name="assetsRegister.assetsName" class="inputxt"/>
+				</td>
+				<td><span style="color:red">* </span>型号：</td>
+				<td><input type="text" id="assetsModel" value="" name="assetsRegister.assetsModel" class="inputxt" /></td>
+			</tr>
+			
+			
+			<tr>
+				<td>存放地点：</td>
+				<td  >
+				<select name="assetsRegister.storePlace" id="storePlace" >
+				 	<#if storePlaceList?exists>
+							<#list storePlaceList as dist>
+								<option value="${dist.dictValue}">${dist.displayName}</option>
+							</#list>
+						</#if>
+					
+				</select>	</td>
+			<td>资产类别：</td>
+				<td  >
+				<select name="assetsRegister.category" id="category">
+				<#if categoryList?exists>
+							<#list categoryList as dist>
+								<option value="${dist.dictValue}">${dist.displayName}</option>
+							</#list>
+						</#if>
+			</select></td>	
+			</tr>
+			
+			<tr>
+				<td><span style="color:red">* </span>数量：</td>
+				<td>
+					<input type="text" id="amount"  value="" name="assetsRegister.amount" class="inputxt"/>
+				</td>
+				<td>单价：</td>
+				<td><input type="text" id="unitPrice" value="" name="assetsRegister.unitPrice" class="inputxt" /></td>
+			</tr>
+			
+			
+			<tr>
+				<td>总价：</td>
+				<td>
+					<input type="text" id="totalPrice"  value="" name="assetsRegister.totalPrice" class="inputxt"/>
+				</td>
+				<td>资产类型：</td>
+				<td>
+					<select name="assetsRegister.type" id="type">
+						<#if assetsTypeList?exists>
+							<#list assetsTypeList as dist>
+								<option value="${dist.dictValue}">${dist.displayName}</option>
+							</#list>
+						</#if>
+			</select>
+					
+				</td>
+			</tr>
+			
+			
+			<tr>
+				<td>申购理由:</td>
+			   <td colspan="3"><textarea id="buyReason" name="assetsRegister.remark" style="width: 496px"></textarea></td>
+			   
+			</tr>
+			
+			
+			<tr>
+				<td colspan="4" style="padding:10px 0 0 0; text-align:center;">
+					<label title="勾选之后，页面不会自动关闭。" class="goOn"><input id="saveType" type="checkbox" /> 继续添加</label>
+					<input class="submit_btn_1" id="save_btn" type="button" value="保 存" />
+					<input type="hidden" id="wfId"  value="" name="assetsRegister.wfId" class="inputxt"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<style>
+
+</style>
+</body>
+<script src="${base}/aufw/resources/common/js/jquery.js"></script>
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+
+<script>
+    function page_layout() {
+        var ifr_width = $(window).width();
+        $('#set_bg_image').width(ifr_width-50);
+    }
+    $(function(){
+        setTimeout(page_layout, 0);
+      
+    })
+
+    function afterSave(){
+	    var type=$('#saveType').is(':checked');
+	    if(type){
+		    $('#assetsNum,#assetsName,#assetsModel,#storePlace,#category,#amount,#unitPrice,#totalPrice,#type,#buyReason').val('');
+	    }else{
+		    //setTimeout(function(){window.top.closeWin('addAssets');},500);
+	    	
+	    	 setTimeout(function(){window.parent.closeWin('addAssets');},500);
+	    }
+    }
+
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    }
+    
+     $(function(){
+	 /*     var getInfoObj = function () {
+		     return     $(this).parents("td").next().find(".info");
+	     };
+
+
+	     $("[datatype]").focusin(function(){
+            if(this.timeout){clearTimeout(this.timeout);}
+            var infoObj=getInfoObj.call(this);
+            if(infoObj.siblings(".Validform_right").length!=0){
+                return;
+            }
+            infoObj.show().siblings().hide();
+
+        }).focusout(function(){
+                    var infoObj=getInfoObj.call(this);
+                    this.timeout=setTimeout(function(){
+                        infoObj.hide().siblings(".Validform_wrong,.Validform_loading").show();
+                    },0);
+
+                });
+
+        $(".register_form table tr").each(function(){
+           $(this).find('td:eq(0)').addClass('text_align_right');
+        });
+		
+        $("#code").blur(function(){
+	   		 blurUnique("ea_org_tree", "code", this.value, function(result){
+	   			 if(result.isExists){
+	   				 $("#code").select();
+	   				 $.dialog.tips('编码已存在！');
+	   			 }
+	   		 });
+	   	 }); */
+	   var wfId=getQueryString("wfId");
+       $('#wfId').val(wfId);
+        
+        $("#save_btn").click(function(){
+	        if(valid_input('assetsNum', 'NotEmpty', "资产编号不能为空") && valid_input('assetsName', 'NotEmpty', "资产名称不能为空")&& valid_input('assetsModel', 'NotEmpty', "资产型号不能为空")&&valid_input('amount', 'NotEmpty', "资产数量不能为空")){
+	        	
+	        /* 	if(!valid_input('amount', 'ValidInteger', "资产数量为数字"))
+	        	{
+	        		return;
+	        	} */
+	        	
+	        	if($('#unitPrice').val())
+	        	{
+	        		if(!valid_input('unitPrice', 'ValidInteger', "单价要为数字"))
+	        		{
+	        			return;
+	        			
+	        		}
+	        	}
+	        	if($('#totalPrice').val())
+	        	{
+	        		if(!valid_input('totalPrice', 'ValidInteger', "总价要为数字"))
+	        		{
+	        			return;
+	        			
+	        		}
+	        	}
+	       
+			    var button = $(this);
+			        button.attr("disabled", "disabled").val("正在提交...");
+			        var par_ifr = window.ParentIframe;
+			        $.post("${base}/admin/assetsRegister/insert.action", $("form:first").serialize(), function (result) {
+				        button.attr("disabled", false).val("确定");
+				        if(result.result=='success'){
+					        $.dialog.tips(result.message);
+					        var aid=result.id;
+					        var assetsNum=$('#assetsNum').val();
+					        var assetsName=$('#assetsName').val();
+					        var amount=$('#amount').val();
+					        addToParantList(aid,assetsNum,assetsName,amount);
+					      
+					        afterSave();
+				        }else{
+					        $.dialog.tips(result.message);
+				        }
+
+			        });
+			       
+
+	        }
+        });
+    })
+    
+    
+    function addToParantList(aid,assetsNum,assetsName,amount)
+    {
+         var pRowIdVal = "";  
+	            
+	        var pRowId = window.parent.grid.getAllRowIds(',').split(',');
+	      // alert(window.parent.grid.getAllRowIds(','))
+	        for(i=0;i<pRowId.length;i++){ 
+	          // alert(window.parent.grid.cellById(pRowId[i], 2).getValue())
+	        	pRowIdVal = pRowIdVal + pRowId[i] + "-";
+	        }
+	        
+			window.parent.grid.addRow(aid,[" ",assetsNum,assetsName,amount],1); 
+			 window.parent.setRelevanceid();
+    	 
+    }
+        
+	 $(window).resize(function(){
+		 setTimeout(page_layout, 0);
+	});
+	 
+	 
+	 function selectAsset()
+	 {
+		//amountIndex="+amountIndex
+		 	var url =  "${base}/admin/assetsRegister/assetsSelect.action?addType=1";
+		 	window.top.createWindow({
+		 		id:"assetsAddSelect",
+		 		text: "资产选择",
+		 		width: 500,
+		 		height: 450,
+		 		url: url,
+		 		parent_ifr : window
+		 	});
+	
+
+		 
+	 }
+</script>
+</html>

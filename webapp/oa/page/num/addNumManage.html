@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+	<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css" id="style_css"/>
+</head>
+<body>
+<div id="form_add"></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var userId = "${(userInfo.userId)!}";
+
+
+    function afterSave(){
+	    setTimeout(function(){
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+    }
+    function init(){
+ 		if(userId == ""){
+ 			$.ajax({
+ 	  		   type: "POST",
+ 	  		   async: false,
+ 	  		   url: "${base}/admin/commonSeq/commonSeqAction!getSeqNo.action?etc="+new Date().getTime(),
+ 	  		   data: "seqKey=${(userInfo.depId)!}",
+ 	  		   success: function(msg){
+ 	  			 if(msg.result=="success"){
+ 	  				 $("#seq").val(msg.message);
+ 	  			 }
+ 	  		   }
+ 	  		}); 
+ 		}	
+    }
+	$(function(){
+		 $('#form_add').loadForm({
+			 formInputs: [
+				 <#if (userInfo.userId)??>   
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'userInfo.userId',
+					 value:'${(userInfo.userId)!}'
+				 	}
+				 },
+				 </#if>
+				 <#if accountName??>   
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'accountName',
+					 value:'${(accountName)!}'
+				 	}
+				 },
+				 </#if>
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'userInfo.depId',
+					 value:'${(userInfo.depId)!}'
+				 	}
+				 },
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'userInfo.depCode',
+					 value:'${(userInfo.depCode)!}'
+				 	}
+				 },
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'userInfo.orgId',
+					 value:'${(userInfo.orgId)!}'
+				 	}
+				 },
+				 {type: 'text', attr: {
+						 isRequired:true,
+						 validate:'required:不能为空的,',
+						 placeholder: '',
+						 style:'x6',
+						 infor:'用户姓名',
+						 id: 'userName',
+						 data:'1',
+						 name:'userInfo.userName',  
+						 value:'${(userInfo.userName)!}'
+				 	}
+				 },	
+				 {type: 'text', attr: {
+					 isRequired:true,
+					 validate:'required:不能为空的,',
+					 placeholder: '',
+					 style:'x6 ',
+					 infor:'序号',
+					 id: 'userName',
+					 data:'1',
+					 name:'userInfo.seq',  
+					 value:'${(userInfo.seq)!}'
+			 	}
+			 },	
+				 {type: 'textAdd', attr: {
+					 isRequired:true,
+					 validate:'required:不能为空的,mobile:请输入正确的号码',
+					 placeholder: '',
+					 style:'x12',
+					 infor:'手机号码',
+					 id: 'birthday',
+					 data:'1',
+					 name:'numManage.shoujihao',  
+    				 value:'${(numManage.shoujihao)!}',
+    				 content:[
+    				          <#if (shoujihao)??>   
+								<#list shoujihao as shoujihao>  
+									<#if shoujihao_index==0>
+    							 		{ name:'numManage.shoujihao',value:'${shoujihao!}',id:''},
+    							 	<#else>
+								    	{ name:'',value:'${shoujihao!}',id:''},
+    							 	</#if>
+    							 </#list>
+    							 <#else> { name:'numManage.shoujihao',value:'${shoujihao!}',id:''}
+    						   </#if>
+    						 ]
+    			 	}
+    			 },	
+				 {type: 'textAdd', attr: {
+					 isRequired:true,
+					 validate:'required:不能为空的,tel:请输入正确的号码',
+					 placeholder: '',
+					 style:'x12',
+					 infor:'电话号码',
+					 id: 'phoneNumber',
+					 data:'1',
+					 name:'numManage.dianhuahao',  
+					 value:'${(numManage.dianhuahao)!}',
+					 content:[
+								<#if (dianhuahao)??>   
+									<#list dianhuahao as dianhuahao>  
+										<#if dianhuahao_index==0>
+									 		{ name:'numManage.dianhuahao',value:'${(dianhuahao)!}',id:''},
+									 	<#else>
+									    	{ name:'',value:'${dianhuahao!}',id:''},
+									 	</#if>
+									 </#list>
+									 <#else> { name:'numManage.dianhuahao',value:'${(dianhuahao)!}',id:''}
+								</#if>		 
+							 ]
+
+    			 	}
+    			 },	
+				 {type: 'textAdd', attr: {
+					 isRequired:true,
+					 validate:'required:不能为空的,number:请输入正确的号码',
+					 placeholder: '',
+					 style:'x12',
+					 infor:'虚拟网',
+					 id: 'xuniwang',
+					 data:'1',
+					 name:'numManage.xuniwang',  
+					 value:'${(numManage.xuniwang)!}',
+					 content:[
+								<#if (xuniwang)??>   
+									<#list xuniwang as xuniwang>  
+										<#if xuniwang_index==0>
+									 		{ name:'numManage.xuniwang',value:'${(xuniwang)!}',id:''},
+									 	<#else>
+									    	{ name:'',value:'${xuniwang!}',id:''},
+									 	</#if>
+									 </#list>
+									 <#else> { name:'numManage.xuniwang',value:'${(xuniwang)!}',id:''}
+								</#if>	
+								
+							 ]
+
+    			 	}
+    			 }
+			 ],
+			 buttons: [
+				 {
+					 type:'button',
+					 size: 'lg',
+					 color:'blue',
+					 validationState: 'success',
+					 id: 'save_btn',
+					 infor: '保存',
+					 onSubmit: function(form) {
+						 submit(form);
+
+					 }
+				 }
+			 ]
+		 })
+		init();
+	})
+
+	function submit(form) {
+		var url = "${base}/admin/numManager/update.action";
+		if(userId == "") {
+			url = "${base}/admin/numManager/insert.action";
+		}
+				$(".js-text-input-box").each(function(i){
+					var data=[],
+							$name=$(this).find(".js-add-input").eq(0).find("input");
+					$(".js-text-input-box:eq("+i+") .js-add-input").each(function(j){
+						var $inputThis=$(this);
+						var $val=$inputThis.find("input").val();
+						if($val.length>0){
+							data.push($val);
+						}
+					});
+					$name.val(data.join(","));
+					//console.log($name.val());
+				});
+				
+        $.post(url, $("form:first").serialize(), function (result) {
+        	
+        	if(result.resultFlag=='true'){	
+        		parentIfr.gridOne.refreshPage();
+        		afterSave();
+         	}
+        	$("input").val("");
+         	layer.msg(result.message);
+         }); 
+	}
+
+</script>
+</html>

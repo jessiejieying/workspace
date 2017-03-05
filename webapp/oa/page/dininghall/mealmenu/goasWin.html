@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/list.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/icon.css">
+</head>
+<style type="text/css">
+	html,body,div,li,ul{margin: 0; padding: 0; list-style: none;}
+	.content{width: 600px; height: 400px;  margin: 0 auto; margin-top: 30px; border: 1px solid #ccc;}
+	.content ul{
+		width: 540px;
+		height: 340px;
+		border-bottom:1px solid #ccc;
+		padding: 0 30px 0 30px;
+		overflow-y:scroll; 
+	}
+	.content li{
+		float: left;
+		width: 154px;
+		height: 18px;
+		line-height: 18px;
+		margin: 10px;
+	}
+	.save{
+		margin-top: 5px;
+		margin-left: 480px;
+		width:100px;
+		height:30px;
+	}
+	
+</style>
+<body>
+<div class="content">
+		<ul>
+        <#list mealList as meal>
+		<li><input type ="checkbox" name="mealContent" value="${meal.id}" />${meal.mealName}</li>
+        </#list>
+		</ul>
+		<input id="save" class="save" type="button" value="保 存" onClick="save()" />
+</div>
+<!--<#list mealList as meal>
+	<input type="checkbox" name="mealContent" value="${meal.id}" />${meal.mealName}<br/>
+</#list>
+	<input type="button" value="保 存" onClick="save()" />-->
+<style>
+</style>
+</body>
+<script src="${base}/aufw/resources/common/js/jquery.js"></script>
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+<script>
+	//console.log(mealContentOld);
+	function save(){
+		var result="";
+		var idResult="";
+		var mealContent = document.getElementsByName("mealContent");
+		for(var i=0;i<mealContent.length;i++){
+			if(mealContent[i].checked == true){
+				result+=mealContent[i].nextSibling.nodeValue+",";
+				idResult+=mealContent[i].value+",";
+			} 
+		}
+		result=result.substring(0,result.length-1);
+		idResult=idResult.substring(0,idResult.length-1);
+		ParentIframe.form.getInput('mealContent').value=result;
+		ParentIframe.form.getInput('mealId').value=idResult;
+		window.top.closeWin("goasWin");
+	}
+	$(function(){
+		var mealContentNew = document.getElementsByName("mealContent");
+		var mealContentOldText = "${mealContent}";
+		var mealContentOld = mealContentOldText.toString().split(",");
+		for(var i=0;i<mealContentNew.length;i++){
+			var nextVal=mealContentNew[i].nextSibling.nodeValue;
+			for(var j=0;j< mealContentOld.length;j++){
+				//console.log(mealContentNew[i].nextSibling.nodeValue);
+				if($.trim(mealContentOld[j]) ==  $.trim(nextVal)){
+					mealContentNew[i].checked=true;
+	
+				} 
+				
+				
+			}
+		}	
+	});
+</script>
+</html>

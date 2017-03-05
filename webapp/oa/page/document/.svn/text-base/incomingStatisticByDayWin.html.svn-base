@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+<#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;" class="statistics">
+
+  <#include "/aufw/page/include/loading.html">
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+
+          <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+               <div class="form-group statistics-condition header-group">
+					<span class="header-title ">年度:</span>
+					<span id="yearDiv">
+						<input id="year" name="year" class="tool-bar-input margin-left-in" style="cursor: pointer;width: 60px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+					</span>
+					<span class="header-title margin-left-out">月份:</span>
+					<select  class="input margin-left-in statistics-select" style="width: 48px;" id="month">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						<option value="11">11</option>
+						<option value="12">12</option>
+					</select>
+					<span class="header-title margin-left-out">来文单位:</span>
+					<select id="incomingFileUnit" datatype="*" class="input margin-left-in statistics-select" style="width: 100px;">
+					<option value="">全部</option>
+					<#list incomingUnit as dataDict>                                                                         
+						<option title="${dataDict.file_unit}" value="${dataDict.unit_id}">${dataDict.file_unit}</option>
+					</#list>
+					</select>
+					<div  class="button button-main margin-left-out js-statistics">统计</div>
+					<div id="exportButton" class="button button-main margin-left-in">导出</div>
+              </div> 
+				<div class="statistics-tab">
+					<div class="tab-content-show"><span id="condition"></span><span style="float:right; margin-right: 30px;" id='currtTime'></span></div>
+				</div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th width="40">序号</th>
+                  <th w_index="date" width="100">日期</th>
+                  <th w_index="deal" width="100">办件</th>
+                  <th w_index="read" width="100">阅件</th>
+                  <th w_index="council" width="100">国务院文</th>
+                  <th w_index="telegram" width="100">明传电报</th>
+                  <th w_index="application" width="100">依申请公开</th>
+                  <th w_index="total">总数</th>
+                </tr>
+              </table>
+            </div>
+          </div> 
+        </td>
+      </tr>
+    </table>
+  </div> 
+  <script src="${base}/edenui/common/js/jq_plugins/highcharts/highcharts.js"></script>
+    <script src="${base}/edenui/common/js/json2.js"></script>
+  <script>
+  	
+
+	var gridOne;
+	var selectURL = "${base}/admin/documentStatistics/incomingStatisticByDay.action";
+	$(function() {
+		var date2=new Date();
+		var yearCur=date2.getFullYear();
+		var monthCur=date2.getMonth()+1;
+		$("#year").val(yearCur);
+		
+		var sel = document.getElementById("month");
+	  	for (var i = 0; i < sel.length; i++) {
+		  	if (sel[i].value == monthCur) {
+			  	sel[i].selected = true;
+		  	}
+	  	}
+		
+		layOut("#common_table", "#grid_table");
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : encodeURI(encodeURI(selectURL + "?etc=" + new Date().getTime()+"&year="+$('#year').val()+"&month="+$('#month').val()+"&fileUnit="+$('#incomingFileUnit').val())),
+			row_primary_key : "primaryKey",
+		    autoLoad : true,
+		    pageSizeSelect : true,
+		    pageSize : 15,
+		    complete : function(options, XMLHttpRequest, textStatus){
+		    },
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				$("#currtTime").text(gridData.currentTime);
+				$("#condition").text(gridData.condition);
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("tr","#manage_grid_bot").each(function(){
+					$("td",this).eq(1).css("padding-left","8px");
+					$("td",this).css({"padding-left":"0px","text-align":"center"});
+				});
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+	        		$index=parseInt($this.attr("index"));
+	        		$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+			}
+		});
+		
+		//统计功能
+		$(".js-statistics").click(function(){
+			gridOne.changeUrl(encodeURI(encodeURI(selectURL + "?etc=" + new Date().getTime()+"&year="+$('#year').val()+"&month="+$('#month').val()+"&fileUnit="+$('#incomingFileUnit').val())));
+		});
+		
+		$(document).on("click", "#exportButton", function() {
+	        window.location = encodeURI(encodeURI("${base}/admin/documentStatistics/incomingStatisticByDayExport.action?etc="+new Date().getTime()+"&year="+$('#year').val()+"&month="+$('#month').val()+"&fileUnit="+$('#incomingFileUnit').val()));
+		});
+	});
+	
+	function chartHeight() {
+		var $tableTop = $("#grid_table").height(), $bar = $(".js-tool-bar").height();
+		$("#container").height($tableTop - $bar);
+	}
+
+	</script>
+</body>
+</html>

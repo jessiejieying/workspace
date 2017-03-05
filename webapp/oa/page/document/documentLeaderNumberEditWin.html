@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+</head>
+<body>
+<div id="form_add"></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var id = "${documentLeaderNumber.id!}";
+    $(function(){
+        setTimeout(page_layout, 0);
+    })
+
+    function afterSave(){
+	    setTimeout(function(){
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+    }
+    function init(){
+ 		
+    }
+	$(function(){
+		 $('#form_add').loadForm({
+			 formInputs: [
+				 <#if documentLeaderNumber.id??>   
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'documentLeaderNumber.id',
+					 value:'${(documentLeaderNumber.id)!}'
+				 	}
+				 },
+				 </#if>
+				 {type: 'text', attr: {
+						 isRequired:true,
+						 validate:'required:不能为空的,',
+						 placeholder: '',
+						 style:'x12',
+						 infor:'省长名称',
+						 id: 'fileNumberName',
+						 data:'1',
+						 name:'documentLeaderNumber.fileNumberName',
+						 value:'${(documentLeaderNumber.fileNumberName)!}'
+				 	}
+				 },
+				 {type: 'select', attr: {
+					 isRequired:true,
+					 style:'x12',
+					 infor:'对应省长',
+					 id:'',
+					 data:'1',
+					 name:'documentLeaderNumber.fileNumberType',				
+					 options: [
+						<#list configInstLeader! as entry>
+						    <#list entry.dictDesc?split("|") as str>
+						        {value: '${str}', text: '${str}' <#if documentLeaderNumber.fileNumberType?? && documentLeaderNumber.fileNumberType==str>,selected:true</#if> },
+							</#list>
+						</#list>
+  					 ]
+    			 	}
+    			 },				
+				 {type: 'radio', attr: {
+						style:'x12',
+						infor:'是否有效',
+						data:'1',
+						radios: [
+                         <#list dataValidSet as dataDict>    
+                         	{name: "documentLeaderNumber.dataValid",value: '${dataDict.dictValue}', label: '${dataDict.displayName}' <#if documentLeaderNumber.dataValid?? && documentLeaderNumber.dataValid?number==dataDict.dictValue?number>,checked:true</#if> },
+                         </#list>
+						]
+				 	}
+				 },
+				 {type: 'textarea', attr: {
+					 isRequired:true,
+					 validate:'required:不能为空的,',
+					 placeholder: '',
+					 style:'x12',
+					 rows: '3',
+					 infor:'流水号格式',
+					 id: 'fileNumberFormat',
+					 data:'1',
+					 name:'documentLeaderNumber.fileNumberFormat',
+					 value:'${(documentLeaderNumber.fileNumberFormat?js_string)!}'
+					 }
+				 },
+				 {type: 'textarea', attr: {
+					 placeholder: '',
+					 style:'x12',
+					 rows: '3',
+					 infor:'备注',
+					 id: 'remark',
+					 data:'1',
+					 name:'documentLeaderNumber.remark',
+					 value:'${(documentLeaderNumber.remark?js_string)!}'
+					 }
+				 }
+			 ],
+			 buttons: [
+				 {
+					 type:'button',
+					 size: 'lg',
+					 color:'blue',
+					 validationState: 'success',
+					 id: 'save_btn',
+					 infor: '保存',
+					 onSubmit: function(form) {
+						 submit(form);
+
+					 }
+				 }
+			 ]
+		 })	
+		init();
+	})
+
+	function submit(form) {		
+		var url = "${base}/admin/documentLeaderNumber/update.action";
+		if(id == "") {
+			url = "${base}/admin/documentLeaderNumber/insert.action";
+		}
+		$.post(url, $("form:first").serialize(), function (result) {
+		 	if(result.resultFlag=='true'){					
+				 parentIfr.gridOne.refreshPage();
+				 afterSave();
+		 	}
+		 	layer.msg(result.message);
+		 });
+	}
+	
+	$(window).resize(function(){
+		 setTimeout(page_layout, 0);
+	});
+	
+	function page_layout() {
+	    var ifr_width = $(window).width();
+	    $('#set_bg_image').width(ifr_width-50);
+	}
+</script>
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/list.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/icon.css">
+<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+	<script src = "${base}/aufw/resources/common/kindeditor-4.1.9/kindeditor-min.js"></script>
+	
+
+
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+
+</head>
+<body>
+<div id="set_tips_sound" class="fieldset_style set_tips_sound" style="width: 780px">
+	<div class="area_name">公告信息</div>
+	<form class="register_form" method="post" action="${base}/admin/announcement/addAnnouncement.action">
+	
+
+		<table width="100%" style="table-layout:fixed;">
+		
+				
+			<tr style="height: 2px">
+				<td style="width:90px;height: 2px"></td>
+				<td style="width:300px;height: 2px">
+				
+				</td>
+				<td style="width:80px;height: 2px"></td>
+			     <td style="width:300px;height: 2px"></td>
+				
+			</tr>
+			
+			<tr>
+				<td ><span style="color:red">* </span>标题：</td>
+				<td colspan="3"  style="width:670px;">
+				<input type="hidden" id="anId" value="${(announcement.id)!}" name="announcement.id"   />	
+				<input type="text" id="title" value="${(announcement.title)!}" style="width: 600px" class="inputxt" name="announcement.title"/>
+				
+				</td>
+			  
+			</tr>
+				
+			<tr>
+				<td >类型：</td>
+				<td >
+				
+					<select name="announcement.announcementType" >
+					 <#if announcementTypes??>
+       				 <#list announcementTypes as dataDict>
+           
+            			 <option value="${dataDict.dictValue}"  <#if announcement.announcementType??&&(announcement.announcementType?string)==dataDict.dictValue > selected="selected" </#if>  >${dataDict.displayName}</option>
+       				 </#list>
+    				</#if>
+					
+							
+					</select>
+				
+				</td>
+				<td ></td>
+			     <td></td>
+				
+			</tr>
+			
+			
+			<tr>
+				<td>置顶：</td>
+				<td colspan="3">
+					<input type="checkbox" value="1" name="announcement.isTop"  class="inputxt" style="width: 20px " 
+					 <#if announcement.isTop??&&announcement.isTop==1> 
+					 checked="checked" 
+					 </#if> 
+					 />	
+				
+				</td>
+				
+			</tr>
+			
+			<tr>
+				
+				<td>公告截止时间：</td>
+				<td>
+				
+				<input id="startDateId" value="${(announcement.startDate?string('yyyy-MM-dd'))!}" name="announcement.startDate" type="hidden">
+				<input type="text" id="endDateId" name="announcement.endDate"  value="${(announcement.endDate?string('yyyy-MM-dd'))!}" style="cursor:pointer;" class = "Wdate inputxt" onclick = "WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startDateId\')}',maxDate:'2020-10-01'})"  /></td>
+			<td ></td>
+			     <td></td>
+			</tr>
+			
+			<tr>
+				<td>附件：</td>
+				<td colspan="3" >
+				   <input type="hidden" id="eUploadId" value="" name="eUpload"   />	
+						<div class="attachList" id="attachList" style="margin-bottom: 10px"></div>
+				</td>
+			</tr>
+			
+			<tr>
+				<td>公告内容：</td>
+				<td colspan="3" >
+				   <textarea name="announcement.content" id="content" rows=""  cols="" class="info_main_right_form_textarea" style="width: 670px;height: 300px">${(announcement.content)!}</textarea>
+				
+				</td>
+			</tr>
+		
+			
+			<tr>
+				<td>是否定向：</td>
+				<td>
+						<input type="checkbox" value="1" id="isDesignateId" name="announcement.isDesignate"  class="inputxt" style="width: 20px " <#if announcement.isDesignate??&&announcement.isDesignate==1>checked="checked"</#if> />	
+				
+				</td>
+				<td></td>
+				<td>
+				
+				</td>
+			</tr>
+			
+			<tr id="orgTr">				
+			
+            	<td >
+				
+            	</td>
+            	<td colspan="3">
+            	定向单位：<input type="text" id="selectOrgId" readonly="readonly" value="${(announcement.receiveDep)!}" style="width: 400px" class="inputxt" name="announcement.receiveDep" /> 
+            	<a href="javascript:void(0)" class="selectDivA" onclick="selectOrgs()" >选择</a>
+					 <a href="javascript:void(0)" class="selectDivA" onclick="clearOrg()" >清除选择</a><input  id="selectOrgCodeId" type="hidden" value="${(announcement.receiveDepCode)!}" name="announcement.receiveDepCode" >
+            	</td>
+            	
+			</tr>
+			
+			<tr id="userTr">				
+			
+            	<td >
+            	</td>
+            	<td colspan="3">
+            	定向个人：<input type="text" id="selectPersonId" readonly="readonly" value="${(announcement.receivePerson)!}" style="width: 400px" class="inputxt" name="announcement.receivePerson" />
+					<a href="javascript:void(0)" class="selectDivA" onclick="selectUsers()" >选择</a>   <input  id="selectPersonCodeId" type="hidden" value="${(announcement.receivePersonCode)!}" name="announcement.receivePersonCode" >
+					 <a href="javascript:void(0)" class="selectDivA" onclick="clearUser()">清除选择</a>
+            	</td>
+            	
+			</tr>
+			
+				<tr>
+				<td>发送短信：</td>
+				<td>
+						<input type="checkbox" value="1" name="announcement.receiveType"  <#if announcement.receiveType??&&announcement.receiveType==1>checked="checked"</#if> class="inputxt" style="width: 20px " />	
+				
+				</td>
+				<td></td>
+				<td>
+				
+				</td>
+			</tr>
+			
+			<tr>
+				<td colspan="4" style="padding:10px 0 0 0; text-align:center;">
+				
+					<input class="submit_btn_1" id="save_btn" type="button" value="保存" />
+				
+					<input class="submit_btn_1" id="publish_btn" style="display: none;" type="button" value="发布" />
+					
+					<input class="submit_btn_1" id="other_btn" style="display: none;" type="button" value="停止" />
+					
+					
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<style>
+
+</style>
+</body>
+<script src="${base}/aufw/resources/common/js/jquery.js"></script>
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+ <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+ <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+ <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+<script>
+
+var attachList1;
+var editor;
+var announcementId="${(announcement.id)!}";
+var announcementStatus="${(announcement.status)!}";
+var changeStatusflag=2;  //改变状态
+    function page_layout() {
+        var ifr_width = $(window).width();
+        $('#set_bg_image').width(ifr_width-50);
+    }
+    $(function(){
+        setTimeout(page_layout, 0);
+       // init();
+    })
+
+    function afterSave(){
+
+         
+    	setTimeout(function(){
+    		
+    		 var par_ifr = window.ParentIframe;
+    		 if(par_ifr.SimpleSearch)
+    		 {
+    			 par_ifr.SimpleSearch();
+    		 } 
+           
+    		 window.top.closeWin('showAnnouncementWin');},500);
+    }
+
+ /*    function init(){
+    	$.ajax({
+ 		   type: "POST",
+ 		   async: false,
+ 		   url: "${base}/admin/commonSeq/commonSeqAction!getSeqNo.action?etc="+new Date().getTime(),
+ 		   data: "seqKey=${(parentTree.orgId)!}",
+ 		   success: function(msg){
+ 			 if(msg.result=="success"){
+ 				 $("#orgSeq").val(msg.message);
+ 			 }
+ 		   }
+ 		});
+    } */
+    
+    function selectCallBack(orgId,orgName)
+    {
+    	if(!orgId)
+		{
+			$.dialog.tips("未选择组织！");
+			return;
+		}
+		var orgs=$('#selectOrgId').val();
+		var orgsCode=$('#selectOrgCodeId').val();
+		
+		var orgSpl=orgId;
+		for(var i=0;i<orgSpl.length;i++)
+		{
+			var addOrg=orgSpl[i];
+			var neworgsCode=checkAndAddMan(orgsCode,addOrg);
+			if(neworgsCode!=orgsCode)
+			{
+				orgsCode=neworgsCode;
+				orgs=addCnItem(orgs,orgName[i]);
+			}
+			
+		}
+		
+		$('#selectOrgId').val(orgs);
+		$('#selectOrgCodeId').val(orgsCode);
+		  
+		  window.top.closeWin('commonSelOrg');  
+    	
+    }
+    
+    function clearOrg()
+    {
+    	$('#selectOrgId').val("");
+		$('#selectOrgCodeId').val("");
+    }
+  
+    
+    function hideSelectOrgAndUser()
+    {
+    	$('#userTr').hide();
+    	$('#orgTr').hide();
+    	
+    }
+    
+    function showSelectOrgAndUser()
+    {
+    	$('#userTr').show();
+    	$('#orgTr').show();
+    	
+    }
+    
+    /**
+     *  选择组织
+     */
+    function selectOrgs()
+    {
+    	//var btn=$('#selectOrgId');
+    	top.createWindow({
+    		text    :'选择组织',
+    		url     : '${base}/form/fceform/common/run.html?djsn=selOrgPage&djtype=eden_form',
+    		id      :'commonSelOrg',
+    		width   :'330',
+    		height  :'400',
+    		parent_ifr:window,
+    		callBack:function (orgId,orgName) {
+    			
+    			 
+    		
+    	     }
+    	});
+
+    }
+    
+    
+    function selectUsers(){
+    	
+		window.top.createWindow({
+			text    :'选择用户',
+			url     :'${base}/admin/announcement/selectUsersPage.action?etc='+new Date().getTime(),
+			id      :'commonChoiceUserWin',
+			width   :'900',
+			height  :'520',
+			parent_ifr:window
+        });
+    }
+
+    
+    function commonChoiceUserCallback(userIdArr,userNameArr){
+
+    	if(!userIdArr)
+		{
+			$.dialog.tips("未选择用户！");
+			return;
+		}
+		var persons=$('#selectPersonId').val();
+		var personCode=$('#selectPersonCodeId').val();
+		
+		var userIdSpl=userIdArr.split(",");
+		var userNameSpl=userNameArr.split(",");
+		for(var i=0;i<userIdSpl.length;i++)
+		{
+			var addPerson=userIdSpl[i];
+			if(addPerson)
+			{
+				var newCode=checkAndAddMan(personCode,addPerson);
+				if(newCode!=personCode)
+				{
+					personCode=newCode;
+					persons=addCnItem(persons,userNameSpl[i]);
+				}
+				
+			}
+		
+		}
+		
+		$('#selectPersonId').val(persons);
+		$('#selectPersonCodeId').val(personCode);
+		  
+		  window.top.closeWin('commonChoiceUserWin');  
+  		
+  	}
+
+
+    function clearUser()
+    {
+    	$('#selectPersonId').val("");
+		$('#selectPersonCodeId').val("");
+    }
+  
+
+  //添加名称，如果存在了不添加，以逗号分隔
+  function checkAndAddMan(orgNames,addname)
+  {
+  	
+  	
+  	var name=addname;
+  	var returnName="";
+  	
+
+  		 var signs=orgNames;
+  		 if(signs)
+  	     {
+  			 var hasName=0;  //是否已经包含了
+  			 var valspl=signs.split(",");  //排重
+  			 for(var i=0;i<valspl.length;i++)
+  			{
+  				
+  				 if(name==valspl[i])
+  			     {
+  					 hasName=1; //有了该阅者 
+  					 
+  			     }
+  				 
+  			}
+  			 if(hasName==0) //加入阅者
+  		     {
+  				 signs+=","+name;
+  		     }
+  			 returnName=signs;
+  			 
+  	     }else{  //前面没有阅者
+  	    	 
+  	    	 
+  	    	 returnName=name;
+  	     }
+  	
+  	return returnName;
+  }
+  
+  function addCnItem(alls,addItem)
+  {
+	  if(alls)
+	  {
+		  return alls+","+addItem;
+	  }else{
+		  
+		  return addItem;
+	  }
+	  
+  }
+  
+  // flag: 1：发布   2：保存
+  function sub(btn,flag)
+  {
+	  var url="${base}/admin/announcement/addAnnouncement.action";
+	  if(flag==1)
+	   {
+		  url="${base}/admin/announcement/publishAnnouncement.action";
+		  
+	   }
+	//  $('#content').html(editor.html());
+	  
+	  editor.sync();
+	  
+	  if(valid_input('title', 'NotEmpty', "标题不能为空") && valid_input('content', 'NotEmpty', "内容不能为空")){
+      	
+  	    $('#eUploadId').val(attachList1.getValue());  //上传附件
+	        var button = btn;
+	        button.attr("disabled", "disabled").val("正在提交...");
+	        var par_ifr = window.ParentIframe;
+	        
+	        
+	        $.post(url, $("form:first").serialize(), function (result) {
+		        button.attr("disabled", false).val("确定");
+		        if(result.msg=='success'){
+		        	 $.dialog.tips(result.tips);
+			        afterSave();
+		        }else{
+			        $.dialog.tips(result.tips);
+		        }
+
+	        });
+
+  	}
+  
+	  
+	  
+  }
+  
+  //停止发布 重新发布
+  function changeAnnou()
+  {
+	  var id=$("#anId").val();
+	  if(!id)
+	  {
+		  return ;
+	  }
+	  var url="${base}/admin/announcement/stopPublish.action";
+	  if(changeStatusflag==1)
+	  {
+		  url="${base}/admin/announcement/republishAnnouncement.action";
+	  }
+	  
+	    $.post(url, "id="+id, function (result) {
+	       
+	    	 
+	        if(result.result=='success'){
+	        	 $.dialog.tips(result.message);
+	        	  afterSave();
+	        }else{
+		        $.dialog.tips(result.message);
+	        }
+
+        });
+	  
+	  
+  }
+    
+     $(function(){
+    	  
+    	  if(  $("#isDesignateId").is(':checked')) {
+          	showSelectOrgAndUser()
+          
+          }else{
+        		hideSelectOrgAndUser();
+          }
+    	  
+    	  if(announcementStatus&&announcementStatus>=1) //不能修改
+    	  {
+    		//  $("#isDesignateId").attr("disabled","disabled");
+    		  $(".selectDivA").each(function(){
+    			  $(this).hide();
+    		 });
+    		  
+    		  if(announcementStatus==1) //已发布
+    		  {
+    			  changeStatusflag=2; 
+    		  }else if(announcementStatus==2) //已停止
+    		  {
+    			  changeStatusflag=1; 
+    			  $("#other_btn").val("重新发布");
+    		  }
+    		  $("#other_btn").show();
+    		  
+    	  }else{
+    		  $("#publish_btn").show();
+    		  
+    		  $("#save_btn").val("暂存");
+    	  }
+    	  
+    	  
+    	    $("#isDesignateId").click(function(){
+    	    	 if(announcementStatus&&announcementStatus>=1) //不能修改
+    	    	  {
+    	    		 $.dialog.tips('已发布，不能修改发布方式！');
+    	    		  return false;
+    	    	  }
+                    if( $(this).is(':checked')) {
+                    	showSelectOrgAndUser()
+                    
+                    }else{
+                   		hideSelectOrgAndUser()
+                   		
+                   	}
+    	        
+            });
+    	 
+    	 
+    	    editor = KindEditor.create('#content',{
+                uploadJson : '${base}/servlet/uploadServlet?etc=' + new Date().getTime(),
+                urlType : 'relative',
+            	allowPreviewEmoticons : false,
+            	filterMode : false,
+            	items : [
+ 						'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+ 						'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+ 						'insertunorderedlist', '|', 'emoticons', 'image', 'link']
+       		 });   
+    	    
+    	attachList1=new EDEN_upload('attachList',{servlet:'${base}/servlet/uploadServlet',inputHeight:50, inputWidth:517});
+    	if(announcementId)
+    		attachList1.setAttachList({'tableName':'oa_announcement','tableKey':'id','tableKeyId':announcementId});
+
+	     var getInfoObj = function () {
+		     return     $(this).parents("td").next().find(".info");
+	     };
+
+/* 
+	     $("[datatype]").focusin(function(){
+            if(this.timeout){clearTimeout(this.timeout);}
+            var infoObj=getInfoObj.call(this);
+            if(infoObj.siblings(".Validform_right").length!=0){
+                return;
+            }
+            infoObj.show().siblings().hide();
+
+        }).focusout(function(){
+                    var infoObj=getInfoObj.call(this);
+                    this.timeout=setTimeout(function(){
+                        infoObj.hide().siblings(".Validform_wrong,.Validform_loading").show();
+                    },0);
+
+                }); */
+
+        $(".register_form table tr").each(function(){
+           $(this).find('td:eq(0)').addClass('text_align_right');
+        });
+		
+        $("#code").blur(function(){
+	   		 blurUnique("ea_org_tree", "code", this.value, function(result){
+	   			 if(result.isExists){
+	   				 $("#code").select();
+	   				 $.dialog.tips('编码已存在！');
+	   			 }
+	   		 });
+	   	 });
+        
+        
+        $("#save_btn").click(function(){
+	       var btn=$(this);
+	       sub(btn,2);
+        	
+        });
+        
+        $("#publish_btn").click(function(){
+ 	       var btn=$(this);
+ 	       sub(btn,1);
+         	
+         });
+        
+        $("#other_btn").click(function(){
+        	changeAnnou();
+          	
+          });
+    
+        
+    })
+        
+	 $(window).resize(function(){
+		 setTimeout(page_layout, 0);
+	});
+</script>
+</html>

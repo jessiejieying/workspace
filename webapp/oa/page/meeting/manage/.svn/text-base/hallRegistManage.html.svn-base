@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+</head>
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+				<div class="js-tool-bar">
+					<div class="level-searh form-group header-group">
+					  	<span class="header-title margin-left-out">报名情况:</span>
+						<select id="statusWin" class="input margin-left-in statistics-select" style="width: 80px;">
+							<option value="">全部</option>
+							<option value="0">未报名</option>
+							<option value="1">已报名</option>
+							<option value="2">已请假</option>
+						</select>
+					
+						<div class="button button-main margin-left-out" id="grid_search">搜索</div>
+					</div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+	                  <th w_index="true" width="40">序号</th>
+	                  <th w_index="type" width="160">会议类型</th>
+	                  <th w_index="title" width="400">会议名称</th>
+	                  <th w_index="status" width="120">报名情况</th>
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+			
+
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/hallRegist/queryHallRegist.action";
+	var version='1';
+	$(function(){
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+	        	$("#manage_grid tbody tr").each(function(){
+	        		$("td",this).eq(1).css("padding-left","8px");
+	        		$("td",this).eq(1).css({"text-align":"center","padding-left":"0px"});
+              		$("td",this).eq(2).css({"text-align":"center","padding-left":"0px"});
+	        		$("td",this).eq(5).css({"text-align":"center","padding-left":"0px"});
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+		      }
+		  });
+		
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	    	gridOne.changeUrl(selectURL + "?etc=" + new Date().getTime()
+		        	+ "&statusWin=" + $('#statusWin').val());
+	    });
+	    
+	});
+	
+    //执行任务
+    function execute(url){
+    	var task_name = "";
+		var project = '${base}';
+		project += url;
+		window.open(project,"_target"); 
+    }
+    
+    function titleOnclik(wfId){
+		var win = {
+				text:"会议报名详情", 
+				url:"${base}/admin/hallRegist/queryHallRegistDetail.action?wfId=" + wfId, 
+				width:'900', 
+				height:'550', 
+				id:"detail", 
+				parentIfr:window
+		};
+		window.top.createWindow(win);
+	}
+
+</script>
+
+</html>

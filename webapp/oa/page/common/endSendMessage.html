@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>短消息</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+    <style>
+        .message-textarea-box .sendObj .send-content{
+            height: 100px;
+        }
+        .message-textarea-box .message-textarea textarea{
+            height: 120px;
+        }
+    </style>
+
+</head>
+<body  class="ms-controller" ms-controller="wrap">
+<div class="message-textarea-box">
+    <div class="sendObj">
+        <h4>接收人：</h4>
+        <div class="send-content">
+            <div id="massage_send_content">
+                <label ms-for="el in @dataList">{{el.userName}}({{el.cellphoneNumber}})</label>
+            </div>
+        </div>
+    </div>
+    <div class="message-textarea">
+      <textarea id="message_textarea"></textarea>
+    </div>
+</div>
+<div class="text-center">
+    <div class="button button-main"  ms-click="@send()">发送</div>
+</div>
+<script src = "${base}/edenui/common/js/jquery.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src = "${base}/edenui/common/js/avalon/avalon2.js"></script>
+<script>
+    //参数配置表
+    avalon.config({debug: false});
+    var model = avalon.define({
+        $id: "wrap",
+        dataList:[],
+        message:"",
+        send:function () {
+        	   var cellPhone=model.dataList.map(function (value) {
+                   return value.cellphoneNumber;
+               });
+               var url="${base}/admin/sendDocument/sendMail.action",
+                   obj={
+                       "tels":cellPhone.join(","),
+                       "content":$("#message_textarea").val()
+                   }
+               $.post(url,obj,function (data) {
+                   layer.msg(data.message);
+
+                   window.top.refreshIndex();
+                   setTimeout(function () {
+                       window.top.close();
+                   },500);
+               })
+        }
+    });
+    var page=(function () {
+        var obj={
+            init:function () {
+                this.getInfor();
+            },
+            getInfor:function () {
+                var url="${base}/admin/sendDocument/showFinishMail.action?etc="+new Date().getTime()+"&wfId="+window.top.globalParams.wfid;
+
+                $.getJSON(url,function (data) {
+                    $("#message_textarea").val(data.mailContent).focus();
+                    var person=[];
+                    data.users.forEach(function (value) {
+                        person.push({
+                            "userName":value.userName,
+                            "cellphoneNumber":value.cellphoneNumber
+                        })
+
+                    });
+
+                    model.dataList=person;
+
+                });
+            }
+        }
+        return obj;
+    })();
+    $(function () {
+        page.init();
+    });
+</script>
+</body>
+</html>

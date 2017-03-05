@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>eden</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+
+    <script src = "${base}/edenui/common/js/jquery.js"></script>
+    <script src ="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+    <script src = "${base}/edenui/common/js/avalon/avalon2.js"></script>
+
+    <SCRIPT ID=clientEventHandlersJS LANGUAGE=javascript>
+
+        //获取浏览器的临时目录
+        var fso = new ActiveXObject("Scripting.FileSystemObject");
+        var destSrc = fso.GetSpecialFolder(2);
+        var fatherPage=$(window.parent.document);
+        //信息配置表
+        var inforParam;
+
+        //收文
+        if(window.top.globalParams.djsn==="oa_pg_incoming_form"){
+            inforParam={
+                fileTitle:fatherPage.find("#FILE_TITLE").val(),
+                fileNum:fatherPage.find("#SERIAL_NUMBER").val(),
+                secret:fatherPage.find("#FILE_DEGREE").val(),
+                hurry:fatherPage.find("#URGENT_DEGREE").val(),
+                filecreatedate:fatherPage.find("#INCOMING_DATE").val(),
+                unit:fatherPage.find("#FILE_UNIT").val(),
+                fileName:fatherPage.find("#sel_dropdownlist29").find("option:selected").text()
+
+            }
+        }
+
+        //发文
+        else if(window.top.globalParams.djsn==="oa_send_document"){
+            inforParam={
+                fileTitle:fatherPage.find("#TITLE").val(),
+                fileNum:fatherPage.find("#DOCUMENT_NO").val(),
+                secret:fatherPage.find("#SECRET_LEVEL").val(),
+                hurry:fatherPage.find("#DEAL_LEVEL").val(),
+                filecreatedate:fatherPage.find("#SYTY_DATE").val(),
+                unit:fatherPage.find("#DRAFT_DEPT").val(),
+                fileName:fatherPage.find("#sel_dropdownlist29").find("option:selected").text()
+
+            }
+        }
+        var wfId=window.top.globalParams.wfid;
+        function button1_onclick() {
+
+            Pdf4171Create1.Ver="GB0626-2016";
+            //条码编号
+            Pdf4171Create1.Barcode="";
+            Pdf4171Create1.BSenddept="22";
+            // 公文种类或刊物名称
+            Pdf4171Create1.Filename=inforParam.fileName;
+            Pdf4171Create1.Filenum=inforParam.fileNum;
+            Pdf4171Create1.MainSenddept=inforParam.unit;
+            //文件标题
+            Pdf4171Create1.FileTitle=inforParam.fileTitle;
+            //密集程度
+            Pdf4171Create1.Secret=inforParam.secret;
+            //紧急程度
+            Pdf4171Create1.Hurry=inforParam.hurry;
+            //   Pdf4171Create1.Senddegree="333";
+            //  Pdf4171Create1.BarCreateDept="333";
+            //   Pdf4171Create1.BarCreatedate="333";
+            //成文日期
+            Pdf4171Create1.Filecreatedate=inforParam.filecreatedate;
+            Pdf4171Create1.Other="";
+
+            try{
+                //生产tif图片
+                Pdf4171Create1.CreateBarcodeToBmp(destSrc+"\\"+wfId+".tif");
+
+            }catch(e){
+              //  closePage();
+            }
+
+            upLoadFile();
+//            Pdf4171Create1.PrintBarcode2("Lpt1", 15, 30, "×óÉÏ",15 ,0 , "×óÏÂ", 15,155 , "ÓÒÉÏ", 385, 0, "ÓÒÏÂ",385,155);
+        }
+
+        function window_onload() {
+            try{
+                button1_onclick();
+            }catch(e){
+               // closePage();
+            }
+
+        }
+        function Pdf417Read1_OnCommData(data) {
+
+        }
+
+        function upLoadFile(){
+            var serverUrl = "http://" +window.location.host + "${base}/servlet/sealUploadServlet";
+
+            var destpath=destSrc+"\\"+wfId+".tif";
+            var delJson=encodeURI("{method:'encryptPdf',tableKeyId:'222',name:'111',size:'222',userid:'${userid}'}");
+
+            var Res = TGPDFPlugIn.UploadFileToServer(serverUrl, destpath, encodeURI("aaaa"), delJson);
+
+            //  $("#qr_code").text("二维码生成成功！");
+            //    var billPageId=$(window.top.frames["billPageId"].document);
+               var imgHtml="<img src='"+destSrc+"\\"+wfId+".tif' alt=''/>";
+            $("#imgLoad").html(imgHtml);
+            //    billPageId.find("#createQRCode").html(imgHtml);
+            //  setTimeout(function(){
+          //  closePage();
+            // },300);
+        }
+
+        function closePage(){
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index); //再执行关闭
+        }
+
+    </SCRIPT>
+    <script>
+        //参数配置表
+        avalon.config({
+            debug: false
+        });
+        var model = avalon.define({
+            $id: "wrap",
+            dataList:[
+                {
+                'id':'11',
+                'name':'收件人'
+                },
+                    {'id':'11',
+                        'name':'标题'
+                },
+                {
+                    'id':'11',
+                    'name':'内容'
+                }
+            ],
+            send:function(){
+                var father = window.parent;
+                var url='${base}/admin/wfManage/directSend.action';
+                var obj={
+                    'step_id':'1647',
+                    'wf_id':window.top.globalParams.wfid,
+                    'flowXml': father.doSubmitDataOa(),
+                    'action_id': window.top.globalParams.actionId,
+                    'dynamic_instance_id':window.top.globalParams.dynamicInstanceId
+                }
+                $.post(url,obj,function(){
+                    closePage();
+                })
+            }
+        });
+        $(function() {
+
+        });
+
+    </script>
+</head>
+<body  class="ms-controller" onload="return window_onload()"  ms-controller="wrap">
+
+<div class="line oa-form-line " style="width: 500px;padding: 10px;">
+<div class="form-group margin-large-top clearfix" >
+    <div class="field" >
+        <label class="field-left text-right" >收件人</label>
+        <div class="field-right" style="position: relative;width:400px;">
+            <input type="text" class="input"  value="" >
+        </div>
+
+    </div>
+</div>
+    <div class="form-group margin-large-top clearfix" >
+        <div class="field" >
+            <label class="field-left text-right" >标题</label>
+            <div class="field-right" style="position: relative;width:400px;">
+                <input type="text" class="input"  value="" >
+            </div>
+
+        </div>
+    </div>
+    <div class="form-group margin-large-top clearfix" >
+        <div class="field" >
+            <label class="field-left text-right field-left-textarea" >内容</label>
+            <div class="field-right" style="position: relative;width:400px;">
+                <textarea class="input">
+
+                </textarea>
+            </div>
+
+        </div>
+    </div>
+    <div id="imgLoad" class="margin-top"></div>
+</div>
+
+<div class="text-center margin-top">
+    <button class="button button-main" ms-click="@send()">发送</button>
+</div>
+
+<div style="display: none;" >
+<P>
+    <OBJECT id=Pdf4171Create1 width="0" height="0" style="WIDTH: 130px; HEIGHT: 32px;"
+            classid=clsid:FDE0D05A-7FDD-4D65-B964-8798E9E88781><PARAM NAME="BSenddept" VALUE=""><PARAM NAME="Barcode" VALUE=""><PARAM NAME="Ver" VALUE="GB0626-2005"><PARAM NAME="Filename" VALUE=""><PARAM NAME="Filenum" VALUE=""><PARAM NAME="FileTitle" VALUE=""><PARAM NAME="MainSenddept" VALUE=""><PARAM NAME="Secret" VALUE=""><PARAM NAME="Hurry" VALUE=""><PARAM NAME="Senddegree" VALUE=""><PARAM NAME="FileCreatedate" VALUE=""><PARAM NAME="BarCreatedate" VALUE=""><PARAM NAME="BarCreatedept" VALUE=""><PARAM NAME="Other" VALUE=""><PARAM NAME="BFilecode" VALUE=""><PARAM NAME="BSenddept" VALUE=""><PARAM NAME="BFilename" VALUE=""><PARAM NAME="BMainsenddept" VALUE=""><PARAM NAME="BTitle" VALUE=""><PARAM NAME="BSecret" VALUE=""><PARAM NAME="BCreatefiledate" VALUE=""><PARAM NAME="BBarcreatedept" VALUE=""></OBJECT>
+</P>
+<P>
+    <OBJECT id=Pdf417Read1 width="0" height="0" style="LEFT: 202px; WIDTH: 90px; TOP: 15px; HEIGHT: 45px"
+            classid=clsid:7E944F89-34F2-4240-83B6-38D0B8E16926 VIEWASTEXT><PARAM NAME="_ExtentX" VALUE="2381"><PARAM NAME="_ExtentY" VALUE="1191"></OBJECT>
+</P>
+
+
+<object id="TGPDFPlugIn" classid="clsid:04DDDFAA-0AC0-4D47-9315-9F442F65D403" width="1200" height="900">
+    <embed name="TGPDFPlugIn" type="application/nptseal-TGPDFPlugIn" width="1200" height="900"></embed>
+</object>
+</div>
+</body>
+</html>

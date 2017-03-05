@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<link href="${base}/form/resources/chosen_v1.2.0/chosen.css" type="text/css" rel="stylesheet" />
+<head>
+	<#include "/aufw/page/include/head.html">
+</head>
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="form-group statistics-condition header-group">
+                        <span class="header-title">会议时间:</span>
+                        <input name="startDate" id="startDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height: 26px;width: 90px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd ', maxDate:'#F{$dp.$D(\'endDate\')||\'2025-10-01 00:00:00\'}'})" size="19" type="text">
+                        <span class="header-title margin-left-in">至</span>
+                        <input id="endDate" style="cursor: pointer;height: 26px;width: 90px;" size="19" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startDate\')}',maxDate:'2025-10-01 00:00:00'})" name="endDate" type="text">
+
+                        <div id="titleGroup" style="margin-top: 0px">
+	                        <span class="header-title margin-left-out">会议名称:</span>
+	                        <input id="subject" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+	                        <#if queryType?? && queryType='date'>
+	                            <span class="header-title margin-left-out">会议类型:</span>
+	                            <select id="meetingType"	class="input display-ib margin-small-left"	style="width: 100px;" name="age">
+	                                <option value="" title="全部类型">全部类型</option>
+	                                <#list meetingTypeDictList! as entry>
+	         	 						<option value="${entry.dictValue!}" title="${entry.displayName!}" title="${entry.displayName!}">${entry.displayName!}</option>
+	                                </#list>
+	                            </select>
+
+									</#if>
+									
+									<#if queryType?? && queryType='meetingLevel'>
+									<span class="header-title margin-left-out">会议级别:</span>
+	                                    <select id="meetingLevel"	class="input display-ib margin-small-left"	style="width: 100px;" name="age">
+											<option value="" title="全部级别">全部级别</option>
+											<#list meetingLevelDictList! as entry>
+	         	 							<option value="${entry.dictValue!}" title="${entry.displayName!}">${entry.displayName!}</option>
+	      									</#list>
+										</select>
+
+									</#if>
+									
+									<#if queryType?? && queryType='mainOrg'>
+										 <span class="span-bold header-title margin-left-out">申报单位：</span>
+						                    <select class="tool-bar-input chzn-select" id="mainOrg" style="width:150px;height: 26px;" data-placeholder="找不到">
+						                        <option value="" style="color:#c2c2c2;">---请选择---</option>
+						                    </select>
+									
+<!-- 									<span class="header-title margin-left-out">申报单位:</span> -->
+<!-- 	                                    <input id="mainOrg" type="text" class="tool-bar-input" placeholder="" /> -->
+
+									</#if>
+									
+									<#if queryType?? && queryType='meetingType'>
+									<span class="header-title margin-left-out">会议类型:</span>
+	                                    <select id="meetingType"	class="input display-ib margin-small-left"	style="width: 100px;" name="age">
+											<option value="" title="全部类型">全部类型</option>
+											<#list meetingTypeDictList! as entry>
+	         	 							<option value="${entry.dictValue!}" title="${entry.displayName!}">${entry.displayName!}</option>
+	      									</#list>
+										</select>
+
+									</#if>
+									
+							<div class="button button-main margin-left-out" id="senior_grid_search">搜索</div>
+						</div>
+					</div>							
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+					  <th width="40">序号</th>
+	                  <th w_index="meetingType" width="200"  w_type="method" w_method="show">会议类型</th>
+	                  <th w_index="subject"  w_type="method" w_method="show">会议名称</th>
+	                  <th w_index="mainOrg" width="150" w_type="method" w_method="show" w_align="center">申报单位（处室）</th>
+	                  <th class="hidden" w_hidden="true"></th>
+	                  <!-- th w_index="operate" width="140">操作</th-->
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+<script src="${base}/oa/resource/js/oa_common.js"></script>
+<script src="${base}/form/resources/chosen_v1.2.0/chosen.jquery.js"></script>
+<script>
+
+	var gridOne;
+	var arr = []; 
+	var selectURL = "${base}/admin/meeting/queryMeetingInfo.action?wfType=${wfType!}&queryType=${queryType!}";
+	var showURL = "${base}/form/fceform/common/run.html?djtype=eden&is_oa_bill=true&wfs=view&actionId=show&djsn=oa_meeting_info&wfId=";
+	
+	var version='1';
+    var wf_name='oa_provincial_meeting';//全省性会议
+    var wf_name2='oa_meeting_program_approval';//省政府会议
+    var wfType="${wfType!}";
+
+	$(function(){
+		initLink();
+	    selectURL=selectURL+"&link="+JSON.stringify(link);
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "&etc="+new Date().getTime(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	  gridOne.initGrid();
+		        	$("#manage_grid tbody tr").each(function(){
+		        		changeTable(this);
+		        		var $this=$(this);
+		        		$("td",this).eq(1).css("padding-left","8px");
+		        			$index=parseInt($this.attr("index"));
+		        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+		        	});
+		      }
+		  });
+		
+		
+		///初始化选择框
+        initData();
+		//初始化选择框
+		 $("#mainOrg").html("<option value='' style='color:#c2c2c2;'>---请选择---</option>");  
+           for(var i=0; i<arr.length; i++ ) {  
+               $("#mainOrg").append("<option value="+arr[i]+">"+arr[i]+"</option>");      
+           } 
+		 $('#mainOrg').chosen({
+			 "no_results_text":"找不到"
+		 });
+		
+	});
+	
+    //查看任务
+    function show(id){
+    	var task_name = "";
+		var item = getRecord(id);
+
+		window.open(showURL + item.wfId+"&wfName="+item.wfName);
+    }
+	
+    //执行任务
+    function execute(id){
+    	var task_name = "";
+		var item = getRecord(id);
+		uf_doAction(item.wfId,item.wfName,task_name,version,null);
+    }
+
+  //全省性会议登记
+  function provincialMeeting_add(){
+  	initWorkflow(wf_name,"",version);
+  }
+
+  //省政府会议登记
+  function meetingProgram_add(){
+  	initWorkflow(wf_name2,"",version);
+  }
+
+  //工具条搜索 异步交互
+  $(document).on("click","#grid_search",function(){
+      var clu = $("#search").val();
+      var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+      var symbol = "?";
+      if(selectURL.indexOf("?")>0){
+      	symbol = "&";
+      }
+      gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+  });
+
+  //工具条高级搜索 展开
+  $(document).on("click",".js-level-search",function(){
+      girdTable(this);
+  });
+
+  //工具条高级搜索 异步交互
+  $(document).on("click","#senior_grid_search",function(){
+      var subject= $("#subject").val();
+      var startDate= $("#startDate").val();
+      var endDate= $("#endDate").val();
+      var meetingType= $("#meetingType").val();
+      if(meetingType==null || meetingType=="" || meetingType=="undefined")
+    	  meetingType = "";
+      var meetingLevel= $("#meetingLevel").val();
+      if(meetingLevel==null || meetingLevel=="" || meetingLevel=="undefined")
+    	  meetingLevel = "";
+      var mainOrg= $("#mainOrg").val();
+      if(mainOrg==null || mainOrg=="" || mainOrg=="undefined")
+    	  mainOrg = "";
+      var symbol = "?";
+      if(selectURL.indexOf("?")>0){
+      	symbol = "&";
+      }
+      
+      gridOne.changeUrl(selectURL + symbol + 'subject=' + window.encodeURI(subject) + '&startDate=' + startDate + '&endDate=' + endDate + '&meetingType=' + window.encodeURI(meetingType) + '&meetingLevel=' + window.encodeURI(meetingLevel) + '&mainOrg=' + window.encodeURI(mainOrg) + '&etc='+new Date().getTime());
+  });
+  
+	//初始化数据
+	function initData(){
+		var url="${base}/admin/department/selectDepartment.action";
+		param="module=oa_meeting_info&type=meeting_pro_unit";
+		$.ajax({
+			type:"POST",
+			url:url,
+			data:param,
+			async: false,
+			success:function(data){
+				for(var i=0;i<data.data.length;i++){
+					arr.push(data.data[i].name);
+				}
+			}
+		});
+		
+		
+		
+	}
+
+  //屏幕分辨率小于1024，右侧排版 
+  if($(window).width() <= 1024){
+    $("#titleGroup").css({"width":"100%","margin-left":"-10px"});
+  }
+</script>
+
+</html>

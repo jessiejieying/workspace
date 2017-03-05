@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html style = "overflow:hidden; height:100%;">
+<head>
+	<meta charset = "utf-8">
+	<title>Explorer</title>
+	<#include "/aufw/page/include/style.html">
+	<style>
+		#option { width: 350px; height: 230px; overflow: auto; }
+
+		.form_style .text_input { width: 200px; margin: 5px 0 5px 10px; background-color: #fff; line-height: 14px; height: 14px; padding: 5px; border: 1px solid #CCCCCC; }
+
+		.form_style .textarea { width: 200px; height: 60px; margin: 5px 0 5px 10px; line-height: 20px; padding: 5px; border: 1px solid #CCCCCC; }
+
+		#option_area .submit_btn_1 { margin-left: 30px; width: 50px; }
+
+		.btn .submit_btn_1 { margin: 0 10px; }
+	</style>
+
+</head>
+<body style = "height:100%;">
+<div id = "tree_wrap" style = "width:100%; height:100%; overflow: hidden; display:none;">
+	<div id = "tree_search" class = "tree-search"></div>
+	<div id = "tree" style = "width:100%; padding-top: 3px;"></div>
+</div>
+<div id = "toolbar_wrap" style = "width:100%; height:100%; overflow: hidden; display:none;">
+
+	<div id="toolbar" class="ed-toolbar" style="z-index:8;"> 
+
+  		<@f.operateRight operate="/admin/helpDocument/helpDocumentAction!insert.action">
+				<a type = "add" class = "btn btn-info toolbar-btn">新建帮助文档</a>
+			</@f.operateRight>
+			<@f.operateRight operate="/admin/helpDocument/helpDocumentAction!update.action">
+				<a type = "edit" class = "btn btn-info toolbar-btn">修改帮助文档</a>
+			</@f.operateRight>
+			<@f.operateRight operate="/admin/helpDocument/helpDocumentAction!deleteByKey.action">
+				<a type = "delete" class = "btn btn-warning toolbar-btn">删除帮助文档</a>
+			</@f.operateRight>
+	</div>
+
+</div>
+<div id = "option" style = "display: none;">
+	<table class = "form_style">
+		<tbody id = "option_area">
+		<tr>
+			<td width = "90" align = "right">主键<span style="color:red"> </span></td>
+			<td>
+				<input id = "commonTreeId" name = "commonTree.id" class = "text_input" type = "text">
+			</td>
+		</tr>
+		<tr>
+			<td width = "90" align = "right">名称<span style="color:red"> *</span></td>
+			<td>
+				<input id = "commonTreeName" name = "commonTree.name" class = "text_input" type = "text">
+			</td>
+		</tr>
+		<tr>
+			<td width = "90" align = "right">值</td>
+			<td>
+				<textarea id = "commonTreeRemark" name = "commonTree.remark" class = "textarea"></textarea>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	<table class = "form_style">
+		<tr>
+			<td colspan = "2" style = "text-align: center;width:360px; padding-top:10px;">
+				<input type = "button" id = "saveOption" class = "btn btn-info" value = "确定">
+				<input type = "button" id = "cancelOption" class = "btn btn-info" value = "取消">
+			</td>
+		</tr>
+	</table>
+	<div style = "width:100%;height:10px;"></div>
+</div>
+
+<#include "/aufw/page/include/script.html">
+
+<script src = "${base}/aufw/resources/common/dhtmlx/types/ftypes.js"></script>
+<script src = "${base}/aufw/resources/common/dhtmlx${base}.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+<script>
+	var layout, treeObj, menu, tree, treeSearch, folder, canEdit, dhxWins, w1, folderInfo,sendUrl;
+	folderInfo = {type:'', parentId:'', nodeId:''};
+	canEdit = false;
+	var key="${key}";
+	var helpDocumentId=null;
+	var helpDocumentTreeId=null;
+	var folderItem=new Array();
+	window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+	function init() {
+		menu = new dhtmlXMenuObject("contextArea");
+		menu.setIconsPath("${base}/aufw/resources/common/dhtmlx/imgs/menu/");
+		menu.renderAsContextMenu();
+		menu.loadXMLString(createMenu());
+		menu.attachEvent("onClick", function (id, zoneId, casState) {
+			if (id == 'new') {
+				folderInfo = {type:'new', parentId:zoneId, nodeId:''};
+				clearTreeForm();
+				showWindow('新建文件夹');
+			} else if (id == 'edit') {
+				commonTreeEdit(zoneId);			
+			} else {     //删除		
+				delCommonTree(zoneId);
+			}
+		});
+
+		layout = new dhtmlXLayoutObject(document.body, "3L");
+		layout.cells('a').hideHeader();
+		layout.cells('b').hideHeader();
+		layout.cells('c').hideHeader();
+		layout.cells('a').setWidth(200);
+		layout.cells('b').setHeight(40);
+		layout.attachEvent('onResizeFinish', page_layout);
+		layout.attachEvent('onPanelResizeFinish', page_layout);
+
+		treeObj = layout.cells("a").attachObject('tree_wrap');
+		tree = new dhtmlXTreeObject("tree", "100%", "100%", 'root');
+		tree.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/csh_dhx_terrace/");
+		tree.enableSmartXMLParsing(true);
+		tree.setSkin('dhx_skyblue');
+		tree.enableTreeLines(true);;
+		tree.setDataMode('json');
+		tree.loadJSON("${base}/admin/commonTree/commonTreeAction!getTree.action?key="+key+"&etc=" + new Date().getTime());
+		tree.attachEvent("onXLE", function (tree, id) {
+			var rootsAr = tree.getSubItems(id);//.split(",");
+			tree.openItem(rootsAr);
+			tree.selectItem(rootsAr, true);
+		});
+		tree.attachEvent("onSelect", function (id) {
+			tree.selectItem(id);
+			helpDocumentTreeId=id;
+			reloadFolder();
+		});
+		tree.attachEvent("onRightClick", function (id, e) {
+			tree.selectItem(id);
+			menu._doOnContextBeforeCall(e, {
+				id:id
+			});
+
+		});
+
+		treeSearch = new treeSearchBar('tree_search', tree);
+		layout.cells('b').attachObject('toolbar_wrap');
+		folder = layout.cells('c').attachDataView({type:"ficon", tooltip:{template:"#name#"}});
+		changeType("ficon");
+		
+		folder.attachEvent('onAfterSelect', function (id) {
+			folderItem[0] = folder.get(id);
+		})
+		
+		folder.attachEvent('onItemDblclick', function (id) {
+			folderItem[0] = folder.get(id);			
+			edit();			
+		})
+		//folder.load("files_ext.json","json");
+
+		dhxWins = new dhtmlXWindows();
+		dhxWins.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		w1 = dhxWins.createWindow("w1", 20, 30, 320, 240);
+		w1.setText("新建文件夹");
+		$('#option').show();
+		w1.attachObject('option', true);
+		w1.center();
+		w1.hide();
+		dhxWins.attachEvent('onClose', function (win) {
+			w1.hide();
+		});
+		$('#saveOption').click(function () {
+			if(!valid_input('commonTreeName', 'NotEmpty', "文件夹名称不能为空")){
+				return;
+			}
+			var val={};
+			var tid=$("#commonTreeId").val();
+			if(tid)
+			{
+				val["commonTree.id"]=tid;
+			}
+			val["commonTree.name"]=$("#commonTreeName").val();
+			
+			val["commonTree.remark"]=$("#commonTreeRemark").val();
+			if(folderInfo.type == "edit"){
+	   			sendUrl = "${base}/admin/commonTree/commonTreeAction!update.action?etc=" + new Date().getTime();
+	   			val["commonTree.id"]=folderInfo.nodeId;	
+	   			val["commonTree.parentId"]=folderInfo.parentId;	
+	  		}else{
+	  			sendUrl = "${base}/admin/commonTree/commonTreeAction!insert.action?etc=" + new Date().getTime();
+	  			val["commonTree.parentId"]=folderInfo.parentId;		
+	  		}
+		  
+			jQuery.post(sendUrl, val, function(data){
+	            if(data["result"]=="success"){  
+	            	 tree.smartRefreshBranch(folderInfo.parentId); 	 
+	            	 setTimeout(hideWindow, 2);
+	            }            		
+	       	  	$.dialog.tips(data["message"]);
+			});
+		});
+		$('#cancelOption').click(function () {
+			w1.hide();
+		});
+
+		page_layout();
+	}
+	
+	function createMenu(){
+		var menu='<menu>';
+		<@f.operateRight operate="/admin/commonTree/commonTreeAction!insert.action">
+			menu+='<item id="new" text="新建" img="dark_add.png" imgdis="dark_add.png"/>';
+		</@f.operateRight>
+		<@f.operateRight operate="/admin/commonTree/commonTreeAction!update.action">
+			menu+='<item id="file_sep_1" type="separator"/><item id="edit" text="修改" img="dark_edit.png" imgdis="dark_edit.png"/>';
+		</@f.operateRight>
+		<@f.operateRight operate="/admin/commonTree/commonTreeAction!deleteByKey.action">
+			menu+='<item id="file_sep_2" type="separator"/><item id="delete" text="删除" img="dark_delete.png" imgdis="dark_delete.png"/>';
+		</@f.operateRight>
+		menu+='</menu>';
+		return menu;
+	}
+	function reloadFolder(){
+		var url="${base}/admin/helpDocument/helpDocumentAction!getDirectoryAndHelpDocuments.action?treeId="+helpDocumentTreeId+"&etc=" + new Date().getTime();
+		folder.clearAll();
+		folder.load(url,"json");
+	}
+	
+	function clearTreeForm(){
+		$('#commonTreeName').val("");
+		$('#commonTreeRemark').val("");
+		$('#commonTreeId').val("");
+	}
+	
+	function fillTreeForm(){
+		jQuery.post("${base}/admin/commonTree/commonTreeAction!fetchByCriteria.action?etc=" + new Date().getTime(), {"id":folderInfo.nodeId,"dataValid":"1"}, function (data) {
+			if (data["result"] == "success") {
+				$("#commonTreeId").val(data["message"][0].id);
+				$("#commonTreeName").val(data["message"][0].name);
+				$("#commonTreeRemark").val(data["message"][0].remark);
+			}else{
+				$.dialog.tips(data["message"]);
+			}
+			
+		});
+	}
+	function hideWindow(){
+		w1.hide();
+	}
+	
+	function showWindow(winTitle) {
+		w1.setText(winTitle);
+		w1.show();
+	}	
+	function toolbar_func(id) {
+		if (id == 'add') {		
+			if (helpDocumentTreeId) {		
+				helpDocumentEdit('',helpDocumentTreeId);
+			} else {
+				$.dialog.tips('请选择目录');
+			}
+		} else if (id == 'delete') {
+			var id = folder.getSelected();
+			
+			if(id==null||id==""){
+				$.dialog.tips('请选择一条记录');
+				return false;
+			}
+			folderItem[0] = folder.get(id);
+			del();
+		}else{
+			edit();
+		}
+	}
+	
+	function del(){
+		var item=folderItem[0];
+		if (item.type == 'dir') {
+			<@f.operateRight operate="/admin/commonTree/commonTreeAction!deleteByKey.action">
+				delCommonTree(item.id);
+			</@f.operateRight>
+		} else if (item.type == 'file') {
+			<@f.operateRight operate="/admin/helpDocument/helpDocumentAction!deleteByKey.action">
+				delHelpDocument(item.id);
+			</@f.operateRight>
+		}
+	}
+	
+	function delCommonTree(id){
+		$.dialog.confirm('你确定要删除这个文件夹及包含的数据吗？', function () {
+			jQuery.post("${base}/admin/commonTree/commonTreeAction!deleteByKey.action?etc=" + new Date().getTime(), {"commonTree.id":id}, function(data){
+	             if(data["result"]=="success"){  
+	            	 tree.smartRefreshBranch("root");
+	             }            		
+	        	 $.dialog.tips(data["message"]);
+	       	});		
+		});
+		
+	}
+	
+	function delHelpDocument(id){
+		$.dialog.confirm('你确定要删除这个文档吗？', function () {
+			jQuery.post("${base}/admin/helpDocument/helpDocumentAction!deleteByKey.action?etc=" + new Date().getTime(), {"helpDocument.id":id}, function(data){
+	            if(data["result"]=="success"){  	            	
+	            	reloadFolder();
+	            }            		
+	       	    $.dialog.tips(data["message"]);
+	       	 
+	      	});
+		});		
+	}
+	
+	function edit(){
+		var item=folderItem[0];
+		if (item.type == 'dir') {
+			<@f.operateRight operate="/admin/commonTree/commonTreeAction!update.action">
+				commonTreeEdit(item.id);
+			</@f.operateRight>
+		} else if (item.type == 'file') {
+			<@f.operateRight operate="/admin/helpDocument/helpDocumentAction!update.action">
+				helpDocumentEdit(item.id,helpDocumentTreeId);
+			</@f.operateRight>
+		}
+	}
+	
+	function helpDocumentEdit(id,treeId){
+		var url = '${base}/admin/helpDocument/helpDocumentAction!helpDocumentEdit.action?treeId='+treeId+"&id="+id+"&etc=" + new Date().getTime();
+		window.top.createWindow({   id:'editPageHtml',
+			text              :'帮助页面',
+			url               :url,
+			width             :'810',
+			height            :'520',
+			parent_ifr:window ,
+			afterClose:function(){
+				reloadFolder();
+			}
+		});
+	}
+	
+	function commonTreeEdit(zoneId){
+		var parentId=tree.getParentId(zoneId);
+		parentId=parentId=="root"?"-1":parentId;
+		folderInfo = {type:'edit', parentId:parentId, nodeId:zoneId};
+		fillTreeForm();
+		showWindow('修改文件夹');
+	}
+	function page_layout() {
+		var wrap_height = $('#tree_wrap').height();
+		$('#tree').height(wrap_height - 33);
+	}
+	function changeType(type) {
+		folder.types[type].icons_src_dir = "${base}/aufw/resources/common/images/folder";
+		folder.define("type", type);
+	}
+	$(function () {
+		setTimeout(init, 0);
+		$('#toolbar').find('.toolbar-btn').click(function () {
+			var id = $(this).attr('type');
+			toolbar_func(id);
+		});
+	});
+</script>
+</body>
+</html>

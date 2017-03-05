@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+</head>
+
+<body style="height: 100%;">
+	<div id="grid_wrap"
+		style="width: 100%; height: 100%; overflow: hidden; display: none;">
+		<div id="grid_toolbar" class="ed-toolbar">
+				<a id="user_add" class="btn btn-info">添加预定</a>
+				<a id="user_delete" class="btn btn-info">删除</a>
+				<select name="" id="search"><option value="criteriaName">会议名称</option>
+				</select>
+				<input id="search_text" class="search_text" value="请输入关键字"
+					name="" type="text">
+				<input class="btn btn-info" name=""
+					onClick="simpleSearch()" value="搜 索" type="button">
+				<a id="selectAll" class="btn">全选</a>
+				<a id="advanced_search_btn" class="btn">高级搜索</a>
+
+			<div id="advanced_search_bar" class="ed-advanced-search-bar">
+			<table align="center">
+			<tr>
+				<td><label for="sname">会议名称</label></td>
+				<td><input id="sname" name="sname" type="text"> </td>
+				<td><label for="sorganizer">主办单位：</label></td>
+				<td><input id="sorganizer" name="sorganizer" type="text"></td> 				
+				<td><label for="sleader">领导：</label></td>
+				<td><input id="sleader" name="sleader" type="text"></td>
+				<td><label for="sstatus">状态：</label></td>
+				<td>
+					<select id="sstatus" name="sstatus" value=""type="text">
+							<option value="">全部</option>
+							<#list statusSelect as dataDict>
+								<option value="${dataDict.dictValue}">${dataDict.displayName}</option>
+							</#list>
+				</td>
+				<td><input class="btn btn-info" name="advancedSearch" onClick="advancedSearch()" value="搜 索" type="button"></td>
+			</tr>
+			</table>
+			</div>
+		</div>
+
+		<div id="grid" style="width: 100%;"></div>
+		<div class="ed-grid-page">
+		<div id="grid_page"></div>
+		</div>
+	</div>
+	<div id="form_maskA"
+		style="background: #ffffff; z-index: 99999; display: none; position: absolute; top: 0; left: 0; height: 0px; width: 0px;"></div>
+	<div id="form_maskB"
+		style="background: #ffffff; z-index: 99999; display: none; position: absolute; top: 0; left: 0; height: 0px; width: 00px;"></div>
+</body>
+<#include "/aufw/page/include/script.html">
+<script src="${base}/oa/resource/js/task.js"></script>	
+<script>
+	var layout, grid, data, tabbar, option, sendUrl;
+	//window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+	function init() {
+		var parentId;
+
+		layout = new dhtmlXLayoutObject(document.body, "1C");
+
+		layout.cells('a').hideHeader();
+
+		layout.attachEvent('onResizeFinish', page_layout);
+		layout.attachEvent('onPanelResizeFinish', page_layout);
+
+		data = new dhtmlXDataStore({
+			url : "${base}/admin/meetingBooking/selectBooking.action?etc="+ new Date().getTime(),
+			datatype : "json"
+		});
+
+		layout.cells('a').attachObject('grid_wrap');
+
+		grid = new dhtmlXGridObject('grid');
+		grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		grid.setHeader(" ,会议名称,开始时间,结束时间,主办单位,主要领导,状态,操作");
+		grid.setColumnIds("check,name,startDate,endDate,organizer,leader,status,operate");
+		grid.setInitWidths("30,*,*,*,*,*,*,180");
+		grid.setColTypes("ch,ro,ro,ro,ro,ro,co,link");
+		<#list statusSelect as obj>                                                                         
+			grid.getCombo(6).put(${obj.dictValue},'${obj.displayName}');
+		</#list>
+
+		grid.enablePaging(true, 20, 999, 'grid_page', true);//启用分页
+		grid.setPagingSkin("toolbar");//设置分页底部
+		grid.init();
+		grid.attachEvent("onCheck", function(rId, cInd, state) {
+			grid.selectRowById(rId);
+		});
+		//grid.attachEvent("onRowSelect", doOnRowSelected);
+		grid.sync(data);
+		page_layout();
+	}
+
+	//searchBarCommon('advanced_search_bar',30,'advanced_search_btn','grid_toolbar','grid');
+searchToggle('advanced_search_btn','advanced_search_bar');
+	function refresh_data() {
+		var path = "${base}/admin/meetingBooking/selectBooking.action?etc="
+				+ new Date().getTime();
+		data.clearAll();
+		data.load(path, "json");
+		window.data.data.url = path;
+	}
+
+	function see(id) { 
+		//alert(id);
+		window.top.createWindow({
+                'text':'预定查看',
+                'id':'workflow',
+				'url':'${base}/form/fceform/common/run.html?djsn=see&djtype=meeting&id='+id,
+                'width':'1024',
+                'height':'550'
+				});
+	}
+	
+
+
+	function toolbar_func(id) {
+		if (id == 'add') {
+		//initWorkflow("oa_meeting","预定会议室",1);
+			oaInitWorkflowWithCallBack("oa_meeting","预定会议室",1,"","simpleSearch()");
+		}
+
+		if (id == 'edit') {
+			//form.unlock();
+		}
+		if (id == 'delete') {
+			var row_id = grid.getCheckedRows(0);
+			if (row_id == '') {
+				$.dialog.tips('请至少选择一条数据！');
+				return;
+			}
+			row_id = row_id.split(',');
+			if (row_id.length == 0)
+				return;
+			$.dialog.confirm('你确定要删除这些数据吗？', function() {
+				var idArr = new Array();
+				for ( var i = 0; i < row_id.length; i++) {
+					idArr.push(data.item(row_id[i]).id);
+				}
+				$.post("${base}/admin/meetingBooking/deleteBooking.action", {
+					"booking.id" : idArr.join(",")
+				}, function(result) {
+					if (result.result = "success") {
+						simpleSearch();
+						$.dialog.tips(result.message);
+					}
+				});
+			});
+		}
+	}
+
+	 function  advancedSearch(){
+		data.clearAll();
+		var name= $("#sname").val();
+		var organizer= $("#sorganizer").val();
+		//var startDate= $("#sstartDate").val();
+       // var endDate= $("#sendDate").val();
+        var status= $("#sstatus").val();
+        var leader= $("#sleader").val();
+		var s = "booking.name="+ window.encodeURI(name)+"&booking.organizer="+ window.encodeURI(organizer)+"&booking.status="+status+"&booking.leader="+ window.encodeURI(leader);
+		var url = '${base}/admin/meetingBooking/selectBooking.action?'+s;
+		window.data.data.url = url
+		data.load(url);
+    }
+	
+	 function  clearSearch(){
+		$("#sname").val('');
+		$("#sbookinger").val('');
+		$("#sbookingTime").val('');
+    }
+
+
+	function d(id) { //删除 grid中的一行数据
+		grid.selectRowById(id);
+		$.dialog.confirm('你确定要删除这条数据？', function() {
+
+			$.post("${base}/admin/meetingBooking/deleteBooking.action?", {
+				"booking.id" : id
+			}, function(result) {
+				if (result.result == "success") {
+					simpleSearch();
+				}
+				$.dialog.tips(result.message);
+			});
+		});
+	}
+
+
+	
+
+	function simpleSearch() {
+		data.clearAll();
+		var value = $("#search_text").val() == '请输入关键字' ? ''
+				: $("#search_text").val();
+		if (value == '') {
+			var url = '${base}/admin/meetingBooking/selectBooking.action'+"?etc="+ new Date().getTime();
+		} else {
+			var url = '${base}/admin/meetingBooking/selectBooking.action?booking.name='
+					+ window.encodeURI(value)+"&etc="+ new Date().getTime();
+		}
+		window.data.data.url = url
+		data.load(url);
+		$("#search_text").val('请输入关键字');
+	}
+
+	function page_layout() {
+		var wrap_height = $('#tree_wrap').height();
+		var grid_wrap_height = $('#grid_wrap').height();
+		$('#tree').height(wrap_height - 43);
+		$('#grid').height(grid_wrap_height - 43 - 35);
+		if (grid)
+			grid.setSizes();
+
+	}
+
+	$(function() {
+		setTimeout(init, 0);
+
+		$('#selectAll').bind('click', function() {
+			var ids = grid.getAllRowIds();
+			//console.log(ids);
+			var idsArr = ids.split(',');
+			//alert(idsArr.length);
+			var nowPage = grid.currentPage;
+			var pageItemsLength = grid.rowsBufferOutSize;
+			var allItemsLength = grid.rowsBuffer.length;
+
+			var forBigen = pageItemsLength * (nowPage - 1);
+			var forOver = pageItemsLength * (nowPage);
+			if (forOver > allItemsLength) {
+				forOver = allItemsLength
+			}
+			for (i = forBigen; i < forOver; i++) {
+				var forId = idsArr[i];
+				var check = grid.cellById(forId, 0).getValue();
+				//console.log(check);
+				if (check == 1) {
+					check = 0;
+				} else {
+					check = 1;
+				}
+				grid.cellById(forId, 0).setValue(check);
+			}
+
+		})
+
+		//$('#grid_toolbar a').last().addClass('last');
+		$('#grid_toolbar a').click(function() {
+			var id = $(this).attr('id');
+			if (!id)
+				return;
+			id = id.substring(5);
+			toolbar_func(id);
+		});
+	
+
+		$("#search_text").focus(function() {
+			if ($(this).val() == this.defaultValue) {
+				$(this).val('');
+			}
+		}).blur(function() {
+			if ($(this).val() == '') {
+				$(this).val(this.defaultValue);
+			}
+		});
+	})
+</script>
+</html>

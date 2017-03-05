@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+    <link rel="stylesheet" type="text/css" href="${base}/oa/resource/style/css/imgList.css">
+</head>
+<style type="text/css">
+	.sco{overflow-y: auto;}
+	.advanced_search_bar{position:static;}
+	.container{width:auto !important; height:auto !important;}	
+	
+</style>
+<body style="height:100%;">
+
+<!--  body 的style  应属性加上 height:100%;   是为了计算页面高度   -->
+
+<div id="tree_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+    <div id="tree_search" class="tree_search"></div>
+    <div id="tree" style="width:100%; padding-top: 3px;"></div>
+</div>
+
+<!-- tree_wrap 这个 div 用于放置 左侧树和搜索树的工具栏 -->
+
+<div id="grid_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+    <div id="grid_toolbar" class="ed-toolbar">
+         <@f.operateRight operate="/admin/dininghallInfoManager!insert.action">
+			<a btn_id="add" class="btn btn-info">新增餐厅</a>
+             </@f.operateRight >
+             <@f.operateRight operate="/admin/dininghallInfoManager!delete.action">
+			<a id="del_id" btn_id="delete" class="btn btn-warning">删除</a>
+             </@f.operateRight >
+
+           	<select name="" id="search">
+        		<option value="dininghall.dininghallName">餐厅名称</option>
+                <option value="dininghall.dininghallPlace">餐厅地点</option>
+   			</select>
+
+
+                <input id="search_text" class="search_text" value="请输入关键字" name="" type="text">
+
+
+                <input class="btn btn-info" name="" onClick="SimpleSearch()" value="查 找" type="button">
+
+			<a id="advanced_search_btn" class="btn">高级查找</a>
+			<a class="btn btn-info" title="以图片形式展现" id="listShowPicture">图</a>
+			<a class="btn btn-info" title="以列表形式展现" id="listShowList">列表</a>
+
+		</div>
+        <div id="advanced_search_bar" class="ed-advanced-search-bar">
+           <table cellpadding="0" cellspacing="0" border="0" align="center">
+          	<tr>
+                <td><label for="searchTopic">餐厅名称：</label></td><td><input  id='searchTopic' name="searchTopic" type="text"></td>
+                <td><label for="searchContent">餐厅地点：</label></td><td><input  id='searchContent' name="searchContent" type="text"></td>
+                <td><input class="btn btn-info" name="advancedSearch" onClick="advancedSearch()" value="查 找" type="button"></td>
+            </tr>
+          </table>
+        
+	 </div>
+    <div id="grid" style="width:100%;overflow:auto;"></div>
+	<div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	    </div>
+     
+</div>
+
+</body>
+<#include "/aufw/page/include/script.html">
+<script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+<script src="${base}/form/fceform/js/fcpub.js"></script>
+<script src="${base}/form/fceform/js/fcrundj.js"></script>
+<script src="${base}/form/fceform/js/tabpane.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+<script src="${base}/oa/resource/js/ImgListPlug.js"></script>
+
+<script>
+    var layout,treeObj,tree,treeSearch,grid,data,form,tabbar,option,sendUrl,dininghallId,dhxWins,w1,listShowR;
+    var version='1';
+    var wf_name='meeting_manage';
+	 window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+    <!--    设置dhtmlx各组件用到的图片的的路径-->
+    function init(listShow,first) {       //初始化 方法
+		listShowR = listShow;
+        layout = new dhtmlXLayoutObject(document.body, "1C");     //添加一个 3L的layout
+        layout.cells('a').hideHeader();         //隐藏 cell a 的 标题 ， b c 同理
+		//layout.cells('c').hideHeader();
+		//layout.cells('b').hideHeader();
+        layout.attachEvent('onResizeFinish', page_layout);//添加自定义程序处理事件
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        <!-- 为layout添加监听事件    -->
+        <!-- onResizeFinish 为在layout大小变了之后触发 -->
+        <!-- onPanelResizeFinish 为在layout中一块区域大小变了之后触发 -->
+        data = new dhtmlXDataStore({
+            url: "${base}/admin/dininghallInfoManager/selectDininghall.action?etc="+ new Date().getTime(),
+            //url:"${base}/admin/event/eventManage!selectEventInfos.action?eventInfo.dataValid=1&etc="+new Date().getTime(),
+            datatype: "json"
+        });     //添加一个 为DataStore
+		
+        layout.cells('a').attachObject('grid_wrap');
+        // 在 layout的 cell b上添加 ID为 grid_wrap 的div
+		if(listShow===1){
+			grid = new dhtmlXGridObject('grid');
+			// 把 grid 添加到  ID为 grid的div中
+			grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+			//设置 grid上 图片的路径
+			grid.setHeader(" ,餐厅名称,餐厅地点,用餐人数,用餐标准,操作");
+			//设置 grid每列的标题
+			grid.setColumnIds("check,dininghallName,dininghallPlace,personNum,standard,operate");
+			//设置 grid每列的数据  对应 json中的哪条数据
+			grid.setInitWidths("30,200,*,80,80,180");
+			//设置 每列的宽度
+			grid.setColTypes("ch,ro,ro,ro,ro,link");
+			//设置每列的 类型
+			grid.init();
+			// 初始化grid
+			grid.enablePaging(true,15,999, 'grid_page', true);
+			//添加 grid的分页
+			//grid.enablePaging(fl, pageSize, pagesInGrp, parentObj, showRecInfo, recInfoParentObj)
+	/*          @参数: fl - true|false - 是否分页
+			*   @参数: pageSize - 每页的行数
+			*   @参数: pagesInGrp - 可见的页面的数量
+			*   @参数: parentObj - 放置分页的 div的ID
+			*   @参数: showRecInfo - true|false - enable|disable showing of additional info about paging state
+			*   @参数: recInfoParentObj - ID or container which will be used for showing paging state
+	*/
+			grid.setPagingSkin("toolbar");   //设置 分页的皮肤
+			grid.sync(data);                // grid从 DataStore中同步数据
+		}else if(listShow===0){
+			/*$('#grid').append("<ul id='pictureGrid' class='picture_grid'></ul>");
+			data.attachEvent("onXLE", function (){ //occurs when xml loading finished
+				$('#pictureGrid').empty();
+				for(i=0;i<data.dataCount();i++){
+					var itemId = data.idByIndex(i);
+					var imageSrc = data.item(itemId).picture;
+					var vName = data.item(itemId).dininghallName; 
+					$('#pictureGrid').append("<li><img src='"+imageSrc+"' onContextMenu=showEvent()"+"><span>"+vName+"</span></li>")
+					}
+			});*/
+			var jsonurl="${base}/admin/dininghallInfoManager/selectDininghall.action?etc="+ new Date().getTime();
+			pictureInit(jsonurl);
+		}
+			var formData = [
+				{ type:"settings", position:"label-left", labelWidth:"65", inputWidth:50 },
+				{
+					type:"fieldset", label:"餐厅信息", inputWidth:"660", offsetLeft:10,
+					list:[
+						{
+                          type:"hidden", offsetTop:5, list:[
+							{ type:"avatar", name:"picture", url:'${base}/admin/attachmentInfoManager/attachmentInfoAction!uploadPhoto.action',value:"${base}${defaultPicUrl}", label:"餐厅图片", inputWidth:200 }
+                         ]
+                        },
+						{
+							type:"hidden", offsetTop:5, list:[
+							{ type:"input", name:"dininghallName", value:"", label:"餐厅名称", inputWidth:200,required:true},
+							{ type:"newcolumn", offset:40},
+							{type:"input", name:"dininghallPlace", value:"", label:"餐厅地点", inputWidth:200 }
+						]
+						},
+						{
+							type:"hidden", offsetTop:5, list:[
+							{ type:"input", name:"personNum", value:"", label:"用餐人数", inputWidth:200,validate:'isInt'},
+							{ type:"newcolumn", offset:40},
+							{ type:"input", name:"standard", value:"", label:"用餐标准", inputWidth:200 ,validate:'isInt'}
+						]
+						},
+						{
+							type:"hidden", offsetTop:5, list:[
+							{ type:"input", name:"dininghallSeat", value:"", label:"餐厅座位", inputWidth:200 },		
+							{ type:"newcolumn", offset:40},
+							{ type:"input", name:"dininghallArea", value:"", label:"餐厅面积", inputWidth:200 }
+						]
+						},
+						{
+							type:"hidden", offsetTop:5, list:[
+							{ type:"input", name:"remarks", value:"", label:"备注",rows:3, inputWidth:515 },
+						]
+						},{ type:"newcolumn", offset:40},
+						{
+							type:"hidden", offsetTop:5, list:[
+							 {type:"label",labelWidth:230},
+							 { type:"newcolumn"},
+							 {type:"button",value:"确定",name:"send"}
+						]
+						}
+						]
+				}
+				];
+		if(first===true){
+			dhxWins = new dhtmlXWindows();
+			dhxWins.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+			w1 = dhxWins.createWindow("w1", 20, 30, 700, 500);
+			w1.setText("餐厅信息");	
+			w1.center();
+			dhxWins.attachEvent('onClose', function (win) {
+				w1.hide();
+			});
+			w1.hide(); 
+			form = w1.attachForm(formData);//returns a dhtmlxForm object 
+			form.disableItem('send'); //禁用特定项
+			form.attachEvent('onButtonClick', function (id) {
+				if(id=='send'){
+					if(option=="update"){
+						sendUrl="${base}/admin/dininghallInfoManager/update.action?dininghall.id="+dininghallId;
+					}
+					else if(option=="add"){
+						sendUrl="${base}/admin/dininghallInfoManager/insert.action";
+					}
+				   form.send(sendUrl,"post",function(data){
+					var datatest = eval("(" + data.xmlDoc.responseText + ")");
+						if(datatest.result=="success"){
+							SimpleSearch();
+							form.disableItem('send');
+							option="no";
+							w1.hide();
+						}
+						$.dialog.tips(datatest.message);
+						}
+			   		);
+				}
+			});
+		}
+		//$('#grid_toolbar').outerHeight(true)
+		/* searchBarCommon('advanced_search_bar',30,'advanced_search_btn','grid_toolbar','grid');*/
+		$('#advanced_search_btn').unbind('click');
+		$('#advanced_search_btn').bind('click',function(){
+			$('#advanced_search_bar').slideToggle('fast');
+			page_layout();
+		});
+        page_layout();      // 调用page_layout方法   ,方法的声明在下面
+    	} 
+	
+	function  SimpleSearch(){
+		data.clearAll();
+		var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+		var clu = $("#search").val();
+		var url = '${base}/admin/dininghallInfoManager/selectDininghall.action?'+clu+'='+window.encodeURI(value)+"&etc="+ new Date().getTime();
+		window.data.data.url = url
+		data.load(url);
+		if(listShowR===0){
+			pictureInit(url);
+		}
+    }
+   
+    function  advancedSearch(){
+		data.clearAll();
+		//var personNum= $("#personNum").val();
+		//var standard= $("#standard").val();
+		var searchContent= $("#searchContent").val();
+        var searchTopic= $("#searchTopic").val();
+        var s = "dininghall.dininghallName="+window.encodeURI(searchTopic)+"&dininghall.dininghallPlace="+window.encodeURI(searchContent);
+        var url = '${base}/admin/dininghallInfoManager/selectDininghall.action?'+s+"&etc="+ new Date().getTime();
+		window.data.data.url = url;
+		data.load(url);
+		if(listShowR===0){
+			pictureInit(url);
+		}
+    }
+
+    function pictureInit (jsonurl) { //图片列表
+    	$('#grid').empty();
+		var seeting={
+			containsSize:{width:1150,height:600}, 				//设置imgList大小
+			renderTo:$("#grid"),			 					//设置父容器位置
+			enableShowDetails:true   							//是否显示详情
+		}
+		var iList = new imgListObject(seeting);					//新建imgList对象
+		iList.init();											//执行初始化操作
+		iList.hideTitle();	
+		var dataForm={
+			id:"id",//操作id
+			imgUrl:"picture",
+			title:"dininghallName",
+			info1:{name:"地址",value:"dininghallPlace"},
+			info2:{name:"用餐人数",value:"personNum"},
+			info3:{name:"用餐标准",value:"standard"},
+			details:[
+				{type:"title",value:"dininghallName"},
+				{type:"line",name:"地址",value:"dininghallPlace"},
+				{type:"line",name:"用餐人数",value:"personNum"},
+				{type:"line",name:"用餐标准",value:"standard"},
+				{type:"line",name:"面积",value:"dininghallArea"},
+				{type:"line",name:"座位数",value:"dininghallSeat"},
+				{type:"textarea",name:"备注",value:"remarks"}
+			]
+		}
+			
+		iList.setDataForm(dataForm);									//隐藏标题
+		iList.loadJson(jsonurl);							//获取数据并渲染
+		operation={							//设置操作函数，key为id value为a标签文本内容
+			deletes:"删除",
+			update:"修改",
+			checkDate:"查看日程"
+		}
+		iList.setFunction(operation);	
+		$(".deletes").bind("click",function(){
+			var imgId = $(this).parent().attr("id");
+			d(imgId);
+		});
+		$(".checkDate").bind("click",function(){
+			var imgId = $(this).parent().attr("id");
+			k(imgId);
+		});
+		$(".update").bind("click",function() {
+			$('#picture_pick').html("[修改图片]");
+			var imgId = $(this).parent().attr("id");
+			e(imgId);
+		});
+    }
+
+  	//执行任务
+    function execute(id){
+    	
+    	//$.dialog.tips("未定义");
+    	var item=data.item(id);
+    	
+    	//showWFLatest(wf_name,item.wfId);	
+    	var task_name='';
+   
+    	itsm_doAction(item.wfId,wf_name,task_name,version);
+    }
+
+	//查看流程图
+	function viewFlow(id){
+		var item=data.item(id);
+		showWfHistory(item.wfId);
+	}
+	
+	
+
+	function goasWin(title,url) {           //弹出窗口
+		var isWin = window.top.dhxWins.isWindow('goasWin');
+		if (isWin == true) return;
+		window.top.createWindow(
+				{   id      :'goasWin',
+					text    : title,
+					setModal: true,
+					url     : url,
+					width   :'890',
+					height  :'550'
+				}
+			);
+		}
+
+
+    function toolbar_func(id){           // grid上面 的那些按钮的 功能
+       if (id == 'add') {
+    	   $('#picture_pick').html("[修改图片]");
+        	//goasWin('新增菜单','${base}/form/fceform/common/run.html?djsn=mealMenuAdd&djtype=goas');
+        	//initWorkflow(wf_name,"增加事件",version);
+			$("#picture_img")[0].src="${base}${defaultPicUrl}"; //jq转js
+			w1.show();
+			option="add";
+			var addId=new Date();
+			var add_data={
+				id:addId
+			};
+			data.add(add_data,0);
+			form.clear();
+			if(listShowR===1){
+				grid.selectRowById(addId);
+			}
+			//$("#picture_img")[0].src="${base}/aufw/resources/userDefaultPhoto/default_l.png"; 
+			form.setItemFocus("dininghallName");//设置焦点
+			form.enableItem("send");
+        }
+        /*if (id == 'edit') {
+        	//eventWin('修改事件','${base}/form/fceform/common/run.html?djsn=eventEdit&djtype=itsm&wf_id=678')
+			if(listShow===0){
+				if(typeof(dininghallId) == "undefined") {
+					$.dialog.tips('请选择一条数据！');
+					return;
+				}
+				form.showItem("picture");
+				option = "update";
+				form.setItemFocus("dininghallName");//设置焦点
+				form.enableItem("send");
+			}else if(listShow===1){
+				var row_id = grid.getCheckedRows(0);
+				e(row_id);
+			}
+        }*/
+        if (id == 'delete') {
+			if(listShowR===1){
+				var row_id = grid.getCheckedRows(0);
+				if (row_id == '') {
+					$.dialog.tips('请至少选择一条数据！');
+					return;
+				}
+				row_id = row_id.split(',');
+				if (row_id.length == 0) return;
+					$.dialog.confirm('你确定要删除这些数据吗？', function () {
+						var idArr = new Array();
+						for (var i = 0; i < row_id.length; i++) {
+							idArr.push(data.item(row_id[i]).id);
+						}
+						$.post("${base}/admin/dininghallInfoManager/delete.action", {"dininghall.id":idArr.join(",")},function(result){
+							if(result.result="success"){         
+								for (var i = 0; i < row_id.length; i++) {           
+									data.remove(row_id[i]);
+								}
+							}
+							$.dialog.tips(result.message);
+						});
+					});
+			}
+        }
+    }
+	
+	function formClear(){
+		form.getInput("dininghallName").value='';
+		form.getInput("dininghallPlace").value='';
+		form.getInput("personNum").value='';
+		form.getInput("standard").value='';
+		form.getInput("dininghallSeat").value='';
+		form.getInput("dininghallArea").value='';
+		form.getInput("remarks").value='';	
+	}
+	function k(id){
+		 var path = "${base}/admin/mealApproveManager/scheduler.action?id="+id;
+         var win = {text:'查看日程',width:1024,height:600, url:path, id:"detailWin"};
+         window.top.createWindow(win);
+		}
+	function d(id) {       //删除 grid中的一行数据
+		if(listShowR===1){
+			grid.selectRowById(id);
+		}
+		$.dialog.confirm('你确定要删除这条数据？', function () {		   
+			$.post("${base}/admin/dininghallInfoManager/delete.action?", {"dininghall.id":id}, function(result){
+				if(result.result=="success"){
+					data.remove(id);
+					
+					if(listShowR===0){
+						
+						var jsonurl="${base}/admin/dininghallInfoManager/selectDininghall.action";
+						pictureInit(jsonurl);
+					}else{
+						
+						SimpleSearch();
+					}
+					
+				}
+				$.dialog.tips(result.message);
+			});
+		});
+		form.disableItem("send");
+	}
+
+	function e(id) {      //编辑 grid中的一行数据
+		//alert(id);
+		w1.show();
+		if(listShowR===0){
+			form.setFormData(data.item(id));
+		}
+		//var pictureUrl = data.item(id).picture;
+		//$("#picture_img")[0].src=pictureUrl; 
+		option = "update";
+		dininghallId = id;
+		if(listShowR===1){
+			grid.selectRowById(id);//选中行
+		}
+		//layout.cells('b').view("def").setActive();
+		//window._now_grid_edit_id=id;      //把当前正在编辑的这条数据的ID 保存起来，用于  form保存后，将结果同时保存到左侧树中；
+		form.setItemFocus("dininghallName");//设置焦点
+		form.enableItem("send");//启用指定项
+	   // form2.enableItem("send");
+	}
+
+    function page_layout() {                 // page_layout为控制页面布局的方法 ，  用于自适应窗口的大小
+        var grid_wrap_height = $('#grid_wrap').height();  //得到 ID为  grid_wrap 的div的高度
+       // $('#grid').height(grid_wrap_height -$('#grid_toolbar').outerHeight(true)); 
+        
+    	var grid_wrap_width = $('#grid_wrap').width();
+		$('#grid').width(grid_wrap_width);
+    	
+       // setTimeout(function(){
+        	
+       // },300);
+      
+        if(listShowR==1)  //列表
+		{
+			
+        	
+        		$('#grid').height(grid_wrap_height -43-35);    //设置  ID为  grid 的div的高度                  // 如果grid 存在，则 让 grid 适应下窗口的大小	
+        	
+        	
+		}else{
+			$('#grid').height(grid_wrap_height -43);
+		}
+        
+       $('.xhdr').each(function(){
+			$(this).siblings('div.objbox').find('.obj').width($('#grid').width());
+			$(this).siblings('div.objbox').find('th').eq(1).css('width','auto');
+		});	 
+       if(grid)    grid.setSizes();  
+    }
+    $(function () {
+    	
+    	var delId=$('#del_id');  //删除按钮图片界面时隐藏
+		if(delId)
+		{
+			delId.css("display","none");
+		}
+    	
+         setTimeout(function(){init(0,true);}, 0);                          //在 页面加载好后，触发init方法；
+		$('#listShowList').click(function(){
+			if(delId)
+			{
+				delId.css("display","none");
+			}
+			
+			init(1,false);
+			form.bind(grid);
+			
+			$('#grid').css('overflow','hidden');
+			$('#grid').height($('#grid_wrap').height() - 40-35);
+			
+		})
+		$('#listShowPicture').click(function(){
+			if(delId)
+			{
+				delId.css("display","inline-block");
+			}
+			
+			init(0,false);
+			$("#grid_page").empty();
+
+			$('#grid').css('overflow','auto');
+			$('#grid').height($('#grid_wrap').height()- 40);
+			
+		});
+		//$('#grid_toolbar_ul li').last().addClass('last');   //为grid上面的一排按钮中的最后一个li添加一个为‘last’的class
+        $('#grid_toolbar a').click(function(){       //那些按钮 点击之后 触发 toolbar_func 方法
+            var id=$(this).attr('btn_id');
+            toolbar_func(id);
+        });
+		
+		$("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+		page_layout();
+		
+    })
+</script>
+</html>

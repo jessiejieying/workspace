@@ -1,0 +1,213 @@
+.padding-left10{padding-left:10px !important;}
+.padding-left8{padding-left: 8px !important;}
+.padding-left0{padding-left: 0 !important;text-align: center!important;}
+.font-size12{font-size: 12px;}
+.font-size14{font-size: 14px;}
+.font-size16{font-size: 16px;}
+.text-center{text-align:center !important;}
+.margin-bottom20{margin-bottom:20px !important;}
+.centerBlock{margin: 0 auto !important;}
+.border-top-blue{border-top: 2px solid #71b8ec !important;}
+.common-skin-btn-syle01{color:#fff;border-color:#0ae;background-color:#0ae}
+.common-skin-btn-syle01:hover{color:#fff;border-color:#3bd;background-color:#3bd}
+.border-null{border: none !important;}
+.fill{width: 90%;}
+.tr-selected td{background:#3bd !important;}
+.layui-layer-title {
+    background: #4989d8!important;
+    color: #fff!important;
+    text-align: center;
+    padding: 0!important;
+}
+.standard-checkbox{
+    width: 16px;
+    height: 16px;
+    margin: 2px 0 0;
+    padding: 0;
+}
+.exchange-form-grid td a {
+    color: #5b97e1;
+    font-size: 18px;
+    cursor: pointer;
+}
+.exchange-upload-btn{
+    width: 10%;
+    height: 100%;
+    position:relative;
+}
+
+.exchange-form-grid th, .exchange-form-grid td{
+    text-align: left;
+    color: #9f9f9f;
+    height: 20px;
+}
+.exchange-form-grid {
+    margin: 0 auto;
+    font-size: 14px;
+    table-layout: fixed;
+
+}
+
+.file-module{
+width: 200px;
+}
+
+.exchange-no-data td{
+   text-align: center !important;
+    vertical-align: middle !important;
+    height: 30px !important;
+    padding-left: 0!important;
+    padding-top: 10px!important;
+}
+.icon-file-text-o{
+    color:#9f9f9f;
+    text-align: right !important;
+    width: 25px;
+}
+.oa-meeting-entry .td-select {
+    padding: 5px 3px !important;
+}
+.exchange-tbody{
+    height: 20px;
+}
+.icon-file-text-o:before{
+    content: none !important;
+}
+.icon-file-text-o{
+    width: 20px;
+    height: 20px;
+    background:url("./skintheme/images/icon/icon-file.png") no-repeat;
+
+}
+.icon-ellipsis-h {
+    width: 20px;
+    height: 20px;
+    background:url("./skintheme/images/icon/Ellipsis.png") no-repeat;
+    margin-right: 5px;
+    border:none;
+}
+.icon-ellipsis-h:before {
+    content: none !important;
+}
+.icon-download{
+    display:inline-block;
+    width:16px;
+    height:16px;
+    background:url("./skintheme/images/icon/dowload.png") no-repeat;
+    margin-right: 10px;
+}
+.icon-download:before {
+    content: none !important;
+}
+.icon-times{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background:url("./skintheme/images/icon/delete.png") no-repeat;
+    margin-right: 10px;
+}
+.icon-times:before {
+    content: none !important;
+}
+.icon-upload{
+    width: 18px;
+    height:18px;
+    line-height:20px;
+    cursor: pointer !important;
+    position: absolute;
+    top: 10px;
+    right:5px;
+    background:url("./skintheme/images/icon/upload.png") no-repeat;
+}
+.icon-upload:before {
+    content: none !important;
+}
+.icon-jianzhang{
+    display: inline-block;
+    width: 16px;
+    height:16px;
+    line-height:16px;
+    cursor: pointer !important;
+    background:url("./skintheme/images/icon/icon-jianzhang.png") no-repeat;
+}
+.file-btn{
+    border:1px solid #c7c7c7;
+    background-color:#f1f1f1;
+    font-size:14px;
+    height:30px;
+    line-height:30px;
+    color:#1d140d;
+    cursor:pointer;
+    margin:5px auto 0;
+    width:100%;
+    text-align:center;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.text-over{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    width: 300px;
+}
+.center-block{
+    margin: 0 auto;
+}
+.export{
+    width: 126px;
+    height: 52px;
+    line-height: 51px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    background:url(../oa/resource/images/oa-only-bill-page-header-bg.png) no-repeat;
+    cursor: pointer;
+    margin-bottom: 26px;
+    position: relative;
+    padding-left: 12px;
+}
+.export:before{
+    content: "";
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 16px;
+    left: 28px;
+    background:url(../oa/resource/images/icon-export.png);
+}
+.font-hanyi{
+    font-family:"汉仪大宋简";
+    font-weight: 700;
+    font-size: 26px !important;
+}
+.font-fangzheng{
+    font-family: "方正小标宋简体 ";
+
+}
+.font-heiti{
+    font-family: "黑体";
+}
+.content{
+    text-align:left;
+    padding-left:19px;
+    color:#2f2f2f;
+    font-family:'宋体';
+    font-size:14px;
+}
+.js-unlock{
+    font-size: 18px;
+    cursor: pointer;
+}
+.apply-table td{
+    text-align: center;
+    padding-left: 0px !important;
+}
+.apply-table td input{
+    width: 100%;
+    text-align: center;
+}
+table.bsgrid tbody tr.myDragClass td {
+    font-weight: bold;
+    background-color: #bce8f1 !important;
+}

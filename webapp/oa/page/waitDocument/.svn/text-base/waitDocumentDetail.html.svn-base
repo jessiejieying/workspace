@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=10,Chrome=1">
+<title>Eden</title>
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+	<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css" id="style_css"/>
+    <style>
+        .js-unlock{
+            font-size: 12px;
+            cursor: pointer;
+            padding: 5px 8px;
+			position: relative;
+			top: -7px;
+        }
+		.js-a-path{
+			display: inline-block;
+		     /*width: 10%;*/
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			width: 400px;
+		}
+    </style>
+</head>
+<body onload="load();">
+<!--  <object id="TGGovDocumentCtrl" name="TGGovDocumentCtrl" classid="CLSID:DBA9A5F0-586D-48C7-92E7-5F0A7C749E0E" width="0" height="0"> -->
+<!-- 	<embed name="TGGovDocumentCtrl" width="0" height="0"></embed> -->
+<!--  </object> -->
+ <object id="TGPDFPlugIn" classid="clsid:04DDDFAA-0AC0-4D47-9315-9F442F65D403" width="0" height="0">
+    <embed name="TGPDFPlugIn" type="application/nptseal-TGPDFPlugIn" width="0" height="0"></embed>
+ </object>
+ <form action="" class="wait-form">
+ 	<h1 style="margin-left: 120px;margin-right: 120px;">${(waitDocument.fileTitle)!}</h1>
+ <table class="wait-table">
+ 	<tr>
+ 		<td class="td-left" height="60">来文单位</td>
+ 		<td>
+ 			<table class="intable">	
+				<tr>
+					<td class="td-text-left" style="padding-left: 0px;" id="radioId">						
+						<lable>${(waitDocument.fileUnit)!}</lable>
+					</td>
+					<td class="td-mid" width="108" height="60">紧急程度</td>
+					<td width="256">
+						<input type="text" class="td-input" value="${(waitDocument.fileLevel)!}">
+					</td>
+				</tr>
+ 			</table>
+ 		</td>
+ 	</tr> 
+ 	<tr>
+ 		<td class="td-left" height="60">来文字号</td>
+ 		<td>
+ 			<table class="intable">
+ 				<tr>
+ 					<td class="td-text-left" style="padding-left: 0px;">
+ 						<input id="fileBackDate" type="text" class="td-input" value="${(waitDocument.fileChar)!}">
+ 					</td>
+ 					
+ 					<td class="td-mid" width="108" height="60">来文日期</td>
+ 					<td width="256">
+ 					<input id="fileBackDate" type="text" class="td-input" value="${(waitDocument.fileDateStr)!}">
+ 					</td>
+ 				</tr>
+ 			</table>
+ 		</td>
+ 	</tr>
+ 	
+ 	<tr>
+ 		<td class="td-left" height="70">附件信息</td>
+ 		<td style="text-align:left;padding-right: 20px;padding-top: 10px;padding-bottom: 10px;" >
+ 			<#if attachmentInfos?? && attachmentInfos.size() &gt;0 >
+	 			<#list attachmentInfos as obj>
+	 			
+	 			    <span class="js-link-father  file-icon" style="line-height: 22px;display: block" data-size="${obj.size!}" data-name="${(obj.name)!}">
+			     	<a href="${(obj.path)!}" data-href="${(obj.path)!}" class="js-a-path" title="${(obj.name)!}">
+				     	<font color="blue" style="padding-right: 10px;">${(obj.name)!}</font>
+				     	</a>
+					     	 <#if (obj.name?index_of("tgw"))!=(-1)>
+					     	 	<#if (obj.remark?index_of("tgw"))!=(-1) >
+				                 <#else>
+				                 	<div id="jiemi" class="button common-skin-btn-syle01 js-unlock" style="padding-top: 1px;padding-bottom: 1px;">解密</div>
+				                </#if>
+			                    
+			                </#if>
+				     	
+			                 <#if (obj.remark?index_of("pdf"))!=(-1) >
+			                     <div onclick="delete1('${(obj.id)!}');" class="button common-skin-btn-syle01 js-unlock" style="padding-top: 1px;padding-bottom: 1px;">删除</div>
+			                 <#else>
+		                 	
+		                </#if>
+	                <br>
+			     	</span>
+	
+			    </#list>
+		    <#else>
+				<font color="#999"><label>没有附件！</label></font>
+		    </#if>  
+ 		</td>
+ 	</tr>
+ </table>
+ <div class="text-center margin-large-top">
+ 	<!-- <label class="message-tip"><input id="smsRemind" type="checkbox"> 是否短信提醒 </label>  -->
+ 	<div class="button common-skin-btn-syle01 " id="back">退文</div>
+ 	<div class="button common-skin-btn-syle01 " id="incoming_add">收文登记</div>
+	 <div class="button common-skin-btn-syle01 " id="file_add">抄送文件</div>
+ </div>
+ 
+ </form>
+<div id="form_add" ></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/edenui/common/js/jquery_migrate.min.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var userId = "${(userInfo.userId)!}";
+	var wfId1 = "${(waitDocument.id)!}";
+	var TGGovDocumentCtrl;    //加密解密控件
+	var TGPDFPlugIn;		  //天谷印章控件
+	var tempPath;
+	var decryptPath;
+	var $this;
+	
+
+	function hrefChange(){
+		$(".js-a-path").each(function(){
+
+			var $this=$(this),
+				path=$this.data("href").split("path=");
+			$this.attr("href",encodeURI(path[0]+"path="+path[1]).replace(/\+/g,"%2B"));
+		});
+	}
+	
+	function delete1(id){
+		$.post("${base}/admin/waitDocument/deleteAttach.action",{
+   			id:id
+   		},function(data){
+			if(data.resultFlag){
+				layer.msg("发送成功");
+				window.location.reload();
+			}
+			else
+				layer.msg("发送失败");
+   		});
+		
+	}
+	
+	function load() {
+    	TGPDFPlugIn = getPluginObjcet("TGPDFPlugIn");
+//     	TGGovDocumentCtrl = getPluginObjcet("TGGovDocumentCtrl");
+        
+    	attach_event();
+
+    	//fileDecrypt();
+    	
+	    TGPDFPlugIn.ResizePlugin(0,0,0,0);
+	}
+	
+	 function getPluginObjcet(objname) {
+         if (!isIEBrowser()) {
+             if (document.embeds && document.embeds[objname])
+                 return document.embeds[objname];
+         } else return document.getElementById(objname);
+     }
+	 
+     function attach_event() {
+         try {
+             TGPDFPlugIn.attachEvent("OnEventFinish", jsFire_TGPDFPlugInCallback);
+         }
+         catch (e) {
+             return false;
+         }
+         return true;
+     }
+	 
+	 function jsFire_TGPDFPlugInCallback(eventID, errorCode, result) {
+         switch(eventID)
+         {
+             case 10101:
+            	 var $linkFather=$this.closest(".js-link-father");
+                 var dataSize=$linkFather.data("size");
+                 var dataName=($linkFather.data("name").toString()).split(".")[0];
+    			 var outInfo;
+    	         var outInfoLen;	
+    	     	 TGPDFPlugIn.GetCurrentDocInfo(1, outInfo, outInfoLen); // 获取当前文件缓存路径
+    	
+     	         var res = TGPDFPlugIn.CloseCurrentDoc();
+    	     	
+    	     	 if(tempPath){    // tempPath是临时文件
+//     	     		var str=(tempPath.toString()).split("\");
+//     	     	 	TGGovDocumentCtrl.GovDocDecrypt(tempPath, "C:\\Users\\Lina\\Desktop\\6_6.pdf");  // 解密文件
+    				var delJson=encodeURI("{method:'decryptPdf',tableKeyId:'${(waitDocument.id)!}',name:'"+dataName+".tgw',size:'"+dataSize+"',userid:'${userid}'}");
+    				var location= "http://"+window.location.host+"/${base}/servlet/sealUploadServlet";
+    				var destPath = tempPath.substring(0,tempPath.lastIndexOf("."))+"_temp.pdf";
+    				
+    				var Res = TGPDFPlugIn.DecodeDocument(tempPath, destPath, 0);
+	
+    	     		TGPDFPlugIn.UploadFileToServer(location, destPath, encodeURIComponent(dataName+".pdf"), delJson);
+    	     		window.location.reload();
+    	     	 }
+            	 break;
+             case 11201:
+            	 tempPath = result;
+                 ShowResultMessage("获取当前文件路径" + errorCode, result)
+                 break;
+             case 11202:
+                 ShowResultMessage("文档缓存路径" + errorCode, result)
+                 break;
+             case 11203:
+                 ShowResultMessage("文档总页数" + errorCode, result)
+                 break;
+             case 11204:
+                 ShowResultMessage("文档当前页码" + errorCode, result)
+                 break;
+             case 11205:
+                 ShowResultMessage("签章个数" + errorCode, result)
+                 break;
+             case 11206:
+                 ShowResultMessage("签章信息字符串形式" + errorCode, result)
+                 break;
+             case 11207:
+                 ShowResultMessage("签章信息文件路径" + errorCode, result)
+                 break;
+             case 11300:
+                 SignContext = errorCode;
+                 ShowResultMessage("签名环境", errorCode)
+                 break;
+             case 12600:
+                 ShowResultMessage("上传文件" + errorCode, result);
+                  $(".js-unlock").hide();
+                 layer.msg("解密完成!");
+                 break
+             default:
+                 if (eventID / 100 == 104) {
+                     ShowResultMessage("签名结果" + errorCode, result)
+                 }
+                 break;
+         }
+     }
+	 
+	 function ShowResultMessage(msg, result) {
+         var resultMsg = "";
+         try{
+             resultMsg = TGPDFPlugIn.GetErrorMsg(result);
+         }catch(e){
+
+         }
+     }
+	 
+     function isIEBrowser() {
+       	 return (navigator.appName.indexOf("Microsoft Internet") != -1);
+     }
+ 
+	$(function(){
+         hrefChange();
+
+        //解密
+        $("#jiemi").click(function(event){
+        	 
+        	$this=$(this);
+//             layer.msg("正在解密");
+            var getAPath=($this.closest(".js-link-father").find(".js-a-path").data("href")).split("path=");
+           // fileDecrypt();
+           
+             var windowLocation=(window.location).toString();
+	     	 var windowBase=windowLocation.split("admin")[0]
+			 var location= "http://"+window.location.host+"${base}/admin/documentData/sealPdf.action?path=" 
+					 + encodeURIComponent(getAPath[1]);
+	     	  	
+	     	 TGPDFPlugIn.LoadPDF(encodeURI(location));   // 加载服务器端加密文件
+        });
+
+	    //工具条退文
+	    $(document).on("click","#back",function(){
+            var win = {text:"退文信息", url:"${base}/admin/waitDocument/addBackDocumentWin.action?waitDocument.id=${(waitDocument.id)!}",width:'900',height:'550', id:"addBackWin",'parentIfr':parentIfr};
+            window.top.createWindow(win);
+            var index = parent.layer.getFrameIndex(window.name);
+    		parent.layer.close(index);
+	    });
+	    
+		$(document).on("click","#file_add",function () {
+			var url = "${base}/admin/documentCopySend/oaCcFileClose.action?wfId=${(waitDocument.id)!}";
+			 var win = {text:"抄送文件", url:url,width:'900',height:'600', id:"addBackWin",'parentIfr':parentIfr};
+	            window.top.createWindow(win);
+		
+		});
+		
+	    $(document).on("click","#incoming_add",function(){
+	    	
+			$.post('${base}/admin/waitDocument/waitToIncoming.action?waitDocument.id=${(waitDocument.id)!}',{},function(data){
+				if(data){
+					uf_doAction(data.wfId, data.wfName, '', '1',null);
+					setTimeout(function(){
+						//parentIfr.gridOne.refreshPage();
+
+						parentIfr.location.reload();
+						var index = parent.layer.getFrameIndex(window.name);
+						parent.layer.close(index);
+					},2000);
+
+				}
+			});
+			
+			
+//			setTimeout(function(){
+//				parentIfr.gridOne.refreshPage();
+//				var index = parent.layer.getFrameIndex(window.name);
+//				parent.layer.close(index);
+//			},2000);
+			
+// 			afterSave();
+	    });
+	    
+	  //下载
+	    $(document).on("click",".js-tr-download",function(){
+	    	var $download=$(this).attr("href");    	
+	      if($download.indexOf("javascript:")>-1){
+	         window.top.layer.msg("先保存，才能下载");
+	      }
+	    });
+	    
+	});
+	
+ 	function afterSave(){
+	    setTimeout(function(){
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+	}
+
+    //附件信息文件添加图标
+    function classStyle(){
+        var arrSpan = [];
+        for (var i = 0; i < $(".js-link-father").length; i++) {
+            arrSpan.push($(".js-link-father").eq(i).data("name"))
+        }
+        $.each(arrSpan,function(i,item){
+            if(item.indexOf(".doc") > -1){
+                $(".js-link-father").eq(i).addClass("file-icon-word");
+            }else if(item.indexOf(".pdf") > -1){
+                $(".js-link-father").eq(i).addClass("file-icon-pdf");
+            }else if(item.indexOf(".tgw") > -1){
+                $(".js-link-father").eq(i).addClass("file-icon-tiangu");
+            }else{
+                return ""
+            }
+        });
+
+    }
+    classStyle();
+ 	
+</script>
+</html>

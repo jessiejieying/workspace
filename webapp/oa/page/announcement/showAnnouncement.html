@@ -1,0 +1,280 @@
+<!doctype html>
+<html style="height:100%;">
+<head>
+<meta charset="utf-8">
+    <title>通知公告</title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+    <script>
+        setSkinsCss("listCss,iconCss");
+    </script>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+     <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+<style>
+*{ margin:0 ; padding:0;}
+li{ list-style:none;}
+a{ text-decoration:none; outline:none;}
+.clearfix:after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+.clearfix {
+   zoom:1;
+}
+
+.flleft{float:left;}
+.flright{float:right;}
+
+.popup_box{padding:0 10px 10px;}
+.top_popup{width:548px;height:15px;overflow:hidden; background:url(${base}/oa/page/knowledge/knowledgeSquare/images/popup_top.png) no-repeat; display:none;}
+.center_popup{min-width:517px;width:auto !important;width:517px;}
+.bottom_popup{width:548px;height:5px;overflow:hidden;background:url(${base}/oa/page/knowledge/knowledgeSquare/images/popup_bottom.png) no-repeat; display:none;}
+.title_box{ overflow:hidden;padding-left:15px; padding-top:20px;}
+.Classification_two{float:right;}
+.title_text{ float:left; font-size:15px; font-weight:bold; color:#2b64b3;}
+.Classification{ float:right; margin-right:15px;font-size:12px; color:#9f9f9f;}
+.author_box{padding-top:7px; border-bottom:1px solid #d0d0d0;padding-left:15px;}
+.author_box a{ display:block; float:left; font-size:12px; color:#9f9f9f; line-height:24px;}
+.author_box .title_time{ float:right;}
+.title_content{padding:10px 6px;}
+.title_content p{ font-size:14px;text-indent:2em; line-height:20px;}
+.annex_box{padding-top:7px;padding-left:15px;}
+.annex_box span.annex_box_span{ font-size:12px;float:left;font-weight:bold; background-image:url(${base}/oa/page/knowledge/knowledgeSquare/images/annex_icon.png); background-repeat:no-repeat; background-position:left center; padding-left:13px;}
+.annex_box_div{float:left;}
+.dhxform_textarea p{display:none;}
+.dhxform_textarea .eUpload_fileAdded{display:block;}
+.dhxform_textarea .eUpload_fileAdded .del_attach{display:none;}
+.annex_text{ text-decoration:underline; color:#2b64b3;}
+
+.comment_btn{padding:10px 15px 5px 0;margin-top: 60px}
+.comment_btn a{display:block; color:#2c6aa6; text-decoration:underline; font-size:14px; font-weight:bold; float:right;}
+.comment_btn a:hover{ color:#36F;}
+.comment_btn a.release{color:#fff;}
+.write_comment{width:100%;padding-top:2px;}
+
+.top_comment{height:12px;overflow:hidden; width:100%; background:url(${base}/oa/page/knowledge/knowledgeSquare/images/popup_comment_top.png) no-repeat right;}
+.top_comment div{height:12px;overflow:hidden; width:3px; background:url(${base}/oa/page/knowledge/knowledgeSquare/images/popup_comment_top.png) no-repeat;}
+
+.center_comment{padding:5px 20px 0; border-left:1px solid #EDEDED;border-right:1px solid #EDEDED; position:relative;}
+.comment_zd{position:absolute;width:100%;left:1px;bottom:34px;height:1px;overflow:hidden;background:#fff;}
+.comment_text{ height:40px; border:1px solid #b8b8b8; padding-left:13px;color:#666;}
+.comment_release{padding-left:380px; overflow:hidden; margin-top:10px; width:100px; height:35px; border-bottom:1px solid #ededed; margin-bottom:10px; }
+.cancel{ display:block; float:left; font-size:14px; color:#393939; margin-right:10px;}
+.release{display:block; float:left; width:50px; height:21px; border-radius:4px; background-color:#3692ea; font-size:14px; color:#fff; text-align:center;}
+.cancel:hover{ text-decoration:underline;}
+.release:hover{ text-decoration:underline;}
+.comment_details_box{ padding-bottom:10px;}
+.comment_details{border-bottom:1px dashed #e5e5e5; padding-bottom:10px;}
+.comment_top{ font-size:12px; color:#666666;padding-top:8px;}
+.comment_bottom {font-size:12px; color:#333333;padding-top:10px;}
+
+.bottom_comment{width:100%;height:5px;overflow:hidden;background:url(${base}/oa/page/knowledge/knowledgeSquare/images/popup_comment_bottom.png) no-repeat right;}
+.bottom_comment div{width:3px;height:5px;overflow:hidden;background:url(${base}/oa/page/knowledge/knowledgeSquare/images/popup_comment_bottom.png) no-repeat;}
+
+.push_all{padding-top:8px;}
+.push_all a{display:block;float:right;color:#fff;background:#3692EA;padding:4px 8px;line-height:18px;}
+</style>
+<meta charset="utf-8">
+<title>弹窗</title>
+</head>
+
+<body style="height:100%;">
+
+<div class="popup_box">
+      <div class="top_popup"></div>
+      <div class="center_popup" id="center_popup">     	        
+        
+		<div class="annex_box clearfix"><span class="annex_box_span">附件：</span><div class="annex_box_div" id="attachList"></div></div>
+        <div class="comment_btn clearfix"><a id="commentBtn" href="javascript:void(0)">评论</a></div>
+                    
+                    <div class="write_comment">
+                    	<div class="top_comment"><div></div></div>
+                        <div class="center_comment" id="center_comment">
+                        	               
+                        </div>
+                        <div class="bottom_comment"><div></div></div>
+                    </div>
+      </div>
+      <div class="bottom_popup"></div>
+</div>
+</body>
+<script type="text/javascript">
+	var announcementId="${announcementId}";
+	var noRead="${noRead!}";
+	var attachList;
+	$(function(){
+		myInit();		
+		initAttach();
+		layout();
+		
+		$('#commentBtn').bind('click',function(){
+			$('.write_comment').slideToggle('fast');
+		});
+		
+		$(window).resize(function(){
+			layout();
+		});
+		if(!noRead)
+		{
+			clickRead();
+		}
+	
+		
+	});
+	function initAttach(){
+		attachList = new EDEN_upload('attachList',{servlet:'${base}/servlet/uploadServlet',inputHeight:22, inputWidth:634});
+		attachList.setAttachList({'tableName':'oa_announcement','tableKey':'id','tableKeyId':announcementId});
+	}
+	
+	function clickRead()
+	{
+		
+    	var url="${base}/admin/announcement/clickAnnouncement.action?etc="+new Date().getTime()
+   	   $.post(url, "announcementId="+announcementId, function(result) {
+   		
+ 	      
+   	     });
+
+		
+	}
+	
+	function getCnType(type)
+	{
+	  
+		var types=${announcementTypesString};
+		  for(var t in types){ 
+			 
+			  if(types[t].key==type)
+			  {
+				  return types[t].value;
+			  }
+		  }
+		  return type;
+	}
+	
+	function myInit(){
+		jQuery.post("${base}/admin/announcement/selectAnnouncement.action?etc="+new Date().getTime(), 
+    			{"id":announcementId,"showCon":1}, function (loader) {
+    				var data=loader.data;
+    				var item=data[0];
+    				
+    				var  cnType= getCnType(item.announcementType);
+    				
+    				var ele="<div class='title_box clearfix'><a href='javascript:void(0)' class='title_text'>"+item.title+"</a><span class='Classification_two'>分类："+cnType+"</span></div>";
+    				ele+="<div class='author_box clearfix'><a>发布人：</a><a>"+item.authorCn+"</a><span class='title_time'>"+item.startDate+"</span></div>";
+    				ele+="<div class='title_content'><p>"+item.content+"</p></div>";
+    				$("#center_popup").prepend(ele);
+    				fillComment();
+		},"json");   
+	}
+	
+	function fillComment(){
+		jQuery.post("${base}/admin/announcement/selectComment.action?etc="+new Date().getTime(), 
+    			{"announcementId":announcementId}, function (loader) {
+    				var data=loader.data;
+    				$("#center_comment").empty();
+    				var ele="<div class='comment_zd'></div><input id='commentText' class='comment_text' onblur=blurObj("+"this"+") onfocus=focusObj("+"this"+") value='写下你的评论'>";
+    				ele+=" <div class='comment_btn clearfix'> <a class='release' href='javascript:void(0)' onclick='addComment(&quot;"+announcementId+"&quot;)'>发布</a></div>";
+    				
+    				for(var key in data){
+    					var item=data[key];
+    					var creatdate=item.createDttm;
+    					creatdate=creatdate.replace("T"," ");
+    					ele+="<div class='comment_details'>";
+    					ele+="<div class='comment_top clearfix'><span class='flleft'>"+item.replyCnName+"</span><span class='flright'>"+creatdate+"</span></div>";
+    					ele+="<div class='comment_bottom'><span>"+item.replyContent+"</span></div>";
+    					ele+="</div>";     			   
+    				}	
+    				
+    				 $("#center_comment").append(ele);
+    				 $('.comment_text').width($('.comment_text').parent().width()-20);
+    				 
+    				 var detaLength=$('.comment_details').length;
+    				 if(detaLength>2){
+    					 $('.comment_details:last').after("<div class='push_all clearfix'><a onclick='pushToggle()' href='javascript:void(0)'>更多</a></div>");
+    					 $('.comment_details').each(function(index){
+    						 if(index>2){
+    							$(this).css('display','none'); 
+    						 }
+    					 }); 
+    				 }
+    				 
+		},"json"); 
+		
+	}
+	function addComment(announcementId){
+		var commentText=$("#commentText").val();
+		if(commentText==null||commentText==""||commentText=="写下你的评论"){
+			$.dialog.tips("评论不能为空");
+			return;
+		}
+		$.post("${base}/admin/announcement/addComment.action?etc"+new Date().getTime(), {"announcementId":announcementId,"announcementReply.replyContent":commentText}, function(result){
+            if(result.result=="success"){
+            	fillComment();
+            }
+            $.dialog.tips(result.message);
+        });
+		
+	}
+	
+	function layout(){
+		
+		$('#attachList').width($('#attachList').parent().width()-$('#attachList').siblings('.annex_box_span').outerWidth(true)-28);
+		$('#attachList').css('height','auto');
+		$('.comment_text').width($('.comment_text').parent().width()-20);
+	}
+	
+	function pushToggle(){
+		if($('.push_all').hasClass('has_push')){
+			$('.push_all').removeClass('has_push');
+			
+			$('.push_all a:first').html("更多");
+			$('.comment_details').each(function(index){
+				 if(index>2){
+					$(this).slideUp('fast'); 
+				 }
+			 }); 
+		}else{
+			$('.push_all').addClass('has_push');
+			$('.push_all a:first').html("收起");
+			$('.comment_details').each(function(index){
+				 if(index>2){
+					$(this).slideDown('fast'); 
+				 }
+			 }); 
+		}
+	}
+	
+	function focusObj(obj){
+		$(obj).css('color','#000');
+		if(obj.value=="写下你的评论"){
+			$(obj).val("");
+		}
+	}
+	
+	function blurObj(obj){
+		$(obj).css('color','#666');
+		if($.trim(obj.value)==""){
+			$(obj).val("写下你的评论");
+		}
+	}
+</script>
+</html>

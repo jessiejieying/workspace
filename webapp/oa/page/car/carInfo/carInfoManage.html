@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+<link rel="stylesheet" type="text/css" href="${base}/oa/resource/style/css/imgList.css">
+<style>
+.advanced_search_bar{position:static;}
+.container{width:auto !important; height:auto !important;}
+</style>
+</head>
+
+<body style="height:100%;">
+	<!--  body 的style  应属性加上 height:100%;   是为了计算页面高度   -->
+
+	<div id="tree_wrap"
+		style="width: 100%; height: 100%; overflow: hidden; display: none;">
+		<div id="tree_search" class="tree_search"></div>
+		<div id="tree" style="width: 100%; padding-top: 3px;"></div>
+	</div>
+
+	<!-- tree_wrap 这个 div 用于放置 左侧树和搜索树的工具栏 -->
+
+	<div id="grid_wrap" style="width: 100%; height: 100%; overflow: hidden; display: none;">
+		<div id="grid_toolbar" class="ed-toolbar">
+				<@f.operateRight operate="/admin/carInfoManager/insert.action">
+				<a btn_id="add" class="btn btn-info">添加车辆信息</a>
+				</@f.operateRight> 
+				<@f.operateRight operate="/admin/carInfoManager/deleteCarInfo.action">
+					<a btn_id="delete" id="del_id" class="btn btn-warning">删除</a>
+					</@f.operateRight>
+
+					<select name="" id="search">
+					<option value="licenseNum">车牌号</option>
+
+					</select>
+
+
+
+				<input id="search_text" class="search_text" value="请输入关键字"
+					name="" type="text">
+
+
+				<input class="btn" name=""
+					onClick="SimpleSearch()" value="查 找" type="button">
+		
+				<a id="advanced_search_btn" class="btn">高级查找</a>
+
+			<a class="btn btn-info" title="以图片形式展现" id="listShowPicture">图</a>
+			<a class="btn btn-info" title="以列表形式展现" id="listShowList">列表</a>
+
+		</div>
+		<div id="advanced_search_bar" class="ed-advanced-search-bar">
+			<table cellpadding="0" cellspacing="0" border="0" align="center">
+				<tr>
+					<td><label for="search_license_num">车牌号：</label></td>
+					<td><input id="search_license_num" name="search_license_num"
+						value="" type="text"></td>
+
+					<td><label for="search_car_type">车型：</label></td>
+					<td><select id="search_car_type" name="search_car_type"
+						value="0" type="text">
+							<option value="">全部</option> <#list carTypeSet as dataDict>
+							<option value="${dataDict.dictValue}">${dataDict.displayName}</option>
+							</#list> </td>
+					<td><label for="search_status">状态：</label></td>
+					<td><select id="search_status" name="search_status"
+						value="0" type="text">
+							<option value="">全部</option> <#list carStatusSet as dataDict>
+							<option value="${dataDict.dictValue}">${dataDict.displayName}</option>
+							</#list> </td>
+					<td><input class="btn btn-info" name="advancedSearch" onClick="advancedSearch()" value="查 找" type="button"></td>
+				</tr>
+			</table>
+		</div>
+
+		<div id="grid" style="width: 100%;overflow:auto;"></div>
+		<div class="ed-grid-page">
+		<div id="grid_page"></div>
+		</div>
+
+	</div>
+
+</body>
+<#include "/aufw/page/include/script.html">
+<script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+<script src="${base}/form/fceform/js/fcpub.js"></script>
+<script src="${base}/form/fceform/js/fcrundj.js"></script>
+<script src="${base}/form/fceform/js/tabpane.js"></script>
+<script src="${base}/oa/resource/js/ImgListPlug.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script>
+    var layout,treeObj,tree,treeSearch,grid,data,form,tabbar,option,sendUrl,carId,dhxWins,w1,listShowR;
+    var version='1';
+    var wf_name='meeting_manage';
+	 window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+    <!--    设置dhtmlx各组件用到的图片的的路径-->
+    function init(listShow,first) {       //初始化 方法
+		listShowR = listShow;
+        layout = new dhtmlXLayoutObject(document.body, "1C");     //添加一个 3L的layout
+        layout.cells('a').hideHeader();         //隐藏 cell a 的 标题 ， b c 同理
+		//layout.cells('c').hideHeader();
+		//layout.cells('b').hideHeader();
+        layout.attachEvent('onResizeFinish', page_layout);//添加自定义程序处理事件
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        <!-- 为layout添加监听事件    -->
+        <!-- onResizeFinish 为在layout大小变了之后触发 -->
+        <!-- onPanelResizeFinish 为在layout中一块区域大小变了之后触发 -->
+        data = new dhtmlXDataStore({
+           url: "${base}/admin/carInfoManager/selectCarInfos.action?etc="+ new Date().getTime(),
+            datatype: "json"
+        });     //添加一个 为DataStore
+		
+        layout.cells('a').attachObject('grid_wrap');
+        // 在 layout的 cell b上添加 ID为 grid_wrap 的div
+		if(listShow===1){
+			//$("#grid").removeClass();
+			grid = new dhtmlXGridObject('grid');
+			// 把 grid 添加到  ID为 grid的div中
+			grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+			//设置 grid上 图片的路径
+			grid.setHeader(" ,车牌号,厂牌型号,车型,座位,购买日期,下次年检时间,状态,操作");
+			//设置 grid每列的标题
+			grid.setColumnIds("check,licenseNum,labNum,carType,seat,buyTime,nextCheckTime,status,operate");
+			//设置 grid每列的数据  对应 json中的哪条数据
+			grid.setInitWidths("30,100,*,60,50,100,100,80,180");
+			//设置 每列的宽度
+          
+			grid.setColTypes("ch,ro,ro,co,ro,ro,ro,co,link");
+        
+			<#list carTypeSet as dataDict>                                                                         
+				grid.getCombo(3).put(${dataDict.dictValue},'${dataDict.dictName}');
+			</#list>
+			<#list carStatusSet as dataDict>                                                                         
+				grid.getCombo(7).put(${dataDict.dictValue},'${dataDict.dictName}');
+			</#list>
+			grid.init();
+			grid.enablePaging(true,15,999, 'grid_page', true);
+			//添加 grid的分页
+			//grid.enablePaging(fl, pageSize, pagesInGrp, parentObj, showRecInfo, recInfoParentObj)
+	/*          @参数: fl - true|false - 是否分页
+			*   @参数: pageSize - 每页的行数
+			*   @参数: pagesInGrp - 可见的页面的数量
+			*   @参数: parentObj - 放置分页的 div的ID
+			*   @参数: showRecInfo - true|false - enable|disable showing of additional info about paging state
+			*   @参数: recInfoParentObj - ID or container which will be used for showing paging state
+	*/
+			grid.setPagingSkin("toolbar");   //设置 分页的皮肤
+			grid.attachEvent("onRowSelect", doOnRowSelected);
+			grid.sync(data);                // grid从 DataStore中同步数据
+		}
+		if(listShow===0){
+			/*$('#grid').append("<ul id='pictureGrid' class='picture_grid'></ul>");
+			data.attachEvent("onXLE", function (){ //occurs when xml loading finished
+				$('#pictureGrid').empty();
+				for(i=0;i<data.dataCount();i++){
+					var itemId = data.idByIndex(i);
+					var imgsrc = data.item(itemId).imgsrc;
+					var vName = data.item(itemId).licenseNum; 
+					$('#pictureGrid').append("<li><img src='"+imgsrc+"' onContextMenu=showEvent()"+"><span>"+vName+"</span></li>")
+					}
+			});*/
+			var jsonurl="${base}/admin/carInfoManager/selectCarInfos.action?etc="+ new Date().getTime();
+			pictureInit(jsonurl);
+		}
+		if(first===true){
+		var formData = [
+        { type:"settings", position:"label-left", labelWidth:"65", inputWidth:50 },
+        { type:"fieldset", label:"车辆信息", inputWidth:"660", offsetLeft:10,
+			list:[
+				{
+					type:"hidden", offsetTop:5, list:[
+					{ type:"avatar", name:"imgsrc", url:'${base}/admin/attachmentInfoManager/attachmentInfoAction!uploadPhoto.action', label:"图片", inputWidth:200 
+					}
+                         
+                    ]
+                },
+				{
+					type:"hidden", offsetTop:5, list:[									  
+					{ type:"hidden", name:"id", value:"", label:"id" },
+                    { type:"input", name:"licenseNum", value:"", label:"车牌号",inputWidth:200 , required:true, validate:"NotEmpty" },
+					{ type:"newcolumn", offset:40},
+                    { type:"input", name:"labNum", value:"", label:"厂牌型号", inputWidth:200 },
+					]
+				},
+				
+				{
+					type:"hidden", offsetTop:5, list:[
+					{ type:"input", name:"engineNum", value:"", label:"发动机号", inputWidth:200 },
+					{ type:"newcolumn", offset:40},
+					{ type:"select", name:"carType", value:"", label:"车型", inputWidth:200 ,options:[
+						         
+							<#list carTypeSet as dataDict>                                                                         
+								{text:"${dataDict.displayName}", value:"${dataDict.dictValue}"}
+								<#if dataDict_has_next>
+									,
+								</#if>
+							</#list>
+							]},
+					]
+				},
+				{
+					type:"hidden", offsetTop:5, list:[
+
+					{ type:"input", name:"buyPrice", value:"", label:"购买价格", inputWidth:200 ,validate:'isNum'},
+					{ type:"newcolumn", offset:40},
+					{ type:"template", name:"buyTime", format:dateType, value:"", label:"购买时间", inputWidth:200}
+					]
+				},
+				{
+					type:"hidden", offsetTop:5, list:[
+					{ type:"input", name:"seat", value:"", label:"座位数", inputWidth:200,validate:'isNum' },
+					{ type:"newcolumn", offset:40},
+					{ type:"select", name:"status", value:"", label:"状态", inputWidth:200,options:[
+						         
+							<#list carStatusSet as dataDict>                                                                         
+								{text:"${dataDict.displayName}", value:"${dataDict.dictValue}"}
+								<#if dataDict_has_next>
+									,
+								</#if>
+							</#list>
+							]},
+					]
+				},
+				{
+					type:"hidden", offsetTop:5, list:[
+					{ type:"select", name:"driver", value:"", label:"司机", inputWidth:200 ,options:[
+						         {text:"", value:""},
+							<#list driverName as dataDict>                                                                         
+								{text:"${dataDict.name}", value:"${dataDict.id}"}
+								<#if dataDict_has_next>
+									,
+								</#if>
+							</#list>
+							]},
+					{ type:"newcolumn", offset:40},
+					{ type:"input", name:"phone", value:"", label:"手机", inputWidth:200,validate:'isInt' },			
+					]
+				},
+				{
+					type:"hidden", offsetTop:5, list:[
+					{ type:"template",name:"nextCheckTime", format:dateType,value:"", label:"年检时间", required:true, validate:"NotEmpty", inputWidth:200},
+					]
+				},
+				{
+					type:"hidden", offsetTop:5, list:[
+					{ type:"input", name:"remark", value:"", rows: 3,inputWidth: 515, label:"备注"},
+					]
+				},
+				{
+					type:"hidden", offsetTop:5, list:[
+					{type:"label",labelWidth:270},
+					{type:"newcolumn"},
+					{type:"button",value:"确定",name:"send"}
+					]
+				},
+			]
+        },
+		
+    ];
+		
+			dhxWins = new dhtmlXWindows();
+			dhxWins.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+			w1 = dhxWins.createWindow("w1", 20, 30, 800, 550);
+			w1.setText("车辆信息");	
+			w1.center();
+			w1.hide();
+			dhxWins.attachEvent('onClose', function (win) {
+				w1.hide();
+			});
+		
+			form = w1.attachForm(formData);//returns a dhtmlxForm object 
+			form.disableItem('send'); //禁用特定项
+			//form.bind(grid);
+			form.attachEvent('onButtonClick', function (id) {
+				if(id=='send'){
+					if(option=="update"){
+						sendUrl="${base}/admin/carInfoManager/updateCarInfo.action";
+					}
+					else if(option=="add"){
+						sendUrl="${base}/admin/carInfoManager/insert.action";
+					}
+					
+				 form.sendWithSuffix(sendUrl,"post","carInfo",function(data){
+					var datatest = eval("(" + data.xmlDoc.responseText + ")");
+						if(datatest.result=="success"){
+							SimpleSearch();
+							form.disableItem('send');
+							option="no";
+							w1.hide();
+						}
+						$.dialog.tips(datatest.message);
+						}
+			   		);
+				}
+			});
+		}
+		$('#advanced_search_btn').unbind('click');
+		//searchBarCommon('advanced_search_bar',0,'advanced_search_btn','grid_toolbar','grid');
+		searchToggle('advanced_search_btn','advanced_search_bar');
+        page_layout();      // 调用page_layout方法   ,方法的声明在下面
+    }
+	
+	function  SimpleSearch(){
+		data.clearAll();
+		var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+		var clu = $("#search").val();
+		var url = "${base}/admin/carInfoManager/selectCarInfos.action?carInfo."+clu+"="+window.encodeURI(value)+"&etc="+ new Date().getTime();
+		window.data.data.url = url;
+		data.load(url);
+		if(listShowR===0){
+			pictureInit(url);
+		}
+    }
+   
+    function  advancedSearch(){
+		
+		data.clearAll();
+		
+		var licenseNum = $("#search_license_num").val()==''?'':$("#search_license_num").val();
+		var carType = $("#search_car_type").val()==''?'':$("#search_car_type").val();
+		var status = $("#search_status").val()==''?'':$("#search_status").val();
+		var url = "${base}/admin/carInfoManager/selectCarInfos.action?carInfo.licenseNum="+window.encodeURI(licenseNum)+"&carInfo.carType="+carType+"&carInfo.status="+status+"&etc="+ new Date().getTime();
+		window.data.data.url = url;
+		data.load(url);
+        if(listShowR===0){
+			pictureInit(url);
+		}
+    }
+
+    function pictureInit (jsonurl) {
+    	$('#grid').empty();
+		var seeting={
+			containsSize:{width:1150,height:800}, 				//设置imgList大小
+			renderTo:$("#grid"),			 					//设置父容器位置
+			enableShowDetails:true   							//是否显示详情
+		}
+		var iList = new imgListObject(seeting);					//新建imgList对象
+		iList.init();											//执行初始化操作
+		iList.hideTitle();	
+		var dataForm={
+			id:"id",//操作id
+			imgUrl:"imgsrc",
+			title:"licenseNum",
+			info1:{name:"车辆类型",value:"carTypeName"},
+			info2:{name:"座位",value:"seat"},
+			info3:{name:"状态",value:"statusValue"},
+			details:[
+				{type:"title",value:"licenseNum"},
+				{type:"line",name:"车辆类型",value:"carTypeName"},
+				{type:"line",name:"座位",value:"seat"},
+				{type:"line",name:"状态",value:"statusValue"},//状态还需要转换
+				{type:"line",name:"司机",value:"driverName"},
+				{type:"line",name:"购买时间",value:"buyTime"},
+				{type:"line",name:"购买价格",value:"buyPrice"},
+				{type:"textarea",name:"备注",value:"remark"}
+			]
+		}	
+		iList.setDataForm(dataForm);									//隐藏标题
+		iList.loadJson(jsonurl);							//获取数据并渲染
+		operation={							//设置操作函数，key为id value为a标签文本内容
+			deletes:"删除",
+			update:"修改",
+			checkDate:"查看日程"
+		}
+		iList.setFunction(operation);	
+		$(".deletes").bind("click",function(){
+			var imgId = $(this).parent().attr("id");
+			d(imgId);
+		});
+		$(".checkDate").bind("click",function(){
+			var imgId = $(this).parent().attr("id");
+			schedu(imgId);
+		});
+		$(".update").bind("click",function() {
+			$('#imgsrc_pick').html('[修改图片]');
+			var imgId = $(this).parent().attr("id");
+			e(imgId);
+		});
+		
+    }
+
+  	//执行任务
+    function execute(id){
+    	
+    	//$.dialog.tips("未定义");
+    	var item=data.item(id);
+    	
+    	//showWFLatest(wf_name,item.wfId);	
+    	var task_name='';
+   
+    	itsm_doAction(item.wfId,wf_name,task_name,version);
+    }
+
+	//查看流程图
+	function viewFlow(id){
+		var item=data.item(id);
+		showWfHistory(item.wfId);
+	}
+	
+		
+	
+
+	function goasWin(title,url) {           //弹出窗口
+		var isWin = window.top.dhxWins.isWindow('goasWin');
+		if (isWin == true) return;
+		window.top.createWindow(
+				{   id      :'goasWin',
+					text    : title,
+					setModal: true,
+					url     : url,
+					width   :'890',
+					height  :'550'
+				}
+			);
+		}
+
+
+    function toolbar_func(id){           // grid上面 的那些按钮的 功能
+       if (id == 'add') {
+    	   $('#imgsrc_pick').html('[修改图片]');
+        	//goasWin('新增菜单','${base}/form/fceform/common/run.html?djsn=mealMenuAdd&djtype=goas');
+        	//initWorkflow(wf_name,"增加事件",version);
+			form.setItemValue("imgsrc","${base}${defaultPicUrl}");
+			form.clear();
+			w1.show();
+			option="add";
+			var addId=new Date();
+			var add_data={
+					id:addId
+			};
+			data.add(add_data,0);
+			if(listShowR===1){
+				grid.selectRowById(addId);
+			}
+			//form.setItemFocus("carName");//设置焦点
+			form.enableItem("send");
+        }
+        /*if (id == 'edit') {
+        	//eventWin('修改事件','${base}/form/fceform/common/run.html?djsn=eventEdit&djtype=itsm&wf_id=678')
+			if(listShow===0){
+				if(typeof(carId) == "undefined") {
+					$.dialog.tips('请选择一条数据！');
+					return;
+				}
+				form.showItem("picture");
+				option = "update";
+				form.setItemFocus("carName");//设置焦点
+				form.enableItem("send");
+			}else if(listShow===1){
+				var row_id = grid.getCheckedRows(0);
+				e(row_id);
+			}
+        }*/
+        if (id == 'delete') {
+			if(listShowR===1){
+				 var row_id = grid.getCheckedRows(0);
+	
+			if (row_id == '') {
+				$.dialog.tips('请至少选择一条数据！');
+				return;
+			}
+			var idArr=new Array();
+			idArr = row_id.split(',');
+		
+			if (row_id.length == 0) return;
+			$.dialog.confirm('你确定要删除这些数据吗？', function () {
+			//  var idArr = new Array();
+			// var nameArr=new Array();
+			// for (var i = 0; i < idArr.length; i++) {
+		
+			
+               // idArr.push(data.item(row_id[i]).userId);
+               // nameArr.push(data.item(row_id[i]).accountName);
+			//}
+			
+				$.post("${base}/admin/carInfoManager/deleteCarInfo.action", {"idArr":row_id},function(result){
+					if(result.result="success"){         
+						for (var i = 0; i < idArr.length; i++) {           
+							data.remove(idArr[i]);
+						}
+					}
+					$.dialog.tips(result.message);
+					//SimpleSearch();
+				});
+			});
+			}
+        }
+    }
+	
+	function formClear(){
+		form.getInput("carName").value='';
+		form.getInput("carPlace").value='';
+		form.getInput("personNum").value='';
+		form.getInput("standard").value='';
+		form.getInput("carSeat").value='';
+		form.getInput("carArea").value='';
+		form.getInput("remarks").value='';	
+	}
+
+	function schedu(id){
+
+		window.top.createWindow({
+				text    :'查看日程',
+				url     :'${base}/admin/carInfoManager/carSchedulerPage.action?id='+id,
+				id      :'carScheduler',
+				width   :'970',
+				height  :'500',
+				prent_ifr:window
+				
+				
+		})
+	}
+	function doOnRowSelected(id) {
+		if(!window._add_new_child){
+		
+			updateFormBtn({
+            "dataStore":data,
+            "grid":grid,
+            "rowId":id,
+            "forms":[form]
+        });
+        window._add_new_child=false;
+		}else{
+        return false;
+		}
+	}
+   
+	function d(id) {       //删除 grid中的一行数据
+		if(listShowR===1){
+			grid.selectRowById(id);
+		}
+		$.dialog.confirm('你确定要删除这条数据？', function () {
+   
+			$.post("${base}/admin/carInfoManager/deleteCarInfo.action", {"idArr":id}, function(datatest){
+		
+			//var datatest = eval("(" + data.xmlDoc.responseText + ")");
+				if(datatest.result=="success"){
+					SimpleSearch();		 
+				}
+			
+				$.dialog.tips(datatest.message);
+			
+			
+			
+			});
+		});
+		form.disableItem("send");
+	}
+
+	function e(id) {      //编辑 grid中的一行数据
+		//alert(id);
+		w1.show();
+		if(listShowR===0){
+			showToForm(id);
+		}
+		//var pictureUrl = data.item(id).imgsrc;
+		//$("#picture_img")[0].src=pictureUrl; 
+		option = "update";
+		//carId = id;
+		if(listShowR===1){
+			grid.selectRowById(id);//选中行
+		}
+		//layout.cells('b').view("def").setActive();
+		//window._now_grid_edit_id=id;      //把当前正在编辑的这条数据的ID 保存起来，用于  form保存后，将结果同时保存到左侧树中；
+		form.setItemFocus("licenseNum");//设置焦点
+		form.enableItem("send");//启用指定项
+	   // form2.enableItem("send");
+	}
+	function showToForm(itemId){
+		//form.clear();
+		//$("#picture_img")[0].src=data.item(itemId).imgsrc; 
+		form.setFormData(data.item(itemId));
+	}
+    function page_layout() {                 // page_layout为控制页面布局的方法 ，  用于自适应窗口的大小
+        var grid_wrap_height = $('#grid_wrap').height();  //得到 ID为  grid_wrap 的div的高度
+        $('#grid').height(grid_wrap_height - 53 );    //设置  ID为  grid 的div的高度
+
+        if(listShowR==1)  //列表
+		{
+			
+			$('#grid').height($('#grid_wrap').height() - 50-35);
+		}
+        
+        var grid_wrap_width = $('#grid_wrap').width();
+		$('#grid').width(grid_wrap_width);
+        
+        $('.xhdr').each(function(){
+			$(this).siblings('div.objbox').find('.obj').width($('#grid').width()-10);
+			$(this).siblings('div.objbox').find('th').eq(1).css('width','auto');
+		});	
+        
+        if(grid)    grid.setSizes();                   // 如果grid 存在，则 让 grid 适应下窗口的大小
+    }
+    $(function () {
+    	
+    	
+    	var delId=$('#del_id');  //删除按钮图片界面时隐藏
+		if(delId)
+		{
+			delId.css("display","none");
+		}
+    	
+         setTimeout(function(){init(0,true);}, 0);                          //在 页面加载好后，触发init方法；
+		$('#listShowList').click(function(){
+			if(delId)
+			{
+				delId.css("display","none");
+			}
+			
+			init(1,false);
+			form.bind(grid);
+			$('#grid').css('overflow','hidden');
+			$('#grid').height($('#grid_wrap').height() - 30-35);
+			
+		})
+		$('#listShowPicture').click(function(){
+			if(delId)
+			{
+				delId.css("display","inline-block");
+			}
+			
+			init(0,false);
+			$("#grid_page").empty();
+			$('#grid').css('overflow','auto');
+			$('#grid').height($('#grid_wrap').height()- 50);
+
+		});
+		//$('#grid_toolbar a').last().addClass('last');   //为grid上面的一排按钮中的最后一个li添加一个为‘last’的class
+        $('#grid_toolbar a').click(function(){       //那些按钮 点击之后 触发 toolbar_func 方法
+            var id=$(this).attr('btn_id');
+            toolbar_func(id);
+        });
+		
+		$("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+
+	
+    })
+</script>
+</html>

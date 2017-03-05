@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+<#include "/aufw/page/include/head.html">
+</head>
+<body style="height:100%;">
+<#include "/aufw/page/include/loading.html">
+	<div class="container-layout line">
+<#include "/aufw/page/include/script.html">
+        <table style="width: 100%;" id="common_table">
+            <tr>
+            	<!-- 左侧 -->
+                <td id="td_tree" style="width: 250px;">
+                    <div class="container-left   pos-rel">
+                    <div class="line border-bottom padding-left padding-top js-line-top">
+                        <div class="form-group x10 ">
+                            <div class="field field-icon-right">
+                                <input type="text"  id="search_tree" class="input left-tree-input" placeholder="搜索">
+                                <span class="tree-search-num js-tree-search-num">0</span>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="drop left-drop x1-right  margin-top">
+                            <i class="icon icon-ellipsis-h"></i>
+                            <ul class="drop-menu">
+                                <li>
+                                    <a href="javascript:void(0)" data-id="0" class="icon icon-refresh js-tree-refresh"></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" data-id="1" class="icon-folder-open js-tree-open"></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" data-id="2" class="icon-folder js-tree-close"></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tree-father overfl">
+                                <div id="js_tree"></div>
+                        </div>
+                    </div>
+                </td>
+                <!-- 右侧 -->
+                <td class="ver-top">
+                    <div class="grid-table-top" id="grid_table">
+                      <div class="js-tool-bar">
+                        <div class="form-group ">
+                        	<@f.operateRight operate="/admin/org/addOrg.action">
+                            <div class="button common-skin-btn-syle01 js-add-account"  id="add">增加</div>
+                            </@f.operateRight>
+                            <@f.operateRight operate="/admin/org/deleteOrg.action">
+                            <div class="button  margin-small-left" id="delete">删除</div>
+                            </@f.operateRight>
+                            <select id="search" class="input display-ib margin-small-left" style="width: 100px;" name="age">
+                                <option value="criteriaUserName">姓名</option>
+                            </select>
+                            <div class="display-ib input-father" >
+                                <input id="search_text" type="text" class=" tool-bar-input" id="grid_input" placeholder="输入关键字"/>
+                            </div>
+                            <div class="button common-skin-btn-syle01" id="grid_search">搜索</div>
+                            <div class="button js-level-search">高级搜索<span class="icon-long-arrow-down"></span></div>
+                        </div>
+                    <div class="level-searh form-group" style="display: none;">
+                        <span class="ft12">姓名:</span>
+                        <div class="display-ib " >
+                            <input  id = "senior_orgName" type="text" class="tool-bar-input"  placeholder="" />
+                        </div>
+                        <div class="button common-skin-btn-syle01" id = "senior_grid_search">搜索</div>
+                    </div>
+    </div>
+                    <div class="js-grid-father grid-father">
+                        <table id="manage_grid"  class="bsgrid">
+                        <tr>
+                            <th w_index="id"  w_hidden="true" class="hidden"></th>
+                            <th w_check="true"  width="40" ></th>
+                            <th w_index="username" width="100">姓名</th>
+                            <th w_index="seq">排序号</th>
+                            <th w_index="phone" width="150">电话号码</th>
+                            <th w_index="cellphone" width="150">手机号码</th>
+                            <th w_index="duanhao" width="150">虚拟网</th>
+                            <th w_index="operate" width="100">操作</th>
+                        </tr>
+                        </table>
+                    </div>
+                    </div>
+
+                </td>
+            </tr>
+        </table>
+	</div>
+<script>
+
+var gridOne, jsTree, orgCode;
+var selectURL = "${base}/admin/numManager/queryContactManage.action";
+$(function(){
+    layOut("#common_table","#grid_table");
+    //tree初始化
+    $("#js_tree").jstree({
+		"plugins" : ["search"],
+		"themes": {
+		    "theme": "classic",
+		    "dots": true,
+		    "icons": false
+		},
+		'core' :{
+		    "check_callback" : true,
+		    'data' : {
+		     	'url' : "${base}/admin/numManager/showOrgUserTree.action?etc="+new Date().getTime(),
+		        'dataType':'json'	     	
+		    }
+		}
+    }).on("click.jstree",".jstree-anchor",function(e,data){
+    	orgCode = $(this).attr("orgcode");
+		gridOne.changeUrl(selectURL + "?userInfo.depCode=" + orgCode+"&etc="+new Date().getTime());
+
+    }).on("loaded.jstree",function(e,data){
+    	jsTree = $('#js_tree').jstree();
+    	jsTree.open_node("B00001");
+        var allNode=jsTree.get_all_node();
+        for(var i= 0,max=allNode.length;i<max;i++){
+            var hasChild=jsTree.get_node(allNode[i]).children;
+            if(hasChild.length<1){
+                jsTree.set_icon(allNode[i],"jstree-file");
+            }
+        }
+    });
+
+    //树的拖曳 handles:{e:右边,s:下边}
+    $("#td_tree").resizable({
+        handles: "e",
+        helper: true,
+        maxHeight: 1000,
+        maxWidth: 1000,
+        minHeight:100,
+        minWidth: 250,
+        onStartResize: function () {},
+        onResize: function () {},
+        onStopResize: function () {
+            //将表头和表体的宽度设置成一样
+            $(".bsgrid-header").each(function(){
+                var $this=$(this);
+                $this.css({"width":$this.next(".bsgrid").width()})
+            });
+        }
+    });
+
+    //js树刷新，打开，关闭
+    $(document).on("click",".js-tree-refresh,.js-tree-open,.js-tree-close",function(){
+        var id=$(this).data("id");
+        if(id=="0"){
+            jsTree.refresh();
+        }
+        else if(id=="1"){
+            jsTree.open_all();
+        }
+        else if(id=="2"){
+            jsTree.close_all()
+        }
+    });
+
+    var to = false;
+    //jstree 搜索
+    $('#search_tree').keyup(function () {
+        if(to) { clearTimeout(to); }
+        to = setTimeout(function () {
+            var v = $('#search_tree').val();
+            $('#js_tree').jstree().search(v);
+            var counter=$("a:contains('"+v+"')").size();
+            $('.js-tree-search-num').text(counter);
+
+            if(v==""){
+                $('.js-tree-search-num').text("0");
+            }
+
+        }, 250);
+	});
+    
+    //grid初始化
+     gridOne=$.fn.bsgrid.init("manage_grid", {
+        url:selectURL + "?etc="+new Date().getTime(),
+        row_primary_key: "primaryKey",
+        autoLoad: true,
+        pageSizeSelect: true,
+        pageSize:15,
+        complete:function(options, XMLHttpRequest, textStatus){
+
+        },
+        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+        },
+        additionalAfterRenderGrid:function(){
+            gridOne.initGrid();
+        }
+    }); 
+
+
+    //工具条高级搜索
+    $(document).on("click",".js-level-search",function(){
+            girdTable(this);
+        $('.icon-long-arrow-down').toggleClass('icon-long-arrow-up');
+    });
+    //工具条高级搜索
+    $(document).on("click","#senior_grid_search",function(){
+        var orgName = $("#senior_orgName").val();
+        gridOne.changeUrl(selectURL + "?criteriaUserName=" + window.encodeURI(orgName) +"&userInfo.depCode=" + orgCode+ '&etc='+new Date().getTime());
+    });
+    //工具条搜索
+    $(document).on("click","#grid_search",function(){
+        var clu = $("#search").val();
+        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+        gridOne.changeUrl(selectURL + "?" + clu + '=' + window.encodeURI(value) + "&userInfo.depCode=" + orgCode+'&etc='+new Date().getTime());
+    });
+    
+    //工具条增加
+    $(document).on("click","#add",function(){
+    	var jsTree= $('#js_tree').jstree();
+		var parentId = jsTree.get_selected()[0];
+
+		if(jsTree.get_parent(parentId)=="B00001"){
+			layer.msg('请选择三级以上');
+			return;
+		}
+		else if(parentId=="B00001"){
+			layer.msg('请选择三级以上');
+			return;
+		}
+       
+        if (parentId) {
+            var win = {text:"添加联系人", url:"${base}/admin/numManager/addNumManage.action?userInfo.depId="+parentId,width:'900',height:'550', id:"addOrgWin",'parentIfr':window};
+            window.top.createWindow(win);
+        } else {
+            layer.msg('请选择上级组织！');
+        }
+    });
+    //工具条删除
+    $(document).on("click","#delete",function(){
+        var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+        
+        if(checkedRowsRecoreds.length < 1) {
+        	layer.msg('请至少选择一条数据');
+        	return
+        }
+        var orgIdArr=[];
+        var orgCodeArr = [];
+        for(var i = 0; i < checkedRowsRecoreds.length; i ++) {
+        	var record = checkedRowsRecoreds[i];
+        	orgIdArr.push(record.id);
+        }
+		layer.confirm('你确定要删除这些数据吗？', function(index){
+		   
+		    $.post("${base}/admin/numManager/deleteUserInfo.action", {"userIds":orgIdArr.join(",")}, function(result){
+		        if(result.resultFlag=="true"){
+		            gridOne.refreshPage();
+		            jsTree.refresh();
+		        }
+		        layer.msg(result.message);
+		    });
+		    
+		    layer.close(index);
+		});
+        
+    });
+
+});
+
+//删除
+function d(selId){
+  	layer.confirm('你确定要删除这条数据吗？', function(index){		   
+	    $.post("${base}/admin/numManager/deleteUserInfo.action", {"userIds":selId}, function(result){
+	    	alert(result);
+	        if(result.resultFlag=="true"){
+	            gridOne.refreshPage();
+	            jsTree.refresh();
+	        }
+	        layer.msg(result.message);
+	    });
+	    
+	    layer.close(index);
+	});
+}
+
+function getRecord(selId) {
+	var getIndex = -1,getId="#grid_"+selId;
+    getIndex = $(getId).attr("index");
+    if(getIndex == -1){
+    	return null;
+    }
+	return gridOne.getRowRecord(gridOne.getRow(getIndex));
+}
+
+//授权
+function a(selId){
+	if(selId){
+		var win = {text:"权限授予", url:"${base}/admin/org/addAuthWin.action?orgTree.orgId="+selId, id:"addAuthWin",'parentIfr':window}
+		window.top.createWindow(win);
+	}
+}
+
+//修改
+function e(selId){
+	if(selId){
+		var win = {text:"修改联系人", url:"${base}/admin/numManager/addNumManage.action?userInfo.userId="+selId,width:'900',height:'550', id:"updateOrgWin",'parentIfr':window};
+		window.top.createWindow(win);
+	}
+}
+
+</script>
+</body>
+</html>

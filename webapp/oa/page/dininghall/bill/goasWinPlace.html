@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/list.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/icon.css">
+</head>
+<style type="text/css">
+	html,body,div,li,ul{margin: 0; padding: 0; list-style: none;}
+	.content{width: 600px; height: 400px;  margin: 0 auto; margin-top: 30px; border: 1px solid #ccc;}
+	.content ul{
+		width: 540px;
+		height: 340px;
+		border-bottom:1px solid #ccc;
+		padding: 0 30px 0 30px;
+		overflow-y:scroll; 
+	}
+	.content li{
+		float: left;
+		width: 154px;
+		height: 18px;
+		line-height: 18px;
+		margin: 10px;
+	}
+	.save{
+		margin-top: 5px;
+		margin-left: 480px;
+		width:100px;
+		height:30px;
+	}
+	
+</style>
+<body>
+<div class="content">
+		<ul>
+        <#list dininghallList as dininghall>
+		<li><input type ="checkbox" name="place" value="${dininghall.id}" />${dininghall.dininghallName}</li>
+        </#list>
+		</ul>
+		<input id="save" class="save" type="button" value="保 存" onClick="save()" />
+</div>
+<style>
+</style>
+</body>
+<script src="${base}/aufw/resources/common/js/jquery.js"></script>
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+<script>
+	//console.log(mealContentOld);
+	function save(){
+		var result="";
+		var idResult="";
+		var place = document.getElementsByName("place");
+		for(var i in place){
+			if(place[i].checked == true){
+				result+=place[i].nextSibling.nodeValue+",";
+				idResult+=place[i].value+",";
+			} 
+		}
+		result=result.substring(0,result.length-1);
+		idResult=idResult.substring(0,idResult.length-1);
+		ParentIframe.form.getInput('place').value=result;
+		ParentIframe.form.getInput('placeId').value=idResult;
+		window.top.closeWin("goasWin");
+	}
+	$(function(){
+		var placeNew = document.getElementsByName("place");
+		var placeOldText = "${place}";
+		var placeOld = placeOldText.toString().split(",");
+		for(var i in placeNew){
+			for(var j in placeOld){
+				//console.log(mealContentNew[i].nextSibling.nodeValue);
+				if(placeOld[j] == placeNew[i].nextSibling.nodeValue){
+					placeNew[i].checked=true;
+				}
+			}
+		}	
+	});
+</script>
+</html>

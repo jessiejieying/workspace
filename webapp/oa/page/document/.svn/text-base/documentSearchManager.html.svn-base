@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+<meta charset="utf-8">
+<title></title>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/style.html">
+
+	<!--引用首页主题样式文件-->
+	<script src="${base}/edenui/common/js/ed_skins.js"></script>
+	<script>
+		setSkinsCss("admin_css");
+	</script>
+</head>
+
+<body style="height: 100%;">
+
+	<!-- 页面载入进度条 begin-->
+	<link rel="stylesheet" href="${base}/edenui/common/js/plugins/pace/themes/silver/pace-theme-loading-bar.css" />
+	<script src="${base}/edenui/common/js/plugins/pace/pace.eden.min.js"></script>
+	<!-- 页面载入进度条 end-->
+
+
+	<div id="grid_wrap"	style="width: 100%; height: 100%; overflow: hidden; display: none;">
+		<div id="toolbar" class="ed-toolbar" style="z-index:8;"> 
+	
+		  <div class="input-prepend input-append">
+		  
+		  <div class="btn-group">
+		   <input type="hidden" value="searchKey" id="search_type">
+	      <button class="btn dropdown-toggle" data-toggle="dropdown" id="ssearch">文件内容<span class="caret"></span> </button>
+	      <ul class="dropdown-menu">
+			<li><a value="searchKey">文件内容</a></li>
+		
+	      </ul>
+	    </div>
+		    
+		    <input class="span2" id="search_text" value="" type="text" placeholder="">
+		    <div class="btn-group">
+		      <button class="btn btn-info" onClick="SimpleSearch()">检索</button>
+		    </div>
+		  </div>
+
+		</div>
+		
+		
+		<div class="ed-grid">
+			<div id="grid"></div>
+		</div>
+		<div class="clearfix">
+    	<div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	    </div>
+    </div>
+	</div>
+
+</body>
+
+<#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<script>
+    var layout, treeObj, tree, treeSearch, grid, data, form,tree_form,flowName,flowVersion,user_id;
+    var version='1';
+  
+    window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+    
+    var baseUrl="${base}/admin/documentSearch/searchDoc.action";
+    
+    function init() {
+    	
+        layout = new dhtmlXLayoutObject(document.body, "1C");
+        layout.cells('a').hideHeader();
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        data = new dhtmlXDataStore({
+            url     :baseUrl+"?etc="+new Date().getTime(),
+            datatype:"json"
+        });
+	
+        layout.cells('a').attachObject('grid_wrap');
+
+        grid = new dhtmlXGridObject('grid');
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        grid.setHeader("标题,文件类型");
+        grid.setColumnIds("title,businessType");
+        grid.setInitWidths("*,200");
+        grid.setColTypes("ro,coro");
+        <#if typeDictList??>
+	        <#list typeDictList as type>
+	     	 grid.getCombo(1).put('${type.dictValue}', '${type.displayName}');
+	      </#list>
+    	 </#if>
+    
+        grid.init();
+        grid.enablePaging(true, 15, 999999, 'grid_page', true);
+        grid.setPagingSkin("toolbar");
+        grid.sync(data);
+        page_layout();
+        
+    } 
+   
+
+    function toolbar_func(id) {
+        if (id == 'add') {
+        	//initWorkflow(wf_name,"拟稿",version);
+           //openSelectWf()
+        }else if (id == 'clean') {
+        	
+        }else if (id == 'edit') {
+            //form.unlock();
+        }else if (id == 'delete') {
+
+        }
+    }
+    
+    /**
+     * 解析url参数
+     * 
+     */
+    function parser_request(url, parm) {
+    	var reg = new RegExp("(^|&)" + parm + "=([^&]*)(&|$)");
+    	var r = url.substr(url.indexOf("\?") + 1).match(reg);
+    	if (r != null)
+    		return unescape(r[2]);
+    	return null;
+    }
+   
+
+
+	
+    
+    
+    function seeInfo(id)
+ 	{
+    	var surl="${base}"+data.item(id).url;
+    	//var surl="${base}/form/fceform/common/run.html?djsn=oa_incoming_duein&djtype=eden&id="+id;
+    	window.top.createWindow({   id:'workFlow',
+			text                  :"查看",
+			setModal              :true,
+			url                   :surl,
+			width                 :'850',
+			height                :'500',
+			parent_ifr            :window
+			}
+
+		);	
+    	
+ 	}
+    
+    function form_mask_init(){
+        var grid_area=$('#grid > div:eq(1) > table');
+        var maskB_height=grid_area.height()+70;
+        var maskB_width=grid_area.width();
+        var maskB_left=grid_area.offset().left;
+        $('#form_maskB').height(maskB_height).width(maskB_width).css('left',maskB_left);
+
+    }
+
+    function page_layout() {
+        var grid_wrap_height = $('#grid_wrap').height();
+        $('#grid').height(grid_wrap_height - 50-40);
+        $('#grid').width($('#grid_wrap').width()-20);
+        if (grid)    grid.setSizes();
+        form_mask_init();
+    }
+
+	function  SimpleSearch(){
+		
+		var clu = $("#search_type").val();
+	    var value = $("#search_text").val();
+        var s=clu+'='+encodeURI(value);
+        data.clearAll();
+        var url=baseUrl+'?'+s+'&etc='+new Date().getTime();
+        window.data.data.url=url;
+        data.load(url);
+        page_layout();
+    }
+
+
+
+/*     //执行任务
+    function execute(id){
+    	//$.dialog.tips("未定义");
+    	var item=data.item(id);
+    	var task_name='';
+
+    	uf_doAction(item.wf_id,wf_name,task_name,version);
+    }
+ */
+
+    $(function () {
+        setTimeout(init, 0);
+        $('#toolbar .toolbar_btn').click(function () {
+            var id = $(this).attr('btn_id');
+            toolbar_func(id);
+        });
+
+  	 $('#ssearch').next().find('a').click(function(){
+	   $("#search_type").val($(this).attr('value'));
+        	$("#dataValid").val($(this).attr('value'));
+        	$('#ssearch').text($(this).text());
+        }) 
+        
+      
+        
+        $("#config_left_menu > li").click(function (event) {
+            $("#config_left_menu > li.on").removeClass('on').children('ul').slideUp(200);
+            $(this).addClass('on');
+            $(this).children('ul').slideDown(400);
+        });
+        $("#config_left_menu .level_2 > li").click(function (event) {
+            $("#config_left_menu .level_2 li.on").removeClass('on');
+            $(this).addClass('on')
+            event.stopPropagation();
+        })
+
+        $("#advanced_search_btn").click(function(){
+            $(this).toggleClass('advanced_on');
+            $('#advanced_search_bar').slideToggle(200);
+        });
+
+        $("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+    })
+    
+</script>
+</html>

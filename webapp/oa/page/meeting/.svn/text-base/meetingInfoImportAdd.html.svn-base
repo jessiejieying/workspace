@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+  <style type="text/css"></style>
+</head>
+
+<body > 
+<div class="form-print  form-pt88"  style="width:530px;"  id="showHtml">
+<div class="button common-skin-btn-syle01 js-add-account" id="meetingImport_insert" onclick="meetingImport_insert()">保存</div>
+  <h1 class="text-center margin-bottom padding-small-bottom">省直机关会议备案表<span style="font-size: 20px;font-family:'楷体';">（政府系统）</span></h1>
+  <div class="clearfix margin-bottom">
+      <span class="text-left form-per-w33 float-left form-pl20" >会议级别 
+  
+    <select id="meetingLevel">
+      <#list meetingLevelDictList! as entry>
+          <option value="${entry.dictValue!}">${entry.displayName!}</option>
+      </#list>
+    </select>
+    </span>
+    <span class="text-right form-per-w33 float-right" style="font-size: 13px;">编号： <input class="form-w80" type="text" id = "docNum" value = ""/></span>
+  </div>
+  <table  style="font-size:15px;width:530px;border: 1px solid #ef655d;color:#ef655d;font-family: '宋体';">
+    <tr style="height:37px;">
+      <td  width="108" style="text-align:center;vertical-align:middle;border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" >申报单位</td>
+          <td  style="border-bottom:1px solid #ef655d;">
+        <table style="width:420px;" height="37" frame="void">
+          <tr>
+            <td width="125" height="37" valign="middle"><input style=" width: 100%;height:37px;padding:13px 0 0 10px;border: 0;background-color:transparent;font-size: 15px;color:#000;" id="mainOrg" value="" /></td>
+            <td  width="85" style="color:#ef655d;height: 100%;border-right:1px solid #ef655d;border-left: 1px solid #ef655d;text-align: center;vertical-align: middle;font-family:'黑体';">联系人</td>
+            <td width="64" height="37" style="vertical-align: middle;"> <input style=" width: 100%;padding-left: 10px;border: 0;background-color:transparent;color:#000;" type="text" id="linkPeople"  value = "" /></td>
+            <td  width="56" style="height: 100%;border-left: 1px solid #ef655d;border-right: 1px solid #ef655d;text-align:center;color:#ef655d;padding: 0 5px;font-family:'黑体';" valign="middle">联系电话</td>
+            <td width="91"  style="vertical-align: middle; text-align: center;">
+            <input style=" width: 100%;padding-left: 10px;border: 0;background-color:transparent;color:#000;" type="text" id="linkPhone"  value = "" />
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr >
+      <td  width="108" style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">会议名称</td>
+      <td height="36" style="border-bottom:1px solid #ef655d;vertical-align: middle;"> <input style="padding-left: 10px; width: 420px;color:#000;" type="text" id="subject"  value = ""/></td>
+    </tr>
+    <tr >
+      <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">拟<span style="padding: 0 8px;"></span>邀<span style="padding: 0 8px;"></span>请<br>省<span style="padding: 0 8px;"></span>领<span style="padding: 0 8px;"></span>导</td>
+      <td height="38" style="border-bottom:1px solid #ef655d;vertical-align: middle;"> <input style="padding-left: 10px;color:#000;" type="text" id="attendanceLeader"  value =""/></td>
+    </tr>
+    <tr >
+      <td  width="108" style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">会议内容<br>(议程)</td>
+      <td height="74" style="border-bottom:1px solid #ef655d;vertical-align: middle;"> <textarea style=" width: 100%;height:78px;padding-left: 10px;padding-top:5px;border: 0;background-color:transparent;font-size: 15px;color:#000;" id="meetingContent"></textarea></td>
+    </tr>
+    <tr style="height:98px;">
+      <td  width="108" style="text-align:center;vertical-align:middle;border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">会<span style="padding: 0 10px;"></span>议<br>主要情况</td>
+      <td style="border-bottom:1px solid #ef655d;">
+        <table style="width:420px;" height="98" frame="void">
+          <tr>
+            <td width="45" height="49" style="color:#ef655d;border-right:1px solid #ef655d;text-align: center;vertical-align: middle;border-bottom:1px solid #ef655d;font-family:'黑体';" valign="middle">时间</td>
+            <td width="144" height="49" style="border-bottom:1px solid #ef655d;" valign="middle"> <input style=" width: 100%;height:39px;padding:13px 0 0 1px;border: 0;background-color:transparent;font-size: 15px;color:#000;" id="startDate" onfocus="WdatePicker({dateFmt:'yyyy月MM日',readOnly:true})" value=""/></td>
+            <td  width="68" style="color:#ef655d;height: 100%;border-right:1px solid #ef655d;border-left: 1px solid #ef655d;text-align: center;vertical-align: middle;border-bottom:1px solid #ef655d;font-family:'黑体';">规模<br>(人数)</td>
+            <td width="163" height="49" style="border-bottom:1px solid #ef655d;vertical-align: middle;"><input style=" width: 100%;padding-left: 10px;border: 0;background-color:transparent;color:#000;" type="text" id="meetingSize"  value = "" /></td>
+          </tr>
+          <tr>
+            <td width="45" height="49" style="color:#ef655d;border-right:1px solid #ef655d;text-align: center;vertical-align: middle;font-family:'黑体';" valign="middle">地点</td>
+            <td width="144" height="49" style="" valign="middle"> <textarea style=" width: 100%;height:39px;padding-left: 10px;border: 0;background-color:transparent;font-size: 15px;color:#000;padding-top: 12px;" id="location"></textarea></td>
+            <td  width="68" style="color:#ef655d;height: 100%;border-right:1px solid #ef655d;border-left: 1px solid #ef655d;text-align: center;vertical-align: middle;font-family:'黑体';">经费<br>(万元)</td>
+            <td width="163" height="49" style="vertical-align: middle;"><input style=" width: 100%;padding-left: 10px;border: 0;background-color:transparent;color:#000;" type="text" id="meetingMoney" value = "" /></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    
+  </table>
+</div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/edenui/common/js/plugins/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="${base}/form/resources/common/js/print.js"></script>
+</html>
+<script>
+
+  //会议导入
+  function meetingImport_insert(){
+  	var meetingLevel = $('#meetingLevel').val();
+  	var docNum = $('#docNum').val();
+  	var mainOrg = $('#mainOrg').val();
+  	var linkPeople = $('#linkPeople').val();
+  	var linkPhone = $('#linkPhone').val();
+  	var subject = $('#subject').val();
+  	var attendanceLeader = $('#attendanceLeader').val();
+  	var meetingContent = $('#meetingContent').val();
+  	var startDate = $('#startDate').val();
+  	var meetingSize = $('#meetingSize').val();
+  	var location = $('#location').val();
+  	var meetingMoney = $('#meetingMoney').val();
+
+  	//alert(subject+meetingLevel+meetingContent+startDate);
+  	if(subject==""){
+  		alert("会议名称不能为空");
+  		$("#subject").focus();
+		return;
+  	}
+  	
+  	jQuery.post("${base}/admin/meeting/meetingImportInsert.action",
+            {
+		        "meetingInfo.meetingLevel":meetingLevel,
+		        "meetingInfo.docNum":docNum,
+		        "meetingInfo.mainOrg":mainOrg,
+		        "meetingInfo.linkPeople":linkPeople,
+		        "meetingInfo.linkPhone":linkPhone,
+		        "meetingInfo.subject":subject,
+		        "meetingInfo.attendanceLeader":attendanceLeader,
+		        "meetingInfo.meetingContent":meetingContent,
+		        "meetingInfo.startDate":startDate,
+		        "meetingInfo.meetingSize":meetingSize,
+		        "meetingInfo.location":location,
+		        "meetingInfo.meetingMoney":meetingMoney
+            },
+            function(data){
+            	alert(data.result);
+            }   //成功后返回的函数
+    );
+
+  	
+  }
+  
+</script>

@@ -1,0 +1,311 @@
+﻿
+<#--  数据集配置，会根据dataset中的设置，
+      id:  后面用这个id名来调用数据 
+      sql:  根据sql语句来查询数据集，其中urlParam("xxx") 会将页面url中的xxx参数值赋值过来
+	  type:   取过来以什么类型存放，
+	           如果是 type="one"，则取查询的第一行数据，类型为map
+	           如果是 type="list"，则取查询的所有行数据，类型为list，每个子项类型为map  
+	  groupby： 当type="list"，对取回的数据集根据groupby的字段进行分类，后面可以用 id值+"_"+具体groupby值 调用
+	             
+  -->
+
+<datasets>
+	<dataset type="one" id="dataset1" sql=" select * from oa_send_document where wf_id='urlParam("wf_id")'"></dataset>
+	<#--     -->
+	<dataset type="list" groupby="advice_type" id="adviceDb" sql="select t.id,advice_type,t.advice_content,t.create_by,DATE_FORMAT(t.create_dttm,'%Y-%m-%d %T' ) CREATE_DTTM 
+from oa_document_advice t 
+where wf_id='urlParam("wf_id")' and t.data_valid=1"></dataset>
+		<dataset type="list" id="datasetAtt" sql="select name from  ea_attachment_info
+where table_key_id=(select id from OA_SEND_DOCUMENT where  wf_id='urlParam("wf_id")' )"></dataset>
+		
+</datasets>
+		<html style="width:100%;height:100%;overflow:hidden;">
+			<head>
+				<title>杭州市下城区政府发文稿</title>
+			</head>
+	<body  LeftMargin="25px" >
+
+	<DIV id="viewPane" style="width: 100%; text-align: center; ">
+
+								<div style="padding-bottom:0.5cm;text-align:right;font-size:14pt;color:red;font-weight:bold;font-family:宋体;letter-spacing: ..3em;text-align:center">杭州市下城区政府发文稿</div>
+
+		
+					<TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-left:0px;  border-right:0px;border-top:0px" cellpadding="0" cellspacing="0">
+						<tr style="height:0cm">
+							<td></td>	
+						</tr>
+					</TABLE>
+					
+
+					<TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+
+						<tr style="height:1.2cm">
+							<td valign="top" style="border-right:1px solid red;width:3.0cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">发文字号</div>
+							</td>
+							<td valign="top" style="border-right:1px solid red;width:5.35cm;padding-top:16px">
+								<span style="padding-bottom:0.1cm;text-align:right;font-size:12pt;color:red;font-family:宋体;letter-spacing: ..3em"></span> 
+									<span style="padding-left:5px;font-size:12pt"  onmouseout="return;UpdateFlag=false;">
+									${dataset1.document_no!}
+									
+								</span>
+							</td>
+							<td valign="top" style="border-right:1px solid red;width:1.8cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">密级</div>
+							</td>
+					
+                                                        <td  id="ID_SecLevel" type="select" onMouseOut="UpdateFlag=false;" valign="center" align="center" style="width:2.0cm;border-right:1px solid red;font-size:12pt">
+				                       
+											${dataset1.secret_level!}
+			                                </td>
+
+							<td valign="top" style="border-right:1px solid red;width:3.55cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">紧急程度</div>
+							</td>
+			 
+                                                        <td id="ID_UrgentLevel" type="select" onMouseOut="UpdateFlag=false;"  valign="center" align="center" style="border-right:1px solid red;font-size:12pt">
+				                             ${dataset1.deal_level_name!}
+			                                </td>
+						</tr>
+					</TABLE>
+				<TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+
+						<tr style="height:1.2cm">
+							<td valign="top" style="border-right:1px solid red;width:3.5cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">是否同意公开发布</div>
+							</td>
+							
+                                                    <td id="ID_OpenProperty" type="select" onMouseOut="UpdateFlag=false;"  valign="center" align="center" style="border-right:1px solid red;font-size:12pt">
+						         ${dataset1.is_public_name!}
+					          </td>
+
+						</tr>
+					</TABLE>
+                                                                              
+					<TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+						<tr style="height:4.0cm">
+							<td valign="top" style="padding-top:10px;font-size:12pt;width:2.5cm;">
+								<table style="width:7.0cm;height:auto;"><tr><td>
+								<span style="padding-left:5px;color:red;font-size:12pt">领导签发：</span>
+								</td></tr>
+								<tr>
+								<td style="width:7.0cm;padding-top:10px;font-size:12pt">
+										
+										<#list adviceDb_5! as entry>
+										   ${entry.advice_content}
+												<div style="text-align:right;color:blue">
+													${entry.create_by}
+                                               <span style="width:8pt"></span> 
+													${entry.CREATE_DTTM}
+												</div>
+												
+										</#list>
+								</td>
+								</tr></table>
+							</td>
+							<td style="border-right:1px solid red;width:0cm"></td>
+
+							<td valign="top" style="padding-top:10px;font-size:12pt;width:2.5cm;">
+								<table style="width:8.0cm;height:auto;"><tr><td>
+								<span style="padding-left:5px;color:red;font-size:12pt"> 办公室审核:</span>
+								</td></tr>
+								<tr>
+								<td style="width:9.0cm;padding-left:5px;padding-top:10px;font-size:12pt;height:auto;">
+										<#list adviceDb_2! as entry>
+										   ${entry.advice_content}
+												<div style="text-align:right;color:blue">
+													${entry.create_by}
+                                               <span style="width:8pt"></span> 
+													${entry.CREATE_DTTM}
+												</div>
+												
+										</#list>
+										
+								</td>
+								</tr></table>
+							</td>
+						</tr>
+					</TABLE>
+
+					
+
+					<TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+
+						<tr style="height:1.2cm">
+							<td valign="top" style="border-right:1px solid red;width:3.0cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">文件标题</div>
+							</td>
+							
+                                                    <td id="ID_Subject" type="textarea" onMouseOut="UpdateFlag=false;" style="padding-left:5px;padding-top:10px;font-size:12pt">
+						          ${dataset1.title!}
+					          </td>
+
+						</tr>
+					</TABLE>
+				
+
+					
+
+				     <TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+				
+						<tr style="height:1.2cm">
+							<td valign="top" style="border-right:1px solid red;width:3.0cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">附 件</div>
+							</td>
+							
+                                                    <td id="ID_Subject" type="textarea" onMouseOut="UpdateFlag=false;" style="padding-left:5px;padding-top:10px;font-size:12pt">
+						      <#list datasetAtt! as entry>
+										   ${entry.name}
+												
+										</#list>
+					          </td>
+
+						</tr>
+					</TABLE>
+					     <TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+      <tr style="height:1.2cm">
+           <td valign="center" style="border-right:1px solid red;width:3.0cm">
+        <div style=";text-align:center;font-size:12pt;color:red;font-family:宋体">主题词</div> 
+       </td>
+         <td style="border-right:1px solid red">
+             <span style="padding-left:5px;font-size:12pt" onMouseOut="UpdateFlag=false;">
+					
+	     </span>
+      </td>       
+      </tr>
+     </TABLE>
+     					<TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+						<tr style="height:1.3cm">
+							<td valign="center" style="border-right:1px solid red;width:3.0cm">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体"><br/>主送单位<br/><br/></div> 
+							</td>
+                                            <td id="ID_MainSend" type="text" valign="center" style="padding-left:5px;font-size:12pt;border-right:1px solid red;" >
+						${dataset1.main_send!}
+				
+                                             </td>         
+					</tr>
+					</TABLE>
+
+     <TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+      <tr style="height:1.3cm">
+       <td valign="center" style="border-right:1px solid red;width:3.0cm">
+        <div style="text-align:center;font-size:12pt;color:red;font-family:宋体"><br/>抄送单位<br/><br/></div> 
+       </td>
+       
+         <td id="ID_CopySend" type="text" valign="center" style="padding-left:5px;font-size:12pt;border-right:1px solid red;" onMouseOut="UpdateFlag=false;">
+						${dataset1.copy_send!}
+					</td>
+       
+      </tr>
+     </TABLE>
+     					<TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+						<tr style="height:4.0cm">
+							<td valign="top" style="padding-top:10px;font-size:12pt;width:2.8cm;">
+								<span style="padding-left:0px;color:red;font-size:12pt"> 主办单位意见:</span>
+							
+							
+								<td style="width:6.0cm;padding-top:10px;font-size:12pt">
+									<#list adviceDb_1! as entry>
+										   ${entry.advice_content}
+												<div style="text-align:right;color:blue">
+													${entry.create_by}
+                                               <span style="width:8pt"></span> 
+													${entry.CREATE_DTTM}
+												</div>
+												
+										</#list>
+								</td>
+							</td>
+							<td style="border-right:1px solid red;width:0cm"></td>
+
+							<td valign="top" style="padding-top:10px;font-size:12pt;width:2.8cm;">
+								<span style="padding-left:0px;color:red;font-size:12pt"> 会办单位意见:</span>
+							
+							
+								<td style="width:6.0cm;padding-top:10px;font-size:12pt">
+										<#list adviceDb_8! as entry>
+										   ${entry.advice_content}
+												<div style="text-align:right;color:blue">
+													${entry.create_by}
+                                               <span style="width:8pt"></span> 
+													${entry.CREATE_DTTM}
+												</div>
+												
+										</#list>
+										
+								</td>
+							</td>
+						</tr>
+					</TABLE>
+     
+     
+
+     <TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+
+						<tr style="height:1.2cm">
+							<td valign="top" style="width:2cm;border-right:1px solid red;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">主办部门</div>
+							</td>
+							
+							<td valign="top" style="border-right:1px solid red;width:4cm;padding-top:16px">
+								<span style="padding-bottom:0.1cm;text-align:right;font-size:12pt;color:red;font-family:宋体;letter-spacing: ..3em"></span> 
+									<span style="padding-left:5px;font-size:12pt" onMouseOut="UpdateFlag=false;">
+									${dataset1.draft_dept!}
+									
+								</span>
+							</td>
+							<td valign="top" style="border-right:1px solid red;width:1.5cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">拟稿人</div>
+							</td>
+							<td valign="top" style="border-right:1px solid red;width:2.85cm;padding-top:16px">
+								<span style="padding-bottom:0.1cm;text-align:right;font-size:12pt;color:red;font-family:宋体;letter-spacing: ..3em"></span> 
+									<span style="padding-left:5px;font-size:12pt" onMouseOut="UpdateFlag=false;">
+									${dataset1.draft_man!}
+								</span>
+							</td>
+							
+							<td valign="top" style="border-right:1px solid red;width:2cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">联系电话</div>
+							</td>
+							<td valign="top" style="border-right:1px solid red;width:3.0cm;padding-top:16px">
+								<span style="padding-bottom:0.1cm;text-align:right;font-size:12pt;color:red;font-family:宋体;letter-spacing: ..3em"></span> 
+									<span style="padding-left:5px;font-size:12pt" >
+									${dataset1.draft_phone!}
+								</span>
+							</td>
+							
+	
+						</tr>
+					</TABLE>
+ 					<TABLE STYLE="width:18.55cm;border:1px solid red;border-collapse:collapse;table-layout:fixed;border-top:0px" cellpadding="0" cellspacing="0">
+
+						<tr style="height:1.2cm">
+							<td valign="top" style="border-right:1px solid red;width:2.5cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">印发日期</div>
+							</td>
+							<td valign="top" style="border-right:1px solid red;width:4.95cm;padding-top:16px">
+								<span style="padding-bottom:0.1cm;text-align:right;font-size:12pt;color:red;font-family:宋体;letter-spacing: ..3em"></span> 
+									<span style="padding-left:5px;font-size:12pt"  onmouseout="return;UpdateFlag=false;">
+								${dataset1.print_date!}
+								</span>
+							</td>
+							<td valign="top" style="border-right:1px solid red;width:1.8cm;padding-top:16px">
+								<div style="text-align:center;font-size:12pt;color:red;font-family:宋体">份数</div>
+							</td>
+					
+                                                        <td  id="ID_SecLevel" type="select" onMouseOut="UpdateFlag=false;" valign="center" align="center" style="width:2cm;border-right:1px solid red;font-size:12pt">
+				                        ${dataset1.print_num!}
+			                                </td>
+
+
+						</tr>
+					</TABLE>
+                               
+                                       
+
+             
+     <br/><br/>
+ 
+    </DIV>
+			</body>
+		</html>

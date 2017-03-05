@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;">
+
+	<div class="container-layout line">
+		<#include "/aufw/page/include/script.html">
+		<table style="width: 100%;" id="common_table">
+			<tr>
+				<td class="ver-top">
+					<div class="grid-table-top" id="grid_table">
+						<div class="js-tool-bar">
+							<div class="form-group header-group">
+								<div class="button button-main js-add-account" id="add">增加</div>
+                                <div class="button button-main margin-left-in" id="delete">删除</div>
+                                <span class="header-title margin-left-out">批示领导:</span>
+                                <input id="instructionLeader" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                                <div class="button button-main margin-left-out" id="senior_grid_search">搜索</div>
+								<div class="button js-level-search margin-left-in">高级搜索<i class="li-icon-arrow-down"></i></div>
+							</div>
+							<div class="level-searh form-group header-group" style="display: none;">
+								<span class="header-title">被授权人:</span>
+                                <input id="authUser" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                                <span class="margin-left-out header-title">被授权角色:</span>
+                                <input id="authRole" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+
+								<span class="margin-left-out header-title">被授权部门:</span>
+                                <input id="authDept" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                            </div>
+						</div>
+						<div class="js-grid-father grid-father">
+							<table id="manage_grid" class="bsgrid">
+								<tr>
+									<th w_index="instructionLeader" w_hidden="true" class="hidden"></th>
+									<th w_check="true" width="40"></th>
+									<th w_index="instructionLeader" width="100">省领导</th>
+									<th w_index="authUser" >可以查看该领导权限的对象</th>
+									<th w_index="operate" width="100">操作</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!--表单、流程，基于jquery的方法-->
+	<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+	<script src="${base}/oa/resource/js/task.js"></script>
+	<script>
+
+var gridOne;
+var selectURL = "${base}/admin/instructionAuth/allInstAuth.action?iType=authInstruction";
+$(function(){
+    layOut("#common_table","#grid_table");
+     //grid初始化
+     
+     gridOne=$.fn.bsgrid.init("manage_grid", {
+        url:selectURL + "?etc="+new Date().getTime(),
+        row_primary_key: "primaryKey",
+        autoLoad: true,
+        pageSizeSelect: true,
+        pageSize:15,
+        complete:function(options, XMLHttpRequest, textStatus){
+        },
+        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+        },
+        additionalAfterRenderGrid:function(){gridOne.initGrid();}
+    }); 
+     
+     //工具条高级搜索
+     $(document).on("click",".js-level-search",function(){
+         girdTable(this);
+		 $('.li-icon-arrow-down').toggleClass('li-icon-arrow-top');
+     });
+     
+     //工具条高级搜索
+     $(document).on("click","#senior_grid_search",function(){
+         var authUser = "authUser=" + window.encodeURI($("#authUser").val());
+         var authRole = "authRole=" + window.encodeURI($("#authRole").val());
+         var authDept = "authDept=" + window.encodeURI($("#authDept").val());
+         var instructionLeader = "instructionLeader=" + window.encodeURI($("#instructionLeader").val());
+         var symbol = "?";
+         if(selectURL.indexOf("?")>0){
+         	symbol = "&";
+         }
+         gridOne.changeUrl(selectURL + symbol + authUser + "&" + authRole + "&" + authDept + "&" + instructionLeader + '&etc='+new Date().getTime());
+     });
+     
+     //工具条搜索
+     $(document).on("click","#grid_search",function(){
+         var clu = $("#search").val();
+         var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+         var symbol = "?";
+         if(selectURL.indexOf("?")>0){
+         	symbol = "&";
+         }
+         gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+     });
+    
+    //新增批示权限
+    $(document).on("click","#add",function(){
+        var win = {text:"添加批示权限", url:"${base}/admin/instructionAuth/executeInst.action?iType=authInstAdd&auth.instructionLeader=null&etc=" + new Date().getTime(),width:'900',height:'550', id:"authInstAdd",'parentIfr':window};
+        window.top.createWindow(win);
+    });
+
+    //删除批示权限
+    $(document).on("click","#delete",function(){
+        var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();        
+        if(checkedRowsRecoreds.length < 1) {
+        	layer.msg('请至少选择一条数据');
+        	return
+        }
+        var objectIds=[];
+        for(var i = 0; i < checkedRowsRecoreds.length; i++) {
+        	var record = checkedRowsRecoreds[i];
+        	objectIds.push(record.instructionLeader);
+        }
+		layer.confirm('你确定要删除吗？', function(index){  
+		    $.post("${base}/admin/instructionAuth/deleteInstAuth.action", {"auth.objectIds":objectIds.join(",")}, function(result){
+		        gridOne.refreshPage();
+		        layer.msg(result.message);
+		    });	    
+		});
+        
+    });
+
+});
+
+//修改批示权限
+function execute(id){
+	if(null == id){
+		return;
+	}
+	var win = {text:"修改批示权限", url:"${base}/admin/instructionAuth/executeInst.action?iType=authInstUpdate&auth.instructionLeader=" + id + "&etc=" + new Date().getTime(),width:'900',height:'550', id:"authInstUpdate",'parentIfr':window};
+    window.top.createWindow(win);
+}
+   
+
+</script>
+</body>
+</html>

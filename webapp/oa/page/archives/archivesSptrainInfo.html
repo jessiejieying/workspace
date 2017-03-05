@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="form-group header-group">
+                        <div id="archives_button" class="button button-main">归档</div>
+                        <div id="unarchives_button" class="button button-main margin-left-in">无需归档</div>
+
+							<#if archiveStatus??>
+							  <span class="header-title margin-left-out">归档状态:</span>
+                                <select id="archiveStatus"	class="input margin-left-in" style="width: 100px;" name="age">
+									<option value="">---全部---</option>
+									<#list archiveStatus! as entry>
+									  <#if entry.dictValue=="0">
+									      <option value="${entry.dictValue!}" selected=selected>${entry.displayName!}</option>
+									  <#else>
+									      <option value="${entry.dictValue!}">${entry.displayName!}</option>
+									  </#if>
+      								</#list>
+								 </select>
+
+						    </#if>			
+				           <span class="header-title margin-left-out">事由:</span>
+                        <input id="subject" type="text" class="tool-bar-input margin-left-in" placeholder="请输入关键字" />
+
+						<div class="button button-main margin-left-out" id="senior_grid_search">搜索</div>
+						<div class="button js-level-search margin-left-in">高级搜索<i class="li-icon-arrow-down"></i></div>
+					</div>
+					<!-- 高级搜索页面 -->
+						<div class="level-searh form-group header-group" style="display: none;">
+							<span class="header-title" >拟稿时间:</span>
+                            <input name="startDate" id="startDate" class="Wdate tool-bar-input" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', maxDate:'#F{$dp.$D(\'endDate\')||\'2025-10-01 00:00:00\'}'})" size="19" type="text">
+                            <span class="header-title margin-left-in">至</span>
+                            <input id="endDate" style="cursor: pointer;height: 26px;" size="19" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startDate\')}',maxDate:'2025-10-01 00:00:00'})" name="endDate" type="text">
+                            <span class="header-title margin-left-out">申请人:</span>
+                            <input id="applicantMan" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                        </div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="30"></th>
+					  <th width="40">序号</th>
+	                  <th w_index="title" width="350" w_type="method"  w_align="center" w_method="show">事由</th>
+	                  <th w_index="applicantMan" width="100" w_align="center" w_method="show">申请人</th>
+	                  <th w_index="draftBy" width="" w_type="method" w_method="checkShow" w_align="center">事务资料</th>
+	                  <th w_index="finishDate" width="" w_align="center">办结时间</th>
+	                  <th w_index="remark" width="" w_align="center">是否归档</th>
+	                  <th w_index="archiveType" width="" w_align="center">归档状态</th>
+
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    <div id="provice_html"  style="display: none!important;"></div>
+    <#include "/aufw/page/include/script.html">
+    <script id="provice_choice" type="text/template">
+            <ul class="pop-choice-small js-pop-ul">
+                <%_.each(fileList, function(item){%>
+                <li>
+                    <a  title="点击下载" href="<%=item.path%>"><%=item.fileName%></a>
+                </li>
+                <%});%>
+            </ul>
+    </script>
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+<script src="${base}/edenui/common/js/json2.js"></script>
+<script src="${base}/oa/resource/js/oa_common.js"></script>
+<script>
+	var selectURL = "${base}/admin/archives/queryDataByCondition.action?iType=${iType!}";
+	var showURL = "${base}/form/fceform/common/run.html?djtype=eden&is_oa_bill=true&actionId=show&wfs=view&djsn=oa_sptrain_audit&wfId=";
+	var  fileList=[];
+	$(function(){
+		initLink();
+		selectURL=selectURL+"&link="+JSON.stringify(link);
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "&etc="+new Date().getTime()+"&archiveType=0",
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	  gridOne.initGrid();
+		        	$("#manage_grid tbody tr").each(function(){
+		        		changeTable(this);
+		        		var html= $("td",this).eq(6).html();
+		        		if(html){
+		        			$("td",this).eq(6).html(html.replace("T"," "));
+		        		}
+		        		var $this=$(this);
+		        		$("td",this).eq(1).css("padding-left","8px");
+		        			$index=parseInt($this.attr("index"));
+		        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+		        	});
+		      }
+		  });
+		
+		 //工具条搜索 异步交互
+		  $(document).on("click","#grid_search",function(){
+		      var clu = $("#search").val();
+		      var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+		      var symbol = "?";
+		      if(selectURL.indexOf("?")>0){
+		      	symbol = "&";
+		      }
+		      gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+		  });
+
+		  //工具条高级搜索 展开
+		  $(document).on("click",".js-level-search",function(){
+		      girdTable(this);
+			  $('.li-icon-arrow-down').toggleClass('li-icon-arrow-top');
+		  });
+		  
+		  $(document).on("click","#mainOrg",function(){
+	    	   var win={"text":"选择文种","url":"${base}/admin/department/openSelectDepartment.action?module=oa_send_document","width":"900","height":"550","parentIfr":window};
+	           window.top.CommonInput=$(this);
+	    	   window.top.createWindow(win);
+	      });
+		  //工具条高级搜索 异步交互
+		  $(document).on("click","#senior_grid_search",function(){
+		      gridOne.changeUrl(requestUrl());
+		  }); 
+		  //归档功能
+		  $(document).on("click","#archives_button",function(){
+		  	 var jsonId=archive(); 
+		  	 if(!isBlank(jsonId)){
+		  		 layer.msg("请选择归档数据...");
+		  		 return;
+		  	 }
+		  	 layer.msg("正在归档，请稍等...");
+		  	 $.post("${base}/admin/archives/archive.action",{"jsonId":jsonId,"iType":"${iType!}"},function(data){
+		  		 if(data.flag==1){
+		  			layer.msg(data.result);
+		  		 }else{
+		  			 layer.msg(data.result);
+		  		 }
+		  		 refreshTable();//刷新页面
+		  	 },"json");
+		  });
+		  //无需归档功能
+	  	  $(document).on("click","#unarchives_button",function(){
+			  var jsonId=archive();
+			  if(jsonId=="[]"){
+				  layer.msg("未选择无需归档文件...");
+				  return;
+			  }
+			  $.post("${base}/admin/archives/archive.action",{"jsonId":jsonId,"archiveType":"3","iType":"${iType!}"},function(data){
+				  if(data.flag==1){
+					  layer.msg(data.result);
+					  refreshTable();
+				  }
+			  },"json");
+		  });
+		 //选择select下拉值时刷新页面
+		 $(document).on("change","#archiveStatus",function(){
+			gridOne.changeUrl(requestUrl()); 
+		 });
+	});
+	   //查看会议资料
+    function checkShow(id){
+        var item = getRecord(id);
+        var wfId=item.wfId;
+        var url="${base}/admin/queryAllAttachment/queryAllSptrainAttachemnt.action?id="+id+"&wfId="+wfId;
+        layer.msg("正在打开附件列表...");
+        $.post(url,function(result){
+
+            var resultData=result.data;
+            fileList.length=0;
+            resultData.forEach(function(value){
+                fileList.push({
+                    "fileName":value.fileName,
+                    "path":value.uploadUrl
+                });
+            });
+
+            if(resultData.length<1){
+                layer.msg("暂无附件列表");
+                return;
+            }
+            var contentHtml=$("#provice_html").html(_.template($('#provice_choice').html()));
+            var message = layer.open({
+                type: 1,
+                title: "附件列表",
+                area: ["600px",""],
+                content:contentHtml,
+                success: function (layero, index) {
+
+                    $("#provice_html li").click(function(){
+                        layer.msg("正在下载...");
+                        setTimeout(function(){
+                            layer.closeAll();
+                        },500);
+                    });
+                }
+            });
+        });
+    }
+</script>
+
+</html>
+</html>

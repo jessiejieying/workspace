@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+</head>
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="level-searh form-group header-group">
+					<div class="button button-main" id="incoming_add">收文登记</div>
+					<div class="button button-main margin-left-in" id="back">退文</div>
+					    <span class="margin-left-out header-title">公文标题:</span>
+						<input id="search_text" type="text" class="tool-bar-input margin-left-in" placeholder="输入关键字" />
+						<div class="button button-main margin-left-in"  id="grid_search">搜索</div>
+					</div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="30"></th>
+	                  <th w_index="true" width="40">序号</th>
+	                  <th w_index="fileTitle" width="">公文标题</th>
+	                  <th w_index="fileUnit" width="150">来文单位</th>
+	                  <th w_index="fileChar" width="140">发文字号</th>
+	                  <th w_index="fileDateStr" width="145">来文时间</th>
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/waitDocument/queryWaitDocument.action";
+	var version='1';
+    var wf_name='oa_pg_incoming_message';
+
+	$(function(){
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+	        	$("#manage_grid tbody tr").each(function(){
+	        		$("td",this).eq(1).css("padding-left","8px");
+	        		$("td",this).eq(1).css({"padding-left":"0px","text-align":"center"});
+	        		$("td",this).eq(2).css({"padding-left":"0px","text-align":"center"});
+	        		$("td",this).eq(4).css({"padding-left":"0px","text-align":"center"});
+	        		$("td",this).eq(5).css({"padding-left":"0px","text-align":"center"});
+	        		$("td",this).eq(6).css({"padding-left":"0px","text-align":"center"});
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+		      }
+		  });
+		
+		$("#incoming_add").click(function(){
+			var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+            if(checkedRowsRecoreds.length != 1) {
+            	layer.msg('请选择一条数据');
+            	return
+            }
+			
+            var record = checkedRowsRecoreds[0];
+            
+            var win = {text:"待分公文详情", url:"${base}/admin/waitDocument/waitDocumentDetail.action?waitDocument.id="+record.id,width:'900',height:'550', id:"waitDetail",'parentIfr':window};
+    		window.top.createWindow(win);
+// 			initWorkflow('oa_pg_incoming_document','收文登记','1');
+		});
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	        var clu = $("#search").val();
+	        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+	        gridOne.changeUrl(selectURL + "?fileTitle=" + encodeURI(window.encodeURI(value)) + '&etc='+new Date().getTime());
+	    });
+	    //工具条退文
+	    $(document).on("click","#back",function(){
+	            var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+	            if(checkedRowsRecoreds.length != 1) {
+	            	layer.msg('请选择一条数据');
+	            	return
+	            }
+	            var record = checkedRowsRecoreds[0];
+	            var win = {text:"退文信息", url:"${base}/admin/waitDocument/addBackDocumentWin.action?waitDocument.id="+record.id,width:'900',height:'550', id:"addBackWin",'parentIfr':window};
+	            window.top.createWindow(win);
+	    });
+	    
+	});
+	function titleOnclik(documentId){
+		var win = {text:"待分公文详情", url:"${base}/admin/waitDocument/waitDocumentDetail.action?waitDocument.id="+documentId,width:'900',height:'550', id:"waitDetail",'parentIfr':window};
+		window.top.createWindow(win);
+	}
+	
+	//window.setInterval('gridOne.refreshPage()',5000); 
+	
+
+</script>
+
+</html>

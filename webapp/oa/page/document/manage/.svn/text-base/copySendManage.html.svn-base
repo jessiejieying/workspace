@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+</head>
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+				<div class="js-tool-bar">
+					<div class="level-searh form-group header-group">
+					  	<span class="header-title margin-left-out">查看情况:</span>
+						<select id="statusWin" class="input margin-left-in statistics-select" style="width: 80px;">
+							<option value="">全部</option>
+							<option value="read">已阅</option>
+							<option value="notRead">未阅</option>
+						</select>
+						<span class="header-title margin-left-out"> 标题:</span>
+						<input id="title" type="text" class="tool-bar-input margin-left-in"  style ='margin-left: 2px;' placeholder="输入关键字" />
+						<span class="header-title margin-left-out"> 字号:</span>
+						<input id="fileChar" type="text" class="tool-bar-input margin-left-in"  style ='margin-left: 2px;' placeholder="输入关键字" />		
+						
+						<div class="button button-main margin-left-out" id="grid_search">搜索</div>
+					</div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="20" w_hidden="true" class="hidden"></th>
+	                  <th w_index="true" width="30">序号</th>
+	                  <th w_index="title" width="400">标题</th>
+	                  <th w_index="document_no" width="120">文件字号</th>
+	                  <th w_index="draft_dept" width="140">来文单位(主办处室)</th>
+	                  <th w_index="send_date" width="110">抄送日期</th>
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+			
+
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/documentCopySend/queryCopySend.action";
+	var version='1';
+	$(function(){
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+	        	$("#manage_grid tbody tr").each(function(){
+	        		$("td",this).eq(1).css("padding-left","8px");
+	        		$("td",this).eq(1).css({"text-align":"center","padding-left":"0px"});
+              		$("td",this).eq(2).css({"text-align":"center","padding-left":"0px"});
+	        		$("td",this).eq(6).css({"text-align":"center","padding-left":"0px"});
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+		      }
+		  });
+		
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	    	gridOne.changeUrl(selectURL + "?etc=" + new Date().getTime() + "&title=" + window.encodeURI($('#title').val())
+		        	+ "&statusWin=" + $('#statusWin').val() + "&fileChar=" + window.encodeURI($('#fileChar').val())  );
+	    });
+	    
+	});
+	
+    function titleOnclik(wfId){
+    	setTimeout(function () {
+			window.top.noteTipWaiting();
+			gridOne.refreshPage();
+		},1500);
+
+		var win = {
+				text:"抄送文件详情", 
+				url:"${base}/admin/documentCopySend/queryCopySendDetail.action?wfId=" + wfId, 
+				width:'900', 
+				height:'550', 
+				id:"detail", 
+				parentIfr:window
+		};
+		window.top.createWindow(win);
+	}
+
+</script>
+
+</html>

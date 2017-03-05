@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+</head>
+<body style="height: 100%;">
+	<div class="container-layout line">
+		<#include "/aufw/page/include/script.html">
+		<table style="width: 100%;" id="common_table">
+			<tr>
+				<td class="ver-top">
+					<div class="grid-table-top" id="grid_table">
+						<div class="js-tool-bar">
+							<div class="form-group ">
+                			
+							</div>
+						</div>
+						<div class="js-grid-father grid-father">
+							<table id="manage_grid" class="bsgrid">
+								<tr>
+									<th w_index="id" w_hidden="true" class="hidden"></th>
+								    <th w_check="true" width="40"></th>
+									<th width="30">序号</th>
+									<th w_index="signOrg" width="100">单位名称</th>
+									<th w_index="feedbackContent" width="300">反馈内容</th>
+									<th w_index="feedbackTimeStr" >反馈时间</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+				</td>
+			</tr>
+		</table>
+	</div>
+  <script id="add_pop" type="text/template">
+    <form role="form" class="line oa-form-line" action="${base}/admin/instructionFB/saveFb.action">
+      <div class="form-group margin-large-top x12 check-error">
+        <div class="field">
+          <label class="field-left text-right">单位名称</label>
+          <div class="field-right" style="position: relative;">
+            <input name="documentSignFeedback.signOrg" id="signOrg" type="text" class="input"  value=""/>
+          </div>
+        </div>
+      </div>
+      <div class="form-group margin-large-top x12">
+        <div class="field">
+          <label class="field-left text-right field-left-textarea">反馈内容</label>
+          <div class="field-right">
+          <textarea  class="input"  rows="3" name="documentSignFeedback.feedbackContent" id="feedbackContent"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="form-group margin-large-top x12 check-error">
+        <div class="field">
+          <label class="field-left text-right">反馈时间</label>
+          <div class="field-right" style="position: relative;">
+            <input name="documentSignFeedback.feedbackTime" id="feedbackTime" type="text" class="Wdate tool-bar-input" style="cursor: pointer;height: 26px;"
+										onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"  value=""/>
+          </div>
+        </div>
+      </div>
+      <div class="text-center ">
+        <div class="button common-skin-btn-syle01 margin-top" onclick="saveFb()">保存</div>
+      </div>
+    </form>
+  </script>
+	<!--表单、流程，基于jquery的方法-->
+	<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+  <script src="${base}/edenui/common/js/underscore.js"></script>
+	<script>
+var version='1';
+var gridOne;
+var selectURL = "${base}/admin/instructionFB/queryFeedBackCompany.action?documentId=${documentId!}";
+var idsContent="";
+$(function(){
+
+      //增加
+      $("#grid_add").click(function(){
+
+        var message = layer.open({
+          type: 1,
+          title: '增加列表',
+          area: ['800px', '300px'],
+          content: $("#add_pop").html(),
+          success: function (layero, index) {
+
+          }
+        });
+      });
+
+    //
+    $("#grid_del").click(function(){
+        var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+        if(checkedRowsRecoreds.length < 1) {
+        	layer.msg('请至少选择一条数据');
+        	return;
+        }
+//        initWorkflowNewBill(wf_name, "", version, window.top.$urlParam("wfId"),"true","instruction");
+
+       var idData=checkedRowsRecoreds.map(function(value){
+          return value.id;
+       });
+      idsContent=idData.join(",");
+    	
+    	jQuery.post("${base}/admin/instructionFB/deleteFb.action",
+              {
+  		        "ids":idsContent
+              },
+              function(data){
+
+                  gridOne.refreshPage();
+                layer.closeAll('page');
+               // window.location.reload();
+
+              }   //成功后返回的函数
+      );
+
+    });
+
+     layOut("#common_table","#grid_table");
+     gridOne=$.fn.bsgrid.init("manage_grid", {
+        url:selectURL + "&etc="+new Date().getTime(),
+        row_primary_key: "primaryKey",
+        autoLoad: true,
+        pageSizeSelect: true,
+        pageSize:15,
+        complete:function(options, XMLHttpRequest, textStatus){
+        },
+        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+        },
+        additionalAfterRenderGrid:function(){
+        	gridOne.initGrid();
+        	//刷新表格中的数据
+            parentIfr.gridOne.refreshPage();
+        	
+        	$("#manage_grid tbody tr").each(function(){
+        		var $this=$(this),
+        			$index=parseInt($this.attr("index"));
+        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+        	});
+       
+    }});  
+     //发送Ajax请求，更新领导批示反馈的状态
+     $.ajax({
+    	 type:"POST",
+    	 url:"${base}/admin/instructionFB/changeInstructionFeedBackState.action",
+         data:"documentId=${documentId!}",
+         success:function(data){
+         }
+     });
+     //刷新领导批示条数
+     window.top.noteTipWaiting();
+});
+
+
+ //批示办理单转批示反馈单
+function instructionToFb(){
+    var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+    if(checkedRowsRecoreds.length < 1) {
+    	layer.msg('请至少选择一条数据');
+    	return;
+    }
+//    initWorkflowNewBill(wf_name, "", version, window.top.$urlParam("wfId"),"true","instruction");
+
+   var idData=checkedRowsRecoreds.map(function(value){
+      return value.id;
+   });
+  idsContent=idData.join(",");
+
+  window.top.oa_tempPgSend('1',idsContent);
+ // window.top.close("dhxPop");
+ }
+
+
+//批示反馈单转批示办理单
+function fbToInstruction(){
+
+	 //window.top.oa_tempPgSend("");
+	// window.top.close("dhxPop");
+  window.top.oa_tempPgSend('2');
+}
+
+ //封装map数据
+ function buildMap(map,checkedRowsRecoreds){
+	//来源流程ID封装
+	if(null!=window.top.$urlParam("wfId") || "" !=window.top.$urlParam("wfId")){
+		map["from_wf_id"] = window.top.$urlParam("wfId");
+	}
+
+	//业务表封装
+	map["business_table"] = "oa_instruction_info";
+	//反馈单位
+	var objectIds=[];
+	for(var i = 0; i < checkedRowsRecoreds.length; i++) {
+    	var record = checkedRowsRecoreds[i];
+    	objectIds.push(record.feedBackUnit);
+    }
+	if(null!=objectIds || null!=objectIds.join(",") || "" !=objectIds.join(",")){
+	    map["from_unit"] = objectIds.join(",");
+	}
+	return map;
+ }
+
+//排除 |null|"null"|""|" "|undefined|
+function isBlank(obj){
+	if(null == obj || "undefined" == obj.trim() || "null" == obj.trim() || "" ==obj.trim() || obj.trim().length <=0){
+	return true;
+	}
+	return false;
+}
+
+  function saveFb(){
+  	var signOrg = $('#signOrg').val();
+  	var feedbackContent = $('#feedbackContent').val();
+  	var feedbackTime = $('#feedbackTime').val();
+
+  	if(signOrg==""){
+  		alert("单位名称不能为空");
+  		$("#signOrg").focus();
+		return;
+  	}
+  	if(feedbackContent==""){
+  		alert("反馈内容不能为空");
+  		$("#feedbackContent").focus();
+		return;
+  	}
+  	if(feedbackTime==""){
+  		alert("反馈时间不能为空");
+  		$("#feedbackTime").focus();
+		return;
+  	}
+  	
+  	jQuery.post("${base}/admin/instructionFB/saveFb.action?documentId=${documentId!}",
+            {
+		        "documentSignFeedback.signOrg":signOrg,
+		        "documentSignFeedback.feedbackContent":feedbackContent,
+		        "documentSignFeedback.feedbackTime":feedbackTime
+            },
+            function(data){
+              gridOne.refreshPage();
+              layer.closeAll('page');
+             /// window.location.reload();
+            //	alert(data.result);
+            }   //成功后返回的函数
+    );
+
+  	
+  }
+
+  function view(feedbackId){
+      window.top.createWindow({
+          'text':'查看批示反馈',
+          'id':'documentId',
+          'url':"${base}/admin/instructionFB/instructionFeedbackView.action?ids="+feedbackId,
+          'width':'752',
+          'height':'450',
+          'parent_ifr':window
+      });
+
+  }
+
+</script>
+</body>
+</html>

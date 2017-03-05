@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+<meta charset="utf-8">
+<title></title>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/style.html">
+
+	<!--引用首页主题样式文件-->
+	<script src="${base}/edenui/common/js/ed_skins.js"></script>
+	<script>
+		setSkinsCss("admin_css");
+	</script>
+</head>
+
+<body style="height: 100%;">
+
+	<!-- 页面载入进度条 begin-->
+	<link rel="stylesheet" href="${base}/edenui/common/js/plugins/pace/themes/silver/pace-theme-loading-bar.css" />
+	<script src="${base}/edenui/common/js/plugins/pace/pace.eden.min.js"></script>
+	<!-- 页面载入进度条 end-->
+
+
+	<div id="grid_wrap"	style="width: 100%; height: 100%; overflow: hidden; display: none;">
+		<div id="toolbar" class="ed-toolbar" style="z-index:8;"> 
+	
+		  <div class="input-prepend input-append">
+		
+		  <div class="btn-group">
+		
+		   <input type="hidden" value="dept" id="search_type">
+	      <button class="btn dropdown-toggle" data-toggle="dropdown" id="ssearch">按部门统计<span class="caret"></span> </button>
+	      <ul class="dropdown-menu">
+			<li><a value="dept">按部门统计</a></li>
+			<li><a value="user">按用户统计</a></li>
+			<li><a value="year">按年份统计</a></li>
+			
+	      </ul>
+	      &nbsp;   &nbsp;
+	     <input type="button" class="btn btn-info toolbar-btn" onClick="exportExcel()" style="margin-left: 10px" value="导出">
+
+	    </div>
+		    
+		    
+		  </div>
+
+		</div>
+		
+		
+		<div class="ed-grid">
+			<div id="grid"></div>
+		</div>
+		<div class="clearfix">
+    	<div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	    </div>
+    </div>
+	</div>
+
+</body>
+
+<#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<script>
+    var layout, treeObj, tree, treeSearch, grid, data, form,tree_form,flowName,flowVersion,user_id;
+    var version='1';
+  	var stypeMap={'dept':'部门','user':'用户','year':'年份'}; //查询条件对应名称
+    window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+    
+    var baseUrl="${base}/admin/documentStatistics/getRateStatistics.action?";
+    
+    function init() {
+    	
+        layout = new dhtmlXLayoutObject(document.body, "1C");
+        layout.cells('a').hideHeader();
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        data = new dhtmlXDataStore({
+            url     :baseUrl+"stype=dept&etc="+new Date().getTime(),
+            datatype:"json"
+        });
+	
+        layout.cells('a').attachObject('grid_wrap');
+
+        grid = new dhtmlXGridObject('grid');
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        grid.setHeader("部门,总计,办结数,办结率");
+        grid.setColumnIds("base,allcount,ecount,rate");
+        grid.setInitWidths("250,250,*,200");
+        grid.setColTypes("ro,co,co,ro");
+        
+    
+        grid.init();
+        grid.enablePaging(true, 15, 999999, 'grid_page', true);
+        grid.setPagingSkin("toolbar");
+        grid.sync(data);
+        page_layout();
+        
+    } 
+   
+
+    function toolbar_func(id) {
+        if (id == 'add') {
+        	//initWorkflow(wf_name,"拟稿",version);
+           //openSelectWf()
+        }else if (id == 'clean') {
+        	
+        }else if (id == 'edit') {
+            //form.unlock();
+        }else if (id == 'delete') {
+
+        }
+    }
+    
+    /**
+     * 解析url参数
+     * 
+     */
+    function parser_request(url, parm) {
+    	var reg = new RegExp("(^|&)" + parm + "=([^&]*)(&|$)");
+    	var r = url.substr(url.indexOf("\?") + 1).match(reg);
+    	if (r != null)
+    		return unescape(r[2]);
+    	return null;
+    }
+   
+    
+ 
+    
+    function form_mask_init(){
+        var grid_area=$('#grid > div:eq(1) > table');
+        var maskB_height=grid_area.height()+70;
+        var maskB_width=grid_area.width();
+        var maskB_left=grid_area.offset().left;
+        $('#form_maskB').height(maskB_height).width(maskB_width).css('left',maskB_left);
+
+    }
+
+    function page_layout() {
+        var grid_wrap_height = $('#grid_wrap').height();
+        $('#grid').height(grid_wrap_height - 50-40);
+        $('#grid').width($('#grid_wrap').width()-20);
+        if (grid)    grid.setSizes();
+        form_mask_init();
+    }
+
+	function  SimpleSearch(){
+		
+		var stype = $("#search_type").val();
+        var s="stype="+stype;
+        data.clearAll();
+        var url=baseUrl+'&'+s+'&etc='+new Date().getTime();
+        window.data.data.url=url;
+        data.load(url);
+        page_layout(); 
+        $(".hdrcell").eq(0).html(stypeMap[stype]); //替换第一个表格头名称
+      
+    }
+	
+	function  exportExcel(){
+		
+		var stype = $("#search_type").val();
+		
+        var s="stype="+stype+"&isExcel=1";
+        var keyString ="base,allcount,ecount,rate";
+		var valueString=stypeMap[stype]+",总计,办结数,办结率";
+        var excelFieldStr="&keyString="+encodeURI(keyString)+"&valueString="+encodeURI(valueString);
+        var url=baseUrl+'&'+s+excelFieldStr+'&etc='+new Date().getTime();
+        location.href=url;
+      
+    }
+
+	
+
+    $(function () {
+        setTimeout(init, 0);
+        $('#toolbar .toolbar_btn').click(function () {
+            var id = $(this).attr('btn_id');
+            toolbar_func(id);
+        });
+
+  	 $('#ssearch').next().find('a').click(function(){
+	  	 $("#search_type").val($(this).attr('value'));
+        	$('#ssearch').text($(this).text());
+        	SimpleSearch();
+        }) 
+        
+      
+        
+        $("#config_left_menu > li").click(function (event) {
+            $("#config_left_menu > li.on").removeClass('on').children('ul').slideUp(200);
+            $(this).addClass('on');
+            $(this).children('ul').slideDown(400);
+        });
+        $("#config_left_menu .level_2 > li").click(function (event) {
+            $("#config_left_menu .level_2 li.on").removeClass('on');
+            $(this).addClass('on')
+            event.stopPropagation();
+        })
+
+     /*    $("#advanced_search_btn").click(function(){
+            $(this).toggleClass('advanced_on');
+            $('#advanced_search_bar').slideToggle(200);
+        });
+
+        $("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        }); */
+    })
+    
+</script>
+</html>

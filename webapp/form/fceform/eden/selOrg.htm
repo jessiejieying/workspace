@@ -1,0 +1,52 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>function btn_ok(){
+	var orgId=[];
+	var orgName=[];
+	var tree=window.tree_tree1;
+	var checkedArr = tree.getAllChecked().split(",");
+	var commentArr = new Array();
+
+	for(var i=0; i<checkedArr.length; i++){
+		var parentId = tree.getParentId(checkedArr[i]);
+
+		if($.inArray(parentId, checkedArr)==-1){
+			commentArr.push(checkedArr[i]);
+		}
+	}
+	orgId=commentArr;
+	for (var i = 0; i < commentArr.length; i++) {
+		var nodeId = commentArr[i];
+		orgName.push(tree.getItemText(nodeId));
+	}
+	try{
+		window.edenCallBack(orgId,orgName);
+	}catch (e){
+
+	}
+	window.parent.edenWins.window('commonSelOrg').close();
+}
+</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script><link type='text/css' rel='stylesheet' href='../../fceform/css/xtree.css'  /><script src='../../fceform/js/xtree.js'></script>
+<DIV id=SKbillsheet jslib AutoResizeXml isCheckPermit="否" alertType="1" contxml="<root><button><id>button3</id></button><dataset><id>ds1</id></dataset><tree><id>tree1</id></tree></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:3;radio:0;listbox:1;textarea:0;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:5;text:1;hr:0;checkboxlist:0;radiolist:0;dropdownlist:1;grid:0;dataset:0;spin:0;excel:0;tree:1;ebshow:0;ebiao:0;layout:0;page:0;editor:0" billtaborder="<root><taborder>button3</taborder></root>" isfile="是" posheight poswidth postop posleft window="当前窗口" caption="选择组织" type="eden_form" dj_sn="selOrg" toolbar="不带工具栏" BLONopen center="  " BLONclose BLONopenBefore userType><?xml:namespace prefix = fc /><fc:dataset id=ds1 controltype="dataset" format="<fields><field><fieldname>role_name</fieldname><datatype>字符</datatype><displaylabel>角色名</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>role_id</fieldname><datatype>字符</datatype><displaylabel>角色ID</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" isSubGrid="否" pubpara="否" isaddemptyrec="否" submittype="4" submitno="1" issubds="否" opensortno="1" idtype="1" onValid='bill_ondatasetvalid("<dsid><role_name></role_name><role_id></role_id></dsid>")' onGetText='bill_ondatasetgettext("<dsid><role_name></role_name><role_id></role_id></dsid>")' onSetText='bill_ondatasetsettext("<dsid><role_name></role_name><role_id></role_id></dsid>")' sqltrans="%B4%98%A6%98%94%B6Xrn%D0j%F2%EC%E6%D8%CC%EA%D0%E8%D8XrnXr%94%D0j%F2%EC%E6%D8%CC%E0%D6Xr%94Xrn%D2j%EC%F2%DC%CC%D4%EC%D6%D8Xrn%9A%B2%AC%A8Xrn%D8%D0%CC%F2%EC%E6%D8%CC%E0%EA%DA%ECXrn%D0Xrn%A6%98%9A%B6Xrn%A2%AC%A0%AAXrn%D8%D0%CC%EC%F2%DC%CC%F6%F2%D8%D8Xrn%D2Xrn%AC%AAXrn%D0j%EC%F2%DC%CC%E0%D6XrnXt%96Xrn%D2j%EC%F2%DC%CC%E0%D6"></fc:dataset>&nbsp;<BUTTON style="POSITION: absolute; WIDTH: 75px; HEIGHT: 25px; TOP: 261px; LEFT: 118px" id=button3 onmovestart=moveStart() class=ef_button controltype="button" onclick='bill_onclick("btn_ok()")'>确定</BUTTON> 
+<DIV style="BORDER-BOTTOM: #cecece 1px solid; POSITION: absolute; BORDER-LEFT: #cecece 1px solid; BACKGROUND-COLOR: #ffffff; WIDTH: 299px; HEIGHT: 242px; OVERFLOW: auto; BORDER-TOP: #cecece 1px solid; BORDER-RIGHT: #cecece 1px solid; TOP: 10px; LEFT: 15px" id=tree1 class=ef_design_tree controltype="tree" xml="undefined" datasourceName="" sql2="%F4%D8%E6%D8%D4%F6Xrn%EC%F2%DC%CC%E0%D6XrnXr%94Xrn%EE%D0%F2%D8%EA%F6%CC%E0%D6XrnXr%94Xrn%EC%F2%DC%CC%EA%D0%E8%D8XrnXr%94Xrn%EC%F2%DC%CC%D4%EC%D6%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%EC%F2%DC%CC%F6%F2%D8%D8XrnXn%96Xn%90Xrn%FC%DE%D8%F2%D8Xrn%D6%D0%F6%D0%CC%FA%D0%E6%E0%D6Xt%96pXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%EC%F2%DC%CC%F4%D8%F0Xr%94%EC%F2%DC%CC%D4%EC%D6%D8" ischecked="是" isAll="是" opentb="_self" sourcetype="2" roottext="B00001" clicknode="" xmlpath="undefined"></DIV></DIV><script language="JavaScript">var tree1;window.attachEvent( "onunload", function(){tree1=null;})</script><div id='addHtml'><style>
+
+</style>
+</div> </body></html>

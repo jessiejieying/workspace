@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta name="format-detection" content="telephone=no">
+        <title>审批</title>
+        <link rel="stylesheet" href="${base}/edenui/mobile/css/frozen.css">
+        <link rel="stylesheet" href="${base}/edenui/mobile/lib/layer-mobile/layer.css">
+        <link rel="stylesheet" href="${base}/edenui/mobile/css/common.css">
+
+    </head>
+    
+    <body ontouchstart>
+	<header class="ui-header ui-header-positive ui-border-b">
+		<i class="ui-icon-return" onclick=""></i>
+		<h1>审批</h1>
+	</header>
+  <!--  tab 切换-->
+  <ul class="oa-check-tab ui-tiled" id="tab_check">
+    <li class="active">办理单</li>
+    <li class="">流程记录</li>
+    <li class="">附件</li>
+    <li class="">便签 <div class="cir-tip js-cir-tip">1</div></li>
+  </ul>
+<!--主体内容-->
+  <section class="" style="">
+    <!--办理单-->
+   <section class=" js-section-detail" style="display: block;">
+    <div class="examine-bill-detail">
+      <div class="bill-header">
+        <h2>浙江省人民政府办公厅依申请公开处理单</h2>
+        <ul class="header-ul ui-tiled">
+          <li>密级： <span>非密</span></li>
+          <li>编号： <span>2016098</span></li>
+        </ul>
+      </div>
+      <div class="bill-body">
+        <table class="bill-body-table">
+          <tr>
+            <td class="td-first">申请时间</td>
+            <td class="">
+              <table class="in-table">
+                <tr >
+                  <td width="100" >2016-03-18</td>
+                  <td class="in-table-td">申请人</td>
+                  <td>李斌</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-first td-padding">依申请内容</td>
+            <td class="td-content">申请主办第16届亚洲物理学奥林匹克竞赛</td>
+          </tr>
+          <tr>
+            <td class="td-first td-padding">主办单位</td>
+            <td class="td-content">省科技厅,浙江大学</td>
+          </tr>
+          <tr>
+            <td class="td-first td-padding">拟办意见</td>
+            <td class="td-content js-input-pop">
+              <span class="input-pop ">点击输入</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-first td-padding">处(室)<br>办理意见</td>
+            <td class="td-content js-input-pop">
+              <span class="input-pop">点击输入</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-first td-padding">领导批示</td>
+            <td class="td-content js-input-pop">
+              <span class="input-pop">点击输入</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-first td-padding">处理结果</td>
+            <td class="td-content">同意主办</td>
+          </tr>
+          <tr>
+            <td class="td-first td-padding">备注</td>
+            <td class="td-content">详情见附件</td>
+          </tr>
+
+        </table>
+        <p class="p-tip">注：行政机关应当自收到申请之日起15个工作日之内予以答复</p>
+      </div>
+    </div>
+   </section>
+    <!--流程记录-->
+    <section class=" js-section-detail" style="display: none;">
+      <div class="examine-process-record">
+        <div class="record-header">
+          <div class="header-left">
+            <span style="background-image:url(mobile/img/test.png)"></span>
+          </div>
+          <div class="header-right">
+            <h4 class="">张政</h4>
+            <p class="no-p">审批中</p>
+            <div class="right-time">2016.2.24 10:23</div>
+          </div>
+          <div class="record-uncompleted"></div>
+        </div>
+        <div class="record-content">
+          <ul>
+            <li>
+              <div class="header-left">
+                <span style="background-image:url(mobile/img/test4.jpg)"></span>
+              </div>
+              <div class="header-right">
+                <h4 class="">刘明</h4>
+                <p>已完成</p>
+                <div class="right-time">2016.2.24 10:23</div>
+              </div>
+              <div class="record-completed"></div>
+            </li>
+            <li>
+              <div class="header-left">
+                <span style="background-image:url(mobile/img/test2.jpg)"></span>
+              </div>
+              <div class="header-right">
+                <h4 class="">杨凯</h4>
+                <p>已完成</p>
+                <div class="right-time">2016.2.24 10:23</div>
+              </div>
+              <div class="record-completed"></div>
+            </li>
+            <li>
+              <div class="header-left">
+                <span style="background-image:url(mobile/img/test3.jpg)"></span>
+              </div>
+              <div class="header-right">
+                <h4 class="">李俊</h4>
+                <p class="">发起申请</p>
+                <div class="right-time">2016.2.24 10:23</div>
+              </div>
+              <div class="record-completed"></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <!--附件-->
+    <section class="js-section-detail" style="display: none;">
+      <ul class="examine-file-manager-ul">
+        <li class="">
+          <a href="#">
+            <div class="li-left"></div>
+            <div class="li-right">
+              <h4 >关于丽水办公大楼申请公文审批</h4>
+              <p class="p-style">上传：秘书处 </p>
+              <p class="p-time">2016-2-22 11:20</p>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </section>
+    <!--便签-->
+    <section class=" js-section-detail" style="display: none;">
+      <div class="examine-note-page">
+        <div class="examine-note-page-textarea">
+          <div class="textarea-box js-advice-textarea">
+            <textarea> </textarea>
+            <div class="textarea-tip">在此处输入意见</div>
+          </div>
+          <a href="javascript:void(0)" class="btn-send">发送</a>
+        </div>
+        <div class="note-tip">已收到的消息</div>
+        <ul class="examine-note-page-ul">
+          <li>
+            <a href="#">
+            <div class="li-left">
+              <span style="background-image:url(mobile/img/test.png)"></span>
+            </div>
+            <div class="li-right">
+              <div class="right-header">
+                <span class="header-left">秘书处</span>
+                <span class="header-right">秘书处初审</span>
+              </div>
+              <p class="right-content">此会议比较着急，请尽快处理。此会议比较着急，请尽快处理此会议比较着急，请尽快处理。此会议比较着急，请尽快处理此会议比较着急，请尽快处理。此会议比较着急请尽快处理。此会议比较着急，请尽快处理。</p>
+              <p class="right-time">2016-2-22 11:20</p>
+            </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+    <footer class="footer-btn js-footer-btn">
+      <ul class="ui-tiled">
+        <li id="send" class=""><a href="javascript:void(0)">发送</a></li>
+        <li><a href="javascript:void(0)">办结</a></li>
+        <li><a href="javascript:void(0)">保存</a></li>
+      </ul>
+    </footer>
+
+    <script id="advice_pop" type="text/html">
+        <div class="examine-advice-pop">
+          <div class="examine-advice-pop-body">
+            <div class="body-content">
+             <div class="examine-advice-select js-select">
+               <div class="select-header js-select-header">同意</div>
+               <ul class="select-ul js-select-ul">
+                 <li>已阅</li>
+                 <li>已核</li>
+                 <li>已办</li>
+                 <li>存档备查</li>
+                 <li>同意发</li>
+                 <li>同意不发</li>
+               </ul>
+             </div>
+              <div class="examine-advice-textarea js-advice-textarea">
+                 <textarea  class=""></textarea>
+                <div class="textarea-tip">在此处输入意见</div>
+              </div>
+
+            </div>
+            <a href="javascript:void(0)" class="sure-btn " id="sureBtn">确定</a>
+          </div>
+        </div>
+    </script>
+
+    <script id="advice_send_pop" type="text/html">
+      <div class="examine-advice-send-pop">
+        <header class="ui-header ui-header-positive ui-border-b">
+          <i class="ui-icon-return js-send-back" onclick=""></i>
+          <h1>发送</h1>
+        </header>
+        <ul class="send-pop-ul">
+          <li><label><input type="radio" class="radio-checked" name="sendRadio"/>秘书处副处长审核</label></li>
+          <li><label><input type="radio" class="radio-checked" name="sendRadio"/>秘书处副处长审核</label></li>
+          <li><label><input type="radio" class="radio-checked" name="sendRadio"/>秘书处副处长审核</label></li>
+        </ul>
+        <ul class="examine-advice-infor-ul js-infor-ul">
+          <li class="on">
+          <div class="li-header">
+            <span style="background-image:url(mobile/img/test.png)"></span>
+          </div>
+          <p>秘书处副处长</p>
+        </li>
+          <li>
+            <div class="li-header">
+              <span style="background-image:url(mobile/img/test.png)"></span>
+            </div>
+            <p>秘书处副处长</p>
+          </li>
+          <li>
+            <div class="li-header">
+              <span style="background-image:url(mobile/img/test.png)"></span>
+            </div>
+            <p>秘书处副处长</p>
+          </li>
+          <li>
+            <div class="li-header">
+              <span style="background-image:url(mobile/img/test.png)"></span>
+            </div>
+            <p>秘书处副处长</p>
+          </li> <li>
+          <div class="li-header">
+            <span style="background-image:url(mobile/img/test.png)"></span>
+          </div>
+          <p>秘书处副处长</p>
+        </li>
+          <li>
+            <div class="li-header">
+              <span style="background-image:url(mobile/img/test.png)"></span>
+            </div>
+            <p>秘书处副处长</p>
+          </li>
+          <li>
+            <div class="li-header">
+              <span style="background-image:url(mobile/img/test.png)"></span>
+            </div>
+            <p>秘书处副处长</p>
+          </li>
+
+        </ul>
+        <div class="message-send"><label><input type="checkbox" class="checkbox-checked" name="sendRadio"/>发送短信</label></div>
+
+
+
+
+
+        <footer class="footer-send-sure">
+          <ul class="ui-tiled">
+            <li id="send_sure" class=""><a href="javascript:void(0)">确定发送</a></li>
+          </ul>
+        </footer>
+
+
+      </div>
+  </script>
+
+    <script src="${base}/edenui/mobile/lib/zepto.min.js"></script>
+    <script src="${base}/edenui/mobile/js/frozen.js"></script>
+    <script src="${base}/edenui/mobile/lib/layer-mobile/layer.js"></script>
+    <script src="${base}/edenui/mobile/js/app.js"></script>
+  </section>
+  <script>
+        $(function(){
+          app.init();
+          //审批tab切换
+
+          $("#tab_check li").tap(function(){
+            var $this=$(this);
+            var index= $("#tab_check li").index($this);
+            $this.addClass("active").siblings().removeClass("active");
+            $(".js-section-detail").hide().eq(index).show();
+
+            if(index>0){
+              $(".js-footer-btn").hide();
+              if(index=="3"){
+                    $(".js-cir-tip").hide();
+              }
+            }
+
+            else{
+              $(".js-footer-btn").show();
+            }
+
+          });
+
+        //弹出层
+          $(document).on("tap",".js-input-pop",function(){
+
+            var $advice=$(this),
+                 $father=$advice,
+                 $inputPop=$father.find(".input-pop");
+
+            layer.open({
+              title:[''],
+              content:$("#advice_pop").html(),
+              style: 'width:100%;',
+              success:function(){
+                var $textarea=$(".examine-advice-pop-body textarea");
+                $(".js-select-header").tap(function(){
+                  $(".js-select-ul").toggle();
+                });
+
+                $(".js-select-ul li").tap(function(e){
+
+                  var $this=$(this),
+                       $text=$this.text();
+                    $(".js-select-header").text($text);
+                      $textarea.val($text);
+                    $(".js-select-ul").hide();
+
+                  $this.closest(".examine-advice-pop").find(".textarea-tip").hide();
+
+                });
+
+                $("#sureBtn").tap(function(){
+                if($inputPop.length>0){
+                  $inputPop.remove();
+                }
+                  var $textVal= $textarea.val();
+                  $father.append("<p class='content-p'>"+$textVal+"</p>");
+                  layer.closeAll();
+                });
+              }
+            });
+
+          });
+
+         $("#send").tap(function(){
+            var fullPage = layer.open({
+              type: 1,
+              content:$("#advice_send_pop").html(),
+              style: 'position:fixed; left:0; top:0; width:100%; height:100%; border:none;',
+              success:function(){
+                $(".examine-advice-send-pop").height($(window).height());
+
+
+                $("#send_sure,.js-send-back").tap(function(){
+
+                  layer.closeAll();
+                });
+              }
+            });
+
+         });
+
+
+          $(document).on("tap",".js-infor-ul li",function(){
+            $(this).toggleClass("on");
+          });
+
+          $(document).on("focus",".js-advice-textarea textarea",function(){
+
+            var $this=$(this);
+            $this.closest(".js-advice-textarea").find(".textarea-tip").hide();
+          });
+
+        });
+
+        </script>
+    </body>
+</html>

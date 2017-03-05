@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+</head>
+
+<body style="height: 100%;">
+	<div id="grid_wrap" style="width: 100%; height: 100%; overflow: hidden; display: none;">
+		<div id="grid_toolbar" class="ed-toolbar">
+
+			<@f.operateRight operate="/admin/meetingRoom!insertExpense.action">
+			<a id="user_add" class="btn btn-info">添加费用</a>
+				 </@f.operateRight >
+              <@f.operateRight operate="/admin/meetingRoom!deleteExpense.action">
+              <a id="user_delete" class="btn btn-warning">删除</a>
+					</@f.operateRight >
+				<select name="" id="search">grid_toolbar_ul
+						<option value="criteriaName">会议名称</option>
+				</select>
+				<input id="search_text" class="search_text" value="请输入关键字"
+					name="" type="text">
+				<input class="btn btn-info" name=""
+					onClick="SimpleSearch()" value="搜 索" type="button">
+				<a id="selectAll" class="btn btn-info">全选</a>
+				<a id="advanced_search_btn" class="btn btn-info">高级搜索</a>
+
+			<div id="advanced_search_bar" class="ed-advanced-search-bar">
+			<table align="center">
+			<tr>
+				<td><label for="sname">会议名称</label></td>
+				<td><input id="sname" name="sname" type="text"> </td>
+				<td><label for="sorganizer">主办单位：</label></td>
+				<td><input id="sorganizer" name="sorganizer" type="text"></td> 
+				<td><input class="btn btn-info" name="advancedSearch" onClick="advancedSearch()" value="搜 索" type="button"></td>
+			</tr>	
+			</table>
+			</div>
+		</div>
+
+		<div id="grid" style="width: 100%;"></div>
+		<div class="ed-grid-page">
+		<div id="grid_page" class="grid_page"></div>
+		</div>
+			<div id="grid2" style="width: 100%;"></div>
+		<div class="ed-grid-page">	
+		<div id="grid_page2" class="grid_page2"></div>
+		</div>
+	</div>
+</body>
+<#include "/aufw/page/include/script.html">
+
+<script>
+	var layout, grid, grid2, data, data2 ,form, tabbar, option, sendUrl,selectedId;
+	window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+	function init() {
+		var parentId;
+
+		layout = new dhtmlXLayoutObject(document.body, "2E");
+
+		layout.cells('a').hideHeader();
+		layout.cells('b').hideHeader();
+
+		layout.attachEvent('onResizeFinish', page_layout);
+		layout.attachEvent('onPanelResizeFinish', page_layout);
+
+		data = new dhtmlXDataStore({
+			url : "${base}/admin/meetingExpense/selectExpense.action?etc="+ new Date().getTime(),
+			datatype : "json"
+		});
+
+		layout.cells('a').attachObject('grid_wrap');
+
+		grid = new dhtmlXGridObject('grid');
+		grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		grid.setHeader(" ,会议名称,主办单位,起始时间,结束时间,费用合计,签单人,签单时间,操作");
+		grid.setColumnIds("check,name,organizer,startDate,endDate,total,signature,sigDate,operate");
+		grid.setInitWidths("30,*,*,*,*,*,*,*,180");
+		grid.setColTypes("ch,ro,ro,ro,ro,ro,ro,ro,link");
+
+		grid.enablePaging(true, 9, 999, 'grid_page', true);//启用分页
+		grid.setPagingSkin("toolbar");//设置分页底部
+		grid.init();
+		grid.attachEvent("onCheck", function(rId, cInd, state) {
+			grid.selectRowById(rId);
+		});
+		grid.attachEvent("onRowSelect", doOnRowSelected);
+		grid.sync(data);
+		//grid.setEditable(false);
+		
+		tabbar = layout.cells("b").attachTabbar();
+		tabbar.setSkin('dhx_web');
+		tabbar.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		tabbar.addTab("a", "项目费用", "90px");
+		tabbar.setTabActive("a");
+
+		var formData = [ {
+			type : "settings",
+			position : "label-left",
+			labelWidth : "65",
+			inputWidth : 50
+		}, {
+			type : "fieldset",
+			label : "费用信息",
+			inputWidth : "660",
+			offsetLeft : 10,
+			list : [ {
+				type : "hidden",
+				offsetTop : 5,
+				list : [ {
+					type : "input",
+					name : "expense.name",
+					value : "",
+					label : "会议名称",
+					inputWidth : 200,
+					required : true,
+					validate : "NotEmpty"
+				}, {
+					type : "template",
+					name : "expense.startDate",
+					value : "",
+					format:"dateType1",
+					label : "起始时间",
+					inputWidth : 200
+				}, {
+					type : "input",
+					name : "expense.total",
+					value : "",
+					label : "费用合计",
+					inputWidth : 200,
+					validate:'isNum'
+				}, {
+					type : "input",
+					name : "expense.signature",
+					value : "",
+					label : "签单人",
+					inputWidth : 200
+				}, {
+					type : "newcolumn", offset:40
+				}, {
+					type : "input",
+					name : "expense.organizer",
+					value : "",
+					label : "主办单位",
+					inputWidth : 200
+				}, {
+					type : "template",
+					name : "expense.endDate",
+					value : "",
+					format:"dateType1",
+					label : "结束时间",
+					inputWidth : 200
+				}, {
+					type : "template",
+					name : "expense.sigDate",
+					value : "",
+					format:"dateType1",
+					label : "签单时间",
+					inputWidth : 200
+				} ]
+			}, {
+				type : "hidden",
+				offsetTop : 5,
+				list : [ {
+					type : "label",
+					labelWidth : 270
+				}, {
+					type : "newcolumn"
+				}, {
+					type : "button",
+					value : "确定",
+					name : "send"
+				}, {
+					type : "newcolumn"
+				}, {
+					type : "button",
+					value : "取消",
+					name : "cancel"
+				} ]
+			} ]
+		} ];
+		
+		
+
+		dhxWins = new dhtmlXWindows();
+		dhxWins.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		w1 = dhxWins.createWindow("w1", 20, 30, 700, 500);
+		w1.setText("会议费用");	
+		w1.center();
+		dhxWins.attachEvent('onClose', function (win) {
+		w1.hide();
+		});
+		w1.hide(); 
+form = w1.attachForm(formData);//returns a dhtmlxForm object 
+		grid2 = tabbar.cells('a').attachGrid();
+		grid2.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		grid2.setHeader("项目,摘要,单价,金额,操作");
+		grid2.setColumnIds("project,summary,price,sum,operate");
+		grid2.setInitWidths("*,*,*,*,180");
+		grid2.setColTypes("ro,ro,ro,ro,link");
+		grid2.enablePaging(true, 100, 999, 'grid_page2', true);//启用分页
+		grid2.setPagingSkin("toolbar");//设置分页底部
+		grid2.init();
+		grid2.setEditable(true);
+
+		form.setSkin('dhx_terrace');
+		
+		form.disableItem('send');
+		form.disableItem('cancel');
+		
+		form.bind(grid);
+
+		form.attachEvent("onChange", function(id, value) {
+			if (form.isItemEnabled('send')) {
+				//confirm_form();
+			}
+		});
+
+		form
+				.attachEvent(
+						'onButtonClick',
+						function(id) {
+							if (id == 'send') {
+								if (option == "update") {
+									sendUrl = "${base}/admin/meetingExpense/updateExpense.action?expense.id="
+											+ expenseId;
+								} else if (option == "add") {
+									sendUrl = "${base}/admin/meetingExpense/insertExpense.action";
+								}
+								form.send(sendUrl, "post", function(data) {
+									var datatest = eval("("
+											+ data.xmlDoc.responseText + ")");
+									if (datatest.result == "success") {
+										SimpleSearch();
+										form.disableItem('send');
+										form.disableItem('cancel');
+										option = "no";
+										w1.hide();
+									}
+									$.dialog.tips(datatest.message);
+								});
+							}
+							if (id == 'cancel') {
+								SimpleSearch();
+								form.disableItem('send');
+								form.disableItem('cancel');
+								option = "no";
+							}
+						});
+		page_layout();
+	}
+
+	function refresh_data() {
+		var id = grid.getSelectedId();
+		data2 = new dhtmlXDataStore({
+			url : "${base}/admin/meetingExpenseForm/selectExpenseForm.action?expense.id="+id+"&etc="+ new Date().getTime(),
+			datatype : "json"
+		});
+		grid2.sync(data2);
+	}
+
+	function doOnRowSelected(id) {
+		tabbar.setTabActive("a");
+		expenseId = id;
+		selectedId = id;
+		if (!window._add_new_child) {
+			layout.cells("b").view("def").setActive();
+			updateFormBtn({
+				"dataStore" : data,
+				"grid" : grid,
+				"rowId" : id,
+				"forms" : [ form ]
+			});
+			window._add_new_child = false;
+			data2 = new dhtmlXDataStore({
+			url : "${base}/admin/meetingExpenseForm/selectExpenseForm.action?expense.id="+expenseId+"&etc="+ new Date().getTime(),
+			datatype : "json"
+		});
+		grid2.sync(data2);
+		var item=data.item(id);
+        addForm(item);
+		form.disableItem("send");
+		} else {
+			return false;
+		}
+	}
+	
+	function addForm(item){
+  		form.setItemValue("expense.name",item.name);
+  		form.setItemValue("expense.startDate",item.startDate);
+  		form.setItemValue("expense.total",item.total);
+  		form.setItemValue("expense.signature",item.signature);
+  		form.setItemValue("expense.organizer",item.organizer);
+  		form.setItemValue("expense.endDate",item.endDate);
+  		form.setItemValue("expense.sigDate",item.sigDate);
+  	}
+	function hasFunction(orgCode, rollback) {
+		$.ajax({
+			type : "POST",
+			async : false,
+			url : "${base}/admin/user/hasFunctionAuth.action?etc="
+					+ new Date().getTime(),
+			data : "orgCode=" + orgCode,
+			success : function(msg) {
+				if (msg.result == "success") {
+					rollback();
+				} else {
+					$.dialog.tips(msg.message);
+				}
+			}
+		});
+	}
+
+	function toolbar_func(id) {
+		if (id == 'add') {
+			addId = new Date();
+			var add_data = {
+				id : addId
+			};
+			option = "add";
+			data.add(add_data, 0);
+			grid.selectRowById(addId);
+			form.setItemFocus("number");
+			form.enableItem("send");
+			form.enableItem("cancel");
+			tabbar.setTabActive("a");
+			w1.show();
+		}
+
+		if (id == 'edit') {
+			//form.unlock();
+		}
+		if (id == 'delete') {
+			var row_id = grid.getCheckedRows(0);
+			if (row_id == '') {
+				$.dialog.tips('请至少选择一条数据！');
+				return;
+			}
+			row_id = row_id.split(',');
+			if (row_id.length == 0)
+				return;
+			$.dialog.confirm('你确定要删除这些数据吗？', function() {
+				var idArr = new Array();
+				for ( var i = 0; i < row_id.length; i++) {
+					idArr.push(data.item(row_id[i]).id);
+				}
+				$.post("${base}/admin/meetingExpense/deleteExpense.action", {
+					"expense.id" : idArr.join(",")
+				}, function(result) {
+					if (result.result = "success") {
+						SimpleSearch();
+						$.dialog.tips(result.message);
+					}
+				});
+			});
+		}
+	}
+
+	 function  advancedSearch(){
+		data.clearAll();
+		var name= $("#sname").val();
+		var organizer= $("#sorganizer").val();
+		//var startDate= $("#sstartDate").val();
+        //var endDate= $("#sendDate").val();
+		var s = "expense.name="+ window.encodeURI(name)+"&expense.organizer="+ window.encodeURI(organizer);
+		var url = '${base}/admin/meetingExpense/selectExpense.action?'+s+"&etc="+ new Date().getTime();
+		window.data.data.url = url
+		data.load(url);
+    }
+	
+	//searchBarCommon('advanced_search_bar',30,'advanced_search_btn','grid_toolbar','grid');
+	searchToggle('advanced_search_btn','advanced_search_bar');
+	function r(id) { //重置密码
+		grid.selectRowById(id);
+
+		$.dialog.confirm('你确定要重置该费用的密码？', function() {
+			$.post("${base}/admin/user/resetPw.action", {
+				"idArr" : id
+			}, function(result) {
+				$.dialog.tips(result.tips);
+			});
+		});
+	}
+
+	function d(id) { //删除 grid中的一行数据
+		grid.selectRowById(id);
+		$.dialog.confirm('你确定要删除这条数据？', function() {
+
+			$.post("${base}/admin/meetingExpense/deleteExpense.action?", {
+				"expense.id" : id
+			}, function(result) {
+				if (result.result == "success") {
+					SimpleSearch();
+				}
+				$.dialog.tips(result.message);
+			});
+		});
+		form.disableItem("send");
+		form.disableItem("cancel");
+	}
+	
+	function d1(formId) { //删除 grid2中的一行数据
+		id = selectedId;
+		$.dialog.confirm('你确定要删除项目费用数据？', function() {
+			$.post("${base}/admin/meetingExpenseForm/deleteExpenseForm.action?", {
+				"expense.id" : id,
+				"expense.formId":formId
+			}, function(result) {
+				if (result.result == "success") {
+					SimpleSearch();
+				}
+				$.dialog.tips(result.message);
+				data2 = new dhtmlXDataStore({
+				url : "${base}/admin/meetingExpenseForm/selectExpenseForm.action?expense.id="+id,
+				datatype : "json"
+				});
+				grid2.sync(data2);
+			});
+		});
+	}
+
+	function e(id) { //编辑 grid中的一行数据
+		//alert(id);
+		option = "update";
+		expenseId = id;
+		grid.selectRowById(id);
+		layout.cells('b').view("def").setActive();
+		var item=data.item(id);
+        addForm(item);
+		form.setItemFocus("number");
+		form.enableItem("send");
+		form.enableItem("cancel");
+		tabbar.setTabActive("a");
+		w1.show();
+	}
+	
+	function e1(id) { //编辑 grid2中的一行数据
+		//alert(id);
+		tabbar.setTabActive("a");
+		var win = {text:"修改项目费用", url:"${base}/admin/meetingExpense/updateExpenseFormPage.action?expense.formId="+id,width:'380',height:'350', id:"updateExpenseFormPage",'parent_ifr':window}
+        window.top.createWindow(win);
+		option = "add";
+		grid2.selectRowById(id);
+		layout.cells('b').view("def").setActive();
+	}
+	
+	function add(id) { //增加 grid2中的一行数据
+		//alert(id);
+		tabbar.setTabActive("a");
+		var win = {text:"添加项目费用", url:"${base}/admin/meetingExpense/addExpenseFormPage.action",width:'380',height:'350', id:"addExpenseFormPage",'parent_ifr':window}
+        window.top.createWindow(win);
+		option = "add";
+		expenseId = id;
+		grid.selectRowById(id);
+		layout.cells('b').view("def").setActive();
+	}
+	function a(selId) {
+		grid.selectRowById(selId);
+		var item = data.item(selId);
+
+		if (selId) {
+			var win = {
+				text : "权限授予",
+				url : "${base}/admin/user/addAuthWin.action?accountInfo.accountName="
+						+ window.encodeURI(item.accountName),
+				id : "addAuthWin",
+				openType : 1
+			}
+			window.top.createTab(win);
+		} else {
+			$.dialog({
+				lock : true,
+				content : '请选择授权费用记录',
+				icon : 'error',
+				ok : true
+			});
+		}
+	}
+
+	function u(selId) {
+		grid.selectRowById(selId);
+		var item = data.item(selId);
+		if (selId) {
+			window.top
+					.createWindow({
+						'text' : '费用关联角色',
+						'id' : 'user_link_role',
+						'url' : '${base}/admin/user/assignUserRoleWin.action?accountInfo.accountName='
+								+ window.encodeURI(item.accountName),
+						'width' : '750',
+						'height' : '520'
+					});
+		}
+	}
+
+	function SimpleSearch() {
+		data.clearAll();
+		var value = $("#search_text").val() == '请输入关键字' ? ''
+				: $("#search_text").val();
+		if (value == '') {
+			var url = '${base}/admin/meetingExpense/selectExpense.action?etc='+ new Date().getTime();
+		} else {
+			var url = '${base}/admin/meetingExpense/selectExpense.action?expense.name='
+					+ window.encodeURI(value)+"&etc="+ new Date().getTime();
+		}
+		window.data.data.url = url
+		data.load(url);
+		$("#search_text").val('请输入关键字');
+	}
+
+	function page_layout() {
+		var wrap_height = $('#tree_wrap').height();
+		var grid_wrap_height = $('#grid_wrap').height();
+		$('#tree').height(wrap_height - 43);
+		$('#grid').height(grid_wrap_height - 43 - 35);
+		if (grid)
+			grid.setSizes();
+
+	}
+
+	$(function() {
+		setTimeout(init, 0);
+
+		$('#selectAll').bind('click', function() {
+			var ids = grid.getAllRowIds();
+			var idsArr = ids.split(',');
+			//alert(idsArr.length);
+			var nowPage = grid.currentPage;
+			var pageItemsLength = grid.rowsBufferOutSize;
+			var allItemsLength = grid.rowsBuffer.length;
+
+			var forBigen = pageItemsLength * (nowPage - 1);
+			var forOver = pageItemsLength * (nowPage);
+			if (forOver > allItemsLength) {
+				forOver = allItemsLength
+			}
+			for (i = forBigen; i < forOver; i++) {
+				var forId = idsArr[i];
+				var check = grid.cellById(forId, 0).getValue();
+				if (check == 1) {
+					check = 0;
+				} else {
+					check = 1;
+				}
+				grid.cellById(forId, 0).setValue(check);
+			}
+
+		})
+
+		//$('#grid_toolbar_ul li').last().addClass('last');
+		$('#grid_toolbar a').click(function() {
+			var id = $(this).attr('id');
+			if (!id)
+				return;
+			id = id.substring(5);
+			toolbar_func(id);
+		});
+
+
+		$("#user_auth")
+				.click(
+						function() {
+							var selId = grid.getSelectedId()
+							var item = data.item(selId);
+
+							if (selId) {
+								var win = {
+									text : "权限授予",
+									url : "${base}/admin/user/addAuthWin.action?accountInfo.accountName="
+											+ item.accountName,
+									id : "addAuthWin"
+								}
+								window.top.createWindow(win);
+							} else {
+								$.dialog({
+									lock : true,
+									content : '请选择授权费用记录',
+									icon : 'error',
+									ok : true
+								});
+							}
+						});
+
+		$("#search_text").focus(function() {
+			if ($(this).val() == this.defaultValue) {
+				$(this).val('');
+			}
+		}).blur(function() {
+			if ($(this).val() == '') {
+				$(this).val(this.defaultValue);
+			}
+		});
+	})
+</script>
+</html>

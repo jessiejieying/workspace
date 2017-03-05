@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+</head>
+<body>
+<div id="form_add"></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var id = "${incomingAdvice.id!}";
+    $(function(){
+        setTimeout(page_layout, 0);
+    })
+
+    function afterSave(){
+	    setTimeout(function(){
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+    }
+    function init(){
+ 		
+    }
+	$(function(){
+		 $('#form_add').loadForm({
+			 formInputs: [
+				 <#if incomingAdvice.id??>   
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'incomingAdvice.id',
+					 value:'${(incomingAdvice.id)!}'
+				 	}
+				 },
+				 </#if>
+				 {type: 'text', attr: {
+						 isRequired:true,
+						 validate:'required:不能为空的,',
+						 placeholder: '',
+						 style:'x12',
+						 infor:'文种',
+						 id: 'documentType',
+						 data:'1',
+						 name:'incomingAdvice.documentType',
+						 value:'${(incomingAdvice.documentType)!}'
+				 	}
+				 },
+				 {type: 'text', attr: {
+					 placeholder: '',
+					 style:'x12',
+					 infor:'办理类型',
+					 id: 'manageType',
+					 data:'1',
+					 name:'incomingAdvice.manageType',
+					 value:'${(incomingAdvice.manageType)!}'
+			 		}
+			     },
+			     {type: 'textarea', attr: {
+			    	 isRequired:true,
+					 placeholder: '',
+					 style:'x12',
+					 infor:'拟办意见',
+					 rows: '5',
+					 id: 'toDoAdvice',
+					 data:'1',
+					 name:'incomingAdvice.toDoAdvice',
+					 value:'${(incomingAdvice.toDoAdvice)!}'
+			 		}
+			     },
+			     {type: 'textarea', attr: {
+			    	 isRequired:true,
+					 placeholder: '',
+					 style:'x12',
+					 infor:'抄送',
+					 rows: '2',
+					 id: 'copySend',
+					 data:'1',
+					 name:'incomingAdvice.copySend',
+					 value:'${(incomingAdvice.copySend)!}'
+			 		}
+			     },
+			     {type: 'textarea', attr: {
+			    	 isRequired:true,
+					 placeholder: '',
+					 style:'x12',
+					 rows: '3',
+					 infor:'备注',
+					 id: 'remark',
+					 data:'1',
+					 name:'incomingAdvice.remark',
+					 value:'${(incomingAdvice.remark)!}'
+			 		}
+			     }
+			     
+			 ],
+			 buttons: [
+				 {
+					 type:'button',
+					 size: 'lg',
+					 color:'blue',
+					 validationState: 'success',
+					 id: 'save_btn',
+					 infor: '保存',
+					 onSubmit: function(form) {
+						 submit(form);
+
+					 }
+				 }
+
+			 ],
+		 
+		 })	
+		init();
+	})
+
+	function submit(form) {		
+		var url = "${base}/admin/incomingAdviceConfig/update.action";
+		if(id == "") {
+			url = "${base}/admin/incomingAdviceConfig/insert.action";
+		}
+		$.post(url, $("form:first").serialize(), function (result) {
+		 	if(result.resultFlag=='true'){					
+				 parentIfr.gridOne.refreshPage();
+				 afterSave();
+		 	}
+		 	layer.msg(result.message);
+		 });
+	}
+	
+	$(window).resize(function(){
+		 setTimeout(page_layout, 0);
+	});
+	
+	function page_layout() {
+	    var ifr_width = $(window).width();
+	    $('#set_bg_image').width(ifr_width-50);
+	}
+</script>
+</html>

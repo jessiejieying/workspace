@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>Eden</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css" id="style_css"/>
+</head>
+<body>
+<form action="" class="wait-form" style="padding-top: 17px;margin-top: 0px;">
+    <h1 style="margin-left: 120px;margin-right: 120px;">${(backDocument.fileTitle)!}</h1>
+    <div class="form-print-header" style="float:right;margin-right: 70px;margin-bottom: 10px;">
+		<span class="header-right" style="color: #ef655d;">退文编号：
+			<input class="td-text-left" type="text" style="border: none;" id="backNo" value="${(backDocument.backNo)!}">
+		</span>
+	</div>
+    <table class="wait-table" style="padding-top: 0px;margin-top: 0px;">
+        <tr>
+            <td class="td-left" height="40">来文单位</td>
+            <td>
+                <table class="intable">
+                    <tr>
+                        <td class="td-text-left" style="text-align: left;padding-left: 0px;" id="">
+                            <span>${(waitDocument.fileUnit)!}</span>
+                        </td>
+                        <td class="td-mid" width="108" height="40">来文字号</td>
+                        <td width="256" style="text-align: left;">
+                            <span>${(waitDocument.fileChar)!}</span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+
+        </tr>
+        <tr>
+            <td class="td-left" height="60">附件信息</td>
+            <td style="text-align:left;">
+                <#if attachmentInfos?? && attachmentInfos.size() &gt;0 >
+                    <#list attachmentInfos as obj>
+                        <a href="${(obj.path)!}" style="padding-right: 20px;"><font
+                                color="blue">${(obj.name)!}</font></a>
+                    </#list>
+                    <#else>
+                        <font color="#999"><label>没有附件！</label></font>
+                </#if>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-left" height="30px">秘书处<br>退文理由</td>
+            <td style="text-align: left;width: 645px;padding-top: 15px;padding-bottom: 11px;">
+                <!-- <input style="width:60%;border:none;" type="text" value="" id="backReason"></input> -->
+                <!--<select style="width:20px;" id="Reason_down" onclick="gradeChange();">-->
+                <input name="reason" type="checkbox" value="文件版式错误"/>
+                <span style="line-height:1.8;">文件版式错误&nbsp;</span>
+                <input name="reason" type="checkbox" value="文件标题错误"/>
+                <span>文件标题错误&nbsp;</span>
+                <input name="reason" type="checkbox" value="发文字号错误"/>
+                <span>发文字号错误&nbsp;</span>
+                <input name="reason" type="checkbox" value="上行文无签发人"/>
+                <span>上行文无签发人</span>
+                <br>
+                <input name="reason" type="checkbox" value="公文文种错误"/>
+                <span style="line-height:1.8;">公文文种错误&nbsp;</span>
+                <input name="reason" type="checkbox" value="主送机关错误"/>
+                <span>主送机关错误&nbsp;</span>
+                <input name="reason" type="checkbox" value="请示件无联系人、联系电话"/>
+                <span>请示件无联系人、联系电话</span>
+                <br>
+                <input name="reason" type="checkbox" value="违反行文规则"/>
+                <span style="line-height:1.8;">违反行文规则&nbsp;</span>
+                <input name="reason" type="checkbox" value="加盖印章错误"/>
+                <span>加盖印章错误&nbsp;</span>
+                <input name="reason" type="checkbox" value="成文日期错误"/>
+                <span>成文日期错误&nbsp;</span>
+                <input name="reason" type="checkbox" value="发文机关错误"/>
+                <span>发文机关错误</span>
+                <br>
+
+                <input name="reason" type="checkbox" value="外事活动缺少省外事侨办会签单"/>
+                <span style="line-height:1.8;">外事活动缺少省外事侨务办会签单&nbsp;</span>
+                <input name="reason" type="checkbox" value="行政规范性文件未发文立项"/>
+                <span>行政规范性文件未发文立项&nbsp;</span>
+                <input name="reason" type="checkbox" value="印发时间错误"/>
+                <span>印发时间错误</span>
+                <br>
+                <input name="reason" type="checkbox" value="行政规范性文件报送材料不全"/>
+                <span style="line-height:1.8;">行政规范性文件报送材料不全&nbsp;&nbsp;&nbsp;</span>
+                <input name="reason" type="checkbox" value="涉及多家单位职能未联合行文或附相关单位书面意见"/>
+                <span>涉及多家单位职能未联合行文或附相关单位书面意见</span>
+                <br>
+                <input id="other" name="reason" type="checkbox" value="其它错误"/>
+                <span style="line-height:1.8;">其他：</span>
+                <input id="addOther" class="otherReason" style="WIDTH: 500px;BORDER-RIGHT:#9a9999 0px solid;BORDER-TOP:#9a9999 0px solid;
+			                    BORDER-LEFT: #9a9999 0px solid;BORDER-BOTTOM: #9a9999 1px solid;visibility:hidden;"/>
+
+            </td>
+        </tr>
+        <tr>
+            <td class="td-left">主办处(室)<br>退文理由</td>
+            <td style="padding-left: 0px;">
+                <textarea id="unitReason" style="text-align: left;height:60px;padding-top: 10px;"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-left">备&nbsp;注</td>
+            <td style="padding-left: 0px;">
+                <textarea id="remark" style="text-align: left;height:60px;padding-top: 10px;"></textarea>
+                </textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-left" height="40">联系电话</td>
+            <td style="text-align: left;">
+                <input id="linkPhone" value="0571-87052476" style="border: none;width: 550px"></input>
+            </td>
+        </tr>
+
+    </table>
+    <div class="text-center margin-large-top"
+         style="padding-top: 10px;margin-top: 10px;margin-bottom: 15px;padding-left: 290px;text-align: left;">
+        <input id="mess" type="checkbox"/><span> 短信提醒 </span>
+
+        <div class="button common-skin-btn-syle01" id="btn_send">发送</div>
+        <!--退文第一步为发送，其他均为保存按钮-->
+        <div class="button common-skin-btn-syle01" id="btn_cancel">取消</div>
+
+    </div>
+
+</form>
+<div id="form_add"></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<!-- <script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script> -->
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+    var userId = "${(userInfo.userId)!}";
+
+    window.top.messageObj = {
+        commonTels: "",
+        commonMailContent: "",
+        commonTableKeyId: "",
+        commonTableName: ""
+    }
+
+    function afterSave() {
+        setTimeout(function () {
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index);
+        }, 500);
+    }
+
+    $(function () {
+    	var numberUrl = "${base}/admin/documentSerialNumber/createSerialNumber.action?etc=" + new Date().getTime();
+        var data = "wfName=oa_back_document&fileType=退文编号";
+		$.ajax({
+            url:numberUrl,
+            type:'post',
+            data:data,
+            async:false,
+            error:function(){
+                window.top.layer.msg("流水号生成失败");
+            },
+            success:function(result){
+                if (result.resultFlag == "true") {
+                    $("#backNo").val(result.message);
+                } else {
+                	window.top.layer.msg("流水号生成失败");
+                }
+            }
+        });
+    	
+        $(document).on("click", "#other", function () {
+            if ($(".otherReason").css("visibility") == "visible") {
+                $(".otherReason").css("visibility", "hidden");
+            } else {
+                $(".otherReason").css("visibility", "visible");
+            }
+            ;
+        });
+
+        //发送
+        $("#btn_send").click(function () {
+            var waitDocumentId = '${(backDocument.waitDocumentId)!}';
+            var mail = "";
+            if ($("#mess").is(':checked')) {
+                mail = "yes";
+            } else {
+                mail = "no";
+            }
+
+            var backReason = "";
+            var ck = $(':input[name=reason]');
+            if ($("#other").is(':checked')) {
+                $("#other").val($("#addOther").val());
+            }
+            ck.each(function () {
+                if ($(this).is(':checked')) {
+                    backReason = backReason + $(this).val() + ",";
+                }
+            })
+            if (backReason.length > 0) {
+                backReason = backReason.substring(0, backReason.length - 1);
+            }
+            var remark = $("#remark").val();
+            var linkPhone = $("#linkPhone").val();
+            var url = "${base}/admin/waitDocument/insertBackDocument.action";
+
+            var obj = {};
+            obj["backDocument.remark"] = remark;
+            obj["backDocument.waitDocumentId"] = waitDocumentId;
+            obj["backDocument.backReason"] = backReason;
+            obj["backDocument.backNo"] = $("#backNo").val();
+            obj["backDocument.unitReason"] = $("#unitReason").val();
+            obj["backDocument.linkPhone"] = linkPhone;
+            obj["mailFlag"] = mail;
+            obj["tels"] = window.top.messageObj.commonTels;
+            obj["mailContent"] = window.top.messageObj.commonMailContent;
+            obj["tableKeyId"] = window.top.messageObj.commonTableKeyId;
+            obj["tableName"] = window.top.messageObj.commonTableName;
+
+            $.post(url, obj, function (result) {
+
+                if (result) {
+                    if (result.resultFlag) {
+
+                        var nextUrl = "${base}/admin/wfManage/deleteWf.action?wf_id=" + window.top.globalParams.wfid;
+
+                        $.post(nextUrl, function (data) {
+                            layer.msg(result.message);
+                            setTimeout(function () {
+                                window.top.close();
+                            }, 1000);
+                        });
+
+                    } else {
+                        layer.msg(result.message);
+                    }
+                }
+                else {
+                    layer.msg("发送失败！");
+                }
+            });
+
+        });
+        //取消
+        $("#btn_cancel").click(function () {
+            /*var win = {text:"待分公文详情", url:"${base}/admin/waitDocument/waitDocumentDetail.action?waitDocument.id=${(backDocument.waitDocumentId)!}",width:'900',height:'550', id:"waitDetail",'parentIfr':window};
+             window.top.createWindow(win);*/
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index);
+
+        });
+
+        //退文发送短信
+        $(document).on("click", "#mess", function () {
+            if (!$("#mess").is(':checked')) {
+                return;
+            }
+            var win = {
+                text: "发送短信",
+                url: "${base}/admin/waitDocument/inComingBackPage.action?waitDocumentId=${(backDocument.waitDocumentId)!}",
+                width: '813',
+                height: '500',
+                'parentIfr': window
+            };
+            window.top.createWindow(win);
+        });
+
+    });
+
+    function gradeChange() {
+        document.getElementById('backReason').value = $('#Reason_down').val();
+    }
+
+    function s(e, a) {
+        if (e && e.preventDefault)
+            e.preventDefault();
+        else
+            window.event.returnValue = false;
+        a.focus();
+    }
+
+</script>
+</html>

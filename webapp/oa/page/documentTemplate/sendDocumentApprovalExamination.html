@@ -1,0 +1,105 @@
+<#include "/oa/page/billcommon/head.html">
+  <body>
+  <div class="form-print" id="showHtml">
+    <h1 class="text-center margin-bottom padding-small-bottom">浙江省人民政府办公厅<br>行政规范性文件发文立项审批件
+    </h1>
+      <div class="js-bill-load-file-number">
+      <div class="form-send-header  file-number-no file-num-block" style="display: block;">
+          <span>发文立项审批</span>
+          <span class="js-oa-bill-title-name"></span>〔20<input style="color:#000;width:20px;" id="file_num_pre" type="text"/>〕
+          <input style="color:#000;width:50px;" id="file_num_next" type="text"/>号
+          <button class="margin-left js-get-file-num" style="display:inline-block;">获取文号</button>
+      </div>
+
+      </div>
+      <div class="clearfix margin-large-top">
+          <div class="form-send-header-name float-left">
+              <input id="field1" value = "${billData.dataset1.field1!}" style="color:#000;width:100%;"/>
+          </div>
+          <div class="float-left " style="color:#f2655d;font-size: 27px;margin-top:-11px;">：</div>
+      </div>
+      <div class="clearfix " style="margin: 17px 0 0px 32px;">
+          <div class="float-left common-words" >你</div>
+          <div class="form-send-header-name float-left" style="margin-left: 0;width: 554px;">
+              <input style="color:#000;width:100%;" id="field2" value = "${billData.dataset1.field2!}"/>
+          </div>
+
+      </div>
+      <div class="clearfix" style="margin: 17px 0 10px 0px;">
+          <div class="float-left common-words">发文立项申报表收悉。经研究，（</div>
+          <div class="js-bill-checkbox-box float-left common-words" >
+                      <span class="js-radio-check"><label style="cursor: pointer">同意<i class="<#if ((billData.dataset1.field3)!('2'))=='1'>icon-check-square</#if> icon-square-o" data-value="1"></i></label></span>
+                      <span class="js-radio-check"><label style="cursor: pointer">不同意<i class="<#if (billData.dataset1.field3!('2'))=='0'>icon-check-square</#if> icon-square-o" data-value="0"></i></label></span>
+
+              <input type="hidden" value="${billData.dataset1.field3!'2'}" id="field3">
+          </div>
+          <div class="float-left common-words" >）你</div>
+          <div class="form-send-header-name float-left" style="margin-left: 0;width: 100px;">
+              <input style="color:#000;width:100%;" id="field4" value="${billData.dataset1.field4!}" id="field4"/>
+          </div>
+          <div class="float-left common-words">发文立项。</div>
+      </div>
+    <table class="form-table ">
+        <tr>
+            <td class="table-td-left td-pd20 ">文件名称</td>
+            <td height="79" class="td-left">
+                <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="ATTACHMENT_REMARK" value="${(billData.dataset1.attachment_remark?replace('<br>','\n'))!}">${(billData.dataset1.attachment_remark?replace('<br>','\n'))!}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="table-td-left td-pd20 ">文<i style="padding: 0 15px;"></i>号</td>
+            <td height="79" class="td-left">
+                <span class="js-oa-bill-title-name-bot td-input" id="file_num_no_bot">
+                  ${(billData.dataset1.document_no)!'发文立项审批〔20  〕号'}
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td class="table-td-left td-pd20 ">发文机关</td>
+            <td height="79" class="td-left">
+                <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="SEND_DEPT" value="${(billData.dataset1.send_dept?replace('<br>','\n'))!}">${(billData.dataset1.send_dept?replace('<br>','\n'))!}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="table-td-left td-pd20 ">发文代字</td>
+            <td height="79" class="td-left">
+                <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="SWUNG_DASH" value="${(billData.dataset1.swung_dash?replace('<br>','\n'))!}">${(billData.dataset1.swung_dash?replace('<br>','\n'))!}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="table-td-left td-pd20 ">发文范围<br>和规范对象</td>
+            <td height="79" class="td-left">
+                <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="SEND_SCOPE" value="${(billData.dataset1.send_scope?replace('<br>','\n'))!}">${(billData.dataset1.send_scope?replace('<br>','\n'))!}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="table-td-left td-pd20 ">需征求意见<br>单<i style="padding: 0 15px;"></i>位</td>
+            <td height="79" class="td-left">
+                <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="field5" value="${(billData.dataset1.field5?replace('<br>','\n'))!}">${(billData.dataset1.field5?replace('<br>','\n'))!}</textarea>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="table-td-left td-pd20 ">备<i style="padding: 0 15px;"></i>注</td>
+            <td height="79" class="td-left">
+                <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="DRAFT_REMARK" value="${(billData.dataset1.remark?replace('<br>','\n'))!}">${(billData.dataset1.draft_remark?replace('<br>','\n'))!}</textarea>
+            </td>
+        </tr>
+    </table>
+      <div class="clearfix margin-top margin-bottom" style="padding-right: 10px;">
+          <div class="float-right common-words"   style="color:#f2655d;font-size: 16px;">浙江省人民政府办公厅</div>
+          </div>
+      <div class="form-print-header ">
+     <span class="header-right js-send-get-date">
+       <input style="color:#000;width: 38px;" class="js-send-year padding-right" type="text" id="send_year" data-node="send_year|send_month|send_day" value = ""/>年<input style="color:#000;width: 30px;padding-left: 10px;"class="js-send-month" type="text" id="send_month" value = ""/>月<input style="color:#000;width: 30px;padding-left: 10px;"class="js-send-day" type="text" id="send_day" value = ""/>日
+     </span>
+      </div>
+      <div class="clearfix " style="margin: 17px 0 0 0">
+          <div class="float-left common-words"   >抄送</div>
+          <div class="form-send-header-name float-left" style="margin-left: 0;width:550px;">
+              <input id="copy_unit" value = "${billData.dataset1.copy_unit!}" style="color:#000;width:100%;"/>
+          </div>
+          <div class="float-left common-words"   style="margin-top:3px;">。</div>
+      </div>
+  </body>
+  <#include "/oa/page/billcommon/footer.html">

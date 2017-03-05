@@ -1,0 +1,157 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>function changeOrg(){
+	var id=window.selTree_tree.getSelectedItemId();
+	var org_code=window.selTree_tree.getUserData(id,'org_code');
+          if(!org_code)
+        {
+          org_code="";
+        }
+
+	var sql = "SELECT a.role_name ,a.role_id, b.org_code FROM ea_role_info a LEFT JOIN ea_org_tree b ON a.org_id = b.org_id WHERE b.org_code LIKE '"+org_code+"%' OR a.role_type = 0";
+	setDsSql('ds1', sql);
+	refreshDsById('ds1');
+
+}
+function addItemCommon(){
+	var grid=getGrid('grid1');
+	var checkedID=grid.getCheckedRows(0);
+	var ds=getDs('ds1');
+	var sel=$('#userSel');
+	if(checkedID.length>0){
+		checkedID=checkedID.split(',');
+		for (var i = 0; i < checkedID.length; i++) {
+			var id = checkedID[i];
+			var thisItem=ds.item(id);
+			$('#user_'+thisItem.role_id).remove();
+			//sel.append('<option id="user_'+thisItem.role_id+'" value="'+thisItem.role_id+'">'+thisItem.role_name+'</option>');
+sel.append('<li id="user_'+thisItem.role_id+'" dataname="'+thisItem.role_id+'">'+'<label><span>'+thisItem.role_name+'</span><input type="checkbox" checked="checked"></label></li>');
+		}
+	}else{
+		$.dialog.tips('请至少选上一个角色!',2);
+	}
+
+}
+function delItemCommon(){
+	//$("#userSel option:selected").remove();
+$("#userSel .liSelect").remove();
+}
+
+function btn_ok(){
+	var userId=[];
+	var userName=[];
+var userShow=[];
+	//$("#userSel option").each(function(){
+		//userId.push($(this).val());
+		//userName.push($(this).text());
+	//});
+$("#userSel li").each(function(){
+		userId.push($(this).attr("dataname"));
+		userName.push($(this).find("span").text());
+		var isShow=($(this).find("input").prop("checked"))?1:2;
+		userShow.push(isShow);
+	});
+	 var stepId = QueryURL.GetValue('step_id'); 
+	 var actionId = QueryURL.GetValue('action_id'); 
+     var wfName = QueryURL.GetValue('wf_name'); 
+	 var controlType=3;
+	 var controlValues=userId+"";
+	var controlAuth=userShow+"";
+	  $.post(project+"/admin/documentConfig/doInsertDocumentWfControl.action", {"stepId":stepId,"actionId":actionId,"wfName":wfName,"controlType":controlType,"controlValues":controlValues,"controlAuth":controlAuth},function(result){
+			 if(result&&result.result=="success")
+			{
+			  alert(result.message)	
+			}else{
+			 alert("保存失败，请确保是登录状态！")	
+			}
+		   
+               window.close();  
+		});
+
+}
+
+function load()
+{
+    var orgTree=window.selTree_tree;
+orgTree.insertNewChild("B00001"  ,"allid","所有组织",0);
+
+    var sel=$('#userSel');
+   var ds=getDs('datasetHas');
+   var count = ds.dataCount();
+   	for (var i = 0; i < count; i++) {
+		var id = ds.idByIndex(i);
+		var dataItem=ds.item(id);
+		var value=dataItem.keyvalue;
+		var name=dataItem.name;
+		//sel.append('<option id="user_'+value+'" value="'+value+'">'+name+'</option>');
+sel.append('<li id="user_'+value+'" dataname="'+value+'">'+'<label><span>'+name+'</span><input type="checkbox" checked="checked"></label></li>');
+	}
+
+
+
+}
+function selectAllCheck(obj){
+	window.event? window.event.cancelBubble = true : e.stopPropagation();
+	var grid=getGrid('grid1');
+		var ids = grid.getAllRowIds();
+    	//console.log(ids);
+    	var idsArr = ids.split(',');
+    	//alert(idsArr.length);
+    	var nowPage = grid.currentPage;
+    	var pageItemsLength = grid.rowsBufferOutSize;
+    	var allItemsLength = grid.rowsBuffer.length;
+    	
+    	var forBigen = pageItemsLength*(nowPage-1);
+    	var forOver = pageItemsLength*(nowPage);
+    	if (forOver>allItemsLength){
+    		forOver = allItemsLength
+    	}
+		if($(obj).is(':checked')){
+		 for(i=forBigen;i<forOver;i++){
+    		var forId = idsArr[i];
+    		var check = grid.cellById(forId, 0).getValue();
+    		grid.cellById(forId, 0).setValue(1);
+    	} 
+		}else{
+			for(i=forBigen;i<forOver;i++){
+    		var forId = idsArr[i];
+    		var check = grid.cellById(forId, 0).getValue();
+    		grid.cellById(forId, 0).setValue(0);
+    	}
+		}	
+}
+
+$(function(){
+	$(document).on("click","#userSel li",function(){
+		$(this).toggleClass('liSelect');
+	});
+});</script><script >document.styleSheets[0].addRule("fc\\:fc_code","behavior: url(../../fceform/htc/fc_code.htc)",0);</script><script >document.styleSheets[0].addRule("fc\\:webgrid","behavior: url(../../fceform/htc/webgrid.htc)",0);</script><script src='../../fceform/js/fcwebgrid.js'></script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib BLONclose BLONopen="load()" center="  " toolbar="不带工具栏" dj_sn="selRoleControl" type="eden_form" caption="公用选择用户" window="当前窗口" posleft postop poswidth posheight isfile="是" billtaborder="<root><taborder>grid1</taborder><taborder>userSel</taborder><taborder>button3</taborder><taborder>tree</taborder><taborder>button4</taborder><taborder>button5</taborder></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:3;radio:0;listbox:1;textarea:0;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:5;text:1;hr:0;checkboxlist:0;radiolist:0;dropdownlist:1;grid:0;dataset:1;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" contxml="<root><label><id>label2</id><id>label3</id></label><listbox><id>userSel</id></listbox><button><id>button3</id><id>button4</id><id>button5</id></button><dropdownlist><id>tree</id></dropdownlist><grid><id>grid1</id></grid><dataset><id>ds1</id><id>datasetHas</id></dataset></root>" BLONopenBefore userType isCheckPermit="否" alertType="1" AutoResizeXml><?xml:namespace prefix = fc /><fc:dataset id=ds1 idtype="1" issubds="否" submitno="1" submittype="4" isaddemptyrec="否" isSubGrid="否" pubpara="否" opensortno="1" controltype="dataset" format="<fields><field><fieldname>role_name</fieldname><datatype>字符</datatype><displaylabel>角色名</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>role_id</fieldname><datatype>字符</datatype><displaylabel>角色ID</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><role_name></role_name><role_id></role_id></dsid>")' onGetText='bill_ondatasetgettext("<dsid><role_name></role_name><role_id></role_id></dsid>")' onSetText='bill_ondatasetsettext("<dsid><role_name></role_name><role_id></role_id></dsid>")' sqltrans="%3cfcsql%20djsn%3d%22selRoleControl%22%20djtype%3d%22eden%5fform%22%20widgetId%3d%22ds1%22%20%3e%3c%2ffcsql%3e"></fc:dataset> <fc:webgrid onkeydown='bill_ongridkeydown("<grid1><col></col><col></col></grid1>")' id=grid1 ondblclick='bill_ongriddblclick("<grid1><col></col><col></col></grid1>")' onclick='bill_ongridclick("<grid1><col></col><col></col></grid1>")' controltype="grid" bodyrows="10" showCheckbox="是" colSort="str,str" colType="ro,ro" colWidth="100,*" bodyrowheight="-1" isPage="是" readonly="否" visible="是" dataset="ds1" format="<cols><col><fname>role_name</fname><cname>角色名</cname><width>50</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col><col><fname>role_id</fname><cname>角色ID</cname><width>50</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col></cols>" width="379" height="238" top="42" left="28" autoheight="undefined" autowidth="undefined" autoappend="undefined">
+<TABLE style="BORDER-COLLAPSE: collapse; TABLE-LAYOUT: fixed; TOP: 0px; LEFT: 0px" id=t cellSpacing=0 cellPadding=1 frame=box>
+<TBODY>
+<TR class=fcGridFirstRow>
+<TD></TD></TR></TBODY></TABLE></fc:webgrid><BUTTON style="POSITION: absolute; WIDTH: 75px; HEIGHT: 25px; TOP: 314px; LEFT: 310px" id=button3 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("btn_ok()")'>确定</BUTTON> 
+<UL style="BORDER-BOTTOM: grey 1px inset; POSITION: absolute; BORDER-LEFT: grey 1px inset; WIDTH: 140px; HEIGHT: 220px; BORDER-TOP: grey 1px inset; TOP: 40px; BORDER-RIGHT: grey 1px inset; LEFT: 511px" id=userSel onmovestart=moveStart() async="否" datasourceName controltype="listbox" temptext tempvalue check="1" sql sqltrans multiple size="8"></UL><fc:fc_code id=tree class=ef_design_dropdownlist onchange='bill_onclick("changeOrg()")' datasourceName="" controltype="dropdownlist" visible="是" dataset="undefined" rootNodeId="B00001" FieldNameList="" isTreeNewSql="0" isShowTree="1" multiselect="否" addrow="否" blnempty="否" blninput="是" format="" xml="" width="185" height="23" top="12" left="144" sqltrans="%3cfcsql%20djsn%3d%22selRoleControl%22%20djtype%3d%22eden%5fform%22%20widgetId%3d%22tree%22%20%3e%3c%2ffcsql%3e" field="undefined" position="absolute" align="undefined" sql2="undefined" enabled="false"></fc:fc_code><LABEL style="POSITION: absolute; WIDTH: 109px; FONT-FAMILY: 宋体; HEIGHT: 23px; TOP: 16px; FONT-WEIGHT: bold; LEFT: 33px" id=label2 onmovestart=moveStart() controltype="label" inputTag="否">按所在部门查询：</LABEL><BUTTON style="POSITION: absolute; WIDTH: 75px; HEIGHT: 25px; TOP: 95px; LEFT: 425px" id=button4 class=ef_button title=添加人员 onmovestart=moveStart() controltype="button" onclick='bill_onclick("addItemCommon()")'>&gt;&gt;</BUTTON><BUTTON style="POSITION: absolute; WIDTH: 75px; HEIGHT: 25px; TOP: 142px; LEFT: 426px" id=button5 class=ef_button title=删除人员 onmovestart=moveStart() controltype="button" onclick='bill_onclick("delItemCommon()")'>&lt;&lt;</BUTTON><LABEL style="POSITION: absolute; WIDTH: 128px; FONT-FAMILY: 宋体; HEIGHT: 22px; TOP: 16px; FONT-WEIGHT: bold; LEFT: 513px" id=label3 onmovestart=moveStart() controltype="label" inputTag="否">已添加的角色：</LABEL><fc:dataset id=datasetHas idtype="1" issubds="否" submitno="1" submittype="4" isaddemptyrec="否" isSubGrid="否" pubpara="否" opensortno="1" controltype="dataset" format="<fields><field><fieldname>keyvalue</fieldname><datatype>字符</datatype><displaylabel>keyvalue</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>name</fieldname><datatype>字符</datatype><displaylabel>name</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" isInAddStatus="是" onValid='bill_ondatasetvalid("<dsid><keyvalue></keyvalue><name></name></dsid>")' onGetText='bill_ondatasetgettext("<dsid><keyvalue></keyvalue><name></name></dsid>")' onSetText='bill_ondatasetsettext("<dsid><keyvalue></keyvalue><name></name></dsid>")' sqltrans="%3cfcsql%20djsn%3d%22selRoleControl%22%20djtype%3d%22eden%5fform%22%20widgetId%3d%22datasetHas%22%20%3e%3cwf%5fname%3e%3a%7b%24urlParam%28%22wf%5fname%22%29%7d%3a%3c%2fwf%5fname%3e%3cstep%5fid%3e%3a%7b%24urlParam%28%22step%5fid%22%29%7d%3a%3c%2fstep%5fid%3e%3c%2ffcsql%3e"></fc:dataset></DIV><div id='addHtml'><style>
+.liSelect {
+    background-color: blue;
+}
+</style>
+</div> </body></html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>bookMeetingRoom</title>
+
+
+<link rel="stylesheet" type="text/css"
+	href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+<style type="text/css">
+html,body{  font-family: "微软雅黑","华文细黑","黑体",arial;}
+	*{margin: 0;padding: 0;list-style: none;}
+	.clr {clear: both; zoom:1;}
+	fieldset {border: 1px solid #CECECE; border-radius: 3px;margin-left: 10px;}
+	fieldset legend{margin-left: 6px;}
+	.step_ol {width: 800px; border-bottom: solid 2px #e6e6e6; margin: 0 auto; height: 45px;line-height: 45px; margin-top: 30px;}
+	.step_ol ol{width: 600px; margin: 0 auto;}
+	.step_ol li{display: inline; float: left; width: 180px; height: 45px; padding-left: 20px; font-size: 16px; font-weight: bold; color:#999; font-family: "微软雅黑","华文细黑","黑体",arial;}
+	.step_ol ol li.active{border-bottom: 2px solid #ff4700;color: #3e3e3e;}
+	.step_ol li i {display: inline-block; width: 30px; height: 30px; text-align: center; line-height: 30px; font-size: 16px;  padding-right: 10px;}
+	.formContentWarp {padding-top: 5px; width: 800px;margin: 0 auto; height: 550px; overflow:hidden;color: #646464;font-size: 14px; }
+	.formContent {width:2400px;height: 100%;margin-left: 00px;}
+	.applicationform { display: inline-block; float: left; width: 750px;margin:25px 25px;height: 500px; overflow-y:auto;}
+	
+	table td{ height: 26px; line-height: 26px;}
+	table i {display: inline-block; width: 20px;height: 26px; line-height: 26px; text-align: center; font-style: normal;}
+	table input,select { height: 26px;line-height: 26px; border: 1px solid #CECECE;border-radius: 1px; vertical-align: bottom;}
+	table select:focus{border:1px solid #646464;}
+	table input:focus{border:1px solid #646464;}
+	table .inputTitle{display: inline-block; width:90px; height: 26px; text-align: left;padding: 0 5px 0 25px; margin: 1px 0 2px 0;}
+	.normalIputTitle{display: inline-block; width:60px; height: 26px; text-align: right;padding: 0 5px 0 40px; margin: 1px 0 2px 0;}
+	.longInput{display: inline-block;width: 560px;}
+	.normalInput{display: inline-block;width: 200px;}
+	.smallInput{display: inline-block;width: 106px;}
+	.miniInput{display: inline-block;width: 52px;}
+	.inputwithB{display: inline-block;width: 470px;}
+	.normalSelect{display: inline-block; width: 200px;}
+	.inputButton{width:80px; border: none; background-color: #0C91CF; display: inline-block; color:white; margin-top: 5px;margin-left: 10px; text-align: center;}
+	.inputButton:hover{background-color: #46ABDA; border:none; color:white;}
+	.shebeicheckbox{display: inline-block; width: 20px; margin-left: 30px; vertical-align: bottom;}
+	.yongpingcheckbox{display: inline-block;width: 20px;margin-left: 50px; vertical-align: bottom;}
+	.textareaInfo {width: 645px; height:45px; margin-left: 25px;border: 1px solid #CECECE;}
+
+</style>
+</head>
+<body>
+	<div id="contentWarp" class="contentWarp">
+		<div id="step_ol" class="step_ol">
+			<ol>
+				<li id="step1"  class="step active"><i>1</i><span>基本会议信息</span></li>
+				<li id="step2" class="step"><i>2</i><span>服务需求信息</span>
+				<li id="step3"  class="step"><i>3</i><span>提交申请</span></li>
+			</ol>
+		</div>
+		<div id="formContentWarp" class="formContentWarp clr">
+			<form>
+			<div id="formContent" class="formContent">
+				<div  id="basicFormWarp" class="applicationform active">
+					<div id="basicForm">
+						<fieldset style="width:700px; height:455px;">
+							<legend>基本会议信息</legend>
+							<table >
+								<tbody>
+									<tr>
+										<td><span class="inputTitle">会议名称</span><input class="longInput" type="text" name="name" value=""></td>
+									</tr>
+									<tr>
+										<td><span class="inputTitle">会议时间</span><input class="smallInput" type="text" name="name" value=""><i>到</i><input class="smallInput" type="text" name="end" value="">
+										<span class="inputTitle" >人数</span><input class="normalInput" type="text" name="" value=""></td>
+									</tr>
+									<tr>
+										<td><span class="inputTitle">主办单位</span><input class="inputwithB" type="text" name="name" value="" ><input type="button" class="inputButton" name="department" value="选择单位"></td>
+									</tr>
+									<tr>
+										<td><span class="inputTitle">主要参会领导</span><input class="inputwithB" type="text" name="name" value="" ><input type="button" class="inputButton" name="department" value="选择领导"></td>
+									</tr>
+									<tr>
+										<td>
+											<fieldset style="width:670px; height:95px;margin-left:20px;"><legend>会场要求</legend>
+												<table >
+													<tr>
+														<td>
+															<span class="normalIputTitle" style="">主席台</span><input type='text' class="miniInput" name="" value=""><i>排</i><input type='text' class="miniInput" name="" value=""><i>人</i><input type='text' class="miniInput" name="" value=""><i style="width:50px;">主席台</i><span class="normalIputTitle">讲台</span><select name="tableMoveEnable" class="normalSelect"><option value="volvo">需要</option><option value="saab">不需要</option></select>
+														</td>
+
+													</tr>
+													<tr>
+														<td><span class="normalIputTitle" style="">桌型布置</span><input type="text" class="normalInput" name="" value=""><span class="normalIputTitle" style="width:100px; padding-left:50px;" >桌椅搬动情况</span><select name="tableMoveEnable" class="normalSelect"><option value="volvo">需要</option><option value="saab">不需要</option></select></td>
+													</tr>
+												</table>
+											</fieldset>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<fieldset style="width:670px; height:155px;margin-left:20px;"><legend>会场装饰</legend>
+												<table >
+													<tr>
+														<td><span class="normalIputTitle" style="width:70px; padding-left:30px;">主席台鲜花</span><input type="text" class="normalInput" name="" value=""><i>盆</i>
+															<span class="normalIputTitle" style="width:100px; padding-left:25px;">主席台后植物</span><select name="tableMoveEnable" class="normalSelect"><option value="volvo">需要</option><option value="saab">不需要</option></select>
+														</td>
+
+													</tr>
+													<tr><td>
+														<span class="normalIputTitle"  >会场植物</span><select name="tableMoveEnable" class="normalSelect"><option value="volvo">需要</option><option value="saab">不需要</option></select>
+														<span class="normalIputTitle" style="width:98px; padding-left:50px;" >讲台鲜花</span><select name="tableMoveEnable" class="normalSelect"><option value="volvo">需要</option><option value="saab">不需要</option></select></td>
+													</tr>
+													<tr>
+														<td><span class="normalIputTitle" >会徽</span><input type="checkbox"  ><i style="width:40px;padding-right:10px;">党徽</i><input type="checkbox"  ><i style="width:40px;padding-right:10px;">国徽</i><input type="checkbox"  ><i style="width:50px;padding-right:10px;">政协徽</i><input type="checkbox"  ><i style="width:50px;padding-right:10px;">其他</i><span class="normalIputTitle" style="width:40px; padding-left:40px;" >红旗</span><select name="tableMoveEnable" class="normalSelect"><option value="volvo">需要</option><option value="saab">不需要</option></select></td></td>
+													</tr>
+													<tr>
+														<td><span class="normalIputTitle">横幅内容</span><input type="text" class="longInput" style="width:555px;"  name="" value="">
+														</td>
+													</tr>
+												</table>
+											</fieldset>
+										</td>
+									</tr>
+									<tr>
+										<td style="text-align:center;">
+										<input id="next" type="button" class="inputButton tabButton" name="next" value="下一步" >
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</fieldset>
+					</div>
+				</div>
+				<div   id="needFormWarp" class="applicationform">
+					<div id="needForm">
+						<fieldset style="width:700px;height:640px;"><legend>服务需求信息</legend>
+						<table>
+							<tbody>
+								<tr>
+									<td><span class='inputTitle'>可选会议室</span><input class="inputwithB" type="text" name="" value="" ><input type="button" class="inputButton" name="" value="选择会议室"> </td>
+								</tr>
+								<tr>
+									<td>
+										<fieldset style="width:670px;height:220px;padding-left:8px;"><legend>设备和用品</legend>
+											<table>
+												<tr>
+													<td>
+														<fieldset style="width:640px;height:90px;padding-left:10px;"><legend>设备</legend>
+															<table>
+																<tr>
+																	<td>
+																		<input type="checkbox" class="shebeicheckbox"><i style="width:70px;">音响设备</i>
+																		<input type="checkbox" class="shebeicheckbox"><i style="width:70px;">电脑投影仪</i>
+																		<input type="checkbox" class="shebeicheckbox" ><i style="width:70px;">录音设备</i>
+																		<input type="checkbox" class="shebeicheckbox" ><i style="width:70px;">大厅屏幕</i>
+																		<input type="checkbox" class="shebeicheckbox" ><i style="width:70px;">等离子屏幕</i>
+																		<input type="checkbox" class="shebeicheckbox" ><i style="width:70px;">笔记本电脑</i>
+																		<input type="checkbox"  class="shebeicheckbox"><i style="width:70px;">有线电视</i>
+																		<input type="checkbox"  class="shebeicheckbox"><i style="width:70px;">网络宽带</i>
+																		<input type="checkbox"  class="shebeicheckbox"><i style="width:70px;">空调</i>
+																		<input type="checkbox"  class="shebeicheckbox"><i style="width:70px;">会议签到席</i>
+																	</td>
+																</tr>
+															</table>
+														</fieldset>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<fieldset style="width:640px; height:90px; padding-left:10px;"><legend>用品</legend>
+															<table >
+																<tr>
+																	<td>
+																		<input type="checkbox" class="yongpingcheckbox"><i style="width:60px;">矿泉水</i><input class="miniInput" type="text" name="" value=""><i>瓶</i>
+																		<input type="checkbox" class="yongpingcheckbox"><i style="width:60px;">茶水</i><input class="miniInput" type="text" name="" value=""><i>杯</i>
+																		<input type="checkbox" class="yongpingcheckbox" ><i style="width:60px;">纸笔</i><input class="miniInput" type="text" name="" value=""><i>套</i>
+																		
+																	</td>
+																</tr>
+																<tr>
+																	<td>
+																		<input type="checkbox" class="yongpingcheckbox" ><i style="width:60px;">小方巾</i><input class="miniInput" type="text" name="" value=""><i>块</i>
+																		<input type="checkbox" class="yongpingcheckbox" ><i style="width:60px;">纸巾</i><input class="miniInput" type="text" name="" value=""><i>块</i>
+																		<input type="checkbox" class="yongpingcheckbox" ><i style="width:60px;">湿巾</i><input class="miniInput" type="text" name="" value=""><i>块</i>
+																	</td>
+																</tr>
+															</table>
+														</fieldset>
+														
+													</td>
+												</tr>
+												
+											</table>
+										</fieldset>
+									</td>
+								</tr>
+								<tr>
+									<td>
+									<fieldset style="width:680px; height:80px;"><legend>水果要求</legend>
+										<textarea class="textareaInfo"></textarea>
+									</fieldset>
+									</td>
+								</tr>
+								<tr>
+									<td>
+									<fieldset style="width:680px; height:80px;"><legend>屏显内容</legend>
+										<textarea class="textareaInfo"></textarea>
+									</fieldset>
+									</td>
+								</tr>
+								<tr>
+									<td>
+									<fieldset style="width:680px; height:80px;"><legend>台签内容</legend>
+										<textarea class="textareaInfo"></textarea>
+									</fieldset>
+									</td>
+								</tr>
+								<tr>
+									<td>
+									<span class="inputTitle">预留车位</span><input class="longInput" type="text">
+									</td>
+								</tr>
+								<tr>
+									<td>
+									<span class="inputTitle">其他</span><input class="longInput" type="text">
+									</td>
+								</tr>
+								<tr>
+									<td style="text-align:center;">
+										<input id="back" type="button" class="inputButton tabButton" name="back" value="上一步" >
+										<input id="next" type="button" class="inputButton tabButton" name="next" value="下一步" >
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</fieldset>
+					</div>
+				</div>
+				<div  id="lastFormWarp" class="applicationform">
+					<div id="lastForm">
+						<fieldset style="width:700px; height:200px;"><legend>会议申请人基本信息</legend>
+						<table>
+							<tbody>
+								<tr>
+										<td><span class='inputTitle' style="width:100px;">会务费支付部门</span><input class="inputwithB" type="text" name="" value="" ><input type="button" class="inputButton" name="" value="选择部门"> </td>
+								</tr>
+								<tr>
+									<td><span class='inputTitle' style="width:100px;">部门电话</span><input class="longInput" type="text" name="" value="" ></td>
+								</tr>
+								<tr>
+									<td><span class='inputTitle' style="width:100px;">预订服务确认人</span><input class="longInput" type="text" name="" value="" ></td>
+								</tr>
+								<tr>
+									<td><span class='inputTitle' style="width:100px;">联系电话</span><input class="longInput" type="text" name="" value="" ></td>
+								</tr>
+								<tr>
+									<td style="text-align:center;">
+										<input id="back" type="button" class="inputButton tabButton" name="back" value="上一步" >
+										<input id="tempSave" type="button" class="inputButton tabButton" name="tempSave" value="存为草稿" >
+										<input id="save" type="button" class="inputButton tabButton" name="save" value="提交申请" >
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</fieldset>
+					</div>
+				</div>
+			</div>
+			</form>
+		</div>
+	</div>
+	<script src="${base}/aufw/resources/common/js/jquery.js"></script>
+	<script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+	<script type="text/javascript">
+	var step="step";
+	var i = 1;
+	var length = 0;
+		$(function init(){
+			$("#formContentWarp .tabButton").bind("click",tabDiv);
+		})
+
+		function tabDiv(){
+			if(this.id == "back"){
+				i--;
+				length=length+800;
+				alert(i);
+			}else if(this.id == "next"){
+				i++;
+				length=length-800;
+				alert(i);
+			}
+			alert(this.className);
+			$('#step_ol li').removeClass("active");
+			$('#step'+i).addClass("active");
+			$('#formContent').css("margin-left",length+'px');
+		}
+	</script>
+</body>
+</html>
+
+

@@ -1,0 +1,65 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>function load()
+{
+    $('#text1').val(0);
+   $('#text2').val(GetTime());
+
+    var mainDataset=window.data_readpassdb; 
+   var dataItem=mainDataset.item(mainDataset.idByIndex(0));
+  
+     if(dataItem)   //
+    {
+	$('#button2').hide();
+    }else{  //没有开启传阅，不能取消
+      $('#label2').text("此公文没有开启传阅，不能取消");
+      $('#button1').hide();
+    }
+
+
+}
+
+function sub()
+{
+   doSubmitData(function () {
+	$.dialog.tips("停止成功!");
+      
+     window.setTimeout(function () {
+                   close()
+       }, 300);
+  
+
+   });  
+
+
+}
+
+
+function close()
+{
+ try {
+                       window.edenCallBack(); 
+                    } catch (e) {
+
+        }
+
+}</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib billtaborder="<root><taborder>text1</taborder><taborder>text2</taborder><taborder>button1</taborder><taborder>button2</taborder></root>" dj_sn="CancelPassRead" caption="取消传阅" type="eden_wf" isfile="是" center="  " posleft postop poswidth posheight toolbar="不带工具栏" window="当前窗口" BLONopen="load()" BLONopenBefore BLONclose userType alertType="1" isCheckPermit="否" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:2;radio:0;listbox:0;textarea:0;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:2;text:2;hr:0;checkboxlist:0;radiolist:0;dropdownlist:0;grid:0;dataset:1;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" contxml="<root><label><id>label2</id></label><button><id>button2</id><id>button1</id></button><text><id>text1</id><id>text2</id></text><dataset><id>readpassdb</id></dataset></root>" AutoResizeXml><?xml:namespace prefix = fc /><fc:dataset id=readpassdb isInAddStatus="是" idtype="8" opensortno="1" issubds="否" idparam="BBB" savetable="oa_document_readpass" submitno="1" submittype="1" isaddemptyrec="否" pubpara="否" isSubGrid="否" controltype="dataset" onValid='bill_ondatasetvalid("<dsid><id></id><data_valid></data_valid><cancel_dttm></cancel_dttm></dsid>")' onGetText='bill_ondatasetgettext("<dsid><id></id><data_valid></data_valid><cancel_dttm></cancel_dttm></dsid>")' onSetText='bill_ondatasetsettext("<dsid><id></id><data_valid></data_valid><cancel_dttm></cancel_dttm></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6XrnbXrn%DA%F2%EC%E8Xrn%EC%D0%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%F2%D8%D0%D6%EE%D0%F4%F4XrnXn%96Xn%90%FC%DE%D8%F2%D8Xrn%FC%DA%CC%E0%D6Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%FC%DA%A0%D6XrrXr%80X%7C%96Xt%90Xr%7CXrn%D0%EA%D6Xrn%D6%D0%F6%D0%CC%FA%D0%E6%E0%D6Xt%96p" format="<fields><field><fieldname>id</fieldname><datatype>字符</datatype><displaylabel>id</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>data_valid</fieldname><datatype>整数</datatype><displaylabel>data_valid</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>1</defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>cancel_dttm</fieldname><datatype>时间</datatype><displaylabel>取消时间</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>"></fc:dataset><INPUT style="POSITION: absolute; WIDTH: 110px; DISPLAY: none; HEIGHT: 20px; TOP: 178px; LEFT: 294px" id=text1 onmovestart=moveStart() controltype="text" field="data_valid" china="data_valid" dataset="readpassdb"><INPUT style="POSITION: absolute; WIDTH: 110px; DISPLAY: none; HEIGHT: 20px; TOP: 110px; LEFT: 322px" id=text2 onmovestart=moveStart() controltype="text" field="cancel_dttm" china="取消时间" dataset="readpassdb"> <LABEL style="POSITION: absolute; BACKGROUND-COLOR: #ffffff; FONT-STYLE: normal; WIDTH: 172px; FONT-FAMILY: 宋体; HEIGHT: 58px; FONT-SIZE: 16pt; TOP: 28px; LEFT: 41px" id=label2 onmovestart=moveStart() controltype="label" inputTag="否">要停止传阅吗？</LABEL><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; TOP: 99px; PADDING-TOP: 0px; LEFT: 74px" id=button2 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("close()")'>关闭</BUTTON><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 78px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 28px; TOP: 97px; PADDING-TOP: 0px; LEFT: 74px" id=button1 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("sub()")'>停止传阅</BUTTON> </DIV><div id='addHtml'></div> </body></html>

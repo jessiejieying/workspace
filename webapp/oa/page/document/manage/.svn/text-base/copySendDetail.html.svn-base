@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+<title>Eden</title>
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+	<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css" id="style_css"/>
+</head>
+<body>
+ <form action="" class="wait-form">
+ 	<h1 style="margin-left: 140px;margin-right: 140px;margin-top: 50px;margin-bottom: 15px;">${(detail.title)!}</h1>
+ <table class="wait-table">
+ 	<tr>
+ 		<td class="td-left" height="50">文件字号</td>
+ 		<td>
+ 			<table class="intable">
+				<tr>
+					<td class="td-text-left" style="text-align: left;padding-left: 0px;" id="radioId">						
+						<lable>${(detail.document_no)!}</lable>
+					</td>
+					<td class="td-mid" width="108" height="50">来文日期</td>
+ 					<td width="256">
+ 						<input id="fileChar" type="text" class="td-input" value="${(detail.from_date)!}">
+ 					</td>
+				</tr>
+ 			</table>
+ 		</td>
+ 	</tr>
+ 	<tr>
+ 		<td class="td-left" height="60">  来文单位<br>(主办处室)</td>
+ 		<td style="text-align: left;padding-right: 20px;">
+			<span>${(detail.draft_dept)!}</span>
+ 		</td>
+ 	</tr>
+ 	<tr>
+        <td class="td-left"  height="60">抄送日期</td>
+        <td style="text-align: left;padding-right: 20px;">
+            <span>${(detail.send_date)!}</span>
+        </td>
+    </tr>
+ 	<tr ms-controller="wrap">
+ 		<td class="td-left" height="60">附件信息</td>
+ 		<td style="text-align: left;padding-top: 15px;padding-bottom: 15px;">
+			<a class="file-icon" ms-for="el in @dataList" ms-attr="{'href':el.path,'data-name':el.name}" style="padding-right: 20px;display: block"><font color="blue" ms-text="el.name"></font></a>
+ 		</td>
+ 	</tr>
+ </table>
+
+ </form>
+<div id="form_add" ></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script src = "${base}/edenui/common/js/avalon/avalon2.js"></script>
+
+<script>
+
+	var dataList=[];
+
+	<#list attachmentInfos as obj>
+	dataList.push({
+		"name":"${(obj.name)!}",
+		"path":encodeURI("${(obj.path)!}").replace(/\+/g,"%2B")
+	})
+	</#list>
+	var model = avalon.define({
+		$id: "wrap",
+		dataList:[]
+	});
+
+
+    function afterSave(){
+	    setTimeout(function(){
+	    	parentIfr.gridOne.refreshPage();
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+    }
+    
+    function init(){
+ 		
+    }
+
+	$(function(){
+		model.dataList=dataList;
+
+	   //点击报名
+	   $(document).on("click", "#regist", function(){
+		   var url = "${base}/admin/hallRegist/changeHallRegist.action?type=1&wfId=${(detail.wfId)!}";
+		   $.post(url, function(data){
+			   window.top.layer.msg(data.message);
+			   afterSave();
+		   });
+		   
+	   });
+	   
+	   //点击请假
+	   $(document).on("click", "#leave", function(){
+           var win = {
+               text: "请假详情",
+               url: "${base}/admin/hallRegist/hallRegistLeaveReason.action?wfId=${(detail.wfId)!}&id=${(detail.id)!}",
+               width: '815',
+               height: '550',
+               id: "leaveDetail",
+               parentIfr: window
+           };
+           window.top.createWindow(win);
+		   
+	   });
+		   
+	});
+	
+    //附件信息文件添加图标
+    function classStyle(){
+        var arrSpan = [];
+        for (var i = 0; i < $(".file-icon").length; i++) {
+            arrSpan.push($(".file-icon").eq(i).data("name"))
+        }
+        $.each(arrSpan,function(i,item){
+            if(item.indexOf(".doc") > -1){
+                $(".file-icon").eq(i).addClass("file-icon-word");
+            }else if(item.indexOf(".pdf") > -1){
+                $(".file-icon").eq(i).addClass("file-icon-pdf");
+            }else if(item.indexOf(".tgw") > -1){
+                $(".file-icon").eq(i).addClass("file-icon-tiangu");
+            }else{
+                return ""
+            }
+        });
+
+    }
+    
+    classStyle();
+    
+</script>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+	<style type="text/css">
+	.grid-table-top{
+	  height:300px!important;
+	}
+	.grid-father{
+	  height: 300px!important;
+	}
+	.js-grid-father .grid-father{
+	  height: 300px!important;
+	}
+	</style>
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line" style="margin 0 auto;margin-right:15px;">
+	    <table class="wrongReg-table" style="width: 722px;height:300px;margin-left: auto;margin-right: auto;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	          		
+	          		
+	          	 <div class="wrong-text-title wrong-reg-table" style="margin-top:16px; margin-bottom:5px;">接收人:</div>
+	              <div class="js-grid-father grid-father" style="margin-bottom:60px;">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="46"></th>
+	                  <th w_index="" width="46">序号</th>
+	                  <th w_index="signOrg" width="232">单位</th>
+	                  <th w_index="name" width="131">姓名</th>
+	                  <th w_index="duty" width="131">职务</th>
+	                  <th w_index="phone" width="131">电话</th>
+	                </tr>
+	              </table>
+	          </div>
+	          
+				  <div class="wrong-text-title wrong-reg-table" style="margin-top:-100px;margin-bottom:8px;">消息内容:</div>
+					  <div class="tool-bar-li line">
+						  <textarea rows="6" style="width:722px;height:80px;padding-top:5px;line-height:19px;text-indent:2em;" id="SMS_content"><#if messageContent ??>${messageContent?trim}</#if></textarea>
+					  </div>
+				   <div style="width:722px;height:25px;margin:0 auto;text-align:center;">
+				      <div class="button common-skin-btn-syle01" id="conform_sure" style="display:none;">确定</div>
+				      <div class="button common-skin-btn-syle01" id="conform_add">发送</div>
+				   </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/form/resources/common/js/tool.js"></script>
+<script src="${base}/form/resources/common/js/edenApi.js"></script>
+<script>
+    var id=$urlParam("id");
+    var type=$urlParam("type");
+    var show=$urlParam("show");
+	var gridOne;
+	var meeting_id = $("#meetingId").val();
+	var selectURL = "${base}/admin/backMeeting/queryUrgencyPage.action?id="+id+"&type="+type;
+	$(function(){
+
+		$("#SMS_content").val(parent.$("#messageContent").val());
+
+
+		//隐藏显示确定按钮
+		if(show=="1"){
+			$("#conform_sure").show();
+			$("#conform_add").hide();
+		}
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "&etc="+new Date().getTime() +"&type=" + "${type!}",
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:3,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+		    	$("#manage_grid tbody tr").each(function(){
+	        		var $this=$(this);
+	        		 $("td",this).eq(1).css("padding-left","17px");
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+		      }
+		  });
+		
+		
+		//确认按钮，把值传送给上一级页面
+		$(document).on("click","#conform_sure",function(){
+			window.top.messageContent=$("#SMS_content").val();
+			var item=gridOne.getCheckedRowsRecords();
+			var sendPhone=new Array();
+			for(var i=0;i<item.length;i++){
+				sendPhone.push(item[i].phone);
+			}
+		    window.top.sendPhones=sendPhone.join(",");
+		    
+		   
+			parent.$("#messageContent").val($("#SMS_content").val());
+		    
+			var index = parent.layer.getFrameIndex(window.name);
+			 parent.layer.close(index);
+		});
+		
+		//确认发送短信
+		 $(document).on("click","#conform_add",function(){
+			var checkedRowsRecords=gridOne.getCheckedRowsRecords();
+			if(checkedRowsRecords.length<=0){
+				  layer.msg("请选择一条数据");
+				  return;
+			}
+			if($("#SMS_content").val()==""){
+				layer.msg("请填写消息内容");
+				$("#SMS_content").focus();
+				return;
+			}
+			
+
+		 	var tels = new Array();
+		 	for(var i=0;i<checkedRowsRecords.length;i++){
+		 		var tel = checkedRowsRecords[i].phone;
+		 		if(tel!=null && tel!=""){
+		 			tels.push(tel);
+		 		}
+		 	}
+		 	$.ajax({
+		 		url:"${base}/admin/sendMessage/sendMessage.action",
+	   			traditional:true,
+		 		data:{
+		   			"sms":$("#SMS_content").val(),
+		   			"tels":tels.join(","),
+		   			"moduleType":"会议管理-已退会议",
+		   			"tableName":type,
+		   			"tableKeyId":id
+	   			},
+	   			success:function(data){
+	   				if(data.flag=='1'){
+						layer.msg("发送短信成功");
+						setTimeout(function(){
+							   var index = parent.layer.getFrameIndex(window.name);
+							   parent.layer.close(index); 	
+						   },1000);
+					}
+					else
+						layer.msg("发送失败");
+		   		}
+		  });
+		
+		});
+	});
+	
+	
+</script>
+</body>
+</html>

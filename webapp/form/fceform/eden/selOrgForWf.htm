@@ -1,0 +1,52 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>function btn_ok(){
+	var orgId=[];
+	var orgName=[];
+	var tree=window.tree_tree1;
+	var checkedArr = tree.getAllChecked().split(",");
+	var commentArr = new Array();
+
+	for(var i=0; i<checkedArr.length; i++){
+		var parentId = tree.getParentId(checkedArr[i]);
+
+		if($.inArray(parentId, checkedArr)==-1){
+			commentArr.push(checkedArr[i]);
+		}
+	}
+	orgId=commentArr;
+	for (var i = 0; i < commentArr.length; i++) {
+		var nodeId = commentArr[i];
+		orgName.push(tree.getItemText(nodeId));
+	}         
+	try{
+           parentIfr.selectOrgsCallback(orgId,orgName);
+
+		}catch (e){
+
+	}
+}
+</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script><link type='text/css' rel='stylesheet' href='../../fceform/css/xtree.css'  /><script src='../../fceform/js/xtree.js'></script>
+<DIV id=SKbillsheet jslib isCheckPermit="否" alertType="1" contxml="<root><button><id>button3</id></button><dataset><id>ds1</id></dataset><tree><id>tree1</id></tree></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:3;radio:0;listbox:1;textarea:0;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:5;text:1;hr:0;checkboxlist:0;radiolist:0;dropdownlist:1;grid:0;dataset:0;spin:0;excel:0;tree:1;ebshow:0;ebiao:0;layout:0;page:0;editor:0" billtaborder="<root><taborder>button3</taborder></root>" isfile="是" posheight poswidth postop posleft window="当前窗口" caption="选择组织" type="eden_form" dj_sn="selOrgForWf" toolbar="不带工具栏" BLONopen center="  " BLONclose BLONopenBefore userType AutoResizeXml><?xml:namespace prefix = "fc" /><fc:dataset id=ds1 controltype="dataset" isSubGrid="否" pubpara="否" isaddemptyrec="否" submittype="4" submitno="1" issubds="否" opensortno="1" idtype="1" onValid='bill_ondatasetvalid("<dsid><role_name></role_name><role_id></role_id></dsid>")' onGetText='bill_ondatasetgettext("<dsid><role_name></role_name><role_id></role_id></dsid>")' onSetText='bill_ondatasetsettext("<dsid><role_name></role_name><role_id></role_id></dsid>")' sqltrans="%3cfcsql%20djsn%3d%22selOrgForWf%22%20djtype%3d%22eden%5fform%22%20widgetId%3d%22ds1%22%20%3e%3c%2ffcsql%3e" format="<fields><field><fieldname>role_name</fieldname><datatype>字符</datatype><displaylabel>角色名</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>role_id</fieldname><datatype>字符</datatype><displaylabel>角色ID</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>"></fc:dataset>&nbsp;<BUTTON id=button3 class=ef_button style="HEIGHT: 25px; POSITION: absolute; LEFT: 118px; TOP: 261px; WIDTH: 75px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("btn_ok()")'>确定</BUTTON> 
+<DIV id=tree1 class=ef_design_tree style="OVERFLOW: auto; BORDER-TOP: #cecece 1px solid; HEIGHT: 242px; BORDER-RIGHT: #cecece 1px solid; BORDER-BOTTOM: #cecece 1px solid; POSITION: absolute; LEFT: 15px; BORDER-LEFT: #cecece 1px solid; TOP: 10px; WIDTH: 299px; BACKGROUND-COLOR: #ffffff" controltype="tree" datasourceName="" sql2="%3cfcsql%20djsn%3d%22selOrgForWf%22%20djtype%3d%22eden%5fform%22%20widgetId%3d%22tree1%22%20%3e%3c%2ffcsql%3e" ischecked="是" isAll="是" opentb="_self" sourcetype="2" roottext="B00001" clicknode="" xmlpath="undefined" xml="undefined"></DIV></DIV><script language="JavaScript">var tree1;window.attachEvent( "onunload", function(){tree1=null;})</script><div id='addHtml'><style>
+
+</style>
+</div> </body></html>

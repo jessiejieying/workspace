@@ -1,0 +1,66 @@
+table{
+	display:none;
+}
+
+.icon-btn-close {
+	background-image: url("../images/sealImages/sealSprite.png");
+	background-position: -52px 0px;
+	width: 12px;
+	height: 14px;
+}
+.icon-btn-head {
+	background-image: url("../images/sealImages/sealSprite.png");
+	background-position: -24px -23px;
+	width: 12px;
+	height: 13px;
+}
+.icon-btn-print {
+	background-image: url("../images/sealImages/sealSprite.png");
+	background-position: 0px 0px;
+	width: 16px;
+	height: 13px;
+}
+.icon-btn-save {
+	background-image: url("../images/sealImages/sealSprite.png");
+	background-position: 0px -23px;
+	width: 14px;
+	height: 13px;
+}
+.icon-btn-sec-save {
+	background-image: url("../images/sealImages/sealSprite.png");
+	background-position: -26px 0px;
+	width: 16px;
+	height: 13px;
+}
+
+
+.btn-save{
+
+	cursor: pointer;
+	border: 1px solid #ddd;
+	background: 0 0;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	font-size: 12px;
+	padding:1px 18px 4px 18px ;
+	margin: 0;
+	display: inline-block;
+	-moz-transition: all 1s cubic-bezier(.175,.885,.32,1) 0s;
+	-webkit-transition: all 1s cubic-bezier(.175,.885,.32,1) 0s;
+	box-shadow: 0 2px 2px #c5c5c5,2px 0 2px #c5c5c5;
+	color: #fff;
+	box-shadow: 0 2px 2px #c5c5c5,2px 0 2px #c5c5c5;
+	border-color: #4786d5;
+	background-color: #5b97e1;
+	margin-bottom: 8px;
+
+}
+
+
+.btn-save i{
+	display: inline-block;
+	position: relative;
+	top: 2px;
+	margin-right: 5px;
+}

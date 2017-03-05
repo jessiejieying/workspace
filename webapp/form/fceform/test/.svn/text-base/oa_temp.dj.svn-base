@@ -1,0 +1,117 @@
+<script></script> 
+<DIV oncontrolselect=controlselect() id=SKbillsheet contentEditable=true jslib isCheckPermit="否" alertType="1" center="  " unselectable="on" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:0;radio:0;listbox:0;textarea:0;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:4;div:4;DsMain_field:0;a:0;button:0;text:5;hr:0;checkboxlist:0;radiolist:0;dropdownlist:0;grid:0;dataset:0;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0" posheight poswidth caption="收发文临时文件" type="eden" dj_sn="oa_temp" billtaborder="<root></root>" contxml="<root></root>" BLONopen toolbar="不带工具栏" window="当前窗口" posleft postop isfile="是" BLONopenBefore BLONclose userType><DIV id=laiWen1>
+<TABLE class=table_border_1px border=0 borderColor=#808080 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle><STRONG>*</STRONG>文件字号</DIV></TD>
+<TD colSpan=3></TD>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle>办阅件标识</DIV></TD>
+<TD width=120></TD>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle>流 水 号</DIV></TD>
+<TD bgColor=#f7f7f7 width=120></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle><STRONG>*</STRONG>来文单位</DIV></TD>
+<TD colSpan=3></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>收文表分类</DIV></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>登 记 人</DIV></TD>
+<TD bgColor=#f7f7f7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle><STRONG>*</STRONG>文件标题</DIV></TD>
+<TD colSpan=7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>收文表分类</DIV></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle><STRONG>*</STRONG>文件密级</DIV></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>份　　数</DIV></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>页　　数</DIV></TD>
+<TD bgColor=#f7f7f7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>查询级别</DIV></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>归档类型</DIV></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle><STRONG>*</STRONG>成文日期</DIV></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>收文日期</DIV></TD>
+<TD bgColor=#f7f7f7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>交办日期</DIV></TD>
+<TD bgColor=#f7f7f7></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>办理期限</DIV></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>督办件编号</DIV></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>清退类型</DIV></TD>
+<TD bgColor=#f7f7f7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>文件附件</DIV></TD>
+<TD bgColor=#f7f7f7 colSpan=7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>主 题 词</DIV></TD>
+<TD colSpan=7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>批办领导</DIV></TD>
+<TD colSpan=3></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>主办单位</DIV></TD>
+<TD colSpan=3></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>传阅单位</DIV></TD>
+<TD colSpan=7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>分发范围</DIV></TD>
+<TD colSpan=7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>来文摘要</DIV></TD>
+<TD colSpan=7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>备　　注</DIV></TD>
+<TD colSpan=7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>关 联 号</DIV></TD>
+<TD colSpan=7></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>相关链接</DIV></TD>
+<TD colSpan=7></TD></TR></TBODY></TABLE></DIV></DIV><p id=splitaddhtml /><style>
+body { font-size: 12px; }
+select, input, textarea { outline: none; }
+#laiWen1 { width: 750px; margin: 0 auto; }
+table.table_border_1px { border-collapse: collapse; table-layout: fixed; margin: 0 auto; margin-top: -1px; }
+table.table_border_1px td { border: 1px solid #808080; line-height: 40px; height: 40px; }
+table.table_border_1px tr { border: none; }
+.tdTitle { color: #000080; text-align: center; width: 100%; }
+.tdTitle strong { color: #F00; }
+table.table_border_1px td select, table.table_border_1px td input { width: 90%; margin: 2px; border: 0; }
+table.table_border_1px td textarea { width: 97%; margin: 2px; border: 0; overflow: auto; }
+</style>

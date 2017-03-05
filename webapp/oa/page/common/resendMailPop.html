@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>eden</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+  <style type="text/css">
+  	.msg-type{ display:inline-block;}
+	  	  	.msg-quare{
+	 border-bottom: 2px solid #76aff6;  	  	
+     display: inline-block;
+     height: 27px;
+     padding-top: 6px;
+	 margin-left: 15px;  
+}
+	.js-send-type {
+		margin-right: 4px;
+		margin-left: 4px;
+	}
+		
+	.js-send-type1 {
+		margin-right: 4px;
+	}
+  </style>
+</head>
+<body  class="ms-controller" ms-controller="wrap">
+<div class="message-textarea-box">
+
+    <!--发送给个人 1-->
+    <div class="sendObj" ms-if="@mailMessageData.messageType==1">
+        <h4>发送至：</h4>
+        <div class="send-content">
+            <div id="massage_send_content">
+                <label ms-for="(index,el) in @mailMessageData.sendRange">
+                    <input ms-attr="{'data-id':el.id,'data-name':el.name,'data-post':el.post,'data-tel':el.tel,'data-unit':el.unit}" type="checkbox" checked="checked">{{el.name}}({{el.tel}})</label>
+            </div>
+        </div>
+    </div>
+    <!--发送给单位 2-->
+    <div ms-if="@mailMessageData.messageType==2" class="js-grid-father grid-father" style="position:relative;overflow-y:scroll;height:212px;padding-top:38px;">
+        <table class="table-fixed-header bsgrid-header" id="manage_grid_fixedHeader" style="width: 683px;position: fixed;left: 55px;"><thead><tr>
+            <th    width="30">
+                <input class="bsgrid_editgrid_check js-check-all"  checked="checked" type="checkbox">
+            </th>
+            <th width="40">序号</th>
+            <th width="200" >单位</th>
+            <th >姓名</th>
+            <th width="100" >职务</th>
+            <th  width="150" >联系电话</th>
+        </tr>
+        </thead>
+        </table>
+    <table class="bsgrid" id="massage_send_content" style="border-top: 2px solid #71b8ec;">
+
+        <tr ms-for="(index,el) in @mailMessageData.sendRange">
+            <td width="30" style="padding-left: 0;text-align: center">
+                <label><input class="standard-checkbox"  checked="checked" ms-attr="{'data-id':el.id,'data-name':el.name,'data-post':el.post,'data-tel':el.tel,'data-unit':el.unit}" type="checkbox" value=""/></label>
+            </td>
+            <td  style="padding-left: 0;text-align: center;width: 40px;">{{index+1}}</td>
+            <td width="200" style="padding-left: 0;text-align: center">{{el.unit}}</td>
+            <td width="" style="padding-left: 0;text-align: center">{{el.name}}</td>
+            <td width="100" style="padding-left: 0;text-align: center">{{el.post}}</td>
+            <td width="150" style="padding-left: 0;text-align: center">{{el.tel}}</td>
+        </tr>
+        <tr ms-if="@mailMessageData.sendRange.length<1">
+            <td colspan="6" style="text-align: center;padding-left: 0;">暂无数据</td>
+        </tr>
+    </table>
+    </div>
+
+    <div class="add-phone">
+        <span>手动增加手机号码，多个手机号以逗号分开</span><input type="text" class="tool-bar-input" ms-duplex="@mailMessageData.telphones" id="message_phone" />
+    </div>
+    <div class="message-textarea">
+      <textarea id="message_textarea"  ></textarea>
+    </div>
+</div>
+<div class="text-center">
+	<label>
+        <input type="checkbox" style="display:none;" checked="checked" id="send_mail" class=" "><!--发送短信   -->
+	      <div class = "msg-type ">
+	   			 <#list msgTypes as msg>
+				<#if msg_index == 3>
+				<div class ="msg-quare">
+				<label style = "cursor: pointer;">
+					<input value="${msg.dictValue!}" <#if msg.dictValue == defaultType>checkval = '1'<#else>checkval = '0'</#if> data-ischeck="0" onclick="setSelectUserNo(this);" class="js-send-type1"    name="msgInput1" type="radio" <#if msg.dictValue == defaultType>checked="checked"</#if> >
+					<i class="js-link-name">${msg.dictName!}</i>
+				</label>
+				</div>
+				<#else>
+				<#if msg_index == 0>
+				<div class ="msg-quare">
+				</#if>
+				<label style = "cursor: pointer;">
+					<input value="${msg.dictValue!}" <#if msg.dictValue == defaultType>checkval = '1'<#else>checkval = '0'</#if> <#if msg_index == 0>style = 'margin-left:0px;'</#if> data-ischeck="0"   class="js-send-type" name="msgInput" type="radio" <#if msg.dictValue == defaultType>checked="checked"</#if> >
+					<i class="js-link-name">${msg.dictName!}</i>		
+				</label>
+				<#if msg_index == 2>
+				</div>
+				</#if>
+				</#if>
+			</#list>
+		  </div>
+    </label>
+    <div class="button button-main margin-big-left" ms-click="@sureClick()" >发送</div>
+</div>
+<!-- jquery 框架 1.11 -->
+<script src = "${base}/edenui/common/js/jquery.js"></script>
+<script src = "${base}/form/resources/common/js/tool.js"></script>
+<script src = "${base}/edenui/common/js/underscore.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src = "${base}/edenui/common/js/avalon/avalon2.js"></script>
+<script>
+	
+	//发短信时候验证当前人员是否有发送短信的资格
+	var validateFlag = true;
+	
+	var sendType="${defaultType}";
+	
+	var exceptType;
+	if(0 == "${defaultType}"){
+		 exceptType = "0";
+	}else{
+		 exceptType = "1";
+	}
+	
+    var mailMessageFather=window.parent.mailMessageDataDirect;
+    //参数配置表
+    avalon.config({
+        debug: false
+    });
+    var model = avalon.define({
+        $id: "wrap",
+        mailMessageData:{
+            'sendRange':[],
+            'telphones':'',
+            'content':'',
+            'messageType':1
+        },
+        sureClick:function() {
+
+
+
+            var isEnd = layer.confirm('确认发送？', {
+
+                btn: ['是', '否']
+            }, function () {
+
+
+            var isTure = true;
+            if (model.mailMessageData.telphones.length) {
+            var phoneData = page.trimAll(model.mailMessageData.telphones.replace(/，/g, ",").replace(/,/g, ",")).split(",");
+
+            for (var i = 0, max = phoneData.length; i < max; i++) {
+                if (!page.isMobile(phoneData[i])) {
+                    layer.msg(phoneData[i] + "不是正确的手机号码,请输入重新输入");
+                    isTure = false;
+                    break;
+                }
+            }
+        }
+            var sendData=[];
+            $("#massage_send_content label input").each(function(){
+                var $this=$(this);
+                if($this.prop("checked")){
+                    sendData.push({
+                        'name':$this.data("name"),
+                        'id':$this.data("id"),
+                        'post':$this.data("post"),
+                        'tel':$this.data("tel"),
+                        'unit':$this.data("unit")
+                    });
+                }
+            });
+            if(sendData.length<1){
+                layer.msg('无发送失败人员！');
+                isTure=false;
+            }
+            if(isTure){
+
+
+                var sendDataHtml=sendData.map(function(value){
+                    return value.tel
+                });
+
+                var mainObj={
+                    'accounts':_.uniq(sendDataHtml).join(","),
+                    'telphones':phoneData?phoneData.join(','):'',
+                    'content': $("#message_textarea").val(),
+                    'stepId':'step100',
+                    'wfId':(window.top.wfId),
+                    'sendMailChecked': $("#send_mail").prop("checked"),
+                    "msgType": sendType,
+                    'exceptType':exceptType,
+                    'wfType':'${wfType}'
+                }	
+
+                
+                var url="${base}/admin/sendMessage/sendSignRemind.action";
+                $.post(url,mainObj,function(data){
+                    if(data.flag=='1'){
+                        layer.msg("发送成功");
+                    }
+                    else{
+                        layer.msg("发送失败");
+                    }
+
+                    setTimeout(function(){
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    },500);
+
+                });
+
+
+            }
+
+
+
+            }, function () {
+
+
+            });
+
+
+        }
+    });
+
+
+    var page=(function(){
+        var obj={
+            init:function(){
+                this.getInitData();
+            },
+            isMobile:function(mobile){
+                return (/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/).test(mobile);
+
+            },
+            //对象数组去重,data：传入的数组，main：主键
+            uniqMore:function(data,main){
+                var destData=[],
+                        getData=data,
+                        testData=[];
+
+                getData.forEach(function(value){
+                    //导入未存在的数组
+                    if(testData.indexOf(value[main])<0){
+                        testData.push(value[main]);
+                        var upIndex=destData.length;
+                        destData[upIndex]={};
+                        for(var i in value){
+                            destData[upIndex][i]=value[i];
+                        }
+
+                    }
+
+                });
+
+                return destData;
+
+            },
+            trimAll:function(str){
+                // 取消所有空格
+                    var result;
+                    var is_global="g";
+                    result = str.replace(/(^\s+)|(\s+$)/g,"");
+                    if(is_global.toLowerCase()=="g")
+                    {
+                        result = result.replace(/\s/g,"");
+                    }
+                    return result;
+
+            },
+            getInitData:function(){
+
+                var pageSendRange=[];
+
+                //载入发送范围
+                mailMessageFather.sendRange.forEach(function(value){
+                    pageSendRange.push({
+                        'name':value.name,
+                        'id': value.id,
+                        'post':value.post,
+                        'tel':value.tel,
+                        'unit':value.unit
+                    });
+                });
+
+                model.mailMessageData.sendRange=pageSendRange;
+                model.mailMessageData.telphones=_.uniq(mailMessageFather.telphones).join(",");
+                model.mailMessageData.messageType=mailMessageFather.messageType;
+              //  model.mailMessageData.content=mailMessageFather.content;
+                $("#message_textarea").val(mailMessageFather.content);
+
+            }
+        }
+        return obj;
+    })();
+    $(function() {
+        page.init();
+			
+        validateAccount();
+        
+        $(".js-check-all").change(function(){
+            var $this=$(this);
+            if($this.prop("checked")){
+                $("#massage_send_content label input").prop("checked",true);
+            }
+            else{
+                $("#massage_send_content label input").prop("checked",false);
+            }
+        });
+
+        $(document).on("change","#massage_send_content label input",function(){
+            if(!$(this).prop("checked")){
+                $(".js-check-all").prop("checked",false);
+            }
+        });
+        
+        $(document).on("click",".js-send-type",function(){
+        	if(validateFlag){
+        		
+        		var $this = $(this);
+        		var radioCheck= $this.attr("checkval");  
+        	      if("1"==radioCheck){  
+        	    	  $this.prop("checked",false);  
+        	    	  $this.attr("checkval","0");  
+        	    	  sendType = "0";      
+        	    	  if(exceptType != "0"){
+        	    		  $("#send_mail").prop("checked",false);  
+        	    	  }
+        	      }else{   
+        	    	  $(".js-send-type").attr("checkval","0");
+        	    	  $this.attr("checkval","1");  
+        	          sendType=$(this).val();
+        	          $("#send_mail").prop("checked",true);  
+        	      }  
+        		
+        		
+        	}else{
+        		layer.msg("对不起，您的电话号码未激活，不能发送钉钉！");
+        		sendType = "0";
+        		$(this).prop("checked",false);
+        		$(".js-send-type1").prop("checked",true);
+        		$(".js-send-type1").attr("checkval","1");  
+        		$("#send_mail").prop("checked",true);  
+        	}
+        });
+        
+        
+    });
+    
+    function validateAccount(){
+  	  $.get("${base}/admin/wfManage/validateDingDing.action",function(result){
+  		  if("-1" == result.msg){
+  			  validateFlag = false;
+  			  if(sendType != '0'){
+  				  $(".js-send-type").prop("checked",false).attr("checkval","0");  
+  				  if($("#send_mail").prop("checked")){
+  				  	$(".js-send-type1").prop("checked",true).attr("checkval","1");  
+  				  }
+  			  	  sendType = "0";
+  			  }
+  		  }
+  	  });
+    }
+  
+  function setSelectUserNo(radioObj){  
+      var radioCheck= $(radioObj).attr("checkval");  
+      if("1"==radioCheck){  
+          $(radioObj).prop("checked",false);  
+          $(radioObj).attr("checkval","0");  
+          exceptType = "1";         
+          if(sendType == "0"){
+        	  $("#send_mail").prop("checked",false);
+          }
+      }else{   
+          $(radioObj).attr("checkval","1");  
+          $("#send_mail").prop("checked",true);
+          exceptType = "0";
+      }  
+  }
+
+</script>
+</body>
+</html>

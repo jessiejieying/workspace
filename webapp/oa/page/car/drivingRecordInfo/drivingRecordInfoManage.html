@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+</head>
+
+
+<body style="height:100%;">
+<!--  body 的style  应属性加上 height:100%;   是为了计算页面高度   -->
+
+<div id="tree_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+    <div id="tree_search" class="tree_search"></div>
+    <div id="tree" style="width:100%; padding-top: 3px;"></div>
+</div>
+
+<!-- tree_wrap 这个 div 用于放置 左侧树和搜索树的工具栏 -->
+
+<div id="grid_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+    <div id="grid_toolbar" class="ed-toolbar">
+		<@f.operateRight operate="/admin/drivingRecordInfoManager/insert.action">
+            <a btn_id="add" class="btn btn-info">添加信息</a>
+         </@f.operateRight>
+     <@f.operateRight operate="/admin/drivingRecordInfoManager/deleteDrivingRecordInfo.action">
+        <a btn_id="delete" class="btn btn-warning">删除</a>
+</@f.operateRight>
+    <select name="" id="search">
+        <option value="licenseNum">车牌号</option>        
+    </select>
+
+                <select id="search_text" class="search_text" value="" name="" type="text">
+				<option value="">全部</option>
+				<#list carName as dataDict>
+				<option value="${dataDict.id}">${dataDict.licenseNum}</option>
+				</#list>
+				</select>
+
+                <input class="btn btn-info" name="" onClick="SimpleSearch()" value="查 找" type="button">
+			<a id="advanced_search_btn" class="btn">高级搜索</a>
+	 </div>
+	
+	<div id="advanced_search_bar" class="ed-advanced-search-bar">
+	<table cellpadding="0" cellspacing="0" border="0" align="center">
+		<tr>
+			<td><label for="search_licenseNum">车牌号：</label></td><td><select id="search_licenseNum" name="search_licenseNum" value=""type="text">
+			<option value="">全部</option>
+				<#list carName as dataDict>
+				<option value="${dataDict.id}">${dataDict.licenseNum}</option>
+				</#list></td>
+			<td><label for="search_useBy">用车人：</label></td><td><input id="search_useBy" name="search_useBy" value="" type="text"></td>
+			<td><label for="search_useDep">用车部门：</label></td><td><input id="search_useDep" name="search_useDep" value="" type="text"></td>	
+			<!--  
+			<td><label for="search_startDate">开始时间：</label></td><td><input id="search_startDate" name="search_startDate" value=""type="text"onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"></td>
+			<td><label for="search_endDate">结束时间：</label></td><td><input id="search_endDate" name="search_endDate" value="" type="text"onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})"></td>
+			-->
+			<td><input class="btn btn-info" name="advancedSearch" onClick="advancedSearch()" value="查 找" type="button"></td>
+			
+			</tr>
+
+	</table>
+        </div>
+
+    <div id="grid" style="width:100%;"></div>
+		 <div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	    </div>
+
+</div>
+
+</body>
+
+<#include "/aufw/page/include/script.html">
+<script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+<script src="${base}/form/fceform/js/fcpub.js"></script>
+<script src="${base}/form/fceform/js/fcrundj.js"></script>
+<script src="${base}/form/fceform/js/tabpane.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script>
+
+
+		
+    var layout,treeObj,tree,treeSearch,grid,data,form,listShowR,isDetailR,option,sendUrl,dhxWins;
+   
+  
+	 window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+    <!--    设置dhtmlx各组件用到的图片的的路径-->
+    function init() {       //初始化 方法
+        
+	
+		
+        layout = new dhtmlXLayoutObject(document.body, "1c");     //添加一个的layout
+
+
+        layout.cells('a').hideHeader();         //隐藏 cell a 的 标题 ， b c 同理
+
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        <!-- 为layout添加监听事件    -->
+        <!-- onResizeFinish 为在layout大小变了之后触发 -->
+        <!-- onPanelResizeFinish 为在layout中一块区域大小变了之后触发 -->
+		
+		
+
+        data = new dhtmlXDataStore({
+            url: "${base}/admin/drivingRecordInfoManager/selectDrivingRecordInfos.action?etc="+ new Date().getTime(),
+            datatype: "json"
+        });     //添加一个 为DataStore
+		
+
+        layout.cells('a').attachObject('grid_wrap');
+
+        // 在 layout的 cell b上添加 ID为 grid_wrap 的div
+        grid = new dhtmlXGridObject('grid');
+        // 把 grid 添加到  ID为 grid的div中
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        //设置 grid上 图片的路径
+        grid.setHeader(" ,车牌号,用车人,用车部门,用车时间,出发地,目的地,总费用,操作");
+        //设置 grid每列的标题
+        grid.setColumnIds("check,licenseNum,useBy,useDep,startDate,departure,dest,totalToll,operate");
+        //设置 grid每列的数据  对应 json中的哪条数据
+        grid.setInitWidths("30,100,80,80,100,100,*,60,180");
+        //设置 每列的宽度
+          
+		grid.setColTypes("ch,co,ro,ro,ro,ro,ro,ro,link");
+
+		<#list carName as dataDict>
+		grid.getCombo(1).put('${dataDict.id}','${dataDict.licenseNum}');					
+		</#list>
+		
+        grid.init();
+		//grid.setEditable(false);
+       
+        grid.enablePaging(true,10,2, 'grid_page', true);
+    
+        //grid.enablePaging(fl, pageSize, pagesInGrp, parentObj, showRecInfo, recInfoParentObj)
+/*          @参数: fl - true|false - 是否分页
+        *   @参数: pageSize - 每页的行数
+        *   @参数: pagesInGrp - 可见的页面的数量
+        *   @参数: parentObj - 放置分页的 div的ID
+        *   @参数: showRecInfo - true|false - enable|disable showing of additional info about paging state
+        *   @参数: recInfoParentObj - ID or container which will be used for showing paging state
+*/
+
+        grid.setPagingSkin("toolbar");   //设置 分页的皮肤
+		
+		grid.attachEvent("onRowSelect", doOnRowSelected);
+        grid.sync(data);                // grid从 DataStore中同步数据
+
+
+		var formData = [
+			{ type:"settings", position:"label-left", labelWidth:"65", inputWidth:50 },
+			{
+				type:"fieldset", label:"车辆信息", inputWidth:"660", offsetLeft:10,
+				list:[
+					{
+						type:"hidden", offsetTop:5, list:[
+							{ type:"hidden", name:"id", value:"", label:"id" },
+							{ type:"select", name:"useBy", value:"", label:"用车人",inputWidth:200 , required:true, validate:"NotEmpty" ,options:[
+						         {text:"", value:""},
+								<#list user as dataDict>                                                                         
+									{text:"${dataDict.userName}", value:"${dataDict.userName}"}
+									<#if dataDict_has_next>
+										,
+									</#if>
+								</#list>
+							]},
+							{ type:"newcolumn", offset:40},
+							{ type:"input", name:"useDep", value:"", label:"用车部门",inputWidth:200 , required:true, validate:"NotEmpty" },
+						]
+					},
+					{
+						type:"hidden", offsetTop:5, list:[
+							{ type:"select", name:"licenseNum", value:"", label:"车牌号",inputWidth:200 , required:true, validate:"NotEmpty" ,options:[
+									{text:"", value:""},
+								<#list carName as dataDict>                                                                         
+									{text:"${dataDict.licenseNum}", value:"${dataDict.id}"}
+									<#if dataDict_has_next>
+										,
+									</#if>
+								</#list>
+							]},
+							{ type:"newcolumn", offset:40},
+							{ type:"select", name:"driverId", value:"", label:"司机",inputWidth:200 , required:true, validate:"NotEmpty" ,options:[
+									{text:"", value:""},
+								<#list driverName as dataDict>                                                                         
+								{text:"${dataDict.name}", value:"${dataDict.id}"}
+								<#if dataDict_has_next>
+									,
+								</#if>
+							</#list>
+							]},
+						]
+					},
+					{
+						type:"hidden", offsetTop:5, list:[
+							{ type:"input", name:"departure", value:"", label:"出发地", inputWidth:200},
+							{ type:"newcolumn", offset:40},		
+							{ type:"template", name:"startDate", format:dateType,value:"", label:"用车时间", inputWidth:200, required:true, validate:"NotEmpty" },
+										
+							
+						]
+					},
+					{
+						type:"hidden", offsetTop:5, list:[					
+							{ type:"input", name:"dest", value:"", label:"目的地", inputWidth:200 },
+							{ type:"newcolumn", offset:40},					
+							{ type:"input", name:"mailage", value:"", label:"里程数", inputWidth:200,validate:'isNum' },
+						]
+					},
+					{
+						type:"hidden", offsetTop:5, list:[				
+							{ type:"input", name:"roadToll", value:"", label:"过路费", inputWidth:200,validate:'isNum' },
+							{ type:"newcolumn", offset:40},
+							{ type:"input", name:"liveToll", value:"", label:"住宿费", inputWidth:200,validate:'isNum' },
+						]
+					},
+					{
+						type:"hidden", offsetTop:5, list:[
+							{ type:"input", name:"carToll", value:"", label:"汽车费", inputWidth:200,validate:'isNum' },
+							{ type:"newcolumn", offset:40},
+							{ type:"input", name:"otherToll", value:"", label:"其他费用", inputWidth:200,validate:'isNum' },
+						]
+					},
+					{
+						type:"hidden", offsetTop:5, list:[
+							{ type:"input", name:"remark", value:"", rows: 3,inputWidth: 515, label:"备注"},					
+						]
+					},
+					{
+						type:"hidden", offsetTop:5, list:[
+						{type:"label",labelWidth:270},
+						{type:"newcolumn"},
+						{type:"button",value:"确定",name:"send"}
+						]
+					}
+                ]
+			}
+        ];
+		dhxWins= new dhtmlXWindows();
+		win = dhxWins.createWindow("detail", 20, 30, 800, 550);
+		form = dhxWins.window("detail").attachForm(formData);
+		dhxWins.window("detail").setText("行车记录信息");
+		dhxWins.window("detail").hide();
+		dhxWins.window("detail").centerOnScreen();
+
+
+		form.setSkin('dhx_terrace');
+		form.disableItem('send');
+
+		form.bind(grid);
+
+		
+		dhxWins.attachEvent("onClose", function(win){
+			dhxWins.window("detail").hide();
+		});
+		
+		$("select[name='useBy']").change(function(){
+			var url="${base}/admin/user/queryUserInfo.action";
+			var data="criteriaUserName="+window.encodeURI($("select[name='useBy']").val());
+			$.post(url,data,function(result){
+				for(var i in result.data){
+					form.setItemValue("useDep",result.data[i].depName);
+				}
+			});
+		});
+	
+		form.attachEvent('onButtonClick', function (id) {
+			if(id=='send'){
+				var dataset = form.getFormData();
+				if(option=="update"){
+		   		sendUrl="${base}/admin/drivingRecordInfoManager/updateDrivingRecordInfo.action";    			
+				}
+				else if(option=="add"){
+					sendUrl="${base}/admin/drivingRecordInfoManager/insert.action";
+				}
+				
+				form.sendWithSuffix(sendUrl,"post","drivingRecordInfo",function(data){
+					var datatest = eval("(" + data.xmlDoc.responseText + ")");
+					if(datatest.result=="success"){   
+						dhxWins.window("detail").hide();
+						SimpleSearch();
+						form.disableItem('send');
+						option="no";
+					}
+					$.dialog.tips(datatest.tips);
+				});	
+			}
+		});
+
+        page_layout();      // 调用page_layout方法   ,方法的声明在下面
+
+    }
+	function SimpleSearch(){
+		data.clearAll();
+		var clu = $("#search").val();
+		var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+
+		var url = "selectDrivingRecordInfos.action?drivingRecordInfo."+clu+"="+window.encodeURI(value)+"&etc="+ new Date().getTime();
+		window.data.data.url = url
+		data.load(url);
+	}
+
+    function  advancedSearch(){
+		data.clearAll();
+		var useBy = $("#search_useBy").val()==''?'':$("#search_useBy").val();
+		var useDep = $("#search_useDep").val()==''?'':$("#search_useDep").val();
+		var licenseNum = $("#search_licenseNum").val()==''?'':$("#search_licenseNum").val();
+		//var startDate = $("#search_startDate").val()==''?'':$("#search_startDate").val();
+		//var endDate = $("#search_endDate").val()==''?'':$("#search_endDate").val();
+	
+
+		var url = "selectDrivingRecordInfos.action?drivingRecordInfo.licenseNum="+window.encodeURI(licenseNum)+"&drivingRecordInfo.useBy="+window.encodeURI(useBy)+"&drivingRecordInfo.useDep="+useDep+"&etc="+ new Date().getTime();
+		window.data.data.url = url
+		data.load(url);
+    }
+
+	
+	function doOnRowSelected(id) {
+		if(!window._add_new_child){
+
+			updateFormBtn({
+            "dataStore":data,
+            "grid":grid,
+            "rowId":id,
+            "forms":[form]
+        });
+
+        window._add_new_child=false;
+		}else{
+			return false;
+		}
+	}
+   
+  
+
+
+	
+
+
+
+
+    function toolbar_func(id){           // grid上面 的那些按钮的 功能
+	
+        if (id == 'add') { 
+			dhxWins.window("detail").show();		
+			var addId=new Date().getTime();
+			var addData={
+			'id':addId
+		};
+		data.add(addData,0)
+		grid.selectRowById(addId);
+        option="add";
+        form.enableItem("send");
+        }
+		
+		
+		
+        if (id == 'edit') {
+        	//eventWin('修改事件','${base}/form/fceform/common/run.html?djsn=eventEdit&djtype=itsm&wf_id=678')
+        }
+		
+		
+		
+        if (id == 'delete') {
+		        var row_id = grid.getCheckedRows(0);
+	
+        if (row_id == '') {
+            $.dialog.tips('请至少选择一条数据！');
+            return;
+        }
+		var idArr=new Array();
+        idArr = row_id.split(',');
+		
+        if (row_id.length == 0) return;
+        $.dialog.confirm('你确定要删除这些数据吗？', function () {
+          //  var idArr = new Array();
+           // var nameArr=new Array();
+           // for (var i = 0; i < idArr.length; i++) {
+		
+			
+               // idArr.push(data.item(row_id[i]).userId);
+               // nameArr.push(data.item(row_id[i]).accountName);
+           //}
+			
+
+            $.post("${base}/admin/drivingRecordInfoManager/deleteDrivingRecordInfo.action", {"idArr":row_id},function(result){
+            	if(result.result="success"){         
+                    for (var i = 0; i < idArr.length; i++) {           
+                        data.remove(idArr[i]);
+                    }
+            	}
+                $.dialog.tips(result.tips);
+				//SimpleSearch();
+            });
+        });
+           
+        }
+    }
+    function page_layout() {                 // page_layout为控制页面布局的方法 ，  用于自适应窗口的大小
+        var grid_wrap_height = $('#grid_wrap').height();  //得到 ID为  grid_wrap 的div的高度
+        $('#grid').height(grid_wrap_height - 43 -35);    //设置  ID为  grid 的div的高度
+        if(grid)    grid.setSizes();                   // 如果grid 存在，则 让 grid 适应下窗口的大小
+
+    }
+	
+	function schedu(id){
+		window.top.createWindow({
+				text    :'查看日程',
+				url     :'${base}/oa/page/car/drivingRecordInfo/scheduler/car_scheduler.html?id='+id,
+				id      :'carScheduler',
+				width   :'970',
+				height  :'500'
+				
+				
+		})
+	}
+	
+	
+	function d(id) {
+		//删除 grid中的一行数据
+		grid.selectRowById(id);
+	
+		$.dialog.confirm('你确定要删除这条数据？', function () {      
+			$.post("${base}/admin/drivingRecordInfoManager/deleteDrivingRecordInfo.action", {"idArr":id}, function(datatest){
+				if(datatest.result=="success"){
+					data.remove(id);
+				 
+				}
+			$.dialog.tips(datatest.tips);	
+			});
+		});
+		form.disableItem("send");
+	}
+	
+	
+	function e(id) {      //编辑 grid中的一行数据
+		dhxWins.window("detail").show();	
+		grid.selectRowById(id);
+   
+		window._now_grid_edit_id=id;      //把当前正在编辑的这条数据的ID 保存起来，用于  form保存后，将结果同时保存到左侧树中；
+		// form.setItemFocus("userName");
+		option="update";
+		form.enableItem("send");
+    
+	}
+
+	
+    $(function () {
+        setTimeout(function(){init();}, 0);                        //在 页面加载好后，触发init方法；
+		
+
+
+
+		//$('#grid_toolbar_ul li').last().addClass('last');   //为grid上面的一排按钮中的最后一个li添加一个为‘last’的class
+        $('#grid_toolbar a').click(function(){       //那些按钮 点击之后 触发 toolbar_func 方法
+            var id=$(this).attr('btn_id');
+            toolbar_func(id);
+        });
+		
+		$("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+		$("#search_text").change(function(){
+		SimpleSearch();
+		});
+
+
+		//高级搜索展开
+		//searchBarCommon('advanced_search_bar',30,'advanced_search_btn','grid_toolbar','grid');
+		searchToggle('advanced_search_btn','advanced_search_bar');
+    })
+</script>
+</html>

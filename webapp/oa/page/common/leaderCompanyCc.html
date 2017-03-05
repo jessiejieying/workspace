@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>Eden</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+</head>
+<body>
+<div class="clearfix layer-choice-pop">
+  <div class="layer-choice-header clearfix">
+    <div class="float-left" style="width: 49%;">
+      <span>选择</span>
+      <div class="layer-header-select ">
+        <div class=" ">
+          <select class="input" id="select_step"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class=" layer-choice-content margin-top">
+    <div class="layer-choice-content-header clearfix" style="position:relative;">
+      <span>待选范围</span>
+      <span class="padding-left">已选</span>
+       <div class="input-search">
+        <input id="search_text" type="text" class="tool-bar-input " placeholder="输入搜索内容">
+      </div>
+    </div>
+    <div class="layer-choice-content-body clearfix" style="margin-top:11px;">
+      <div class="body-choice-left">
+        <ul id="select_choice_left">
+        </ul>
+      </div>
+      <div class="body-choice-right" style="height: 312px;overflow-y: auto">
+        <div class="choice-content js-choice-content"></div>
+      </div>
+    </div>
+  </div>
+  <div class="layer-choice-footer clearfix">
+    <div class="button common-skin-btn-syle01 float-left" id="select_all">全部选择</div>
+    <div class="button common-skin-btn-syle01 float-left margin-little-left" id="select_clear">全部清除</div>
+    <div class="button common-skin-btn-syle01 float-right" id="select_sure">确定</div>
+  </div>
+</div>
+<div id="js_tree" class="hidden"></div>
+<script id="option_data" type="text/template">
+  <%_.each(datas, function(item){%>
+  <li data-id="<%=item.id%>"><%=item.name%></li>
+  <%});%>
+</script>
+<script id="massage_send_data" type="text/template">
+  <%_.each(datasSave, function(item){%>
+  <label><input type="checkbox" checked="checked" name="<%=item.id%>"><%=item.name%></label>
+  <%});%>
+</script>
+<script id="select_data" type="text/template">
+  <%_.each(selectData, function(item){%>
+  <option value="<%=item.id%>"><%=item.name%></option>
+  <%});%>
+</script>
+<script id="massage_data" type="text/template">
+  <div class="message-textarea-box">
+  <div class="sendObj">
+    <h4>发送至：</h4>
+    <div class="send-content">
+      <div id="massage_send_content"></div>
+    </div>
+  </div>
+    <div class="message-textarea">
+      <textarea id="message_textarea">
+      </textarea>
+    </div>
+    </div>
+  <div class="text-center">
+    <div class="button common-skin-btn-syle01"  id="message_edit">保存</div>
+  </div>
+</script>
+<script id="massage_content" type="text/template">
+  <div class="note-textarea">
+      <textarea id="message_content_textarea" style="width:510px;height:180px;"></textarea>
+  </div>
+  <div class="text-center">
+    <div class="button common-skin-btn-syle01"  id="message_send_sure">保存</div>
+  </div>
+</script>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jquery_migrate.min.js"></script>
+<script src ="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<script src="${base}/form/resources/common/js/tool.js"></script>
+<script src="${base}/form/resources/common/js/edenApi.js"></script>
+<script>
+  //存储右侧的数据
+  var rightData = [];
+  var datas = [];
+  var datasSave = [];
+  var note = '';
+  var project ='${base}';
+  var free_flow;
+  var selectData=[];
+  //显示选择类型
+  var showStyle=parseInt($urlParam("type"))+1;
+
+  //便签富文本编辑
+  var editor;
+  //厅内处室
+   var tagStyle;
+  $(function () {
+	  if(window.top.billStoreChoice.lenght>1){
+	      rightData.push(window.top.billStoreChoice);
+	    }
+	   init();
+    loadControlUser();
+
+    var to = false;
+    // 搜索
+    $('#search_text').keyup(function () {
+      var $search = $(this),
+              $val = $search.val();
+      if (to) {
+        clearTimeout(to);
+      }
+      to = setTimeout(function () {
+        //过滤搜索到的数组
+        datas = _.filter(datasSave, function (num) {
+          return num.name.indexOf($val) > -1
+        });
+        $('#select_choice_left').html(_.template($('#option_data').html(), datas));
+        selectOption();
+      }, 250);
+    });
+    //选择
+    $(document).on("click", "#select_choice_left li", function () {
+      var $this = $(this);
+      var changeData = $this.text();
+      var $id = $this.data("id");
+     
+      rightData.push({
+        "id": $id,
+        "name": changeData
+      });
+      updateData();
+    });
+
+
+    $("#select_step").change(function(){
+      loadLeftData($(this).val());
+    });
+
+    //全选
+    $(document).on("click", "#select_all", function () {
+      var option = $("#select_choice_left li");
+
+      for (var i = 0, max = option.length; i < max; i++) {
+        rightData.push({
+          "id": option.eq(i).data("id"),
+          "name": option.eq(i).text()
+        });
+      }
+      updateData();
+    });
+
+    //清除
+    $(document).on("click", "#select_clear", function () {
+      rightData.length = 0;
+      updateData();
+    });
+
+    //确定
+    $(document).on("click", "#select_sure", function () {
+      var destData=rightData.map(function(value, index, array) {
+        return value.name;
+      })
+    	var dest=window.top.document.getElementById('billPageId').contentWindow.jsBillInput;
+      var addStr="";
+      if(showStyle=="2"&&destData.length){
+        addStr="同志";
+      }
+    	dest.val(destData.join(",")+addStr);
+        //领导抄送状态
+        if($urlParam("isleadercc")=="leader"){
+            var $billPage=$(window.top.frames["billPageId"].document);
+           var $inputTip=$billPage.find(".js-going-advice-td").find(".td-choice-input-tip");
+            $inputChoice=$billPage.find(".js-going-advice-td").find(".js-choice-input");
+            var $adviceLength=$billPage.find(".js-going-advice-td").find(".js-leader-advice").length;
+
+            var typeUrl="${base}/admin/incomingAdviceConfig/manageMent.action";
+            var $manageType=(destData.length-1)?"多个处室":"一个处室";
+            $.post(typeUrl,{
+                "manageType":$manageType,
+                "deptId":destData.join(","),
+                "documentType":"阅件"
+            },function(data) {
+
+                if(data.success) {
+                    var contentData = [];
+                    var dataTypeAdvice = data.data.advice;
+                    //获取要填入的领导一栏
+                    var dataLeader=$billPage.find(".js-cc-leader-tr").find("textarea");
+                    dataLeader.val(data.data.sendMain);
+                    var $adviceId = "advice" + new Date().getTime();
+                    var surl = window.top.project + "/admin/documentData/addDocumentAdvice.action";
+
+                    contentData.push({
+                        "adviceType": "4",
+                        "adviceId": $adviceId,
+                        "adviceContent": dataTypeAdvice
+                    });
+
+
+                    if ($adviceLength) {
+                        var $editUrl = window.top.project + "/admin/documentData/editDocumentAdvice.action?"+(new Date().getTime());
+
+                        var $id= $billPage.find(".js-going-advice-td").find(".js-leader-advice").eq(0).attr("id");
+                        $.post($editUrl,{
+                            'id':$id,
+                            'adviceContent':(data.data.advice),
+                            "commonAdvice.content":(data.data.advice),
+                            "commonAdvice.wfName":window.top.$urlParam("wfName"),
+                            "accountName":window.top.globalParams.loginName
+                        }, function (data){
+
+                            $billPage.find(".js-going-advice-td").find(".js-leader-advice").eq(0).find(".js-leader-advice-content").find("span").html(dataTypeAdvice);
+
+                            window.top.document.getElementById('billPageId').contentWindow.textAuto();
+                            window.top.closeWin("dhxPop");
+                    })
+                    }
+                    else {
+
+                    $.post(surl, {
+                        "wfId": window.top.$urlParam("wfId"),
+                        contentData: JSON.stringify(contentData),
+                        "commonAdvice.content": dataTypeAdvice,
+                        "commonAdvice.wfName": window.top.$urlParam("wfName"),
+                        "accountName":window.top.globalParams.loginName
+
+                    }, function (result) {
+                        var $resultData = result.datas[0];
+                        var $adviceHtml = "<div data-tyle='word' class='js-leader-advice' data-advice='" + ($adviceId) + "' id='" + ($resultData.id) + "'  data-user=''><p class='js-leader-advice-content' style=''><span>" + (data.data.advice) + "</span><i class='js-leader-advice-del icon-trash-o'></i><i class='icon-edit js-leader-advice-edit'></i></p><p class='js-leader-advice-last' style='text-align:right;'>" + ($resultData.userName) + "&nbsp;" + (commonApi.getCommonTime($resultData.createDttm)) + "</p></div>";
+
+                        $inputChoice.append($adviceHtml);
+                       // $inputChoice.find(".td-choice-input-tip").remove();
+
+                        window.top.document.getElementById('billPageId').contentWindow.textAuto();
+                        window.top.closeWin("dhxPop");
+
+
+                    });
+                }
+                }
+                    else{
+                    window.top.document.getElementById('billPageId').contentWindow.textAuto();
+                    window.top.closeWin("dhxPop");
+                    }
+
+            })
+
+
+        }
+        else {
+            window.top.document.getElementById('billPageId').contentWindow.textAuto();
+            window.top.closeWin("dhxPop");
+        }
+
+    });
+    $(document).on("click", ".js-choice-btn", function () {
+      var $this = $(this),
+              text = $.trim($this.find("span").text().toString());
+
+      for (var i = 0, max = rightData.length; i < max; i++) {
+
+        if (rightData[i].name == text) {
+          rightData.splice(i, 1);
+          break;
+        }
+      }
+
+      updateData();
+    });
+  });
+
+  function loadControlUser() {
+
+      var billStyle=window.top.globalParams.djsn;
+      var isCC;
+      //收文和领导批示
+      if(billStyle=="oa_pg_incoming_form"||billStyle=="oa_leader_instruction_form"){
+
+          tagStyle="officeIn";
+      }
+      else if(billStyle=="oa_meeting_info"||billStyle=="oa_send_document"){
+
+          tagStyle="officeOut";
+      }
+
+      if(showStyle=="1"){
+
+          isCC="&tag="+tagStyle;
+      }
+      else{
+
+          isCC="";
+      }
+
+    datas.length = 0;
+
+    var selectURL = "${base}/admin/myGroup/queryMyGroup.action";
+    var url=selectURL + "?etc="+new Date().getTime()+"&myGroup.dataValid=1&myGroup.groupType="+showStyle+isCC;
+
+    $.get(url, function (result) {
+
+          if(result.success="true"){
+            var resultData=result.data;
+            resultData.forEach(function(value){
+              selectData.push({
+                "id":value.groupId,
+                "name":value.groupName
+              });
+            });
+            $('#select_step').html(_.template($('#select_data').html(), selectData));
+
+            loadLeftData(resultData[0].groupId);
+          }
+    });
+
+  }
+
+  function updateData() {
+    if (rightData.length > 1) {
+      unique(rightData);
+    }
+
+    var contentHtml = '';
+
+    for (var i = 0, max = rightData.length; i < max; i++) {
+
+      contentHtml += "<div class='choice-content-btn js-choice-btn'><span>" + rightData[i].name + "</span><i class='icon-times'></i></div>";
+    }
+    $(".js-choice-content").html(contentHtml);
+    selectOption();
+  }
+
+  function selectOption() {
+
+    $("#select_choice_left li").removeClass("selected");
+    for (var i = 0, max = rightData.length; i < max; i++) {
+
+      var $li = $("#select_choice_left li");
+      $li.each(function () {
+        var $this = $(this);
+        if (rightData[i].name == $this.html()) {
+          $this.addClass("selected");
+        }
+      });
+    }
+  }
+
+  //数组拷贝
+  function copyArrayObject(a, b) {
+    a.lenght = 0;
+    for (var i = 0, max = b.length; i < max; i++) {
+      a[i] = {};
+      for (var j in b[i]) {
+        a[i][j] = b[i][j];
+      }
+    }
+  }
+  //数组去重
+  function unique(data) {
+    var initData = [];
+    var totalData = [];
+
+    data.forEach(function(value){
+      initData.push(value.name);
+    });
+
+    for (var j = 0, inmax = _.uniq(initData).length; j < inmax; j++) {
+      var name;
+      for (var k = 0, kmax = data.length; k < kmax; k++) {
+        if (data[k].name == _.uniq(initData)[j]) {
+          name = data[k].name;
+          break;
+        }
+      }
+      totalData.push({
+        "id": _.uniq(initData)[j],
+        "name": name
+      });
+    }
+    data.length = 0;
+    totalData.forEach(function(value){
+         data.push({
+        "id": value.id,
+        "name": value.name
+      });
+    });
+
+  }
+  //树形json数据解析
+  function jsonTree(result) {
+    for (var i = 0, max = result.length; i < max; i++) {
+      datas.push({
+        "id": result[i].id,
+        "name": result[i].text
+      });
+      var child = result[i].children;
+      if (child) {
+        jsonTree(result[i].children);
+      }
+    }
+  }
+  function init(){
+
+
+	  var dataSource=window.top.document.getElementById('billPageId').contentWindow.jsBillInput.val();
+	  if(dataSource.length>0){
+		  var dataPush=dataSource.replace(/，/g,",").replace(/、/g,",").replace(/;/g,",").replace(/；/g,",").split(",");
+        dataPush.forEach(function(value){
+          var valueStr=value.replace("同志","");
+            rightData.push({
+            "id":valueStr,
+            "name": valueStr
+          });
+        });
+	  }
+    updateData();
+  }
+  function loadLeftData(moduleId){
+      datas.length = 0;
+    
+    var selectURL = "${base}/admin/myGroup/queryMyGroupEmp.action";
+   var selectLeftURL=selectURL+ "?etc="+new Date().getTime()+"&myGroupEmp.dataValid=1&myGroupEmp.empType="+showStyle+"&myGroupEmp.groupId="+moduleId;
+
+        	$.get(selectLeftURL, function (result) {
+    		var resultData=result.data;
+
+            resultData.forEach(function(value){
+              datas.push({
+                "id": value.id,
+                "name":value.empName
+              });
+            });
+            copyArrayObject(datasSave, datas);
+            $('#select_choice_left').html(_.template($('#option_data').html(), datas));
+
+          });
+
+
+
+  }
+</script>
+</html>

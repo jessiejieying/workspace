@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+
+</head>
+<body>
+<div id="form_add"></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var id = "${commonTree.id!}";
+    $(function(){
+        setTimeout(page_layout, 0);
+    })
+
+    function afterSave(){
+	    setTimeout(function(){
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+    }
+    function init(){
+ 		$("#commonTreeAuDepCn").click(function(){
+ 			selectOrgs();
+ 		});
+ 		$("#commonTreeRemark").dblclick(function(){
+ 			openDjShowManager();
+ 		});
+    }
+	$(function(){
+		 $('#form_add').loadForm({
+			 formInputs: [
+				 <#if commonTree.id??>   
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'commonTree.id',
+					 value:'${(commonTree.id)!}'
+				 	}
+				 },
+				 </#if>
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'commonTree.parentId',
+					 value:'${(commonTree.parentId)!}'
+				 	}
+				 },
+				 {type: 'text', attr: {
+						 isRequired:true,
+						 validate:'required:不能为空的,',
+						 placeholder: '',
+						 style:'x12',
+						 infor:'显示名称',
+						 id: 'name',
+						 data:'1',
+						 name:'commonTree.name',
+						 value:'${(commonTree.name)!}'
+				 	}
+				 },
+				 {type: 'text', attr: {
+					 isRequired:true,
+					 validate:'required:不能为空的,',
+					 placeholder: '',
+					 style:'x12',
+					 infor:'流程名或类型',
+					 id: 'id',
+					 data:'1',
+					 <#if commonTree.id??>
+				 	 disabled:true,
+				 	 </#if>
+					 name:'commonTree.id',
+					 value:'${(commonTree.id)!}'
+    			 	}
+    			 },
+				 {type: 'text', attr: {
+					 placeholder: '',
+					 style:'x12',
+					 infor:'所属组织',
+					 id: 'commonTreeAuDepCn',
+					 data:'1',
+					 name:'commonTree.auDepCn',
+					 value:'${(commonTree.auDepCn)!}'
+    			 	}
+    			 },
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: 'commonTreeAuDep',
+					 data:'1',
+					 name:'commonTree.auDep',
+					 value:'${(commonTree.auDep)!}'
+				 	}
+				 },
+				 {type: 'text', attr: {
+					 placeholder: '',
+					 style:'x12',
+					 infor:'查看表单路径',
+					 id: 'commonTreeRemark',
+					 data:'1',
+					 name:'commonTree.remark',
+					 value:'${(commonTree.remark)!}'
+    			 	}
+    			 },
+			 ],
+			 buttons: [
+				 {
+					 type:'button',
+					 size: 'lg',
+					 color:'blue',
+					 validationState: 'success',
+					 id: 'save_btn',
+					 infor: '保存',
+					 onSubmit: function(form) {
+						 submit(form);
+
+					 }
+				 }
+			 ]
+		 })	
+		init();
+	})
+
+	function submit(form) {		
+		var url = "${base}/admin/documentConfig/doUpdateOpenWf.action";
+		if(id == "") {
+			url = "${base}/admin/documentConfig/doInsertOpenWf.action";
+		}
+		$.post(url, $("form:first").serialize(), function (result) {
+		 	if(result.result=='success'){					
+				 parentIfr.jsTree.refresh();
+				 afterSave();
+		 	}
+		 	layer.msg(result.message);
+		 });
+	}
+	
+	$(window).resize(function(){
+		 setTimeout(page_layout, 0);
+	});
+	
+    /**
+     *  选择组织
+     */
+    function selectOrgs(){
+    	//var btn=$('#selectOrgId');
+    	window.top.createWindow({
+    		text    :'选择组织',
+    		url     : '${base}/form/fceform/common/run.html?djsn=selOrgForWf&djtype=eden_form',
+    		id      :'commonSelOrg',
+    		width   :'330',
+    		height  :'400',
+    		parentIfr:window,
+    		callBack:function (orgId,orgName) {
+    			
+    	     }
+    	});
+    }
+    
+	//打开显示页面元素配置
+	function openDjShowManager(){
+		var url="${base}/form/fceform/common/djframe.htm?djsn=wd_dj_show_set&djtype=WF_DSN";
+		var showUrl=$('#commonTreeRemark').val();
+		if(showUrl){
+			url+="&showUrl="+escape(showUrl);
+		}
+		window.open(url); 
+	}
+    function selectOrgsCallback(orgId,orgName)
+    {
+    	$("#commonTreeAuDepCn").val(orgName);
+		$("#commonTreeAuDep").val(orgId);
+    }
+	
+	function page_layout() {
+	    var ifr_width = $(window).width();
+	    $('#set_bg_image').width(ifr_width-50);
+	}
+</script>
+</html>

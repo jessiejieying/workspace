@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+    <meta charset="utf-8">
+    <title>Eden</title>
+    <#include "/aufw/page/include/style.html">
+    <!--以上可以提出放入一个公用页面-->
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+	<script>
+		setSkinsCss("admin_css");
+	</script>
+	<style>
+		.new-time-style{ font-size:14px; line-height:22px; color:#000; float:left; margin-top:4px;}
+	</style>
+    </head>
+</head>
+
+<body style="height:100%;">
+
+<!-- 页面载入进度条 begin-->
+<link rel="stylesheet" href="${base}/edenui/common/js/plugins/pace/themes/silver/pace-theme-loading-bar.css" />
+<script src="${base}/edenui/common/js/plugins/pace/pace.eden.min.js"></script>
+<!-- 页面载入进度条 end-->
+
+
+<div id="grid_wrap"  style="width:100%; height:100%; overflow: hidden; display:none;">
+	<div id="toolbar" class="ed-toolbar" style="z-index:8;"> 
+	
+	<@f.operateRight operate="/admin/supervise/supervisePageAdd.action">
+    <a btn_id="add" class="btn btn-warning toolbar_btn" href="javascript:void(0)"><i class="icon-download-alt icon-white"></i>督查登记</a>
+    </@f.operateRight>
+    <@f.operateRight operate="/admin/supervise/delSupervise.action">
+    <a btn_id="del" class="btn btn-warning toolbar_btn" href="javascript:void(0)"><i class="icon-download-alt icon-white"></i>删除</a>
+    </@f.operateRight>
+    
+    <div class="input-prepend input-append">
+    	  <div class="new-time-style"><span>时间：</span></div>
+		    <input id="yearId" style="width: 40px; float:left; margin-right:6px;" class = "span2" onchange="SimpleSearch()" onclick = "WdatePicker({dateFmt:'yyyy',maxDate:'2020-10-01'})" value="年份" type="text" >
+		    <div class="new-time-style"> </div>
+		    <input id="mouthId" style="width: 40px;  margin-right:12px;"  value="月份" type="text" class = "span2" onchange="SimpleSearch()" onclick = "WdatePicker({dateFmt:'MM',maxDate:'2020-10-01'})" >
+		    
+    
+    
+     <!--    <div class="btn-group">
+		    <input type="hidden" val="" id="wfType">
+		      <button class="btn dropdown-toggle" data-toggle="dropdown" id="wfTypeBtn">所有状态<span class="caret"></span> </button>
+		      <ul class="dropdown-menu">
+		        <li><a value="">所有状态</a></li>
+		        <#list documentStatusSet! as status>
+				<li><a value="${status.dictValue}">${status.displayName}</a></li>
+				</#list>
+		      </ul>
+		  </div> -->
+    
+	    <div class="btn-group">
+	     <input type="hidden" value="title" id="search_type">
+	    	<input type="hidden" val="" id="dataValid">
+	      <button class="btn dropdown-toggle" data-toggle="dropdown" id="ssearch">文件标题<span class="caret"></span> </button>
+	      <ul class="dropdown-menu">
+			<li><a value="title">文件标题</a></li>
+			<li><a value="source">督查来源</a></li>
+			<li><a value="sourceUnit">来文单位</a></li>
+			
+	      </ul>
+	    </div>
+	    <input class="span2" id="search_text" value="" type="text" placeholder="">
+	    <div class="btn-group">
+	      <button class="btn btn-info" onClick="SimpleSearch()">搜索</button>
+	    </div>
+	    </div>
+	 <!--    <a id="advanced_search_btn toolbar_btn" class="btn btn-info" href="javascript:void(0)"><i class="icon-search icon-white"></i>高级搜索</a> -->
+	    
+	   
+	</div>
+
+	<div class="ed-grid">
+		<div id="grid"></div>
+	</div>
+	 <div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	    </div>
+    
+</div>
+
+</body>
+
+<#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<script>
+    var layout, treeSearch,  grid, data, form;
+    window.dhx_globalImgPath = "${base}/edenui/common/plugins/dhtmlx/imgs/";
+    var version='1';
+    var wf_name='';
+    var baseUrl="${base}/admin/supervise/queryDocumentSupervise.action?wfType=${wfType!}";
+    
+    function init() {
+        layout = new dhtmlXLayoutObject(document.body, "1C");
+        layout.cells('a').hideHeader();
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+
+       
+        data = new dhtmlXDataStore({
+            url     :baseUrl+"&etc="+new Date().getTime(),
+            datatype:"json"
+        });
+
+
+        layout.cells('a').attachObject('grid_wrap');
+
+        grid = new dhtmlXGridObject('grid');
+        grid.setImagePath("${base}/edenui/common/js/plugins/dhtmlx/imgs/");
+        
+        
+        grid.setHeader(" ,来件单位,文件标题,收文日期,当前环节");
+        grid.setColumnIds("check,sourceUnit,title,incomingDate,taskName");
+        grid.setInitWidths("30,150,*,150,150");
+        grid.setColTypes("ch,ro,ro,ro,ro");
+        
+       
+        grid.enablePaging(true, 15, 99999, 'grid_page', true);
+        grid.setPagingSkin("toolbar");
+        
+        grid.init();
+        
+//         grid.attachEvent("onCheck", function (rId, cInd, state) {
+//             grid.selectRowById(rId);
+//         });
+        //grid.attachEvent("onRowSelect", doOnRowSelected);
+        grid.sync(data);
+
+        page_layout();
+    }
+
+
+
+    
+    //执行任务
+    function execute(id){
+    	var item=data.item(id);
+    	var wfId=item.wfId;
+    	var task_name='';
+    	uf_doAction_show(wfId,wf_name,task_name,version,null);
+    }
+
+	//查看流程图
+	function viewFlow(id){
+		
+		var item=data.item(id);
+		showWfHistory(item.wfId);
+	}
+
+    
+
+
+    function toolbar_func(id) {
+        if (id == 'add') {
+        	
+			openSelectWf();
+			
+        }
+ 		 if (id == 'del') {
+        	
+ 			  var row_id = grid.getCheckedRows(0);
+	          if (row_id == '') {
+	              $.dialog.tips('请至少选择一条数据！');
+	              return;
+	          }
+	          row_id = row_id.split(',');
+	          if (row_id.length == 0) return;
+	          $.dialog.confirm('你确定要批量删除吗？', function () {
+	              var idArr = new Array();
+	              for (var i = 0; i < row_id.length; i++) {
+	                  idArr.push(data.item(row_id[i]).id);
+	              }
+	              var surl="${base}/admin/supervise/delSupervise.action";
+	              $.post(surl, {"id":idArr.join(",")},function(result){
+	              	if(result.result="success"){                      
+	                     SimpleSearch();
+	              	}
+	              	 $.dialog.tips(result.message);
+	              });
+	          });
+			
+        }
+        
+    }
+    
+    /* function initOaWf(wfName)
+    {
+    	
+    	initWorkflow(wfName,"收文登记",version);
+    } */
+    
+    function initOaWf(wfName,addPram)
+    {
+    	var closefun="checkLeave";
+    	oaInitWorkflow(wfName,"督查登记",version,addPram,closefun);
+    	//initWorkflow(wfName,"拟稿",version);
+    }
+    
+    function openSelectWf()
+    {
+    	
+    	var win = {text:"选择流程双击启动", url:"${base}/admin/documentwf/selectWf.action?key=oa_doc_supervise_wf",width:'270',height:'400', id:"selectWf",'parent_ifr':window}
+        window.top.createWindow(win);
+    	
+    }
+
+    function page_layout() {
+        var grid_wrap_height = $('#grid_wrap').height();
+        $('#grid').height(grid_wrap_height - 50-40);
+        $('#grid').width($(window).width()-20);
+        if (grid)    grid.setSizes();
+    }
+    
+	function SimpleSearch(){
+		data.clearAll();
+        var clu = $("#search_type").val();
+        var value = $("#search_text").val();
+       // var wfType=$('#wfType').val();
+       var year =$('#yearId').val();
+		var mouth =$('#mouthId').val();
+		if(year=="年份")
+		{
+			year="";
+		}
+		if(mouth=="月份")
+		{
+			mouth="";
+		}
+        var dataValid = 1;
+        var params=clu+'='+window.encodeURI(value)+"&dataValid="+dataValid+"&year="+year+"&mouth="+mouth;
+        var url = baseUrl+'&'+params+'&etc='+new Date().getTime();
+        window.data.data.url = url
+        data.load(url);
+    }
+	
+/* 	function advancedSearch(){
+		data.clearAll();	
+		var criteriaFileChar= $("#search1").val();
+		var criteriaFileUnit=$("#search2").val();
+		var criteriaFileTitle=$("#search3").val();
+		var url = 'queryIncoming.action?etc='+new Date().getTime();
+        url = url+'&criteriaFileChar='+window.encodeURI(criteriaFileChar)+'&criteriaFileUnit='+window.encodeURI(criteriaFileUnit)+'&criteriaFileTitle='+window.encodeURI(criteriaFileTitle);
+        window.data.data.url = url
+        data.load(url);
+    } */
+    
+    $(function () {
+        setTimeout(init, 0);
+        $('#toolbar .toolbar_btn').click(function () {
+            var id = $(this).attr('btn_id');
+            toolbar_func(id);
+        });
+
+        $('#ssearch').next().find('a').click(function(){
+        	$("#search_type").val($(this).attr('value'));
+        	//$("#dataValid").val($(this).attr('value'));
+        	$('#ssearch').text($(this).text());
+        })
+        
+        $('#wfTypeBtn').next().find('a').click(function(){
+        	$("#wfType").val($(this).attr('value'));
+        	$('#wfTypeBtn').text($(this).text());
+        	SimpleSearch()
+        })
+        
+        $("#advanced_search_btn").click(function(){
+            $(this).toggleClass('advanced_on');
+            $('#advanced_search_bar').slideToggle(200);
+        });
+        
+        $("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+    })
+</script>
+</html>

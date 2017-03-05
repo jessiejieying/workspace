@@ -1,0 +1,383 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="/form/resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>var table_name='oa_send_document';
+var table_key=$urlParam('wfId');
+//查看文档
+function viewDocument(){
+    var  url=project+'/aufw/page/office/documentEdit.jsp?EditType=0,0&ShowType=1' +
+           '&UserName='+GetSessionOne('userid')+'&table_name='+table_name+'&table_key='+table_key;
+   window.open(url,'文档编辑','');
+}
+
+function showAttach(){
+    $('#attachArea').slideDown();
+}
+function hideAttach(){
+    $('#attachArea').slideUp();
+}
+
+function parseOpinion (word,name,time){
+    time=time.substr(0,4)+'年'+time.substr(5,2)+'月'+time.substr(8,2)+'日';
+	var html='<li><div class="opinion_word">'+word+'</div><div class="opinion_time">'+time+'</div><div class="opinion_man">'+name+'</div></li>';
+	return html;
+}
+function finishForm(){
+   
+  var data=window.data_dataset2;
+  var length=data.dataCount();
+  for(var i=0;i<length;i++){
+      
+      var val=data.item(data.idByIndex(i));
+	  var html=parseOpinion(val.ADVICE_CONTENT,val.CREATE_BY,val.CREATE_DTTM);
+     if(val.ADVICE_TYPE=='核稿'){
+            $('#opinion_3').append(html);
+    }else if(val.ADVICE_TYPE=='审核'){
+             $('#opinion_2').append(html);
+    }else if(val.ADVICE_TYPE=='签发'){
+            $('#opinion_1').append(html);
+    }
+    
+  }
+}
+
+function submit(){
+createWindow({
+				text    :'选择用户',
+				url     :project + '/form/fceform/common/run.html?djsn=selUser&djtype=eden_form',
+				id      :'commonSelUser',
+				width   :'670',
+				height  :'400',
+				//parent_window:window,
+				callBack:function (val, text) {
+					nText = text.toString();
+					nValue = val.toString();
+                                        $('#text34').val(nValue);
+                                        $eform('提交业务数据并执行流程');
+			        }
+			});
+
+}</script><script src='../../fceform/js/fcupload.js'></script><script >document.styleSheets[0].addRule("fc\\:fc_code","behavior: url(../../fceform/htc/fc_code.htc)",0);</script><script >document.styleSheets[0].addRule("fc\\:webgrid","behavior: url(../../fceform/htc/webgrid.htc)",0);</script><script src='../../fceform/js/fcwebgrid.js'></script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib isCheckPermit="否" alertType="1" contxml="<root><label><id>label9</id><id>label11</id><id>label12</id><id>label13</id><id>label14</id><id>label15</id><id>label16</id><id>label17</id><id>label18</id><id>label19</id><id>label20</id><id>label21</id><id>label22</id><id>label23</id><id>label24</id><id>label25</id><id>label26</id><id>label27</id><id>label28</id><id>label29</id><id>label30</id><id>label31</id><id>label32</id><id>label33</id><id>label34</id><id>label35</id><id>label36</id><id>label37</id><id>label38</id><id>label39</id><id>label40</id><id>label41</id><id>label43</id><id>label44</id><id>label45</id><id>label46</id><id>label49</id><id>label50</id><id>label51</id><id>label52</id><id>label53</id><id>label55</id><id>label56</id><id>label57</id><id>label58</id><id>label59</id><id>label60</id><id>label61</id><id>label63</id></label><upload><id>upload1</id></upload><img><id>img5</id><id>img4</id></img><tab><id>tab4</id></tab><div><id>div5</id><id>outer_wrap</id><id>faWen_banLi</id><id>attachArea</id></div><button><id>button8</id><id>addAttach</id><id>button13</id><id>attachSure</id></button><text><id>text33</id><id>text34</id></text><dropdownlist><id>dropdownlist12</id><id>dropdownlist13</id><id>dropdownlist14</id><id>dropdownlist15</id><id>dropdownlist16</id><id>dropdownlist17</id><id>dropdownlist18</id><id>dropdownlist19</id><id>dropdownlist28</id></dropdownlist><grid><id>grid4</id></grid><dataset><id>dataset2</id><id>dataset3</id><id>dataset1</id></dataset></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:48;radio:0;listbox:1;textarea:1;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:1;SKBILLgrid:0;shape:0;tab:4;div:4;DsMain_field:0;a:0;button:13;text:34;hr:0;checkboxlist:0;radiolist:0;dropdownlist:28;grid:4;dataset:5;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0" billtaborder="<root><taborder>dropdownlist12</taborder><taborder>dropdownlist13</taborder><taborder>dropdownlist14</taborder><taborder>dropdownlist15</taborder><taborder>dropdownlist16</taborder><taborder>dropdownlist17</taborder><taborder>dropdownlist18</taborder><taborder>dropdownlist19</taborder><taborder>grid4</taborder><taborder>dropdownlist28</taborder><taborder>text33</taborder><taborder>attachSure</taborder><taborder>button8</taborder><taborder>addAttach</taborder><taborder>button13</taborder><taborder>text34</taborder></root>" isfile="是" posheight poswidth postop posleft window="当前窗口" caption="收发文" type="eden_wf" dj_sn="oa_send_document_legal" toolbar="不带工具栏" BLONopen="finishForm()" center="  " BLONclose BLONopenBefore userType AutoResizeXml><DIV style="BORDER-BOTTOM: 0px; POSITION: static; BORDER-LEFT: 0px; PADDING-BOTTOM: 0px; BACKGROUND-COLOR: #6e99d4; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 100%; PADDING-RIGHT: 0px; FLOAT: none; HEIGHT: 35px; BORDER-TOP: 0px; TOP: 0px; BORDER-RIGHT: 0px; PADDING-TOP: 0px; LEFT: 0px" id=div5 class=ef_div onmovestart=moveStart() controltype="div"><IMG style="POSITION: absolute; TOP: 1px; LEFT: 213px" id=img5 onmovestart=moveStart() src="../../resources/common/images/toolbar_line.png" controltype="img" cover="9" srcsk="../../resources/common/images/toolbar_line.png"><IMG style="POSITION: absolute; TOP: 1px; LEFT: 106px" id=img4 onmovestart=moveStart() src="../../resources/common/images/toolbar_line.png" controltype="img" cover="9" srcsk="../../resources/common/images/toolbar_line.png"><BUTTON style="BACKGROUND-IMAGE: url(../../resources/common/images/icons/light_ok.png); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 8px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 4px 0px; HEIGHT: 25px; TOP: 6px; PADDING-TOP: 0px; LEFT: 234px" id=button8 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("submit()")'>提交</BUTTON><BUTTON style="BACKGROUND-IMAGE: url(../../resources/common/images/icons/light_attach.png); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 22px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 2px 0px; HEIGHT: 25px; TOP: 5px; PADDING-TOP: 0px; LEFT: 122px" id=addAttach class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("showAttach()")'>添加附件</BUTTON><BUTTON style="BACKGROUND-IMAGE: url(../../resources/common/images/icons/light_view.png); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 8px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 4px 0px; HEIGHT: 25px; TOP: 5px; PADDING-TOP: 0px; LEFT: 25px" id=button13 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("viewDocument()")'>查看</BUTTON></DIV>
+<DIV style="WIDTH: 760px; HEIGHT: 841px" id=outer_wrap controltype="div">
+<H1></H1>
+<DIV style="POSITION: absolute; WIDTH: 750px; HEIGHT: 761px; TOP: 40px; LEFT: 0px" id=tab4 class=tab-pane controltype="tab" IsHideTitle="undefined" showtype="luna">
+<DIV style="WIDTH: 750px; HEIGHT: 743px" class=tab-page>
+<H2 class=tab>基本信息</H2>
+<DIV id=faWen1 c>
+<TABLE class=table_border_1px border=0 borderColor=#808080 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle><STRONG><STRONG>*</STRONG></STRONG>文件标题 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: absolute; WIDTH: 660px; HEIGHT: 33px; TOP: 4px; LEFT: 79px" id=label9 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="TITLE" field="TITLE"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>内容概述 </DIV></TD>
+<TD style="HEIGHT: 52px"><LABEL style="POSITION: static; WIDTH: 660px; HEIGHT: 48px; TOP: 0px; LEFT: 0px" id=label11 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="CONTENT" field="CONTENT"></LABEL></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle><STRONG>*</STRONG>拟稿部门 </DIV></TD>
+<TD vAlign=center width=160><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label12 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DRAFT_DEPT" field="DRAFT_DEPT"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle>拟稿日期 </DIV></TD>
+<TD vAlign=center width=160><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label13 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DRAFT_DATE" field="DRAFT_DATE"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center width=80>
+<DIV class=tdTitle><STRONG>*</STRONG>拟 稿 人 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 188px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label14 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DRAFT_MAN" field="DRAFT_MAN"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>拟稿备注 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label15 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DRAFT_REMARK" field="DRAFT_REMARK"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle><STRONG>*</STRONG>公开属性 </DIV></TD>
+<TD vAlign=center><?xml:namespace prefix = fc /><fc:fc_code id=dropdownlist12 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset1" field="IS_PUBLIC" datasourceName="" visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" rootNodeId="undefined" width="150" height="22" top="0" left="0" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%E0%F4%CC%EE%F8%D2%E6%E0%D4Xr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" position="static" align="undefined" sql2="undefined" enabled="true"></fc:fc_code></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>免予公开依据</DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 188px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label16 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="PUBLIC_REASON" field="PUBLIC_REASON"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>密　　级 </DIV></TD>
+<TD vAlign=center><fc:fc_code id=dropdownlist13 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset1" field="SECRET_LEVEL" datasourceName="" visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" rootNodeId="undefined" width="150" height="25" top="0" left="0" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%F4%D8%D4%F2%D8%F6Xr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" position="static" align="undefined" sql2="undefined" enabled="true"></fc:fc_code></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>保密期限 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label17 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="SECRET_TIME" field="SECRET_TIME"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>定密依据 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 188px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label18 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="SECRET_REASON" field="SECRET_REASON"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>办理缓急 </DIV></TD>
+<TD vAlign=center><fc:fc_code id=dropdownlist14 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset1" field="DEAL_LEVEL" datasourceName="" visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" rootNodeId="undefined" width="150" height="25" top="0" left="0" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%D6%D8%D0%E6%CC%E6%D8%FA%D8%E6Xr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" position="static" align="undefined" sql2="undefined" enabled="true"></fc:fc_code></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>内容缓急 </DIV></TD>
+<TD vAlign=center><fc:fc_code id=dropdownlist15 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset1" field="CONTENT_LEVEL" datasourceName="" visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" rootNodeId="undefined" width="150" height="25" top="0" left="0" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%D6%D8%D0%E6%CC%E6%D8%FA%D8%E6Xr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" position="static" align="undefined" sql2="undefined" enabled="true"></fc:fc_code></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle><STRONG>*</STRONG>拟稿人电话 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 188px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label19 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DRAFT_PHONE" field="DRAFT_PHONE"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>规 范 性 </DIV></TD>
+<TD><fc:fc_code id=dropdownlist16 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset1" field="STANDARD" datasourceName="" visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" rootNodeId="undefined" width="150" height="25" top="0" left="0" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%F4%F6%D0%EA%D6%D0%F2%D6Xr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" position="static" align="undefined" sql2="undefined" enabled="true"></fc:fc_code></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>规范编号 </DIV></TD>
+<TD><INPUT style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=text33 onmovestart=moveStart() controltype="text" dataset="dataset3" china="编号" field="standard_no"></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle><STRONG>*</STRONG>文件分类 </DIV></TD>
+<TD><fc:fc_code id=dropdownlist17 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset1" field="DOCUMENT_TYPE" datasourceName="" visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" rootNodeId="undefined" width="188" height="25" top="0" left="0" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%F6%u0100%EE%D8Xr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" position="static" align="undefined" sql2="undefined" enabled="true"></fc:fc_code></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%">
+<TBODY>
+<TR>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle>主　　送 </DIV></TD>
+<TD><LABEL style="POSITION: static; WIDTH: 660px; HEIGHT: 25px; TOP: 0px; LEFT: 0px" id=label20 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="MAIN_SEND" field="MAIN_SEND"></LABEL></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>抄　　送 </DIV></TD>
+<TD><LABEL style="POSITION: static; WIDTH: 660px; HEIGHT: 25px; TOP: 0px; LEFT: 0px" id=label21 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="COPY_SEND" field="COPY_SEND"></LABEL></TD></TR>
+<TR>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width="1%">
+<DIV class=tdTitle>内部抄送 </DIV></TD>
+<TD bgColor=#ffffff vAlign=center width="100%"><LABEL style="POSITION: static; WIDTH: 660px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label22 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="INSIDE_SEND" field="INSIDE_SEND"></LABEL></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle>附件说明 </DIV></TD>
+<TD vAlign=center width=160><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label23 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="ATTACHMENT_REMARK" field="ATTACHMENT_REMARK"></LABEL></TD>
+<TD bgColor=#f7f7f7 vAlign=center width=70>
+<DIV class=tdTitle>附件数量 </DIV></TD>
+<TD vAlign=center width=160><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label24 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="ATTACHMENT_NUM" field="ATTACHMENT_NUM"></LABEL></TD>
+<TD bgColor=#f7f7f7 vAlign=center width=80>
+<DIV class=tdTitle><STRONG>*</STRONG>机关代字</DIV></TD>
+<TD bgColor=#ffffff vAlign=center><fc:fc_code id=dropdownlist18 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset1" field="SWUNG_DASH" datasourceName="" visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" rootNodeId="undefined" width="188" height="25" top="0" left="0" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%F4%FC%F8%EA%DC%CC%D6%D0%F4%DEXr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" position="static" align="undefined" sql2="undefined" enabled="true"></fc:fc_code></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle>部门核稿 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center width=160><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label25 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DEPT_SYTY_MAN" field="DEPT_SYTY_MAN"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle>核稿时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center width=160><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label26 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="SYTY_DATE" field="SYTY_DATE"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center width=80>
+<DIV class=tdTitle><STRONG>*</STRONG>文件种类 </DIV></TD>
+<TD id=DocType vAlign=center><fc:fc_code id=dropdownlist19 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset1" field="DOCUMENT_KIND" datasourceName="" visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" rootNodeId="undefined" width="188" height="25" top="0" left="0" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%E4%E0%EA%D6Xr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" position="static" align="undefined" sql2="undefined" enabled="true"></fc:fc_code></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>会　　稿 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label27 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="MEETING_MAN" field="MEETING_MAN"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>会稿时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label28 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="MEETING_DATE" field="MEETING_DATE"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>页　　数 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 188px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label29 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DOCUMENT_PAGE_NUM" field="DOCUMENT_PAGE_NUM"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>审　　核 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label30 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="AUDIT_MAN" field="AUDIT_MAN"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>审核时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label31 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="AUDIT_DATE" field="AUDIT_DATE"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>印刷份数 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label32 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="PRINT_NUM" field="PRINT_NUM"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>签　　发 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label33 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="SIGN_MAN" field="SIGN_MAN"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>签发时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label34 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="SIGN_DATE" field="SIGN_DATE"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>查询级别 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><fc:fc_code id=dropdownlist28 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset1" field="SELECT_LEVEL" datasourceName="" visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" rootNodeId="undefined" width="188" height="22" top="0" left="0" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%F4%D8%E6%D8%D4%F6%CC%E6%D8%FA%D8%E6Xr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" position="static" align="undefined" sql2="undefined" enabled="true"></fc:fc_code></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>办公室核稿 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label35 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="OFFICE_AUDIT" field="OFFICE_AUDIT"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>核稿时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label36 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="OFFICE_AUDIT_DATE" field="OFFICE_AUDIT_DATE"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>流 水 号 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 188px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label37 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="FLOW_NO" field="FLOW_NO"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>校　　对 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label38 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="CHECK_MAN" field="CHECK_MAN"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>校对时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 180px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label39 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="CHECK_DATE" field="CHECK_DATE"></LABEL></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>文　　号 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 188px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label40 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DOCUMENT_NO" field="DOCUMENT_NO"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>印发时间 </DIV></TD>
+<TD bgColor=#f7f7f7><LABEL style="POSITION: static; WIDTH: 150px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label41 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="PRINT_DATE" field="PRINT_DATE"></LABEL></TD>
+<TD bgColor=#efefef></TD>
+<TD bgColor=#f7f7f7></TD>
+<TD bgColor=#efefef></TD>
+<TD bgColor=#f7f7f7></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle>发文单位 </DIV></TD>
+<TD bgColor=#f7f7f7><LABEL style="POSITION: static; WIDTH: 660px; HEIGHT: 25px; TOP: 0px; LEFT: 0px" id=label43 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="SEND_DEPT" field="SEND_DEPT"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>分发范围 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center><LABEL style="POSITION: static; WIDTH: 660px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label44 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="SEND_SCOPE" field="SEND_SCOPE"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>关 联 号 </DIV></TD>
+<TD bgColor=#f7f7f7><LABEL style="POSITION: static; WIDTH: 660px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label45 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="RELATE_NO" field="RELATE_NO"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>相关链接 </DIV></TD>
+<TD bgColor=#f7f7f7><LABEL style="POSITION: static; WIDTH: 660px; HEIGHT: 22px; TOP: 0px; LEFT: 0px" id=label46 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="RELATE_LINK" field="RELATE_LINK"></LABEL></TD></TR></TBODY></TABLE></DIV></DIV>
+<DIV style="WIDTH: 750px; HEIGHT: 743px" class=tab-page>
+<H2 class=tab>办理单</H2>
+<DIV id=faWen_banLi controltype="div">
+<H2>杭州市下城区政府发文稿</H2>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD vAlign=center width=100>
+<DIV class=tdTitle>发文字号 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 250px; HEIGHT: 15px; TOP: 0px; LEFT: 0px" id=label49 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DOCUMENT_NO" field="DOCUMENT_NO"></LABEL></TD>
+<TD vAlign=center width=78>
+<DIV class=tdTitle>密级 </DIV></TD>
+<TD vAlign=center width=80><LABEL style="POSITION: static; WIDTH: 70px; HEIGHT: 15px; TOP: 0px; LEFT: 0px" id=label50 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="密级名称" field="secret_level_name"></LABEL></TD>
+<TD vAlign=center width=110>
+<DIV class=tdTitle>紧急程度 </DIV></TD>
+<TD vAlign=center width=80><LABEL style="POSITION: static; WIDTH: 65px; HEIGHT: 15px; TOP: 0px; LEFT: 0px" id=label51 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="新建字段" field="deal_level_name"></LABEL></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD vAlign=center width=180>
+<DIV class=tdTitle>是否同意公开发布 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 400px; HEIGHT: 15px; TOP: 0px; LEFT: 0px" id=label52 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="新建字段" field="is_public_name"></LABEL></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD style="POSITION: relative; HEIGHT: 140px" width=350>
+<DIV style="TEXT-ALIGN: left; TEXT-INDENT: 15px" class=tdTitle>领导签发： </DIV>
+<DIV style="POSITION: absolute; WIDTH: 330px; HEIGHT: 110px; TOP: 35px; LEFT: 10px">
+<UL id=opinion_1 class=opinion></UL></DIV></TD>
+<TD style="POSITION: relative; HEIGHT: 140px">
+<DIV style="TEXT-ALIGN: left; TEXT-INDENT: 15px" class=tdTitle>办公室审核: </DIV>
+<DIV style="POSITION: absolute; WIDTH: 330px; HEIGHT: 110px; TOP: 35px; LEFT: 10px">
+<UL id=opinion_2 class=opinion></UL></DIV></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD vAlign=center width=100>
+<DIV class=tdTitle>文件标题 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 601px; HEIGHT: 38px; TOP: 0px; LEFT: 0px" id=label53 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="TITLE" field="TITLE"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD vAlign=center width=100>
+<DIV class=tdTitle>附 件 </DIV></TD>
+<TD vAlign=center></TD></TR>
+<TR vAlign=top>
+<TD vAlign=center width=100>
+<DIV class=tdTitle>主题词 </DIV></TD>
+<TD vAlign=center></TD></TR>
+<TR vAlign=top>
+<TD vAlign=center width=100>
+<DIV class=tdTitle>主送单位 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 597px; HEIGHT: 39px; TOP: 0px; LEFT: 0px" id=label55 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="MAIN_SEND" field="MAIN_SEND"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD vAlign=center width=100>
+<DIV class=tdTitle>抄送单位 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 601px; HEIGHT: 42px; TOP: 0px; LEFT: 0px" id=label56 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="COPY_SEND" field="COPY_SEND"></LABEL></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD style="POSITION: relative; HEIGHT: 140px" width=350>
+<DIV style="TEXT-ALIGN: left; TEXT-INDENT: 15px" class=tdTitle>主办单位意见: </DIV>
+<DIV style="POSITION: absolute; WIDTH: 330px; HEIGHT: 110px; TOP: 35px; LEFT: 10px">
+<UL id=opinion_3 class=opinion></UL></DIV></TD>
+<TD style="POSITION: relative; HEIGHT: 140px">
+<DIV style="TEXT-ALIGN: left; TEXT-INDENT: 15px" class=tdTitle>会办单位意见: </DIV>
+<DIV style="POSITION: absolute; WIDTH: 330px; HEIGHT: 110px; TOP: 35px; LEFT: 10px">
+<UL id=opinion_4 class=opinion></UL></DIV></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD vAlign=center width=100>
+<DIV class=tdTitle>主办部门 </DIV></TD>
+<TD vAlign=center><LABEL style="POSITION: static; WIDTH: 181px; HEIGHT: 40px; TOP: 0px; LEFT: 0px" id=label57 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DRAFT_DEPT" field="DRAFT_DEPT"></LABEL></TD>
+<TD vAlign=center width=70>
+<DIV class=tdTitle>拟稿人 </DIV></TD>
+<TD vAlign=center width=117><LABEL style="POSITION: static; WIDTH: 118px; HEIGHT: 42px; TOP: 0px; LEFT: 0px" id=label58 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DRAFT_MAN" field="DRAFT_MAN"></LABEL></TD>
+<TD vAlign=center width=100>
+<DIV class=tdTitle>联系电话 </DIV></TD>
+<TD vAlign=center width=130><LABEL style="POSITION: static; WIDTH: 129px; HEIGHT: 39px; TOP: 0px; LEFT: 0px" id=label59 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="DRAFT_PHONE" field="DRAFT_PHONE"></LABEL></TD></TR>
+<TR vAlign=top>
+<TD vAlign=center width=100>
+<DIV class=tdTitle>印发日期 </DIV></TD>
+<TD vAlign=center colSpan=2><LABEL style="POSITION: static; WIDTH: 254px; HEIGHT: 42px; TOP: 0px; LEFT: 0px" id=label60 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="PRINT_DATE" field="PRINT_DATE"></LABEL></TD>
+<TD vAlign=center width=90>
+<DIV class=tdTitle>份数 </DIV></TD>
+<TD vAlign=center width=130 colSpan=2><LABEL style="POSITION: static; WIDTH: 230px; HEIGHT: 39px; TOP: 0px; LEFT: 0px" id=label61 onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset1" china="PRINT_NUM" field="PRINT_NUM"></LABEL></TD></TR></TBODY></TABLE></DIV></DIV>
+<DIV style="WIDTH: 750px; HEIGHT: 743px" class=tab-page>
+<H2 class=tab>意见</H2>&nbsp;&nbsp; <fc:webgrid onkeydown='bill_ongridkeydown("<grid4><col></col><col></col><col></col><col></col></grid4>")' id=grid4 ondblclick='bill_ongriddblclick("<grid4><col></col><col></col><col></col><col></col></grid4>")' onclick='bill_ongridclick("<grid4><col></col><col></col><col></col><col></col></grid4>")' controltype="grid" dataset="dataset2" visible="是" format="<cols><col><fname>ADVICE_TYPE</fname><cname>意见类型</cname><width>2</width><dtype>整数</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>right</align></col><col><fname>ADVICE_CONTENT</fname><cname>意见内容</cname><width>512</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col><col><fname>CREATE_BY</fname><cname>创建人</cname><width>50</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col><col><fname>CREATE_DTTM</fname><cname>创建时间</cname><width>19</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col></cols>" bodyrows="10" bodyrowheight="-1" readonly="否" isPage="否" colWidth="100,*,100,130" colType="ro,ro,ro,ro" colSort="str,str,str,str" showCheckbox="否" width="741" height="213" top="14" left="0" ParentPos="相对" autoheight="undefined" autowidth="undefined" autoappend="undefined">
+<TABLE style="BORDER-COLLAPSE: collapse; TABLE-LAYOUT: fixed; TOP: 0px; LEFT: 0px" id=t cellSpacing=0 cellPadding=1 frame=box>
+<TBODY>
+<TR class=fcGridFirstRow>
+<TD></TD></TR></TBODY></TABLE></fc:webgrid><INPUT style="POSITION: absolute; WIDTH: 110px; DISPLAY: none; HEIGHT: 20px; TOP: 343px; LEFT: 84px" id=text34 onmovestart=moveStart() controltype="text" dataset="dataset3" china="处理人" field="user_name"></DIV></DIV>
+<SCRIPT>var tab4 = new WebFXTabPane( document.getElementById( "tab4" ) );</SCRIPT>
+<LABEL style="POSITION: absolute; BACKGROUND-COLOR: #ffffff; WIDTH: 95px; FONT-FAMILY: 微软雅黑; HEIGHT: 32px; FONT-SIZE: 16pt; TOP: 6px; FONT-WEIGHT: bold; LEFT: 333px" id=label63 onmovestart=moveStart() controltype="label" inputTag="否">发文流程</LABEL></DIV><fc:dataset id=dataset2 controltype="dataset" format="<fields><field><fieldname>ADVICE_TYPE</fieldname><datatype>整数</datatype><displaylabel>意见类型</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>ADVICE_CONTENT</fieldname><datatype>字符</datatype><displaylabel>意见内容</displaylabel><size>512</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CREATE_BY</fieldname><datatype>字符</datatype><displaylabel>创建人</displaylabel><size>50</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CREATE_DTTM</fieldname><datatype>字符</datatype><displaylabel>创建时间</displaylabel><size>19</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" isSubGrid="否" pubpara="否" isaddemptyrec="否" submittype="4" submitno="1" issubds="否" opensortno="2" idtype="1" onValid='bill_ondatasetvalid("<dsid><ADVICE_TYPE></ADVICE_TYPE><ADVICE_CONTENT></ADVICE_CONTENT><CREATE_BY></CREATE_BY><CREATE_DTTM></CREATE_DTTM></dsid>")' onGetText='bill_ondatasetgettext("<dsid><ADVICE_TYPE></ADVICE_TYPE><ADVICE_CONTENT></ADVICE_CONTENT><CREATE_BY></CREATE_BY><CREATE_DTTM></CREATE_DTTM></dsid>")' onSetText='bill_ondatasetsettext("<dsid><ADVICE_TYPE></ADVICE_TYPE><ADVICE_CONTENT></ADVICE_CONTENT><CREATE_BY></CREATE_BY><CREATE_DTTM></CREATE_DTTM></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6Xrn%F6j%E0%D6Xr%94%D6j%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xrn%D0%F4Xrn%D0%D6%FA%E0%D4%D8%CC%F6%u0100%EE%D8Xr%94%F6j%D0%D6%FA%E0%D4%D8%CC%D4%EC%EA%F6%D8%EA%F6Xr%94%F6j%D4%F2%D8%D0%F6%D8%CC%D2%u0100Xr%94%96%90%B6%98%CC%9A%AC%B2%A8%90%B6Xr%7E%F6j%D4%F2%D8%D0%F6%D8%CC%D6%F6%F6%E8Xr%94Xr%7CXrx%C0hXrx%E8hXrx%D6XrnXrx%B6Xr%7CXrnXr%80Xrn%94%B2%98%90%B6%98%CC%96%B6%B6%A8Xrn%DA%F2%EC%E8Xrn%EC%D0%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%D0%D6%FA%E0%D4%D8Xrn%F6Xrn%E6%D8%DA%F6XrnXrn%E2%EC%E0%EAXrnXrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100XrnXrn%D6Xrn%EC%EAXrnXrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%D0%D6%FA%E0%D4%D8%CC%F6%u0100%EE%D8Xr%7CXrnXrn%D0%EA%D6Xrn%D6j%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xt%96%F6j%D0%D6%FA%E0%D4%D8%CC%F6%u0100%EE%D8Xn%96Xn%90%FC%DE%D8%F2%D8Xrn%FC%DA%CC%E0%D6Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%FC%DA%A0%D6XrrXr%80X%7C%96Xt%90Xr%7C"></fc:dataset><fc:dataset id=dataset3 controltype="dataset" format="<fields><field><fieldname>user_name</fieldname><datatype>字符</datatype><displaylabel>处理人</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>是</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>ID</fieldname><datatype>字符</datatype><displaylabel>新建字段</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>status</fieldname><datatype>整数</datatype><displaylabel>状态</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>3</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>standard_no</fieldname><datatype>字符</datatype><displaylabel>编号</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" isSubGrid="否" pubpara="否" isaddemptyrec="否" submittype="1" submitno="1" savetable="OA_SEND_DOCUMENT" idparam="BBB" issubds="否" opensortno="1" idtype="1" onValid='bill_ondatasetvalid("<dsid><user_name></user_name><ID></ID><status></status><standard_no></standard_no></dsid>")' onGetText='bill_ondatasetgettext("<dsid><user_name></user_name><ID></ID><status></status><standard_no></standard_no></dsid>")' onSetText='bill_ondatasetsettext("<dsid><user_name></user_name><ID></ID><status></status><standard_no></standard_no></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6Xrn%E0%D6Xr%94%F4%F6%D0%EA%D6%D0%F2%D6%CC%EA%ECXrn%DA%F2%EC%E8Xrn%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6Xrn%FC%DE%D8%F2%D8Xrn%FC%DA%CC%E0%D6Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%FC%DA%A0%D6XrrXr%80X%7C%96Xt%90Xr%7C"></fc:dataset><fc:dataset id=dataset1 controltype="dataset" format="<fields><field><fieldname>ATTACHMENT_NUM</fieldname><datatype>整数</datatype><displaylabel>ATTACHMENT_NUM</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>ATTACHMENT_REMARK</fieldname><datatype>字符</datatype><displaylabel>ATTACHMENT_REMARK</displaylabel><size>512</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>AUDIT_DATE</fieldname><datatype>字符</datatype><displaylabel>AUDIT_DATE</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>AUDIT_MAN</fieldname><datatype>字符</datatype><displaylabel>AUDIT_MAN</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CHECK_DATE</fieldname><datatype>字符</datatype><displaylabel>CHECK_DATE</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CHECK_MAN</fieldname><datatype>字符</datatype><displaylabel>CHECK_MAN</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CONTENT</fieldname><datatype>字符</datatype><displaylabel>CONTENT</displaylabel><size>512</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CONTENT_LEVEL</fieldname><datatype>整数</datatype><displaylabel>CONTENT_LEVEL</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>COPY_SEND</fieldname><datatype>字符</datatype><displaylabel>COPY_SEND</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DATA_VALID</fieldname><datatype>整数</datatype><displaylabel>DATA_VALID</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue>1</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DEAL_LEVEL</fieldname><datatype>整数</datatype><displaylabel>DEAL_LEVEL</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DEPT_SYTY_MAN</fieldname><datatype>字符</datatype><displaylabel>DEPT_SYTY_MAN</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DOCUMENT_KIND</fieldname><datatype>整数</datatype><displaylabel>DOCUMENT_KIND</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DOCUMENT_NO</fieldname><datatype>字符</datatype><displaylabel>DOCUMENT_NO</displaylabel><size>64</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DOCUMENT_PAGE_NUM</fieldname><datatype>整数</datatype><displaylabel>DOCUMENT_PAGE_NUM</displaylabel><size>3</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DOCUMENT_TYPE</fieldname><datatype>整数</datatype><displaylabel>DOCUMENT_TYPE</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DRAFT_DATE</fieldname><datatype>日期</datatype><displaylabel>DRAFT_DATE</displaylabel><size>19</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DRAFT_DEPT</fieldname><datatype>字符</datatype><displaylabel>DRAFT_DEPT</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DRAFT_MAN</fieldname><datatype>字符</datatype><displaylabel>DRAFT_MAN</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DRAFT_PHONE</fieldname><datatype>整数</datatype><displaylabel>DRAFT_PHONE</displaylabel><size>15</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>DRAFT_REMARK</fieldname><datatype>字符</datatype><displaylabel>DRAFT_REMARK</displaylabel><size>512</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>FLOW_NO</fieldname><datatype>字符</datatype><displaylabel>FLOW_NO</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>ID</fieldname><datatype>字符</datatype><displaylabel>ID</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>INSIDE_SEND</fieldname><datatype>字符</datatype><displaylabel>INSIDE_SEND</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>IS_PUBLIC</fieldname><datatype>整数</datatype><displaylabel>IS_PUBLIC</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>MAIN_SEND</fieldname><datatype>字符</datatype><displaylabel>MAIN_SEND</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>MEETING_DATE</fieldname><datatype>字符</datatype><displaylabel>MEETING_DATE</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>MEETING_MAN</fieldname><datatype>字符</datatype><displaylabel>MEETING_MAN</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>OFFICE_AUDIT</fieldname><datatype>字符</datatype><displaylabel>OFFICE_AUDIT</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>OFFICE_AUDIT_DATE</fieldname><datatype>字符</datatype><displaylabel>OFFICE_AUDIT_DATE</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>PRINT_DATE</fieldname><datatype>日期</datatype><displaylabel>PRINT_DATE</displaylabel><size>19</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>PRINT_NUM</fieldname><datatype>整数</datatype><displaylabel>PRINT_NUM</displaylabel><size>10</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>PUBLIC_REASON</fieldname><datatype>字符</datatype><displaylabel>PUBLIC_REASON</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>RECORD_ID</fieldname><datatype>字符</datatype><displaylabel>RECORD_ID</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>RELATE_LINK</fieldname><datatype>字符</datatype><displaylabel>RELATE_LINK</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>RELATE_NO</fieldname><datatype>字符</datatype><displaylabel>RELATE_NO</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SECRET_LEVEL</fieldname><datatype>整数</datatype><displaylabel>SECRET_LEVEL</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SECRET_REASON</fieldname><datatype>字符</datatype><displaylabel>SECRET_REASON</displaylabel><size>512</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SECRET_TIME</fieldname><datatype>字符</datatype><displaylabel>SECRET_TIME</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SELECT_LEVEL</fieldname><datatype>整数</datatype><displaylabel>SELECT_LEVEL</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SEND_DEPT</fieldname><datatype>字符</datatype><displaylabel>SEND_DEPT</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SEND_SCOPE</fieldname><datatype>字符</datatype><displaylabel>SEND_SCOPE</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SIGN_DATE</fieldname><datatype>字符</datatype><displaylabel>SIGN_DATE</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SIGN_MAN</fieldname><datatype>字符</datatype><displaylabel>SIGN_MAN</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>STANDARD</fieldname><datatype>整数</datatype><displaylabel>STANDARD</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>是</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>STANDARD_NO</fieldname><datatype>字符</datatype><displaylabel>STANDARD_NO</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SWUNG_DASH</fieldname><datatype>整数</datatype><displaylabel>SWUNG_DASH</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SYTY_DATE</fieldname><datatype>字符</datatype><displaylabel>SYTY_DATE</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>TITLE</fieldname><datatype>字符</datatype><displaylabel>TITLE</displaylabel><size>128</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>WF_ID</fieldname><datatype>字符</datatype><displaylabel>WF_ID</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue>$urlParam('wfId')</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>secret_level_name</fieldname><datatype>字符</datatype><displaylabel>密级名称</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>deal_level_name</fieldname><datatype>字符</datatype><displaylabel>新建字段</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>is_public_name</fieldname><datatype>字符</datatype><displaylabel>新建字段</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" isSubGrid="否" pubpara="否" isaddemptyrec="否" submittype="4" submitno="1" savetable="OA_SEND_DOCUMENT" idparam="BBB" issubds="否" opensortno="1" idtype="1" onValid='bill_ondatasetvalid("<dsid><ATTACHMENT_NUM></ATTACHMENT_NUM><ATTACHMENT_REMARK></ATTACHMENT_REMARK><AUDIT_DATE></AUDIT_DATE><AUDIT_MAN></AUDIT_MAN><CHECK_DATE></CHECK_DATE><CHECK_MAN></CHECK_MAN><CONTENT></CONTENT><CONTENT_LEVEL></CONTENT_LEVEL><COPY_SEND></COPY_SEND><DATA_VALID></DATA_VALID><DEAL_LEVEL></DEAL_LEVEL><DEPT_SYTY_MAN></DEPT_SYTY_MAN><DOCUMENT_KIND></DOCUMENT_KIND><DOCUMENT_NO></DOCUMENT_NO><DOCUMENT_PAGE_NUM></DOCUMENT_PAGE_NUM><DOCUMENT_TYPE></DOCUMENT_TYPE><DRAFT_DATE></DRAFT_DATE><DRAFT_DEPT></DRAFT_DEPT><DRAFT_MAN></DRAFT_MAN><DRAFT_PHONE></DRAFT_PHONE><DRAFT_REMARK></DRAFT_REMARK><FLOW_NO></FLOW_NO><ID></ID><INSIDE_SEND></INSIDE_SEND><IS_PUBLIC></IS_PUBLIC><MAIN_SEND></MAIN_SEND><MEETING_DATE></MEETING_DATE><MEETING_MAN></MEETING_MAN><OFFICE_AUDIT></OFFICE_AUDIT><OFFICE_AUDIT_DATE></OFFICE_AUDIT_DATE><PRINT_DATE></PRINT_DATE><PRINT_NUM></PRINT_NUM><PUBLIC_REASON></PUBLIC_REASON><RECORD_ID></RECORD_ID><RELATE_LINK></RELATE_LINK><RELATE_NO></RELATE_NO><SECRET_LEVEL></SECRET_LEVEL><SECRET_REASON></SECRET_REASON><SECRET_TIME></SECRET_TIME><SELECT_LEVEL></SELECT_LEVEL><SEND_DEPT></SEND_DEPT><SEND_SCOPE></SEND_SCOPE><SIGN_DATE></SIGN_DATE><SIGN_MAN></SIGN_MAN><STANDARD></STANDARD><STANDARD_NO></STANDARD_NO><SWUNG_DASH></SWUNG_DASH><SYTY_DATE></SYTY_DATE><TITLE></TITLE><WF_ID></WF_ID><secret_level_name></secret_level_name><deal_level_name></deal_level_name><is_public_name></is_public_name></dsid>")' onGetText='bill_ondatasetgettext("<dsid><ATTACHMENT_NUM></ATTACHMENT_NUM><ATTACHMENT_REMARK></ATTACHMENT_REMARK><AUDIT_DATE></AUDIT_DATE><AUDIT_MAN></AUDIT_MAN><CHECK_DATE></CHECK_DATE><CHECK_MAN></CHECK_MAN><CONTENT></CONTENT><CONTENT_LEVEL></CONTENT_LEVEL><COPY_SEND></COPY_SEND><DATA_VALID></DATA_VALID><DEAL_LEVEL></DEAL_LEVEL><DEPT_SYTY_MAN></DEPT_SYTY_MAN><DOCUMENT_KIND></DOCUMENT_KIND><DOCUMENT_NO></DOCUMENT_NO><DOCUMENT_PAGE_NUM></DOCUMENT_PAGE_NUM><DOCUMENT_TYPE></DOCUMENT_TYPE><DRAFT_DATE></DRAFT_DATE><DRAFT_DEPT></DRAFT_DEPT><DRAFT_MAN></DRAFT_MAN><DRAFT_PHONE></DRAFT_PHONE><DRAFT_REMARK></DRAFT_REMARK><FLOW_NO></FLOW_NO><ID></ID><INSIDE_SEND></INSIDE_SEND><IS_PUBLIC></IS_PUBLIC><MAIN_SEND></MAIN_SEND><MEETING_DATE></MEETING_DATE><MEETING_MAN></MEETING_MAN><OFFICE_AUDIT></OFFICE_AUDIT><OFFICE_AUDIT_DATE></OFFICE_AUDIT_DATE><PRINT_DATE></PRINT_DATE><PRINT_NUM></PRINT_NUM><PUBLIC_REASON></PUBLIC_REASON><RECORD_ID></RECORD_ID><RELATE_LINK></RELATE_LINK><RELATE_NO></RELATE_NO><SECRET_LEVEL></SECRET_LEVEL><SECRET_REASON></SECRET_REASON><SECRET_TIME></SECRET_TIME><SELECT_LEVEL></SELECT_LEVEL><SEND_DEPT></SEND_DEPT><SEND_SCOPE></SEND_SCOPE><SIGN_DATE></SIGN_DATE><SIGN_MAN></SIGN_MAN><STANDARD></STANDARD><STANDARD_NO></STANDARD_NO><SWUNG_DASH></SWUNG_DASH><SYTY_DATE></SYTY_DATE><TITLE></TITLE><WF_ID></WF_ID><secret_level_name></secret_level_name><deal_level_name></deal_level_name><is_public_name></is_public_name></dsid>")' onSetText='bill_ondatasetsettext("<dsid><ATTACHMENT_NUM></ATTACHMENT_NUM><ATTACHMENT_REMARK></ATTACHMENT_REMARK><AUDIT_DATE></AUDIT_DATE><AUDIT_MAN></AUDIT_MAN><CHECK_DATE></CHECK_DATE><CHECK_MAN></CHECK_MAN><CONTENT></CONTENT><CONTENT_LEVEL></CONTENT_LEVEL><COPY_SEND></COPY_SEND><DATA_VALID></DATA_VALID><DEAL_LEVEL></DEAL_LEVEL><DEPT_SYTY_MAN></DEPT_SYTY_MAN><DOCUMENT_KIND></DOCUMENT_KIND><DOCUMENT_NO></DOCUMENT_NO><DOCUMENT_PAGE_NUM></DOCUMENT_PAGE_NUM><DOCUMENT_TYPE></DOCUMENT_TYPE><DRAFT_DATE></DRAFT_DATE><DRAFT_DEPT></DRAFT_DEPT><DRAFT_MAN></DRAFT_MAN><DRAFT_PHONE></DRAFT_PHONE><DRAFT_REMARK></DRAFT_REMARK><FLOW_NO></FLOW_NO><ID></ID><INSIDE_SEND></INSIDE_SEND><IS_PUBLIC></IS_PUBLIC><MAIN_SEND></MAIN_SEND><MEETING_DATE></MEETING_DATE><MEETING_MAN></MEETING_MAN><OFFICE_AUDIT></OFFICE_AUDIT><OFFICE_AUDIT_DATE></OFFICE_AUDIT_DATE><PRINT_DATE></PRINT_DATE><PRINT_NUM></PRINT_NUM><PUBLIC_REASON></PUBLIC_REASON><RECORD_ID></RECORD_ID><RELATE_LINK></RELATE_LINK><RELATE_NO></RELATE_NO><SECRET_LEVEL></SECRET_LEVEL><SECRET_REASON></SECRET_REASON><SECRET_TIME></SECRET_TIME><SELECT_LEVEL></SELECT_LEVEL><SEND_DEPT></SEND_DEPT><SEND_SCOPE></SEND_SCOPE><SIGN_DATE></SIGN_DATE><SIGN_MAN></SIGN_MAN><STANDARD></STANDARD><STANDARD_NO></STANDARD_NO><SWUNG_DASH></SWUNG_DASH><SYTY_DATE></SYTY_DATE><TITLE></TITLE><WF_ID></WF_ID><secret_level_name></secret_level_name><deal_level_name></deal_level_name><is_public_name></is_public_name></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6Xrn%F4jbXr%94%D6j%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xrn%F4%D8%D4%F2%D8%F6%CC%E6%D8%FA%D8%E6%CC%EA%D0%E8%D8Xr%94%D6pj%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xrn%D6%D8%D0%E6%CC%E6%D8%FA%D8%E6%CC%EA%D0%E8%D8XrnXr%94%D6rj%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xrn%E0%F4%CC%EE%F8%D2%E6%E0%D4%CC%EA%D0%E8%D8Xrn%DA%F2%EC%E8Xrn%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6Xrn%F4XrnXn%96Xn%90%E6%D8%DA%F6Xrn%E2%EC%E0%EAXrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%D6Xrn%EC%EAXrn%D6j%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%F4%D8%D4%F2%D8%F6Xr%7CXrn%D0%EA%D6Xrn%D6j%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xt%96%F4j%F4%D8%D4%F2%D8%F6%CC%E6%D8%FA%D8%E6XrnXn%96Xn%90%E6%D8%DA%F6Xrn%E2%EC%E0%EAXrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%D6pXrn%EC%EAXrn%D6pj%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%D6%D8%D0%E6%CC%E6%D8%FA%D8%E6Xr%7CXrn%D0%EA%D6Xrn%D6pj%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xt%96%F4j%D6%D8%D0%E6%CC%E6%D8%FA%D8%E6Xn%96Xn%90%E6%D8%DA%F6Xrn%E2%EC%E0%EAXrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%D6rXrn%EC%EAXrn%D6rj%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%E0%F4%CC%EE%F8%D2%E6%E0%D4Xr%7CXrn%D0%EA%D6Xrn%D6rj%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xt%96%F4j%E0%F4%CC%EE%F8%D2%E6%E0%D4XrnXn%96Xn%90%FC%DE%D8%F2%D8Xrn%F4j%FC%DA%CC%E0%D6Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%FC%DA%A0%D6XrrXr%80X%7C%96Xt%90Xr%7C"></fc:dataset> 
+<DIV style="POSITION: absolute; PADDING-BOTTOM: 0px; BACKGROUND-COLOR: #ffffff; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 643px; PADDING-RIGHT: 0px; DISPLAY: none; HEIGHT: 304px; TOP: 80px; PADDING-TOP: 0px; LEFT: 46px" id=attachArea class=ef_div controltype="div">
+<DIV style="POSITION: absolute; WIDTH: 511px; HEIGHT: 226px; TOP: 17px; LEFT: 75px" id=upload1 class=ef_design_upload onmovestart=moveStart() controltype="upload" dataset="dataset1" uploadType="2" extfiles="jpg|doc" setpath="/fceformext/res/"></DIV><BUTTON style="POSITION: absolute; WIDTH: 75px; HEIGHT: 25px; TOP: 263px; LEFT: 259px" id=attachSure class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("hideAttach()")'>确定</BUTTON></DIV></DIV><div id='addHtml'><style>
+td .ef_design_dropdownlist{margin:3px 0 0 3px;}
+#outer_wrap{ width:760px; height:1000px; margin:0 auto;background-color:#fff; position:relative;}
+#outer_wrap h1{ font-size:20px; text-align:center;padding-top:10px;}
+select,input,textarea{ outline:none;}
+#faWen1 { width: 740px; margin: 10px auto; }
+table.table_border_1px { border-collapse: collapse; table-layout: fixed; margin: 0 auto; margin-top: -1px; }
+table.table_border_1px td { border: 1px solid #808080; line-height: 30px; height:30px; }
+table.table_border_1px tr { border: none; }
+.tdTitle { color: #000080; text-align: center; width: 100%; }
+.tdTitle strong { color: #F00; }
+table.table_border_1px td select, table.table_border_1px td input { width: 90%; margin: 2px; }
+table.table_border_1px td textarea{ width:97%;margin: 2px; overflow:auto;}
+#outer_wrap .tab-pane .tab-page{border:0;}
+ #faWen_banLi { width: 700px; margin: 0 auto; font-size: 12pt; }
+#faWen_banLi h2 { text-align: center; font-size: 14pt; color: #F00; }
+#faWen_banLi table.table_border_1px { border-collapse: collapse; table-layout: fixed; margin: 0 auto; margin-top: -1px; }
+#faWen_banLi table.table_border_1px td { border: 1px solid #f00; line-height: 40px; height: 40px; }
+#faWen_banLi table.table_border_1px tr { border: none; }
+#faWen_banLi .tdTitle { color: #f00; text-align: center; width: 100%; }
+
+.opinion { margin:0; padding:0; font-size:14px;}
+.opinion li{ list-style-type:none; line-height:20px;}
+.opinion_word{ width:100%; float:left;}
+.opinion_man{ width:150px; float:right; text-align:right; color:#00F;}
+.opinion_time{ width:130px; float:right; text-align:right;color:#00F;}
+
+</style>
+</div> </body></html>

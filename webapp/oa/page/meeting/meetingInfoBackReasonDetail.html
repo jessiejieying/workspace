@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html style="">
+<head>
+  <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=8,Chrome=1">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+  <style type="text/css">
+   .form-pt88{
+      padding-top:0px;
+   }
+   td{
+      height:40px;
+      color:#ef655d;
+      vertical-align: middle;
+       text-align: center;
+       font-family:'黑体';
+   }
+   td .content{
+      text-align:left;
+      padding-left:19px;
+      color:#2f2f2f;
+      font-family:'宋体';
+      font-size:14px;
+   }
+   input{
+   
+   }
+   .common-skin-btn-syle01{color: #fff;border-color: #4786d5;background-color: #5b97e1;}
+  .common-skin-btn-syle01:hover {
+    color: #fff;
+    border-color: #3bd;
+    background-color: #3bd;
+}
+  </style>
+</head>
+<body style="overflow-y:scroll;"> 
+  <input type="hidden" id="meetingId" value="${meetingInfo.id!}"/>
+  <h1 class="text-center" style="margin-top:16px;margin-bottom:16px;color:#ef655d">${(meetingInfo.subject)!}</span></h1>
+  <div class="form-print-header" style="float:right;margin-right: 70px;margin-bottom: 10px;">
+		<span class="header-right" style="color: #ef655d;">退文编号：
+			<input class="td-text-left" type="text" style="border: none;" id="backNo" value="${(meetingInfo.backNo)!}">
+		</span>
+	</div>
+ <div class="form-print  form-pt88"  style="width:724px;margin-left: auto;margin-right: auto;"  id="showHtml">
+  <table  style="font-size:15px;width:724px;border: 1px solid #ef655d;color:#ef655d;font-family:'宋体';">
+    <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:130px">申报单位</td>
+            <td style="" class="content">${(meetingInfo.mainOrg)!}</td>
+            <td  width="80px" style="color:#ef655d;height: 100%;border-right:1px solid #ef655d;border-left: 1px solid #ef655d;">联系人</td>
+            <td width="122px" class="content">${(meetingInfo.linkPeople)!}</td>
+            <td  width="99px" style="border-left: 1px solid #ef655d;border-right: 1px solid #ef655d;color:#ef655d;padding: 0 5px;">联系电话</td>
+            <td   class="content"> ${(meetingInfo.linkPhone)!}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:130px">会议名称</td>
+            <td style="" class="content">${meetingInfo.subject!}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+     <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:130px">拟邀请省领导</td>
+            <td style="" class="content" >${meetingInfo.attendanceLeader!}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:130px">会议内容（议程）</td>
+            <td style="" class="content">${meetingInfo.meetingContent!}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+      <tr style="height:84px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:130px">会议主要情况</td>
+            <td style="width:589px;margin:0px;">
+               <table  style="font-size:15px;width:590px;color:#ef655d;font-family:'宋体';margin:0; border:0px solid #ef655d;">
+                 <tr style="heigth:41px">
+                    <td style="border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;width:81px">时间</td>
+                    <td style="width:231px;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;" class="content">
+                      <#if meetingInfo.startDate??>
+                          ${(meetingInfo.startDate)!?string("yyyy-MM-dd")}
+                      <#else>
+                         ${(meetingInfo.startDate)!}
+                      </#if>
+                   </td>
+                    <td style="width:131px;border-bottom:1px solid #ef655d;border-right:1px solid #ef655d;">规模（人数）</td>
+                    <td style="width:145px;border-bottom:1px solid #ef655d;" class="content">${(meetingInfo.meetingSize)!}</td>
+                 </tr>
+                  <tr style="heigth:41px">
+                    <td style="border-right:1px solid #ef655d;width:82px">地点</td>
+                    <td style="width:232px;border-right:1px solid #ef655d;" class="content">${(meetingInfo.location)!}</td>
+                    <td style="width:133px;border-right:1px solid #ef655d;" >经费（万元）</td>
+                    <td style="width:145px;" class="content">${(meetingInfo.meetingMoney)!}</td>
+                 </tr>
+               </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:130px">附&nbsp;&nbsp;&nbsp;&nbsp;件</td>
+            <td  class="content" >
+            <#if attachmentInfoList?? && attachmentInfoList.size()&gt;0>
+                <#list attachmentInfoList as attachmentInfo>
+                     <a class="file-icon" href="${(attachmentInfo.path)!}"  data-name="${(attachmentInfo.name)!}" style="padding-left:20px;display: block"><font color="blue">${attachmentInfo_index+1}.${(attachmentInfo.name)!}</font></a>
+                </#list>
+               <#else>
+              </#if>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+     <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:130px">退文理由</td>
+            <td style="" class="content">
+              <#assign  a=(((meetingInfo.backReason)!)?split(","))?size>
+              <#list  ((meetingInfo.backReason)!)?split(",") as reason>
+                 ${reason_index+1}.${reason}<#if  reason_index &lt;a-1>；</#if>
+              </#list>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" >
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:132px">主办处(室)<br>退文理由</td>
+            <td style="width:595px;" class="content" ><input type="text" style="color:#2f2f2f;width:400px;"  id="meetingInfo_unitReason" value="${(meetingInfo.unitReason)!}"/></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+     <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:130px">备&nbsp;&nbsp;&nbsp;&nbsp;注</td>
+            <td style="" class="content">${(meetingInfo.meetingRemark)!}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+   <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:130px">退文时间</td>
+            <td style="width:250px"  class="content" >
+               <#if meetingInfo.backTime??>
+                 ${(meetingInfo.backTime)!?string("yyyy-MM-dd HH:mm:ss")}
+             <#else>
+                ${(meetingInfo.backTime)!}
+             </#if>
+            </td>
+            <td width="122px" style="border-right:1px solid #ef655d;border-left:1px solid #ef655d;">退文签收时间</td>
+            <td class="content"  style="border-left: 1px solid #ef655d;border-right: 1px solid #ef655d">
+             <#if meetingInfo.backSignTime??>
+                 <#assign backSignTime='${(meetingInfo.backSignTime)!?string("yyyy-MM-dd HH:mm:ss")}'/>
+                 <#if backSignTime!="">
+                    ${backSignTime}
+                  <#else>
+                                                                      未签收
+                 </#if>
+             <#else>
+                                                            未签收
+             </#if>
+           </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+   <!--<tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:128px">退文理由</td>
+            <td style="width:376px;" class="content" colspan="3">${(meetingInfo.backReason)!}</td>
+            <td  width="99px" style="border-left: 1px solid #ef655d;border-right: 1px solid #ef655d;color:#ef655d;padding: 0 5px;">退文时间</td>
+            <td width="120px"  class="content"> 
+             <#if meetingInfo.backTime??>
+                ${(meetingInfo.backTime)!?string("yyyy-MM-dd")}
+             <#else>
+                ${(meetingInfo.backTime)!}
+             </#if>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+     <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:128px">备&nbsp;&nbsp;&nbsp;&nbsp;注</td>
+            <td style="width:300px;" class="content" colspan="5">${meetingInfo.meetingContent!}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+      -->
+    <!-- 完成 -->
+  </table>
+  <div style="text-align:center;width:724px;margin-top:10px;margin-bottom: 10px;">
+      <div class="button common-skin-btn-syle01 js-add-account"  style="width:100px;" id="cuiban_meetingInfo">催办</div>
+      <div class="button common-skin-btn-syle01 js-add-account"  style="width:100px;" id="mesage_record">短息记录</div>
+      <!-- <div class="button common-skin-btn-syle01 js-add-account"  id="meetingInfo_del">删除</div> -->
+  </div>
+</div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/edenui/common/js/plugins/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="${base}/form/resources/common/js/print.js"></script>
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<!-- 首页引用 -->
+<script src = "${base}/edenui/common/js/ed_index.js"></script>
+
+<!--公用的js文件-->
+<script src="${base}/edenui/common/js/common.js"></script>
+<script src="${base}/form/resources/common/js/tool.js"></script>
+<script src="${base}/form/resources/common/js/edenApi.js"></script>
+<script type="text/javascript">
+ $(function(){
+	   //删除会议开始
+	     $("#meetingInfo_del").on("click",function(){
+		  if(meetingInfo_id==null || meetingInfo_id.replace("\\s+","")==""){
+			  layer.msg("会议ID为空，删除不能完成");
+			  return;
+		  }
+		  //提醒框开始
+		  layer.confirm('确定删除会议吗 ?', {title:'提示'}, function(index){
+			 $.post("${base}/admin/backMeeting/deleteBackMeetingInfo.action",
+					 {
+				        "meetingInfo.id":meetingInfo_id
+				     },function(data){
+				 if(data.flag=="1"){
+					 layer.msg("删除会议成功");
+					 setTimeout(function(){
+						 var index=parent.layer.getFrameIndex(window.name);
+						 parent.layer.close(index);
+						 parentIfr.gridOne.refreshPage();
+					 },1000);
+				 }else{
+					 layer.msg("删除会议失败");
+				 }
+			 },"json")
+			});
+		  //提醒框结束
+	   });
+	   //删除会议结束
+	   //催办开始
+	      $(document).on("click","#cuiban_meetingInfo",function(){
+		   var meetingInfo_id=$("#meetingId").val();
+		   var win={"text":"发送短信","url":"${base}/admin/backMeeting/inComingUrgencyPage.action?id=${meetingInfo.id!}&type=oa_meeting_info_back","width":"813","height":"460","parentIfr":window};
+	       window.top.createWindow(win);
+	   });
+	   //催办结束
+	   
+	     //短信记录
+	   $(document).on("click","#mesage_record",function(){
+		   var win={"text":"短信记录","url":"${base}/admin/backMeeting/inCominMessageRecord.action?id=${meetingInfo.id!}&type=oa_meeting_info_back","width":"900","height":"550","parentIfr":window};
+	       window.top.createWindow(win);
+	   });
+	   //短信记录
+	   //会议退文弹出框  start           jq_gice_index.js
+	   $(document).on("click","#meetingInfo_back",function(){
+		   var meetingInfo_id=$("meetingId").val();
+		   var win={"text":"会议退文单","url":"${base}/admin/backMeeting/addBackMeetingInfo.action?meetingInfo.id="+meetingInfo_id,"width":"900","height":"640","parentIfr":window};
+		   window.top.createWindow(win);
+	   });
+	   $(document).on("click","#meetingInfo_province_register",function(){
+		  layer.msg("此功能正在开发");
+		  return ;
+	   });
+   });
+ 
+    //附件信息文件添加图标
+    function classStyle() {
+      var arrSpan = [];
+      for (var i = 0; i < $(".file-icon").length; i++) {
+        arrSpan.push($(".file-icon").eq(i).data("name"))
+      }
+      $.each(arrSpan, function(i, item) {
+        if (item.indexOf(".doc") > -1) {
+          $(".file-icon").eq(i).addClass("file-icon-word");
+        } else if (item.indexOf(".pdf") > -1) {
+          $(".file-icon").eq(i).addClass("file-icon-pdf");
+        } else if (item.indexOf(".tgw") > -1) {
+          $(".file-icon").eq(i).addClass("file-icon-tiangu");
+        } else {
+          return ""
+        }
+      });
+
+    }
+    classStyle();   
+</script>
+</html>

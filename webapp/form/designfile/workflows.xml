@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflows>
+<workflow name="oa_provincial_meeting_approve" version="1" desc="全省性会议审批" status="定义" typeid="" />
+<workflow name="oa_provincial_meeting_record" version="1" desc="全省性会议备案" status="定义" typeid="" />
+<workflow name="oa_meeting_program_approval" version="1" desc="会议方案审批" status="定义" typeid="" />
+<workflow name="oa_meeting_notification_approval" version="1" desc="会议通知审批" status="定义" typeid="" />
+<workflow name="oa_leader_instruction_fb" version="1" desc="省领导批示反馈流程" status="定义" typeid="" />
+<workflow name="oa_send_document" version="1" desc="发文流程" status="定义" typeid="" />
+<workflow name="oa_pg_incoming_document" version="1" desc="省政府收文流程" status="定义" typeid=" " />
+<workflow name="oa_leader_instruction" version="1" desc="省领导批示流程" status="定义" typeid="" />
+<workflow name="oa_provincial_meeting" version="1" desc="全省性会议审批（备案）" status="定义" typeid="" />
+<workflow name="oa_sptrain_audit" version="1" desc="专项事务审批" status="定义" typeid="" />
+</workflows>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+<meta charset="utf-8">
+<title></title>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/style.html">
+
+	<!--引用首页主题样式文件-->
+
+	<style type="text/css">
+	
+	.check_all {width:16px;height:16px;margin-top:7px;margin-left:-10px;}
+	</style>
+</head>
+
+<body style="height: 100%;">
+
+	<!-- 页面载入进度条 begin-->
+	<link rel="stylesheet" href="${base}/edenui/common/js/plugins/pace/themes/silver/pace-theme-loading-bar.css" />
+	<script src="${base}/edenui/common/js/plugins/pace/pace.eden.min.js"></script>
+	<!-- 页面载入进度条 end-->
+
+
+	<div id="grid_wrap"	style="width: 100%; height: 100%; overflow: hidden; display: none;">
+		<div id="toolbar" class="ed-toolbar" style="z-index:8;"> 
+	
+	    <#if announcementStatus??>
+	
+	<a btn_id="add" id="add" class="btn btn-warning toolbar_btn" href="javascript:void(0)"><i class="icon-file icon-white"></i>添加公告</a>
+	<a btn_id="del" id="del" class="btn btn-warning toolbar_btn" href="javascript:void(0)"><i class="icon-file icon-white"></i>批量删除</a>
+	</#if>
+	
+		  <div class="input-prepend input-append">
+		  <!--   <div class="btn-group">
+		    <input type="hidden" val="" id="dataValid">
+		      <button class="btn dropdown-toggle" data-toggle="dropdown" id="ssearch">所有状态<span class="caret"></span> </button>
+		      <ul class="dropdown-menu">
+		        <li><a value="">所有状态</a></li>
+		       
+		      </ul>
+		    </div> -->
+		    
+		    
+		    <div class="btn-group">
+		    <input type="hidden" val="" id="typeId">
+		      <button class="btn dropdown-toggle" data-toggle="dropdown" id="typesearch">所有类别<span class="caret"></span> </button>
+		      <ul class="dropdown-menu">
+		        <li><a value="">所有类别</a></li>
+	
+		       <#if announcementTypes??>
+       				 <#list announcementTypes as dataDict>
+           					<li><a value="${dataDict.dictValue}">${dataDict.displayName}</a></li>
+       				 </#list>
+    				</#if>
+					
+			
+		      </ul>
+		    </div>
+		    
+		   
+		    <input class="span2" id="search_text" value="" type="text" placeholder="文件标题">
+		    <div class="btn-group">
+		      <button class="btn btn-info" onClick="SimpleSearch()">搜索</button>
+		    </div>
+		  </div>
+		 
+		</div>
+		
+		
+		<div class="ed-grid">
+			<div id="grid"></div>
+		</div>
+		<div class="clearfix">
+			 <div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	      </div>
+		</div>
+	</div>
+
+</body>
+
+<#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<script>
+    var layout, treeObj, tree, treeSearch, grid, data, form,tree_form,flowName,flowVersion,user_id;
+    window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+    
+    var baseUrl="${base}${baseUrl}?showTop=1";
+    var noRead="${noRead!}";
+    function init() {
+    	
+        layout = new dhtmlXLayoutObject(document.body, "1C");
+        layout.cells('a').hideHeader();
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        data = new dhtmlXDataStore({
+            url     :baseUrl+"&etc="+new Date().getTime(),
+            datatype:"json"
+        });
+	
+        layout.cells('a').attachObject('grid_wrap');
+
+        <#if announcementStatus??>
+        
+        grid = new dhtmlXGridObject('grid');
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        grid.setHeader("<input type='checkbox' class='check_all' id='checkAll' onclick='selectAllCheck()'>,标题,类型,发布时间,发布人,状态,操作");
+        grid.setColumnIds("check,title,announcementType,startDate,authorCn,status,operate");
+        grid.setInitWidths("30,*,200,150,200,100,200");
+        grid.setColTypes("ch,ro,coro,ro,ro,coro,link");
+        
+        
+        <#list announcementStatus as dataDict>
+             grid.getCombo(5).put(${dataDict.dictValue}, '${dataDict.displayName}');
+        </#list>
+
+        
+        <#else>
+        
+        grid = new dhtmlXGridObject('grid');
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        grid.setHeader("<input type='checkbox' class='check_all' id='checkAll' onclick='selectAllCheck()'>,标题,类型,发布人,日期,操作");
+        grid.setColumnIds("check,title,announcementType,authorCn,startDate,operate");
+        grid.setInitWidths("30,*,100,100,150,200");
+        grid.setColTypes("ch,ro,coro,ro,ro,link");
+        
+
+        
+        </#if>
+        
+        <#if announcementTypes??>
+        <#list announcementTypes as dataDict>
+             grid.getCombo(2).put(${dataDict.dictValue}, '${dataDict.displayName}');
+        </#list>
+   	 </#if>
+        
+        grid.init();
+        grid.enablePaging(true, 15, 999999, 'grid_page', true);
+        grid.setPagingSkin("toolbar");
+        grid.sync(data);
+        page_layout();
+
+        
+    } 
+   
+
+    function toolbar_func(id) {
+        if (id == 'add') {
+        	
+           openAddWin();
+        }else if (id == 'clean') {
+        	
+        }else if (id == 'edit') {
+            //form.unlock();
+        }else if (id == 'del') {
+
+        	  var row_id = grid.getCheckedRows(0);
+              if (row_id == '') {
+                  $.dialog.tips('请至少选择一条数据！');
+                  return;
+              }
+              row_id = row_id.split(',');
+              if (row_id.length == 0) return;
+              $.dialog.confirm('你确定要批量删除吗？', function () {
+                  var idArr = new Array();
+                  for (var i = 0; i < row_id.length; i++) {
+                      idArr.push(data.item(row_id[i]).id);
+                  }
+                  var surl="${base}/admin/announcement/delAnnouncement.action";
+                  $.post(surl, {"id":idArr.join(",")},function(result){
+                  	if(result.result="success"){                      
+                         SimpleSearch();
+                  	}
+                  	 $.dialog.tips(result.message);
+                  });
+              });
+
+        }
+    }
+   
+    
+
+    
+    
+    function showAnnouncement(id)
+    {
+    	var winName="公告信息";
+    	
+ 		var openUrl="${base}/admin/announcement/showAnnouncementPage.action?id="+id+"&etc="+new Date().getTime();
+ 		if(noRead)
+    	{
+ 			openUrl+="&noRead="+noRead;
+    	}
+		top.createWindow({
+			text    :winName,
+			url     :openUrl,
+			id      :'showAnnouncementWin',
+			width   :'820',
+			height  :'500',
+			parent_ifr:window
+		
+		});
+ 			
+    	
+    }
+    
+    
+    function openReadRecordWin(id)
+    {
+    	
+    	var param="";
+    	var item=data.item(id);
+    	var title=$(item.title).text();
+    	var winName="[阅读记录]"+title;
+ 		var openUrl="${base}/admin/announcement/showReadRecordPage.action?announcementId="+id+"&etc="+new Date().getTime();
+		top.createWindow({
+			text    :winName,
+			url     :openUrl,
+			id      :'readRecordWin',
+			width   :'820',
+			height  :'500',
+			parent_ifr:window
+		
+		});
+ 			
+ 		
+    	
+    }
+    
+    
+    function openAddWin(id)
+    {
+    	var winName="添加公告";
+  
+    	var openUrl="${base}/admin/announcement/addAnnouncementPage.action?etc="+new Date().getTime();
+    	if(id)
+    	{
+    		var item=data.item(id);
+    		openUrl="${base}/admin/announcement/addAnnouncementPage.action?op=update&id="+id+"&etc="+new Date().getTime();
+    		winName="编辑公告";
+    	}
+    	
+
+		top.createWindow({
+			text    :winName,
+			url     :openUrl,
+			id      :'showAnnouncementWin',
+			width   :'860',
+			height  :'500',
+			parent_ifr:window
+		
+		});
+ 			
+ 		
+    	
+    }
+
+    function form_mask_init(){
+        var grid_area=$('#grid > div:eq(1) > table');
+        var maskB_height=grid_area.height()+70;
+        var maskB_width=grid_area.width();
+        var maskB_left=grid_area.offset().left;
+        $('#form_maskB').height(maskB_height).width(maskB_width).css('left',maskB_left);
+
+    }
+
+    function page_layout() {
+        var grid_wrap_height = $('#grid_wrap').height();
+        $('#grid').height(grid_wrap_height - 50-40);
+        $('#grid').width($('#grid_wrap').width()-20);
+        if (grid)    grid.setSizes();
+        form_mask_init();
+    }
+
+	function  SimpleSearch(){
+		var title= $("#search_text").val();
+		
+		var dtype=$("#typeId").val();
+		
+        data.clearAll();
+        var s='title='+encodeURI(title)+"&announcementType="+dtype;
+        
+        window.data.data.url=baseUrl+'&'+s+'&etc='+new Date().getTime();
+        data.load(baseUrl+'&'+s+'&etc='+new Date().getTime());
+        page_layout();
+    }
+
+
+	
+	
+	function selectAllCheck()
+	{
+		var ids = grid.getAllRowIds();
+    	//console.log(ids);
+    	var idsArr = ids.split(',');
+    	//alert(idsArr.length);
+    	var nowPage = grid.currentPage;
+    	var pageItemsLength = grid.rowsBufferOutSize;
+    	var allItemsLength = grid.rowsBuffer.length;
+    	
+    	var forBigen = pageItemsLength*(nowPage-1);
+    	var forOver = pageItemsLength*(nowPage);
+    	if (forOver>allItemsLength){
+    		forOver = allItemsLength
+    	}
+    	for(i=forBigen;i<forOver;i++){
+    		var forId = idsArr[i];
+    		var check = grid.cellById(forId, 0).getValue();
+    		//console.log(check);
+    		if (check == 1) {
+        		check = 0;
+        	} else {
+        		check = 1;
+        	}
+    		grid.cellById(forId, 0).setValue(check);
+    	}
+
+		
+		
+	}
+
+/*     //执行任务
+    function execute(id){
+    	//$.dialog.tips("未定义");
+    	var item=data.item(id);
+    	var task_name='';
+
+    	uf_doAction(item.wf_id,wf_name,task_name,version);
+    }
+ */
+
+    $(function () {
+    	
+    	
+        setTimeout(init, 0);
+        $('#toolbar .toolbar_btn').click(function () {
+            var id = $(this).attr('btn_id');
+            toolbar_func(id);
+        });
+
+      /*   $('#ssearch').next().find('a').click(function(){
+        	$("#dataValid").val($(this).attr('value'));
+        	$('#ssearch').text($(this).text());
+        }) */
+        
+         $('#typesearch').next().find('a').click(function(){
+        	$("#typeId").val($(this).attr('value'));
+        	$('#typesearch').text($(this).text());
+        	SimpleSearch();
+        })
+        
+     /*    $("#config_left_menu > li").click(function (event) {
+            $("#config_left_menu > li.on").removeClass('on').children('ul').slideUp(200);
+            $(this).addClass('on');
+            $(this).children('ul').slideDown(400);
+        });
+        $("#config_left_menu .level_2 > li").click(function (event) {
+            $("#config_left_menu .level_2 li.on").removeClass('on');
+            $(this).addClass('on')
+            event.stopPropagation();
+        }) */
+
+        $("#advanced_search_btn").click(function(){
+            $(this).toggleClass('advanced_on');
+            $('#advanced_search_bar').slideToggle(200);
+        });
+
+        $("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+    })
+    
+</script>
+</html>

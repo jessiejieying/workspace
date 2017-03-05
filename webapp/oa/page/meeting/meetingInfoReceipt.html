@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=8,Chrome=1">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+  <style type="text/css">
+   .form-pt88{
+      padding-top:0px;
+   }
+   td{
+      height:55px;
+      color:#ef655d;
+      vertical-align: middle;
+      text-align: center;
+      font-family:'黑体';
+   }
+   td .content{
+      text-align:left;
+      padding-left:19px;
+      color:#2f2f2f;
+      font-family:'宋体';
+      font-size:14px;
+   }
+  .common-skin-btn-syle01{color: #fff;border-color: #4786d5;background-color: #5b97e1;}
+  .common-skin-btn-syle01:hover {
+    color: #fff;
+    border-color: #3bd;
+    background-color: #3bd;
+  }
+  .reason_back_label{
+    font-size:12px;
+    font-family:宋体;
+    margin-left:10px;
+  }
+  input[type="checkbox"]{
+    margin-top:3px;
+    vertical-align:top;
+  }
+  .form-print input{
+       color:#2f2f2f;  
+  }
+  .button{
+       border: 0px solid #ddd;
+       box-shadow: 0 0px 0px #FFF,0px 0 0px #FFF; 
+  }
+  .otherReason{
+    font-family:宋体;
+    font-size:12px;
+    width:72%;
+    visibility:hidden;
+  }
+  </style>
+</head>
+<body > 
+ <h1 class="text-center" style="margin-top:16px;margin-bottom:16px;color:#ef655d">${(meetingInfo.subject)!}</span></h1>
+ <div class="form-print  form-pt88"  style="width:724px;margin-left: auto;margin-right: auto;"  id="showHtml">
+  <table  style="font-size:15px;width:724px;border: 1px solid #ef655d;color:#ef655d;font-family:'宋体';">
+    <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+          <table style="width:724px;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:136px">申报单位</td>
+            <td style="" class="content">${(meetingInfo.mainOrg)!}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr style="height:70px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+          <table style="width:100%;" height="100%" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:136px">审 签 单</td>
+            <td style="" class="content">
+                <span style="vertical-align:middle;line-height:23px;">
+              		<input type="checkbox" name="checkboxHandle" checked  value="" id="checkboxHandleID" style="display:none;position:relative;top:2px;">
+              		<a href="" style="padding-left: 5px;" id="handle">
+              			<font color="blue" id="handleName"></font>
+              		</a>
+              		<br>
+              		<input type="checkbox" name="checkboxHandleDoc" checked  value="" id="checkboxHandleIDDoc" style="display:none;position:relative;top:2px;">
+              		<a href="" style="padding-left: 5px;" id="handleDoc">
+              			<font color="blue" id="handleNameDoc"></font>
+              		</a>
+                </span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+   <tr style="height:41px;">
+      <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+          <table style="width:100%;" frame="void">
+          <tr>
+            <td style="border-right:1px solid #ef655d;width:136px">联系电话</td>
+            <td style=""  class="content">0571-87056798</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <!-- 完成 -->
+  </table>
+  <div style="text-align:center;width:724px;margin-top:10px;">
+  	  <label><input type="checkbox" name="checkboxMail" style="position:relative;top:2px;" checked="checked" id="send_mail" class=" ">发送短信</label>
+      <a><span id="editMessage" class="margin-left ">编辑短信</span></a>
+      <div class="button common-skin-btn-syle01 js-add-account"  id="send_meetingInfo_receipt">发送</div>
+      <div class="button common-skin-btn-syle01 js-add-account"  id="meeting_info_receipt_close">关闭</div>
+  </div>
+</div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/edenui/common/js/plugins/My97DatePicker/WdatePicker.js"></script>
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<!-- 首页引用 -->
+<script src = "${base}/edenui/common/js/ed_index.js"></script>
+
+<!--公用的js文件-->
+<script src="${base}/edenui/common/js/common.js"></script>
+
+
+<script type="text/javascript">
+
+	window.top.messageObj={
+		commonTels:"",
+	 	commonMailContent:"",
+		commonTableKeyId:"",
+		commonTableName:"",
+		commonTaskType:"",
+		commonCycleHour:""
+	}
+	//判断办理单生成PDF是否成功
+	var path;
+	var docPath
+	var pdf=0;
+	var doc=0;
+	$(function(){
+		//弹出层的关闭功能
+		$(document).on("click","#meeting_info_receipt_close",function(){
+			var index=parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		});//关闭按钮功能的完成
+
+		//获取关于短信信息
+		$(document).on("click","#editMessage",function(){
+			alert(1);
+		});
+	
+		//发送会议回执
+		$(document).on("click","#send_meetingInfo_receipt",function(){
+			var flagMail = false;
+			var flagPdf = false
+			var flagDoc = false;
+			
+			if($(":checkbox[name='checkboxMail']").prop('checked')==true){
+				flagMail = true;
+			}
+			
+			if($(":checkbox[name='checkboxHandle']").prop('checked')==true){
+				if(pdf==0){
+					layer.msg("办理单生成PDF失败,无法回执在到公文交换系统");
+					return;
+				}
+				flagPdf = true;
+			}
+			
+			if($(":checkbox[name='checkboxHandleDoc']").prop('checked')==true){
+				if(doc==0){
+					layer.msg("办理单生成word失败,无法回执在到公文交换系统");
+					return;
+				}
+				flagDoc = true;
+			}
+			
+			if("${billName}".replace("/\s+/g","")==""){
+				layer.msg("无法查找到word模板,办理单转PDF失败");
+				return;
+			}
+			
+			var obj = {
+				"flagMail":flagMail,
+				"meetingInfo.id":"${(meetingInfo.id)!}",
+				"flagPdf":flagPdf,
+				"pdfAttachment":path,
+				"flagDoc":flagDoc,
+				"docAttachment":docPath,
+				"billName":"${billName!}"
+			};
+			
+			$.post("${base}/admin/meetingToExchange/publishMeetingFeedBackToExchange.action", obj, function(data){
+				parent.layer.msg(data.result);
+				var index=parent.layer.getFrameIndex(window.name);
+				parent.layer.close(index);   
+			});    	
+		});
+		
+		//生成办理单附件
+		$("#handleName").html("正在处理办理单，请稍后。。。");
+		$.post("${base}/admin/meeting/createHandleAttachment.action",
+			{"meetingId":"${(meetingInfo.id)!}","billName":"${billName!}"},
+				function(data){
+			if(data.flag=="1"){
+				$("#checkboxHandleID").show();
+				$("#checkboxHandleIDDoc").show();
+				path=data.path;
+				docPath=data.docPath;
+				path=path.replace(/\\/g,"//");
+				docPath=docPath.replace(/\\/g,"//");
+				$("#handleName").html(data.fileName);
+				$("#handleNameDoc").html(data.wordFileName);
+				$("#handle").attr("href","http://"+location.host+"${base}/servlet/downloadServlet?path="+path);
+				$("#handleDoc").attr("href","http://"+location.host+"${base}/servlet/downloadServlet?path="+docPath);
+				pdf=1;
+				doc=1;
+			}else{
+				layer.msg("办理单转PDF失败");
+				$("#handleName").html("");
+				$("#handleNameDoc").html("");
+			}
+		});
+	}); 
+
+	
+	function messageInit(){
+		var wfid=(window.top.globalParams.wfid);
+		var wfName=(window.top.globalParams.wfName);
+		var url=project+"/admin/sendRange/mailMessage.action?etc="+new Date().getTime() +"&wfId="+wfid+"&wfName="+wfName;
+		$.post(url,function(data){
+			messageData=(data.mailMessage).replace(/<br>/g,"").replace(/\n/g,"");
+			mailMessageData.content=data.mailMessage;
+		});
+	}
+
+</script>
+</html>

@@ -1,0 +1,341 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>var myAdvices;
+var commonAdvice;
+var composeAdvice1;
+var composeAdvice2;
+var composeAdvice3;
+var composeIndex=1;
+
+function sub()
+{
+   var op="添加";
+  var atype=$('#sel_dropdownlist1').val();
+
+  if(atype==-1)
+  {
+      $.dialog.tips("意见类型不能为空"); 
+     return;
+  }
+   doSubmitData(function () {
+	$.dialog.tips(op+"成功!");
+       var con=$('#textarea1').val();  
+      var atype=$('#sel_dropdownlist1').find("option:selected").text();
+        /* refreshDsById("dataset1");
+         var dataset1=window.data_dataset1;
+	   var dataItem=dataset1.item(dataset1.idByIndex(0));
+      var createBy=dataItem.CREATE_BY;
+    var createDate=dataItem.CREATE_DTTM; */
+      var createBy=GetSessionOne('userid');
+      var createDate=GetTime();
+     
+
+     try{
+		window.edenCallBack(con,atype,createBy,createDate);
+
+	}catch (e){
+
+     }
+  
+    
+
+   });
+
+  
+
+
+}
+
+
+function getDictDescByDictId(dataset,dictId)
+{
+    var count=dataset.dataCount();
+    for(var i=0;i<count;i++)
+    {
+         var dataItem=dataset.item(dataset.idByIndex(i));
+		 var did=dataItem.dict_id;
+		 if(did==dictId)
+		 {
+		    return dataItem.dict_desc;
+		 }
+		
+		 
+    }
+    return "";
+}
+
+function load()
+{
+  var wfId=$urlParam('wfId');
+  var actionId=$urlParam('actionId');
+  var dropId="dropdownlist1";
+  var sqltrans="select ea.display_name name,a.control_value value  from oa_document_wf_control a inner join  ea_data_dictionary ea on a.control_value = ea.dict_value where dict_group_id = 'oa_send_document_advice_type' and wf_name=(select name from wf_wfentry where id='"+wfId+"') and action_id ='"+actionId+"' and control_type=1 ";
+  reloadDropdownlist(dropId,sqltrans,"reloadAllAdvice()");
+ 
+  var dataset3=window.data_dataset3;
+  
+   myAdvices=$('#text6').val();
+   refreshOaListBox (myAdvices);
+  
+  commonAdvice =getDictDescByDictId(dataset3,"oa_document_advice_common_set");
+  composeAdvice1=getDictDescByDictId(dataset3,"oa_document_advice_compose1");
+  composeAdvice2=getDictDescByDictId(dataset3,"oa_document_advice_compose2");
+  composeAdvice3=getDictDescByDictId(dataset3,"oa_document_advice_compose3");
+
+   /*
+  //默认选择类型
+  var type=$urlParam('type');
+  var typeNot=$urlParam('typeNot'); //不能选择
+  if(type)
+  {
+     
+     $('#sel_dropdownlist1').val(type)
+     var vl= $('#sel_dropdownlist1').val();
+     if(vl)
+    {
+    $('#sel_dropdownlist1').attr('disabled','disabled');  //不能选
+
+     }
+
+  }
+  if(typeNot)
+  {
+     $('#sel_dropdownlist1').attr('disabled','disabled');  //不能选
+  }
+  */
+
+
+  //待选意见单击时
+  $('#selectAdviceList') .click(function(){
+          var val=  $("#selectAdviceList option:selected").val();
+         if(val)
+         {
+             var con=$('#textarea1').val();
+             $('#textarea1').val(con+val);
+             var selectType=$("input[name='RGadviceRadio']:checked").val();
+             if(selectType==3)  //组合意见
+             {
+                 var alistStr="";
+				 composeIndex++;
+                 switch (composeIndex) {
+	
+						case 2:   
+						{		
+						    alistStr=composeAdvice2;
+						   break;
+						}
+						case 3:   
+						{		
+						    alistStr=composeAdvice3;
+						   break;
+						}  
+                  }
+                   if(alistStr)
+				   {
+				     refreshOaListBox(alistStr);
+				   }
+             }
+             
+
+         }
+         
+        
+  });
+
+
+   $("#adviceRadio input[type='radio']").click(function(){
+          var val=  $(this).val(); 
+          var alistStr="";
+          if(val==1)  //我的意见
+          {
+              $('#button4').show();
+              alistStr=myAdvices;
+          }
+          if(val==2)  //通用意见
+          {
+              $('#button4').hide()
+              alistStr=commonAdvice;
+          }
+		  if(val==3)  //组合意见
+          {
+              $('#button4').hide()
+              alistStr=composeAdvice1;
+			  composeIndex=1;
+          }
+		  
+		  
+          refreshOaListBox(alistStr) 
+ 
+   });
+
+}
+
+function refreshOaListBox (listStr)
+{
+ 
+  var listBoxOb=$('#selectAdviceList');
+   var listArr=listStr.split(';');
+   listBoxOb.html('');
+    for(var i=0;i<listArr.length;i++)
+    {
+       var ad= $.trim(listArr[i]);
+        var app="<option value='"+ ad +"' >"+ ad +"</option>";
+        listBoxOb.append(app);
+
+    }
+
+
+}
+
+function manageMyAdvice()
+{
+ var user=GetSessionOne('userid');
+  	createWindow({
+					text    :'我的意见管理',
+					url     :project + '/form/fceform/common/run.html?djsn=oa_myadvice_edit&djtype=eden_wf&username='+user,
+					id      :'manageMyAdvice',
+					width   :'380',
+					height  :'400',
+					//parent_window:window,
+					callBack:function (addAdvices) {
+
+					myAdvices=addAdvices;
+					refreshOaListBox(addAdvices) 
+						   window.closeWin('manageMyAdvice');      
+					
+				        }
+				});
+
+}
+
+function reloadAllAdvice()
+{
+  var dropId="dropdownlist1";
+ var droplen=$("#sel_"+dropId+" option").length;
+
+  if(droplen<1) //没有设定过
+  {
+  	var html = '<option value="-1"></option>';
+	$('#sel_' + dropId).append(html);
+    sqltrans="select display_name,dict_value from ea_data_dictionary where dict_group_id = 'oa_send_document_advice_type'";
+    reloadDropdownlist(dropId,sqltrans);
+
+  }
+
+}
+
+/**
+ * 重新加载下来控件
+ * dropdownlistId: id值
+ * sqltrans:
+ * callback:回调
+ */
+function reloadDropdownlist(dropdownlistId,sqltrans,callback)
+{
+	var id=dropdownlistId;
+	
+	var sendXml = '<root><percolnum>1</percolnum><sql>' + sqltrans + '</sql><strValue></strValue><perpagerownum>50</perpagerownum><showcheckbox>false</showcheckbox><blnempty>否</blnempty><addrow>否</addrow></root>';
+	var select = $('#' + id);
+	var position = undToSp(select.attr('position'));
+	var top = select.attr('top');
+	var left = select.attr('left');
+	var width = select.attr('width');
+	var height = select.attr('height');
+	var enabled= undToSp(select.attr('enabled'));
+	var onchange = undToSp(select.attr('onchange'));   
+	$.ajax({
+		type       :"POST",
+		url        :project+"/servlet/WebBill?key=sqltoxml",
+		processData:false,
+		//async      :false,
+		data       :sendXml,
+		contentType:'utf-8',
+		success    :function (response) {
+			if (response.match('errInfo') != null) {
+				$.dialog.alert(response);
+			} else {
+	
+				var res = newXml(response);
+				var showList = [];
+				var valList = [];
+				$(res).find('tr').each(function () {
+					var s = $.trim($(this).children('td').eq(0).text());
+					var v = $.trim($(this).children('td').eq(1).text());
+					showList.push(s);
+					valList.push(v);
+				});
+
+				if (showList.length !== valList.length) {
+					alert('返回的数据，“显示”与“取值”数量不对应！');
+				} else {
+			
+					if ($('#sel_' + id).length == 1) {        //已经存在select
+						var html = '';
+						for (var i = 0; i < showList.length; i++) {
+							var sl = showList[i];
+							var vl = valList[i];
+							if (vl == '')  vl = 'null';
+							html += '<option value="' + vl + '">' + sl + '</option>';
+						}
+						$('#sel_' + id).append(html);
+					}else {                              // 新增select
+						var html = '<select style="position:'+position+'; width: ' + width + 'px;height: ' + height + 'px;left:' + left + 'px;top: ' + top + 'px;" name="sel_' + id + '" id="sel_' + id + '">';
+			
+						for (var i = 0; i < showList.length; i++) {
+							var sl = showList[i];
+							var vl = valList[i];
+							html += '<option value="' + vl + '">' + sl + '</option>';
+						}
+						html += '</select>';
+						select.after(html);
+						if(enabled=='true') $('#sel_' + id).prop('disabled',true);
+						$('#sel_' + id).change(function () {
+							eval(onchange);
+						})
+					} 
+					
+				}
+				
+				if(callback)
+				{
+					eval(callback);
+				}
+			}
+
+
+		}
+	})
+
+}
+
+/**
+ * 把 undefined 转换为 ''
+ * @param str
+ * @return {*}
+ */
+function undToSp(str) {
+	if (str === 'undefined' || str === undefined || str === null) {
+		str = '';
+	}
+	return str;
+}</script><script >document.styleSheets[0].addRule("fc\\:fc_code","behavior: url(../../fceform/htc/fc_code.htc)",0);</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib userType BLONopenBefore BLONclose center="  " BLONopen="load()" toolbar="不带工具栏" dj_sn="oa_advice_add" type="eden_wf" caption="意见添加" window="当前窗口" posleft postop poswidth posheight isfile="是" billtaborder="<root><taborder>textarea1</taborder><taborder>button1</taborder><taborder>dropdownlist1</taborder><taborder>selectAdviceList</taborder><taborder>adviceRadio</taborder><taborder>text6</taborder><taborder>button4</taborder></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:5;radio:2;listbox:1;textarea:1;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:4;text:6;hr:0;checkboxlist:0;radiolist:0;dropdownlist:1;grid:0;dataset:3;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" contxml="<root><label><id>label4</id><id>label5</id></label><radio><id>adviceRadio</id></radio><listbox><id>selectAdviceList</id></listbox><textarea><id>textarea1</id></textarea><button><id>button1</id><id>button4</id></button><text><id>text6</id></text><dropdownlist><id>dropdownlist1</id></dropdownlist><dataset><id>dataset1</id><id>dataset2</id><id>dataset3</id></dataset></root>" alertType="1" isCheckPermit="否" AutoResizeXml><TEXTAREA style="POSITION: absolute; WIDTH: 276px; HEIGHT: 163px; TOP: 87px; LEFT: 156px" id=textarea1 onmovestart=moveStart() cols=51 induce="否" value="textarea1" china="意见内容" field="ADVICE_CONTENT" dataset="dataset1" controltype="textarea"></TEXTAREA><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; TOP: 259px; PADDING-TOP: 0px; LEFT: 240px" id=button1 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("sub(0)")'>添加意见</BUTTON><?xml:namespace prefix = fc /><fc:dataset id=dataset1 controltype="dataset" idtype="1" opensortno="1" issubds="否" idparam="BBB" savetable="oa_document_advice" submitno="1" submittype="1" isaddemptyrec="否" pubpara="否" isSubGrid="否" isInAddStatus="是" format="<fields><field><fieldname>ADVICE_CONTENT</fieldname><datatype>字符</datatype><displaylabel>意见内容</displaylabel><size>512</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CREATE_BY</fieldname><datatype>字符</datatype><displaylabel>创建人</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>GetSessionOne('userid')</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CREATE_DTTM</fieldname><datatype>时间</datatype><displaylabel>创建时间</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>GetTime()</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>id</fieldname><datatype>字符</datatype><displaylabel>id</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>data_valid</fieldname><datatype>字符</datatype><displaylabel>data_valid</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>1</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>advice_type</fieldname><datatype>字符</datatype><displaylabel>意见类型</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>wf_id</fieldname><datatype>字符</datatype><displaylabel>wf_id</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>$urlParam('wfId')</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><ADVICE_CONTENT></ADVICE_CONTENT><CREATE_BY></CREATE_BY><CREATE_DTTM></CREATE_DTTM><id></id><data_valid></data_valid><advice_type></advice_type><wf_id></wf_id></dsid>")' onGetText='bill_ondatasetgettext("<dsid><ADVICE_CONTENT></ADVICE_CONTENT><CREATE_BY></CREATE_BY><CREATE_DTTM></CREATE_DTTM><id></id><data_valid></data_valid><advice_type></advice_type><wf_id></wf_id></dsid>")' onSetText='bill_ondatasetsettext("<dsid><ADVICE_CONTENT></ADVICE_CONTENT><CREATE_BY></CREATE_BY><CREATE_DTTM></CREATE_DTTM><id></id><data_valid></data_valid><advice_type></advice_type><wf_id></wf_id></dsid>")'></fc:dataset><LABEL style="POSITION: absolute; WIDTH: 65px; HEIGHT: 15px; TOP: 57px; LEFT: 158px" id=label4 onmovestart=moveStart() controltype="label" inputTag="否">意见类型：</LABEL> <fc:fc_code id=dropdownlist1 class=ef_design_dropdownlist field="advice_type" dataset="dataset1" controltype="dropdownlist" datasourceName="" format="" FieldNameList="" isTreeNewSql="0" isShowTree="0" xml="" multiselect="否" addrow="否" blnempty="否" blninput="是" rootNodeId="rootNode" visible="是" sqltrans="" height="20" width="100" top="58" left="225" position="absolute" align="undefined" sql2="undefined" enabled="false"></fc:fc_code><SELECT style="POSITION: absolute; WIDTH: 121px; HEIGHT: 163px; TOP: 89px; LEFT: 13px" id=selectAdviceList onmovestart=moveStart() size=8 controltype="listbox" datasourceName async="否" temptext tempvalue check="2" sql sqltrans></SELECT><LABEL style="POSITION: absolute; WIDTH: 94px; HEIGHT: 36px; TOP: 55px; LEFT: 16px" id=label5 onmovestart=moveStart() controltype="label" inputTag="否">待选择意见：</LABEL> 
+<FIELDSET style="POSITION: absolute; WIDTH: 240px; HEIGHT: 58px; TOP: 2px; LEFT: 12px" id=adviceRadio onmovestart=moveStart() contentEditable=false value="1" controltype="radio" temptext="我的意见&#13;&#10;公用意见&#13;&#10;组合意见" tempvalue="1&#13;&#10;2&#13;&#10;3" legend aspect="横向"><LEGEND></LEGEND><INPUT id=RGadviceRadio1 onclick=adviceRadio.value=RGadviceRadio[0].value; value=1 CHECKED type=radio name=RGadviceRadio text="我的意见"><SPAN>我的意见</SPAN>&nbsp;<INPUT id=RGadviceRadio2 onclick=adviceRadio.value=RGadviceRadio[1].value; value=2 type=radio name=RGadviceRadio text="公用意见"><SPAN>公用意见</SPAN>&nbsp;<INPUT id=RGadviceRadio3 onclick=adviceRadio.value=RGadviceRadio[2].value; value=3 type=radio name=RGadviceRadio text="组合意见"><SPAN>组合意见</SPAN>&nbsp;</FIELDSET><fc:dataset id=dataset2 controltype="dataset" idtype="1" opensortno="1" issubds="否" submitno="1" submittype="4" isaddemptyrec="否" pubpara="否" isSubGrid="否" isInAddStatus="是" format="<fields><field><fieldname>content</fieldname><datatype>字符</datatype><displaylabel>意见内容</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><content></content></dsid>")' onGetText='bill_ondatasetgettext("<dsid><content></content></dsid>")' onSetText='bill_ondatasetsettext("<dsid><content></content></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6XrnbXrn%DA%F2%EC%E8XrnXrn%EC%D0%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%E8%u0100%F4%D8%E6%D8%D4%F6%D0%D6%FA%E0%D4%D8XrnXrn%FC%DE%D8%F2%D8Xrn%F8%F4%D8%F2%EA%D0%E8%D8Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%F8%F4%D8%F2%EA%D0%E8%D8XrrXr%80X%7C%96Xt%90Xr%7C"></fc:dataset><INPUT style="POSITION: absolute; WIDTH: 110px; DISPLAY: none; HEIGHT: 20px; TOP: 149px; LEFT: 460px" id=text6 onmovestart=moveStart() china="意见内容" field="content" dataset="dataset2" controltype="text"><BUTTON style="BACKGROUND-IMAGE: none; POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 95px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 21px; TOP: 258px; PADDING-TOP: 0px; LEFT: 18px" id=button4 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("manageMyAdvice()")'>管理我的意见</BUTTON><fc:dataset id=dataset3 controltype="dataset" idtype="1" opensortno="1" issubds="否" submitno="1" submittype="4" isaddemptyrec="否" pubpara="否" isSubGrid="否" isInAddStatus="是" format="<fields><field><fieldname>dict_id</fieldname><datatype>字符</datatype><displaylabel>id</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>dict_desc</fieldname><datatype>字符</datatype><displaylabel>意见配置内容</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><dict_id></dict_id><dict_desc></dict_desc></dsid>")' onGetText='bill_ondatasetgettext("<dsid><dict_id></dict_id><dict_desc></dict_desc></dsid>")' onSetText='bill_ondatasetsettext("<dsid><dict_id></dict_id><dict_desc></dict_desc></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%D4%F6%CC%E0%D6XrnXr%94Xrn%D6%E0%D4%F6%CC%D6%D8%F4%D4Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%D0%D6%FA%E0%D4%D8%CC%F4%D8%F6Xr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0"></fc:dataset></DIV><div id='addHtml'></div> </body></html>

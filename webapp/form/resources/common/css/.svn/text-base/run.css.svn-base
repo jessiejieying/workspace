@@ -1,0 +1,279 @@
+@charset "utf-8";
+.form_text { border: #cecece 1px solid !important; outline: none; text-indent: 5px; }
+
+button { background: #6F99D4; color: #fff; border: none; cursor: pointer; }
+
+.checkboxListUl li{ float: left; text-indent: 0.5em; padding: 5px 0; vertical-align: middle;}
+.checkboxListUl li input{ margin-right: 5px;}
+.radioListUl li{ float: left; text-indent: 0.5em; padding: 5px 0; vertical-align: middle;}
+.radioListUl li input{ margin-right: 5px;}
+#SKbillsheet .ef_design_tree{background: none; border-color:#64A9D7;}
+.e_select{  border: 1px solid #cecece; background: #ffffff;z-index: 3;}
+.disabled{background: #EBEBE4; color: #000000;}
+.e_select .select_bg{ height: 100%; width: 25px; cursor: pointer; background: url("../images/combo_select.gif") no-repeat center center;}
+.e_select .select_txt{text-indent:5px;white-space: nowrap; overflow: hidden;text-overflow: ellipsis;}
+.e_select_bg{width: 100%; height: 100%;position: absolute;top:0;left:0;z-index: 2;background: #ccc; display: none;filter:alpha(opacity=0.1); opacity: 0.001;   }
+.e_select .tree_wrap{background: #ffffff; position: absolute;z-index: 3; border: 1px solid #cecece; left: -1px;overflow: auto; display: none;}
+.page_parsing{ width: 100%; height: 100%; position: absolute;z-index: 99999; background: #ffffff url("../images/win8Loading.gif") 150px 80px no-repeat; top: 0; left: 0;}
+.page_parsing div{ font-size: 14px; font-weight: bold; padding: 90px 0 0 190px;}
+/*
+   Plupload
+------------------------------------------------------------------- */
+
+.plupload_button { display: -moz-inline-box; /* FF < 3*/ display: inline-block; font: normal 12px sans-serif; text-decoration: none; color: #42454a; border: 1px solid #bababa; padding: 2px 8px 3px 20px; margin-right: 4px; background: #f3f3f3 url('../images/buttons.png') no-repeat 0 center; outline: 0; /* Optional rounded corners for browsers that support it */
+	-moz-border-radius: 3px; -khtml-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; }
+
+.plupload_button:hover { color: #000; text-decoration: none; }
+
+.plupload_disabled, a.plupload_disabled:hover { color: #737373; border-color: #c5c5c5; background: #ededed url('../images/buttons-disabled.png') no-repeat 0 center; cursor: default; }
+
+.plupload_add { background-position: -181px center; }
+
+.plupload_wrapper { width: 100%; }
+
+.plupload_container { background: url('../images/transp50.png'); /*-moz-border-radius: 5px;*/
+}
+
+.plupload_container input { border: 1px solid #DDD; width: 98%; }
+
+.plupload_header { background: #2A2C2E url('../images/backgrounds.gif') repeat-x; }
+
+.plupload_header_content { /*background: url('../img/backgrounds.gif') no-repeat 0 -317px;*/
+	min-height: 50px; padding-left: 10px; color: #FFF; }
+
+.plupload_header_title { font: normal 15px sans-serif; padding: 6px 0 3px; }
+
+.plupload_header_text { font: normal 12px sans-serif; }
+
+.plupload_filelist { margin: 0; padding: 0; list-style: none; }
+
+.plupload_scroll .plupload_filelist { height: 152px; background: #F5F5F5; overflow-y: scroll; }
+
+.plupload_filelist li { padding: 10px 8px; background: #F5F5F5 url('../images/backgrounds.gif') repeat-x 0 -156px; border-bottom: 1px solid #DDD; }
+
+.plupload_filelist_header, .plupload_filelist_footer { background: #DFDFDF; padding: 8px 8px; color: #42454A; }
+
+.plupload_filelist_header { border-top: 1px solid #EEE; border-bottom: 1px solid #CDCDCD; height: 15px; }
+
+.plupload_filelist_footer { border-top: 1px solid #FFF; height: 22px; line-height: 20px; vertical-align: middle; }
+
+.plupload_file_name { float: left; overflow: hidden }
+
+.plupload_file_status { color: #777; }
+
+.plupload_file_status span { color: #42454A; }
+
+.plupload_file_size, .plupload_file_status, .plupload_progress { float: right; width: 80px; }
+
+.plupload_file_size, .plupload_file_status, .plupload_file_action { text-align: right; }
+
+
+.upload_file_li{ float: left; width: 280px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;}
+
+.plupload_file_action { float: right; width: 16px; height: 16px; margin-left: 15px; }
+
+.plupload_file_action * { display: none; width: 16px; height: 16px; }
+
+li.plupload_uploading { background: #ECF3DC url('../images/backgrounds.gif') repeat-x 0 -238px; }
+
+li.plupload_done { color: #AAA }
+
+li.plupload_delete a { background: url('../images/delete.gif'); }
+
+li.plupload_failed a { background: url('../images/error.gif'); cursor: default; }
+
+li.plupload_failed a.download { background: none; cursor: pointer; color: #0000CC; }
+li.plupload_failed a.delete { background: none; cursor: pointer; color: #ff0000;}
+li.plupload_failed a.cancel{ color: #0000cc;}
+
+li.plupload_done a { background: url('../images/done.gif'); cursor: default; }
+
+.plupload_progress, .plupload_upload_status { display: none; }
+
+.plupload_progress_container { margin-top: 3px; border: 1px solid #CCC; background: #FFF; padding: 1px; }
+
+.plupload_progress_bar { width: 0px; height: 7px; background: #CDEB8B; }
+
+.plupload_scroll .plupload_filelist_header .plupload_file_action, .plupload_scroll .plupload_filelist_footer .plupload_file_action { margin-right: 17px; }
+
+/* Floats */
+
+.plupload_clear, .plupload_clearer { clear: both; }
+
+.plupload_clearer, .plupload_progress_bar { display: block; font-size: 0; line-height: 0; }
+
+li.plupload_droptext { background: transparent; text-align: center; vertical-align: middle; border: 0; line-height: 165px; }
+.plupload_header{ display: none;}
+.eUpload_pick_btn{ padding-left:7px; line-height: 24px;}
+
+/*上传控件新样式 盛金 2015-6-12*/
+.clearfix:after { 
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden; 
+} 
+.clearfix {
+  display: inline-block;
+  zoom: 1;
+}
+
+.eUpload_fileAdded{
+  width: 100%;
+}
+
+.attachList{
+  padding: 4px;
+  height: 30px;
+  min-height: 30px;
+  height: auto !important;
+  border: 1px solid #E1E1E1;
+}
+
+.eUpload_pick_btn{
+  text-decoration: none;
+}
+
+.eUpload_fileAdded span{
+  position: relative;
+  float: left;
+  width: 240px;
+  height: 22px;
+  margin:6px 6px 0 0;
+  padding-bottom: 3px;
+  margin-left: 3px;
+  font-family: "宋体";
+  font-size: 12px;
+  border: 1px solid #E1E1E1;
+  background: #f6f7f8;
+}
+
+.eUpload_fileAdded a{
+  color: #666;
+  text-decoration: none;
+}
+
+.eUpload_fileAdded span a.download_attach{
+  position: absolute;
+  z-index:9;
+  left:10px;
+  top: 3px;
+  width: 140px;
+  overflow:hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #666;	
+}
+
+.eUpload_fileAdded span a.del_attach{
+  display: block;
+  position: absolute;
+  z-index:9;
+  right: 36px;
+  top: 3px;
+  width: 30px;
+  height: 19px;
+  overflow: hidden;
+  padding-left: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.eUpload_fileAdded span a.del_attach:hover{
+  text-decoration: underline;
+}
+
+.eUpload_fileAdded span .progress{
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;	
+}
+
+.eUpload_fileAdded span .percent-bg{
+  width:0;
+  height: 100%;
+  text-align: center;
+  background: #89F58B;	
+}
+
+.bottom_btn_area{ text-align:center;}
+.bottom_btn_area input{ line-height:25px; padding:0 15px;}
+
+.tree_search { position: relative; height: 30px; min-width: 180px; background: #6E99D4;width:100%;  }
+.tree_search .icon { width: 16px; height: 24px; margin-left: 2px; cursor: pointer; display: block; float: left; margin-top: 2px; }
+.tree_search .refresh_icon {display: none;}
+.tree_search .open_icon { margin-left: 5px; background: url(../images/search_bar/unfold.png) no-repeat 0 0; }
+.tree_search .close_icon { background: url(../images/search_bar/packup.png) no-repeat 0 0; }
+.tree_search .prev_icon { position: absolute; left: 108px; top: 2px; background: url(../images/search_bar/previous.png) no-repeat 0 0; }
+.tree_search .next_icon { position: absolute; left: 121px; top: 2px; background: url(../images/search_bar/next.png) no-repeat 0 0; }
+.tree_search_key { float: left; height: 20px; width: 130px; background: #FFF; border: 0; margin: 5px 0 0 5px; outline: none; padding-left: 5px; }
+.tree_search_rs_num { position: absolute; left: 68px; width: 40px; top: 7px; text-align: right; color: #c2c2c2; }
+.sCurrentIcon,.sHistoryIcon{ position: absolute; top: 0; left: 0; z-index: 1;}
+.sCurrentIcon{z-index: 2;}
+.flow_history span.actName{ width: 100%; display: block; text-align: center;}
+.flow_history img{ display: block;margin:0 auto; }
+.readonly .eUpload_pick_btn{ color: #777777; cursor: not-allowed;}
+.readonly .eUpload_fileAdded span a.del_attach{cursor: not-allowed;}
+.readonly .eUpload_fileAdded span a.del_attach:hover{background-position: 2px 0px;}
+
+.attach-more{
+  display: block;
+  position: absolute;
+  z-index:9;
+  right: 2px;
+  top: 3px;
+  width: 30px;
+  height: 19px;
+  overflow: hidden;
+  padding-left: 0;
+  background: none;  
+  cursor: pointer;
+}
+
+.upload-opert-list{
+  display: none;
+  position: absolute;
+  right: -64px;
+  top: 26px;
+  z-index: 99999;
+  width: 86px;
+  padding: 10px 0;
+  background: #fff;
+  border:1px solid #999;
+  box-shadow: 0 0 3px 1px #999;
+}
+
+.upload-opert-list ul:after{
+  content: ".";
+  width: 0 ;
+  height: 0;
+  overflow: hidden;
+  clear: both;
+  visibility: hidden;
+  display: block;
+}
+
+.upload-opert-list ul li{
+  width: 100%;
+  float: left;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.upload-opert-list ul li a{
+  display: block;
+  padding: 8px 2px 8px 20px;
+  color: #666;
+  text-decoration: none;
+}
+
+.upload-opert-list ul li a:hover{
+  background: #A9EEFA;
+  color: #fff;
+}

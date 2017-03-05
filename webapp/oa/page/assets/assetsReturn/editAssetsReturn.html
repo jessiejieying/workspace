@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+    <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+    <script>
+        setSkinsCss("listCss,iconCss,giceCss");
+    </script>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    </head>
+
+<body style="height:100%;overflow:auto;">
+	<div class="consum_wrap">
+	
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="returnBy">归还人</label><input id="returnBy" type="text" name="returnBy"  value="${assetsReturn.returnBy!}"/></div>
+		<div class="consum_inline_right clearfix"><label for="returnDep">归还人部门</label><input id="returnDep" type="text" name="returnDep" value="${assetsReturn.returnDep!}"/></div>
+	</div>
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="returnDate">归还时间</label><input onfocus="WdatePicker();" id="returnDate" type="text" name="returnDate" value="${assetsReturn.returnDate2!}"/></div>
+	</div>
+	
+	<div class="relnum">
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="assetsNum">资产编号</label><input id="assetsNum" type="text"  value="${assetsReturn.assetsNum!}"/></div>
+		<div class="consum_inline_right clearfix"><label for="assetsName">资产名称</label><input id="assetsName" type="text" value="${assetsReturn.assetsName!}"/></div>
+	</div>
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="returnNum">归还数量</label><input id="returnNum" type="text" onblur="checkNum();" value = "${assetsReturn.returnNum!}"/></div>
+	</div>
+	</div>
+	
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="remark">备注</label><textarea id="remark" name="remark">${assetsReturn.remark!}</textarea></div>
+	</div>
+
+	<div class="consum_ablock">
+		<a onclick="updateConsum()" href="javascript:void(0)">确认</a><a onclick="closeWin()" href="javascript:void(0)">取消</a>
+	</div>
+	
+	</div>
+	
+	<input type="hidden" id="returnId" value="${returnId!}" />
+</body>
+    <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+<script>
+    $(function(){
+    	layout();
+    	$(window).resize(function(){
+    		layout();
+    	});
+    	
+    	
+    });
+    
+    function layout(){
+    	$('#remark').width($('.consum_wrap').width()-84);	
+    }
+    
+    function closeWin(){
+    	window.top.closeWin('editAssetsReturn');
+    }
+    
+    function updateConsum(){
+    	var returnBy=$.trim($('#returnBy').val());//归还人
+    	if(returnBy==""){
+    		$.dialog.tips("归还人不能为空！");
+    		$("#returnBy").select();
+    		return;
+    	}
+    	var returnDep=$.trim($('#returnDep').val());//归还人部门
+    	if(returnDep==""){
+    		$.dialog.tips("归还人部门不能为空！");
+    		$("#returnDep").select();
+    		return;
+    	}
+    	var returnDate=$.trim($('#returnDate').val());//归还时间
+    	if(returnDate==""){
+    		$.dialog.tips("归还时间不能为空！");
+    		$("#returnDate").select();
+    		return;
+    	}
+    	
+    	var assetsNum = $("#assetsNum").val();
+    	var assetsName = $("#assetsName").val();
+    	var returnNum = $("#returnNum").val();
+    	
+    	var returnId = $("#returnId").val();
+    	var remark=$('#remark').val();
+    $.post("${base}/admin/assetsReturn/updateAssetsReturn.action", 
+    	    {
+ 		      "assetsReturn.returnId":returnId,
+ 		      "assetsReturn.assetsId":"",
+ 		      "assetsReturn.returnBy":returnBy,
+ 		      "assetsReturn.returnDep":returnDep,
+ 		      "assetsReturn.returnDate":returnDate,
+ 		      "assetsReturn.assetsNum":assetsNum,
+ 		      "assetsReturn.assetsName":assetsName,
+ 		      "assetsReturn.returnNum":returnNum,
+ 		      "assetsReturn.remark":remark
+    	  }, function(result){
+    	      $.dialog.tips(result.tips);
+    	      ParentIframe.refresh_data();
+    	      setTimeout(function(){closeWin();},200);
+    }); 	
+    	
+    	
+    }
+    
+    
+    function checkNum(){
+ 	  	 var reg = /^[0-9]*$/;
+ 	  	 var returnNum = $.trim($("#returnNum").val());
+ 	  	 
+ 	     if(!reg.test(returnNum)){
+         $.dialog.tips("领用数量请输入数字!");
+         $("#returnNum").select();
+         return false;
+       }
+ 	     return true;
+ }
+</script>
+</html>

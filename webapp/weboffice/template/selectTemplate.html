@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;">
+  <#include "/aufw/page/include/loading.html">
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 左侧 -->
+        <td id="td_tree" style="width: 250px;">
+          <div class="container-left   pos-rel">
+            <div class="line border-bottom padding-left padding-top js-line-top">
+              <div class="form-group x10 ">
+                <div class="field field-icon-right">
+                  <input type="text"  id="search_tree" class="input left-tree-input" placeholder="搜索">
+                  <span class="tree-search-num js-tree-search-num">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="drop left-drop x1-right  margin-top">
+              <i class="icon icon-ellipsis-h"></i>
+              <ul class="drop-menu">
+                <li><a href="javascript:void(0)" data-id="0" class="icon icon-refresh js-tree-refresh"></a></li>
+                <li><a href="javascript:void(0)" data-id="1" class="icon-folder-open js-tree-open"></a></li>
+                <li><a href="javascript:void(0)" data-id="2" class="icon-folder js-tree-close"></a></li>
+              </ul>
+            </div>
+            <div class="tree-father overfl">
+              <div id="js_tree"></div>
+            </div>
+          </div>
+        </td>
+        <!-- 右侧 -->
+        <td class="ver-top">
+          <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script>
+
+var gridOne, jsTree;
+var key="${key}";
+var businessId="${id}";
+var parentId;
+$(function(){
+	layOut("#common_table","#grid_table");
+    //tree初始化
+    $("#js_tree").jstree({
+        "plugins" : ["search","contextmenu"],
+        
+		"themes": {
+		    "theme": "classic",
+		    "dots": true,
+		    "icons": false
+		},
+		'core' :{
+		    "check_callback" : true,
+		    'data' : {
+		     	'url' : "${base}/admin/commonTree/commonTreeAction!getTree.action?key="+key+"&etc=" + new Date().getTime(),
+		        'dataType':'json'	     	
+		    }
+		}
+    }).on("click.jstree",".jstree-anchor",function(e,data){
+    	var id = jsTree.get_selected()[0];
+    	var parentId=jsTree.get_parent(id)
+		openDraftDoc(parentId,id)
+    }).on("loaded.jstree",function(e,data){
+    	jsTree = $('#js_tree').jstree();
+    	jsTree.open_node("ew_template");
+      	var allNode=jsTree.get_all_node();
+      	for(var i= 0,max=allNode.length;i<max;i++){
+       		var hasChild=jsTree.get_node(allNode[i]).children;
+        	if(hasChild.length<1){
+          		jsTree.set_icon(allNode[i],"jstree-file");
+        	}
+      	}
+      	
+	
+		var swungdash=parserRequest("swungdash"); //机关代字匹配
+		if(swungdash)
+		{
+			swungdash=decodeURI(swungdash);
+			var nodes = jsTree.get_all_node();
+			for(var i=0;i<nodes.length;i++)
+			{
+				var name=jsTree.get_text(nodes[i]);
+				if(name==swungdash)
+				{			
+					var parentId=jsTree.get_parent(nodes[i]);
+					openDraftDoc(parentId,nodes[i])
+				}
+				
+			}
+		}
+			
+		
+    });
+
+    //树的拖曳 handles:{e:右边,s:下边}
+    $("#td_tree").resizable({
+        handles: "e",
+        helper: true,
+        maxHeight: 1000,
+        maxWidth: 1000,
+        minHeight:100,
+        minWidth: 250,
+        onStartResize: function () {},
+        onResize: function () {},
+        onStopResize: function () {
+          //将表头和表体的宽度设置成一样
+          $(".bsgrid-header").each(function(){
+            var $this=$(this);
+            $this.css({"width":$this.next(".bsgrid").width()})
+          });
+        }
+    });
+
+    //js树刷新，打开，关闭
+    $(document).on("click",".js-tree-refresh,.js-tree-open,.js-tree-close",function(){
+        var id=$(this).data("id");
+        if(id=="0"){
+            jsTree.refresh();
+        }
+        else if(id=="1"){
+            jsTree.open_all();
+        }
+        else if(id=="2"){
+            jsTree.close_all()
+        }
+    });
+
+    var to = false;
+    //jstree 搜索
+    $('#search_tree').keyup(function () {
+        if(to) { clearTimeout(to); }
+        to = setTimeout(function () {
+            var v = $('#search_tree').val();
+            $('#js_tree').jstree().search(v);
+          var counter=$("a:contains('"+v+"')").size();
+          $('.js-tree-search-num').text(counter);
+          if(v==""){
+            $('.js-tree-search-num').text("0");
+          }
+        }, 250);
+	});
+    
+  
+});
+
+
+function getRecord(selId) {
+	var getIndex = -1,getId="#grid_"+selId;
+    getIndex = $(getId).attr("index");
+    if(getIndex == -1){
+    	return null;
+    }
+	return gridOne.getRowRecord(gridOne.getRow(getIndex));
+}
+
+function parserRequest( parm) {
+	var url= location.href;
+	var reg = new RegExp("(^|&)" + parm + "=([^&]*)(&|$)");
+	var r = url.substr(url.indexOf("\?") + 1).match(reg);
+	if (r != null)
+		return r[2];
+	return null;
+}
+
+//打开起草界面
+// id:，模板id，businessId：业务id
+function openDraftDoc(parentId,id)
+{
+	
+	var fileName="doc_"+id+"_"+businessId+".doc";
+	window.open('${base}/documentEdit/TemplateEdit.jsp?FileType=.doc&UserName=eden&parentId='+parentId+'&treeId='+id+'&templateId='+id+'&RecordID='+businessId+'&fileName='+fileName+'&businessId='+businessId);
+	 afterSave();
+	
+ }
+
+function afterSave(){
+    setTimeout(function(){
+		var index = parent.layer.getFrameIndex(window.name);
+		parent.layer.close(index);
+	},500);  
+}
+
+
+</script>
+</body>
+</html>

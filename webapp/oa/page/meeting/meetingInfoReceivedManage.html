@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+</head>
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="form-group header-group" style="white-space:nowrap;">
+						<span class="header-title">会议名称:</span>
+                        <input id="subject" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                        <span class="header-title margin-left-out">会议类型:</span>
+                        <select id="meetingType"	class="input margin-left-in"	style="width: 120px;">
+							<option value="">全部类型</option>
+							<option value="待收会议">待收会议</option>
+							<#list meetingTypeDictList! as entry>
+       	 						<option value="${entry.dictValue!}">${entry.displayName!}</option>
+    						</#list>
+						</select>
+
+						<div class="button button-main margin-left-in" id="senior_grid_search">搜索</div>
+						<div class="button js-level-search margin-left-in">高级搜索<i class="li-icon-arrow-down"></i></div>
+					</div>
+                    <div class="level-searh form-group header-group" style="display: none;">
+                        <span class="header-title" >会议时间:</span>
+                        <input name="startDate" id="startDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', maxDate:'#F{$dp.$D(\'endDate\')||\'2025-10-01 00:00:00\'}'})" size="19" type="text">
+                        <span class="header-title margin-left-in">至</span>
+                        <input id="endDate" style="cursor: pointer;height: 26px;" size="19" class="Wdate tool-bar-input" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startDate\')}',maxDate:'2025-10-01 00:00:00'})" name="endDate" type="text">
+                        <span class="header-title margin-left-out">申报单位/拟稿处室:</span>
+                        <input id="mainOrg" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                    </div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+					  <th width="40">序号</th>
+	                  <th w_index="meetingType" width="100" w_type="method" w_method="view" w_align="center">会议类型</th>
+	                  <th w_index="subject" width="160" w_type="method" w_method="view">会议名称</th>
+	                  <th w_index="attendanceLeader" width="100">拟邀请省领导</th>
+	                  <th w_index="location" width="100" w_type="method" w_method="view" w_align="center">地点</th>
+	                  <th w_index="startDate" width="100">时间</th>
+	                  <th w_index="linkPeople" width="70">联系人</th>
+	                  <th w_index="linkPhone" width="70">联系电话</th>
+	                  <!-- th w_index="operate" width="140">操作</th-->
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+<script src="${base}/oa/resource/js/oa_common.js"></script>				
+
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/meeting/queryMeetingInfo.action?wfType=${wfType!}";
+	
+	var version='1';
+    var wf_name='oa_provincial_meeting';//全省性会议
+    var wf_name2='oa_meeting_program_approval';//省政府会议
+    var wf_name3='oa_meeting_notification_approval';//会议通知
+    var wfType="${wfType!}";
+
+  
+	$(function(){
+		initLink();
+	    selectURL=selectURL+"&link="+JSON.stringify(link);
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "&etc="+new Date().getTime(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	  gridOne.initGrid();
+
+		        	$("#manage_grid tbody tr").each(function() {
+                        changeTable(this);
+                        var $this = $(this);
+
+                        var content = $("td", this).eq(7).html();
+                        if (content) {
+                        content = content.substring(0, content.indexOf("T"));
+                        if (content && $("td", this).eq(7)) {
+                            $("td", this).eq(7).html(content);
+                        }
+                        $("td", this).eq(1).css("padding-left", "8px");
+                        $index = parseInt($this.attr("index"));
+                        $this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val()) * (parseInt($("#undefined").html()) - 1) + $index + 1);
+                    }
+		        	});
+
+		      }
+		  });
+		//选择会议类触发时间START
+		  $(document).on("change","#meetingType",function(){
+		      var subject= $("#subject").val();
+		      var startDate= $("#startDate").val();
+		      var endDate= $("#endDate").val();
+		      var meetingType = $("#meetingType").val();
+		      var mainOrg = $("#mainOrg").val();
+		      var symbol = "?";
+		      if(selectURL.indexOf("?")>0){
+		      	symbol = "&";
+		      }
+		      gridOne.changeUrl(selectURL + symbol + 'subject=' + window.encodeURI(subject) + '&startDate=' + startDate + '&endDate=' + endDate + '&meetingType=' + window.encodeURI(meetingType) + '&mainOrg=' + window.encodeURI(mainOrg) + '&etc='+new Date().getTime());
+		  });
+		//选择会议类型触发时间END
+	});
+	
+    //执行任务
+    function execute(id){
+    	var task_name = "";
+		var item = getRecord(id);
+		uf_doAction(item.wfId,item.wfName,task_name,version,null);
+    }
+
+  //全省性会议登记
+  function provincialMeeting_add(){
+  	initWorkflow(wf_name,"",version);
+  }
+
+  //省政府会议登记
+  function meetingProgram_add(){
+  	initWorkflow(wf_name2,"",version);
+  }
+
+  //起草会议通知
+  function meetingNotification_add(){
+  	initWorkflow(wf_name3,"",version);
+  }
+
+  //会议导入
+  function meetingImport_add(){
+  	window.open("${base}/admin/meeting/meetingImportAdd.action");
+  }
+
+  
+  //待收会议查看
+  function view(id){
+	  var win={text:"全省性会议审批备案详情单",url:"${base}/admin/meeting/meetingImportView.action?meetingId="+id,width:900,height:550,parentIfr:window};
+	  window.top.createWindow(win);
+  }
+
+  //"退回"会议功能
+  $(document).on("click","#meetingInfo_del",function(){
+	  var checkedRowsRecords=gridOne.getCheckedRowsRecords();
+	  if(checkedRowsRecords.length<=0){
+		  layer.msg("请选择一条数据");
+		  return;
+	  }
+	  var record=checkedRowsRecords[0];
+	 if(record.wfId!="null" && record.wfId!=null && record.wfId.replace("\\s+","")!="" && record.wfId!="undefined"){
+		  layer.msg("此会议不能退文");
+		  return;
+	 }
+	  var win = {text:"退文单", url:"${base}/admin/backMeeting/addBackMeetingInfo.action?meetingInfo.id="+record.id,width:'900',height:'550','parentIfr':window};
+      window.top.createWindow(win);
+  })
+  //隐藏的搜索功能。
+  $(document).on("click","#grid_search",function(){
+      var clu = $("#search").val();
+      var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+      var symbol = "?";
+      if(selectURL.indexOf("?")>0){
+      	symbol = "&";
+      }
+      gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+  });
+
+  //工具条高级搜索 展开
+  $(document).on("click",".js-level-search",function(){
+      girdTable(this);
+	  $('.li-icon-arrow-down').toggleClass('li-icon-arrow-top');
+  });
+
+  //搜索
+  $(document).on("click","#senior_grid_search",function(){
+      var subject= $("#subject").val();
+      var startDate= $("#startDate").val();
+      var endDate= $("#endDate").val();
+      var meetingType = $("#meetingType").val();
+      var mainOrg = $("#mainOrg").val();
+      var symbol = "?";
+      if(selectURL.indexOf("?")>0){
+      	symbol = "&";
+      }
+      gridOne.changeUrl(selectURL + symbol + 'subject=' + window.encodeURI(subject) + '&startDate=' + startDate + '&endDate=' + endDate + '&meetingType=' + window.encodeURI(meetingType) + '&mainOrg=' + window.encodeURI(mainOrg) + '&etc='+new Date().getTime());
+  });
+
+</script>
+
+</html>

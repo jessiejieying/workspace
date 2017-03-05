@@ -1,0 +1,68 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>
+function sub()
+{
+   var info= $('#textareaReason').val();
+   
+   var wfId= QueryURL.GetValue('wfId');
+    var groupId= QueryURL.GetValue('groupId');
+
+
+   if(!wfId||!groupId)
+   {
+   alert("缺少参数，删除失败");
+      return ;
+   }
+   
+    var url = project+"/admin/documentConfig/doDelDocNo.action";
+	var data="groupId="+groupId+"&wfId="+wfId+"&info="+info;
+   $.post(url,data,function(result){
+
+		if(result)
+		{
+		   $.dialog.tips(result.msg);
+		   if(result.result=='success')
+		   {
+		   
+		   	setTimeout(function(){
+			   try{
+					window.edenCallBack();
+
+				}catch (e){
+
+				}
+			 },300);
+		       
+				
+		   }
+		}else{
+			$.dialog.tips("访问失败");
+		}
+		
+	});
+
+
+
+
+}
+</script>
+<DIV id=SKbillsheet jslib dj_sn="oa_edit_document_del_no" caption="删除编号页面" type="eden_wf" isfile="是" center="  " posleft postop poswidth posheight toolbar="不带工具栏" window="当前窗口" BLONopen BLONopenBefore BLONclose userType alertType="1" isCheckPermit="否" billtaborder="<root><taborder>textareaReason</taborder><taborder>button1</taborder></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:1;radio:0;listbox:0;textarea:1;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:1;text:0;hr:0;checkboxlist:0;radiolist:0;dropdownlist:0;grid:0;dataset:0;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" contxml="<root><label><id>label1</id></label><textarea><id>textareaReason</id></textarea><button><id>button1</id></button></root>" AutoResizeXml><TEXTAREA style="POSITION: absolute; WIDTH: 247px; HEIGHT: 85px; TOP: 12px; LEFT: 115px" id=textareaReason onmovestart=moveStart() cols=48 value="textarea1" controltype="textarea" induce="否"></TEXTAREA><LABEL style="POSITION: absolute; WIDTH: 113px; HEIGHT: 36px; TOP: 20px; LEFT: 10px" id=label1 onmovestart=moveStart() controltype="label" inputTag="否">请输入删除原因：</LABEL><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; TOP: 120px; PADDING-TOP: 0px; LEFT: 169px" id=button1 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("sub()")'>确定</BUTTON></DIV><div id='addHtml'></div> </body></html>

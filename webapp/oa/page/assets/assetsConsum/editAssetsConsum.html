@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+    <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+    <script>
+        setSkinsCss("listCss,iconCss,giceCss");
+    </script>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    </head>
+
+<body style="height:100%;overflow:auto;">
+	<div class="consum_wrap">
+	
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="consumBy">领用人</label><input id="consumBy" type="text" name="consumBy"  value="${assetsConsum.consumBy!}"/></div>
+		<div class="consum_inline_right clearfix"><label for="consumDep">领用人部门</label><input id="consumDep" type="text" name="consumDep" value="${assetsConsum.consumDep!}"/></div>
+	</div>
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="consumDate">领用时间</label><input onfocus="WdatePicker();" id="consumDate" type="text" name="consumDate" value="${assetsConsum.consumDate2!}"/></div>
+	</div>
+	
+	<div class="relnum">
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="assetsNum">资产编号</label><input id="assetsNum" type="text"  value="${assetsConsum.assetsNum!}"/></div>
+		<div class="consum_inline_right clearfix"><label for="assetsName">资产名称</label><input id="assetsName" type="text" readonly="readonly" value="${assetsConsum.assetsName!}"/></div>
+	</div>
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="consumNum">领用数量</label><input id="consumNum" type="text" onblur="checkNum();" value = "${assetsConsum.consumNum!}"/></div>
+	</div>
+	</div>
+	
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="remark">备注</label><textarea id="remark" name="remark" value="${assetsConsum.remark!}"></textarea></div>
+	</div>
+
+	<div class="consum_ablock">
+		<a onclick="updateConsum()" href="javascript:void(0)">确认</a><a onclick="closeWin()" href="javascript:void(0)">取消</a>
+	</div>
+	
+	</div>
+	
+	<input type="hidden" id="consumId" value="${consumId!}" />
+</body>
+    <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+<script>
+    $(function(){
+    	layout();
+    	$(window).resize(function(){
+    		layout();
+    	});
+    	
+    	$('#assetsNum').bind('keyup',function(){
+    		event.stopPropagation();
+    		event.cancelBubble = true;
+    		var inputVal=$('#assetsNum').val();
+    		jQuery.post("${base}/admin/assetsConsum/selectCheckedAssets.action?inputValLast="+inputVal,
+    	            {
+    	              "inputValLast":inputVal 
+    	            },
+    	            function(result){
+    	            	if(result.orgList.length==0){
+    	            		return;
+    	            	}else{
+    	            			
+    	            	}
+    	            }
+    	    );
+    	});
+    	
+    });
+    
+    function layout(){
+    	$('#remark').width($(window).width()-165);	
+    }
+    
+    function closeWin(){
+    	window.top.closeWin('editAssetsconsul');
+    }
+    
+    function updateConsum(){
+    	var consumBy=$.trim($('#consumBy').val());//领用人
+    	if(consumBy==""){
+    		$.dialog.tips("领用人不能为空！");
+    		$("#consumBy").select();
+    		return;
+    	}
+    	var consumDep=$.trim($('#consumDep').val());//领用人部门
+    	if(consumDep==""){
+    		$.dialog.tips("领用人部门不能为空！");
+    		$("#consumDep").select();
+    		return;
+    	}
+    	var consumDate=$.trim($('#consumDate').val());//领用时间
+    	if(consumDate==""){
+    		$.dialog.tips("领用时间不能为空！");
+    		$("#consumDate").select();
+    		return;
+    	}
+    	var assetsNum = $("#assetsNum").val();
+    	var assetsName = $("#assetsName").val();
+    	var consumNum = $("#consumNum").val();
+    	
+    	var consumId = $("#consumId").val();
+    	var remark=$('#remark').val();
+    	
+    	
+    	if(checkNum()){
+		    $.post("${base}/admin/assetsConsum/updateAssetsConsum.action", 
+		    	    {
+		 		      "assetsConsum.consumId":consumId,
+		 		      "assetsConsum.assetsId":"",
+		 		      "assetsConsum.consumBy":consumBy,
+		 		      "assetsConsum.consumDep":consumDep,
+		 		      "assetsConsum.consumDate":consumDate,
+		 		      "assetsConsum.assetsNum":assetsNum,
+		 		      "assetsConsum.assetsName":assetsName,
+		 		      "assetsConsum.consumNum":consumNum,
+		 		      "assetsConsum.remark":remark
+		    	  }, function(result){
+		    	      $.dialog.tips(result.tips);
+		    	      ParentIframe.refresh_data();
+		    	      setTimeout(function(){closeWin();},200);
+		    }); 	
+    		
+    	}
+    	
+    }
+    
+    function checkNum(){
+  	  	 var reg = /^[0-9]*$/;
+  	  	 var consumNum = $.trim($("#consumNum").val());
+  	  	 
+  	     if(!reg.test(consumNum)){
+          $.dialog.tips("领用数量请输入数字!");
+          $("#consumNum").select();
+          return false;
+        }
+  	     return true;
+  }
+    
+	$("#assetsNum").bind("click",function(){
+		
+	});
+    
+    
+</script>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<#include "/aufw/page/include/head.html">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>decode</title>
+</head>
+<body bgcolor="#FFFFFF"  leftmargin="0" topmargin="0">
+<form name="mainForm" method="POST">
+<OBJECT style="display:none;" ID="read" name="read"  CLASSID="clsid:DD450EAE-FC2D-4942-8E31-F2C43F2EE508"></OBJECT>
+<div>
+<span>输入端口号：</span><input id="CommPort" type="text"/><div class="button button-main margin-left-in" id="sure">搜索</div><br>
+<span>条码编号：</span><input id="BFilecode" type="text"/><br>
+<span>条码编号：</span><input id="BFilecode" type="text"/><br>
+<span>发文机关：</span><input id="BSenddept" type="text"/><br>
+<span>公文种类或刊物名称：</span><input id="BFilename" type="text"/><br>
+<span>发文字号或期号：</span><input id="BFilenum" type="text"/><br>
+<span>主送单位：</span><input id="BMainsenddept" type="text"/><br>
+<span>标题：</span><input id="BTitle" type="text"/><br>
+<span>秘密等级：</span><input id="BSecret" type="text"/><br>
+<span>紧急程度：</span><input id="BHurry" type="text"/><br>
+<span>成文日期：</span><input id="BCreatefiledate" type="text"/><br>
+<span>发布层次：</span><input id="BSenddegree" type="text"/><br>
+<span>条码制作单位：</span><input id="BBarcreatedept" type="text"/><br>
+<span>条码制作时间：</span><input id="Barcreatedate" type="text"/><br>
+</div>
+<#include "/aufw/page/include/script.html">
+<script language="javascript">
+	$(function(){
+		$(document).on("click","#sure",function(){
+			//串口出始化
+			  try
+			  {
+				var port = $("#CommPort").val().trim();
+				alert(port);
+				mainForm.read.CommPort= port; 
+			  	mainForm.read.TimerInternal=200; 
+			  	if(!mainForm.read.OpenPort()){
+			  		alert("打开端口失败！");
+			  	}
+			  }
+			  catch(e)
+			  {
+			   window.alert(e.message);
+			  }
+		});
+	});
+</script>
+<script language="javascript" event="OnComm(pdf)" for="read">
+	$("#BFilecode").val(read.BFilecode);
+	$("#BSenddept").val(read.BSenddept);
+	$("#BFilename").val(read.BFilename);
+	$("#BFilenum").val(read.BFilenum);
+	$("#BMainsenddept").val(read.BMainsenddept);
+	$("#BTitle").val(read.BTitle);
+	$("#BHurry").val(read.BHurry);
+	$("#BCreatefiledate").val(read.BCreatefiledate);
+	$("#BSenddegree").val(read.BSenddegree);
+	$("#BBarcreatedept").val(read.BBarcreatedept);
+	$("#Barcreatedate").val(read.Barcreatedate);
+	alert("文种："+pdf);
+	alert("文号："+read.BFilenum);
+</script>
+</form>	
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+<#include "/aufw/page/include/head.html">
+<link href="${base}/form/resources/chosen_v1.2.0/chosen.css" type="text/css" rel="stylesheet" />
+</head>
+<body style="height: 100%;">
+    <div class="container-layout line">
+	<#include "/aufw/page/include/script.html">
+		<table style="width: 100%;" id="common_table">
+			<tr>
+				<td class="ver-top">
+					<div class="grid-table-top" id="grid_table">
+						<div class="js-tool-bar">
+							<div class="statistics-condition form-group header-group padding-bottom-0">
+								<span id="fromStartDateSpan" class="display-no header-title" >查询时间:</span>
+								<span id="fromStartDateDiv" class="display-no">
+									<input  name="fromStartDate" id="fromStartDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd', maxDate:'#F{$dp.$D(\'fromEndDate\')||\'2025-10-01\'}'})" size="20" type="text">
+                                    <span class="header-title margin-left-out" style ='margin-left: 27px;'>至</span>
+                                    <input id="fromEndDate" style="cursor: pointer;left: 27px;" size="20" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'fromStartDate\')}',maxDate:'2025-10-01'})" name="fromEndDate" type="text">
+								</span>
+								<span class="header-title margin-left-out" style ='margin-left: 65px;'>领导:</span>
+								<input id="instructionLeader" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+							</div>
+							<div class="header-group form-group">
+								<span id="instructionNoSpan" class=" header-title">批示序号 :</span>
+								<span id="instructionNoDiv" class="">
+                                    <input id="instructionNo" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+								</span>
+								
+								<span id="instructionContextSpan1" class="margin-left-out header-title" >来文标题 :</span>
+								<span id="instructionContext1" class="">
+                                    <input id="comeTitle" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+								</span>
+								
+								<span id="instructionContextSpan" class="margin-left-out header-title" >批示内容 :</span>
+								<span id="instructionContext" class="">
+                                    <input id="Context" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+								</span>
+								
+								<div class="button button-main margin-left-out" id="senior_grid_search">搜索</div>
+							</div>
+						</div>
+						<div class="js-grid-father grid-father">
+							<table id="manage_grid" class="bsgrid">
+								<tr>
+									<th w_index="id" w_hidden="true" class="hidden"></th>				
+									<th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+									<th width="30">序号</th>
+									<th w_index="instructionOrder" width="120">批示序号</th>
+									<th w_index="instructionContent" >批示内容</th>
+									<th w_index="instructionDateStr" width="80">批示日期</th>
+									<th w_index="fromDept" width="100">来文单位</th>
+									<th w_index="fromTitle" width="220">来文标题</th>
+									<th w_index="needFeedbackTimeFreemark" width="60">是否反馈</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<style type="text/css">
+	.Wdate{
+	  height:25px;
+	}
+	</style>
+	<!--表单、流程，基于jquery的方法-->
+	<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+	<script src="${base}/oa/resource/js/task.js"></script>
+	<script src="${base}/oa/resource/js/instructionUtils.js"></script>
+	<script src="${base}/form/resources/chosen_v1.2.0/chosen.jquery.js"></script>
+	<script>
+var gridOne;
+var instType = "${instType}";
+var selectURL = "${base}/admin/instructionHistory/queryByCondition.action?iType=allIn&showStep=yes&instAuth=yes";
+var showURL = "${base}/form/fceform/common/run.html?djtype=eden&wfs=view&is_oa_bill=true&actionId=show&djsn=oa_leader_instruction_form&wfId=";
+$(function(){
+    showHidden(instType);
+    layOut("#common_table","#grid_table");
+    //grid初始化
+     gridOne=$.fn.bsgrid.init("manage_grid", {
+        url:selectURL + "&draftDept=" + window.encodeURI($("#draftDept").val())+"&etc="+new Date().getTime(),
+        row_primary_key: "primaryKey",
+        autoLoad: true,
+        pageSizeSelect: true,
+        pageSize:15,
+        complete:function(options, XMLHttpRequest, textStatus){
+        },
+        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+        },
+        additionalAfterRenderGrid:function(){
+        	gridOne.initGrid();
+        	$("#manage_grid tbody tr").each(function(){
+        		var $this=$(this);
+        		    $("td",this).eq(1).css("padding-left","8px");
+        			$index=parseInt($this.attr("index"));
+        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+        			$this.find("td").eq(2).css({"padding-left":"0px","text-align":"center"});
+        			$this.find("td").eq(3).css({"padding-left":"0px","text-align":"center"});
+        			$this.find("td").eq(9).css({"padding-left":"0px","text-align":"center"});
+        	});
+       
+    }});
+
+
+    //工具条搜索 异步交互
+    $(document).on("click","#grid_search",function(){
+        var clu = $("#search").val();
+        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+        var symbol = "?";
+        if(selectURL.indexOf("?")>0){
+        	symbol = "&";
+        }
+        gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&draftDept=' + window.encodeURI($("#draftDept").val()) 
+        							+ '&etc='+new Date().getTime());
+    });
+
+    //工具条高级搜索 展开
+    $(document).on("click",".js-level-search",function(){
+        girdTable(this);
+    });
+
+    //工具条高级搜索 异步交互
+    $(document).on("click","#senior_grid_search",function(){
+       	var requsetUrl = requestStr(selectURL + '&draftDept=' + window.encodeURI($("#draftDept").val()),instType);
+       	var instructionLeader=$("#instructionLeader").val();
+       	if(instructionLeader!=null&&instructionLeader!=undefined&& instructionLeader.replace(/\\s+/g,"")!=""){
+       		if(requsetUrl.indexOf("?")>-1){
+       			requsetUrl=requsetUrl+"&instructionLeader="+window.encodeURI(instructionLeader);
+           	}else{
+           		requsetUrl=requsetUrl+"?instructionLeader="+window.encodeURI(instructionLeader);
+           	}
+       	}
+       	
+       	
+       	requsetUrl = requsetUrl + '&instructionNo=' + window.encodeURI($("#instructionNo").val());
+    	requsetUrl = requsetUrl + '&fromTitle=' + window.encodeURI($("#comeTitle").val());
+       	
+       	
+//        	if(instType=="allYear"||instType=="allMoth"){
+//        		var startMonth=$("#start_month").val();
+//        		if(startMonth==null || startMonth.replace(/\\s+/g,"")==""){
+//        			startMonth=1;
+//        		}
+//        		var endMonth=$("#end_month").val();
+//        		if(endMonth==null || endMonth.replace(/\\s+/g,"")==""){
+//        			endMonth=(new Date().getMonth())+1;
+//        		}
+//        		requsetUrl=requsetUrl+"&startMonth="+startMonth+"&endMonth="+endMonth;
+//        	}
+//        	if(instType=="allLd"){
+//        		var year = $("#year").val();
+//        		var month = $("#month").val();
+
+//        		requsetUrl=requsetUrl+"&year=" + year+"&month="+month;
+//        	}
+       	//alert(requsetUrl);
+        gridOne.changeUrl(requsetUrl + '&instructionContent=' + window.encodeURI($("#Context").val()));
+    });
+    $("#draftDept").bind("propertychange input",function(){
+     	var requsetUrl = requestStr(selectURL,instType);
+    	var instructionLeader=$("#instructionLeader").val();
+       	if(instructionLeader!=null&&instructionLeader!=undefined&& instructionLeader.replace(/\\s+/g,"")!=""){
+       		if(requsetUrl.indexOf("?")>-1){
+       			requsetUrl=requsetUrl+"&instructionLeader="+window.encodeURI(instructionLeader);
+           	}else{
+           		requsetUrl=requsetUrl+"?instructionLeader="+window.encodeURI(instructionLeader);
+           	}
+       	}
+        gridOne.changeUrl(requsetUrl);
+    });
+});
+
+
+function execute(id){
+	var item = getRecord(id);
+	window.open("${base}/form/fceform/common/run.html?djtype=eden&wfs=view&is_oa_bill=true&actionId=show&djsn=oa_leader_instruction_form&wfId="+item.wfId);
+}
+//查看任务
+function show(id){
+	var task_name = "";
+	var item = getRecord(id);
+	window.open(showURL + item.wfId);
+}
+</script>
+</body>
+</html>

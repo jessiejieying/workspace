@@ -1,0 +1,361 @@
+<#include "/oa/page/billcommon/head.html">
+    <body >
+    <div class="form-print "  id="showHtml">
+        <h1 class="text-center margin-bottom padding-small-bottom">${billData.billTitle!}</h1>
+        <div class="form-print-header">
+            <span class="header-right">编号： <input class="js-bill-load-only-number" type="text" id="DOC_NUM" value="${billData.dataset1.doc_num!}"/></span>
+        </div>
+        <table  class="form-table">
+
+                <tr >
+                    <td  width="108"  class="table-td-left td-pd10">会议名称</td>
+                    <td >
+                        <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="SUBJECT" value="${(billData.dataset1.subject?replace('<br>','\n'))!}">${(billData.dataset1.subject?replace('<br>','\n'))!}</textarea>
+                    </td>
+                </tr>
+                <tr >
+
+            <tr style="height:37px;">
+                <td  width="108" class="table-td-left td-pd10" >时<i style="padding: 0 16px;"></i>间</td>
+                <td >
+                    <table class="form-intable" frame="void" style="height:39px;">
+                        <tr>
+                            <td width="113" height="37">
+                                <input class="td-input td-pl16" style="padding-left: 0;text-align: right" id="other" data-node="other|other_detail" onfocus="WdatePicker({dateFmt:'yyyy年MM月dd日',readOnly:true,onpicked:inputChange})"  value="${billData.dataset1.other!}"/>
+                            </td>
+                            <td width="120" height="37" style="border-left: 1px solid #ef655d;">
+                                <input class="td-input" style="padding-left: 0;" id="other_detail"  value="${billData.dataset1.other_detail!}" type="text"/>
+                            </td>
+                            <td  width="87" class="td-infor-mid">地<i style="padding: 0 16px;"></i>点</td>
+                            <td  height="37" class="">
+                                <input type="text" class="td-input" value="${billData.dataset1.location!}" id="LOCATION">
+
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr >
+                <td class="table-td-left td-pd10">主<i style="padding: 0 16px;"></i>持</td>
+                <td >
+                    <input class="td-input" type="text" id="meeting_host"  value ="${billData.dataset1.meeting_host!}"/>
+                </td>
+            </tr>
+
+            <#if (billData.billTypeNumber!)=="5"||(billData.billTypeNumber!)=="6"||(billData.billTypeNumber!)=="7">
+                <tr >
+                    <td  class="table-td-left td-pd60">会<i style="padding: 0 16px;"></i>议<br>议<i style="padding: 0 16px;"></i>题</td>
+                    <td class="td-left" >
+                        <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="agenda_items" value="${(billData.dataset1.agenda_items?replace('<br>','\n'))!}">${(billData.dataset1.agenda_items?replace('<br>','\n'))!}</textarea>
+                    </td>
+                </tr>
+                <tr >
+                    <td class="table-td-left td-pd30">出<i style="padding: 0 16px;"></i>席<br>人<i style="padding: 0 16px;"></i>员</td>
+                    <td class="td-left">
+                        <textarea style="padding-top:8px;padding-bottom:10px;line-height:24px;" class="td-text-area js-auto-textarea" id="present_members" value="${(billData.dataset1.present_members?replace('<br>','\n'))!}">${(billData.dataset1.present_members?replace('<br>','\n'))!}</textarea>
+                    </td>
+                </tr>
+                <#else>
+            <tr >
+                <td class="table-td-left td-pd30">出席人员</td>
+                <td class="td-left">
+                    <textarea style="padding-top:8px;padding-bottom:10px;line-height:24px;" class="td-text-area js-auto-textarea" id="present_members" value="${(billData.dataset1.present_members?replace('<br>','\n'))!}">${(billData.dataset1.present_members?replace('<br>','\n'))!}</textarea>
+                </td>
+            </tr>
+            </#if>
+            <#if (billData.billTypeNumber!)=="1"||(billData.billTypeNumber!)=="2"||(billData.billTypeNumber!)=="4">
+                <tr >
+                    <td class="table-td-left td-pd30">列席人员</td>
+                    <td class="td-left">
+                        <textarea style="padding-top:8px;padding-bottom:10px;line-height:24px;" class="td-text-area js-auto-textarea" id="staff_in_attendance" value="${(billData.dataset1.staff_in_attendance?replace('<br>','\n'))!}">${(billData.dataset1.staff_in_attendance?replace('<br>','\n'))!}</textarea>
+                    </td>
+                </tr>
+            </#if>
+            <#if (billData.billTypeNumber!)=="1"||(billData.billTypeNumber!)=="2"||(billData.billTypeNumber!)=="3"||(billData.billTypeNumber!)=="4"||(billData.billTypeNumber!)=="8">
+                    <tr >
+                        <td  class="table-td-left td-pd60">会议议题</td>
+                        <td class="td-left" >
+                            <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="agenda_items" value="${(billData.dataset1.agenda_items?replace('<br>','\n'))!}">${(billData.dataset1.agenda_items?replace('<br>','\n'))!}</textarea>
+                        </td>
+                    </tr>
+            </#if>
+            <#if (billData.billTypeNumber!)=="8">
+                    <tr >
+                        <td  class="table-td-left td-pd60">审签人</td>
+                        <td class="td-left" >
+                            <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="audit_person" value="${(billData.dataset1.audit_person?replace('<br>','\n'))!}">${(billData.dataset1.audit_person?replace('<br>','\n'))!}</textarea>
+                        </td>
+                    </tr>
+            </#if>            
+
+            <!-- 代省长 -->
+            <#if (billData.billTypeNumber!)=="1">
+                <tr>
+                    <td class="table-td-left td-pd40" >代<i style="padding: 0 4px;"></i>省<i style="padding: 0 4px;"></i>长<br>签<i style="padding: 0 16px;"></i>批
+                    </td>
+                    <td class="line-feed"  data-type="8" id="governor_sign">
+                        <div class="td-choice-input js-choice-input">
+                            <#if billData.adviceDb_8??&& (billData.adviceDb_8?size>0)>
+                                <#list billData.adviceDb_8! as entry>
+                                    <div class='js-leader-advice' data-user='${entry.create_by}' data-advice='' id='${entry.id}'>
+                                        <p class='js-leader-advice-content' style=''>
+                                            <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                                <span style="display:none;">${entry.advice_content}</span>
+                                                <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}" alt="意见">
+                                                <#else>
+                                                    <span>${entry.advice_content}</span>
+                                            </#if>
+                                            <#if entry.create_by==(billData.accountName)>
+                                                <i class='js-leader-advice-del icon-trash-o' title='删除'></i>
+                                                <i class='icon-edit js-leader-advice-edit' title='编辑'></i></#if>
+                                        </p>
+                                        <p class='js-leader-advice-last'>${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                                    </div>
+                                </#list>
+                                <#else>
+                                    <span class="td-choice-input-tip">点击输入</span>
+                            </#if>
+                        </div>
+                    </td>
+                </tr>
+            </#if>
+
+            <!--秘书长签批，主任签批-->
+            <#if (billData.billTypeNumber!)=="3">
+            <tr style="height: 58px;">
+                <td  class="table-td-left">秘<i style="padding: 0 4px;"></i>书<i style="padding: 0 4px;"></i>长<br>签<i style="padding: 0 16px;"></i>批</td>
+                <td >
+                    <table class="form-intable" style="height: 58px;" frame="void">
+                        <tr>
+                            <td width="200" height="67" valign="middle" data-type="7" id="secretary_sign" class="line-feed" style="text-align: left;" >
+                                <div class="td-choice-input js-choice-input">
+                                    <#if billData.adviceDb_7??&& (billData.adviceDb_7?size>0)>
+                                        <#list billData.adviceDb_7! as entry>
+                                            <div class='js-leader-advice' data-user='${entry.create_by}' data-advice='' id='${entry.id}'>
+                                                <p class='js-leader-advice-content' style=''>
+                                                    <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                                        <span style="display:none;">${entry.advice_content}</span>
+                                                        <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}" alt="意见">
+                                                        <#else>
+                                                            <span>${entry.advice_content}</span>
+                                                    </#if>
+                                                    <#if entry.create_by==(billData.accountName)>
+                                                        <i class='js-leader-advice-del icon-trash-o' title='删除'></i>
+                                                        <i class='icon-edit js-leader-advice-edit' title='编辑'></i></#if>
+                                                </p>
+                                                <p class='js-leader-advice-last'>${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                                            </div>
+                                        </#list>
+                                        <#else>
+                                            <span class="td-choice-input-tip">点击输入</span>
+                                    </#if>
+                                </div>
+                            </td>
+                            <td width="100" class="td-infor-mid">主<i style="padding: 0 16px;"></i>任<br>签<i style="padding: 0 16px;"></i>批</td>
+                            <td  height="67" class="line-feed" data-type="6" id="director_sign" style="text-align: left;" >
+                                <div class="td-choice-input js-choice-input">
+                                    <#if billData.adviceDb_6??&& (billData.adviceDb_6?size>0)>
+                                        <#list billData.adviceDb_6! as entry>
+                                            <div class='js-leader-advice' data-user='${entry.create_by}' data-advice='' id='${entry.id}'>
+                                                <p class='js-leader-advice-content' style=''>
+                                                    <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                                        <span style="display:none;">${entry.advice_content}</span>
+                                                        <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}" alt="意见">
+                                                        <#else>
+                                                            <span>${entry.advice_content}</span>
+                                                    </#if>
+                                                    <#if entry.create_by==(billData.accountName)>
+                                                        <i class='js-leader-advice-del icon-trash-o' title='删除'></i>
+                                                        <i class='icon-edit js-leader-advice-edit' title='编辑'></i></#if>
+                                                </p>
+                                                <p class='js-leader-advice-last'>${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                                            </div>
+                                        </#list>
+                                        <#else>
+                                            <span class="td-choice-input-tip">点击输入</span>
+                                    </#if>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!--副秘书长，副主任签批，主办处室签批-->
+
+                <tr style="height: 68px;">
+                    <td  class="table-td-left">副秘书长<br>(副主任)<br>签<i style="padding: 0 16px;"></i>批</td>
+                    <td >
+                        <table class="form-intable" style="height: 68px;" frame="void">
+                            <tr>
+                                <td width="200" height="67" valign="middle" data-type="5" id="deputy_secretary_sign" class="line-feed" style="text-align: left;" >
+                                    <div class="td-choice-input js-choice-input">
+                                        <#if billData.adviceDb_5??&& (billData.adviceDb_5?size>0)>
+                                            <#list billData.adviceDb_5! as entry>
+                                                <div class='js-leader-advice' data-user='${entry.create_by}' data-advice='' id='${entry.id}'>
+                                                    <p class='js-leader-advice-content' style=''>
+                                                        <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                                            <span style="display:none;">${entry.advice_content}</span>
+                                                            <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}" alt="意见">
+                                                            <#else>
+                                                                <span>${entry.advice_content}</span>
+                                                        </#if>
+                                                        <#if entry.create_by==(billData.accountName)>
+                                                            <i class='js-leader-advice-del icon-trash-o' title='删除'></i>
+                                                            <i class='icon-edit js-leader-advice-edit' title='编辑'></i></#if>
+                                                    </p>
+                                                    <p class='js-leader-advice-last'>${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                                                </div>
+                                            </#list>
+                                            <#else>
+                                                <span class="td-choice-input-tip">点击输入</span>
+                                        </#if>
+                                    </div>
+                                </td>
+                                <td width="100" class="td-infor-mid">主办处室<br>意<i style="padding: 0 16px;"></i>见</td>
+                                <td  height="67" class="line-feed" data-type="2" id="host_office_advice" style="text-align: left;" >
+                                    <div class="td-choice-input js-choice-input">
+                                        <#if billData.adviceDb_2??&& (billData.adviceDb_2?size>0)>
+                                            <#list billData.adviceDb_2! as entry>
+                                                <div class='js-leader-advice' data-user='${entry.create_by}' data-advice='' id='${entry.id}'>
+                                                    <p class='js-leader-advice-content' style=''>
+                                                        <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                                            <span style="display:none;">${entry.advice_content}</span>
+                                                            <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}" alt="意见">
+                                                            <#else>
+                                                                <span>${entry.advice_content}</span>
+                                                        </#if>
+                                                        <#if entry.create_by==(billData.accountName)>
+                                                            <i class='js-leader-advice-del icon-trash-o' title='删除'></i>
+                                                            <i class='icon-edit js-leader-advice-edit' title='编辑'></i></#if>
+                                                    </p>
+                                                    <p class='js-leader-advice-last'>${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                                                </div>
+                                            </#list>
+                                            <#else>
+                                                <span class="td-choice-input-tip">点击输入</span>
+                                        </#if>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+            </#if>
+            
+            <!--秘书长意见，办公厅主任意见-->
+            <#if (billData.billTypeNumber!)=="5"||(billData.billTypeNumber!)=="6">
+            <tr style="height: 68px;">
+                <td  class="table-td-left">秘<i style="padding: 0 4px;"></i>书<i style="padding: 0 4px;"></i>长<br>意<i style="padding: 0 16px;"></i>见</td>
+                <td >
+                    <table class="form-intable" style="height: 68px;" frame="void">
+                        <tr>
+                            <td width="200" height="67" valign="middle" data-type="3" id="secretary_advice" class="line-feed" style="text-align: left;" >
+                                <div class="td-choice-input js-choice-input">
+                                    <#if billData.adviceDb_3??&& (billData.adviceDb_3?size>0)>
+                                        <#list billData.adviceDb_3! as entry>
+                                            <div class='js-leader-advice' data-user='${entry.create_by}' data-advice='' id='${entry.id}'>
+                                                <p class='js-leader-advice-content' style=''>
+                                                    <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                                        <span style="display:none;">${entry.advice_content}</span>
+                                                        <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}" alt="意见">
+                                                        <#else>
+                                                            <span>${entry.advice_content}</span>
+                                                    </#if>
+                                                    <#if entry.create_by==(billData.accountName)>
+                                                        <i class='js-leader-advice-del icon-trash-o' title='删除'></i>
+                                                        <i class='icon-edit js-leader-advice-edit' title='编辑'></i></#if>
+                                                </p>
+                                                <p class='js-leader-advice-last'>${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                                            </div>
+                                        </#list>
+                                        <#else>
+                                            <span class="td-choice-input-tip">点击输入</span>
+                                    </#if>
+                                </div>
+                            </td>
+                            <td width="100" class="td-infor-mid">办<i style="padding: 0 4px;" ></i>公<i style="padding: 0 4px;" ></i>厅<br>主<i style="padding: 0 16px;" ></i>任<br>意<i style="padding: 0 16px;"></i>见</td>
+                            <td  height="67" class="line-feed" data-type="2" id="office_director_advice" style="text-align: left;" >
+                                <div class="td-choice-input js-choice-input">
+                                    <#if billData.adviceDb_2??&& (billData.adviceDb_2?size>0)>
+                                        <#list billData.adviceDb_2! as entry>
+                                            <div class='js-leader-advice' data-user='${entry.create_by}' data-advice='' id='${entry.id}'>
+                                                <p class='js-leader-advice-content' style=''>
+                                                    <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                                        <span style="display:none;">${entry.advice_content}</span>
+                                                        <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}" alt="意见">
+                                                        <#else>
+                                                            <span>${entry.advice_content}</span>
+                                                    </#if>
+                                                    <#if entry.create_by==(billData.accountName)>
+                                                        <i class='js-leader-advice-del icon-trash-o' title='删除'></i>
+                                                        <i class='icon-edit js-leader-advice-edit' title='编辑'></i></#if>
+                                                </p>
+                                                <p class='js-leader-advice-last'>${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                                            </div>
+                                        </#list>
+                                        <#else>
+                                            <span class="td-choice-input-tip">点击输入</span>
+                                    </#if>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            </#if>
+
+            <#if (billData.billTypeNumber!)=="5"||(billData.billTypeNumber!)=="6"||(billData.billTypeNumber!)=="7">
+                <tr>
+                    <td class="table-td-left td-pd30" >秘<i style="padding: 0 4px;"></i>书<i style="padding: 0 4px;"></i>处<br>办理意见
+                    </td>
+                    <td class="line-feed"  data-type="1" id="secretariat_management_advice">
+                        <div class="td-choice-input js-choice-input">
+                            <#if billData.adviceDb_1??&& (billData.adviceDb_1?size>0)>
+                                <#list billData.adviceDb_1! as entry>
+                                    <div class='js-leader-advice' data-user='${entry.create_by}' data-advice='' id='${entry.id}'>
+                                        <p class='js-leader-advice-content' style=''>
+                                            <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                                <span style="display:none;">${entry.advice_content}</span>
+                                                <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}" alt="意见">
+                                                <#else>
+                                                    <span>${entry.advice_content}</span>
+                                            </#if>
+                                            <#if entry.create_by==(billData.accountName)>
+                                                <i class='js-leader-advice-del icon-trash-o' title='删除'></i>
+                                                <i class='icon-edit js-leader-advice-edit' title='编辑'></i></#if>
+                                        </p>
+                                        <p class='js-leader-advice-last'>${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                                    </div>
+                                </#list>
+                                <#else>
+                                    <span class="td-choice-input-tip">点击输入</span>
+                            </#if>
+                        </div>
+                    </td>
+                </tr>
+            </#if>
+            <!--列席单位-->
+            <#if (billData.billTypeNumber!)=="1">
+                <tr >
+                    <td class="table-td-left td-pd60">列席单位</td>
+                    <td class="td-left">
+                        <textarea style="padding-top:8px;padding-bottom:10px;line-height:24px;" class="td-text-area js-auto-textarea" id="attend_the_unit" value="${(billData.dataset1.attend_the_unit?replace('<br>','\n'))!}">${(billData.dataset1.attend_the_unit?replace('<br>','\n'))!}</textarea>
+                    </td>
+                </tr>
+            </#if>
+            <#if (billData.billTypeNumber!)=="4"||(billData.billTypeNumber!)=="8">
+                <#else>
+                <tr >
+                    <td class="table-td-left td-pd25">备注</td>
+                    <td height="79" class="td-left">
+                        <textarea  class="td-input-area js-auto-textarea" style="padding-top:8px;padding-bottom:10px;line-height:24px;" value="${(billData.dataset1.meeting_remark?replace('<br>','\n'))!}" id="MEETING_REMARK" >${(billData.dataset1.meeting_remark?replace('<br>','\n'))!}</textarea>
+                    </td>
+                </tr>
+            </#if>
+        </table>
+    </div>
+    </body>
+    <#include "/oa/page/billcommon/footer.html">

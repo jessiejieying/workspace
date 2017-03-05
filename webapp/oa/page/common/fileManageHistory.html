@@ -1,0 +1,1275 @@
+
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>eden</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <style>
+        .oa-form-grid td .black{
+            font-size: 14px;
+            color: #333;
+        }
+         .upload-box div{
+             width: 98px!important;
+             height: 26px!important;
+             left: 50%!important;
+             margin-left: -49px;
+             position: absolute;
+         }
+          .upload-box input{
+            width: 98px!important;
+        }
+
+    </style>
+</head>
+<body style="height: 100%;">
+<div id="contentHmtl">
+<div id="btn_control">
+
+</div>
+  <div class="resource-link ft12 ">历次版本</div>
+  <table id="main_text" class="bsgrid oa-form-grid oa-form-attachment" style="width: 680px!important;margin: 0 auto!important;margin-top: 8px!important;"></table>
+  <div class="text-center margin-top upload-box bill-read-status">
+      <button class="button button-main" id="chooseFile">上传文件</button>
+  </div>
+  <div class="resource-link ft12 ">背景材料</div>
+  <table id="attachment_table" class="bsgrid oa-form-grid oa-form-attachment" style="width: 680px!important;margin: 0 auto!important;margin-top: 8px!important;"></table>
+  <div class="text-center margin-top upload-box bill-read-status">
+      <button class="button button-main "   id="uploadFile">上传文件</button>
+  </div>
+  <div class="resource-link ft12 " style="margin-top:34px;">资源链接 <div class="button common-skin-btn-syle01 margin-left" id="grid_search">关联</div></div>
+  <table id="link_table" class="bsgrid oa-form-grid oa-form-attachment" style="width: 680px!important;margin: 0 auto!important;margin-top: 8px!important;" ></table>
+</div>
+  <script id="link-data" type="text/template">
+    <% if(linkData.length>0){ %>
+    <%_.each(linkData, function(item,index,list){%>
+    <tr class=" <% if(index%2) { %>interlaced-th <%}%>">
+      <td width="40"><%=index+1%></td>
+      <td title="<%=item.title%>"><a target="_blank" class="black" href="<%=item.link%>"><%=item.title%></a></td>
+      <td width="40">
+        <a href="javascript:void(0)" title="删除" data-id="<%=item.id%>" data-index="<%=index%>" class="icon-trash-o js-link-del"></a>
+      </td>
+    </tr>
+    <%})%>
+    <%}else{%>
+    <tr class="tr-no-data">
+      <td colspan="3" >暂无相关材料</td>
+    </tr>
+    <%}%>
+  </script>
+
+<script id="btn-control-html" type="text/template">
+    <%_.each(historyControlData, function(item,index,list){%>
+    <div class="history-btn-top-text <%=item.text%>" style="" id="btn_text">
+        <span>正文操作</span>
+        <button class="button common-skin-btn-syle01 <%=item.sendDraft%>" id="sendDraft_btn">起草正文</button>
+        <button class="button common-skin-btn-syle01 <%=item.edit%>" id="edit_btn">编辑正文</button>
+        <button class="button common-skin-btn-syle01 <%=item.look%>" id="check_btn">查看正文</button>
+        <button class="button common-skin-btn-syle01 <%=item.marking%>" id="mark_btn">批阅正文</button>
+        <button class="button common-skin-btn-syle01 <%=item.download%>" id="down_btn">下载正文</button>
+        <button class="button common-skin-btn-syle01 <%=item.seal%>" id="seal_btn">鉴章正文</button>
+        <button class="button common-skin-btn-syle01 <%=item.qrCode%>" id="create_code_btn">生成二维码</button>
+    </div>
+    <%})%>
+
+</script>
+  <!--历次版本-->
+  <script id="text-data" type="text/template">
+    <tr>
+      <th width="46" >序号</th>
+      <th width="200" >文件名称</th>
+      <th width="102" >上传用户</th>
+      <th width="150"  >上传时间</th>
+      <th >可操作</th>
+    </tr>
+    <% if(textDatas.length>0){ %>
+    <%_.each(textDatas, function(item,index,list){%>
+    <tr class=" <% if(index%2) { %>interlaced-th <%}%>">
+      <td><%=index+1%></td>
+      <td title="<%=item.name%>">
+          <% if(item.remark=="-1"){ %>
+          <div class="file-icon <%=item.style%>"><%=item.name%>（此文件已作废）</div>
+          <%}else{%>
+          <div class="file-icon <%=item.style%>"><%=item.name%></div>
+          <%}%>
+      </td>
+      <td title=""><%=item.createBy%></td>
+      <td title="<%=item.createDttm2%>"><%=item.createDttm2%> </td>
+      <td>
+        <% if(item.remark!="-1"){ %>
+        <a   href=<%=item.path%> title="下载" class="icon-download js-tr-download bill-read-status"></a>
+        <% if(item.isMyself){ %>
+        <a href="javascript:void(0)" title="删除" data-type="0" data-index="<%=index%>" class="icon-trash-o js-tr-delete-text"></a>
+
+        <%}%>
+          <!--暂未开放-->
+        <!--<a href="javascript:void(0)" title="授权" data-index="<%=index%>" class="icon-lock js-tr-authorization"></a>-->
+        <!--<a href="javascript:void(0)" title="个人文件柜" data-index="<%=index%>" class="icon-star js-tr-collection"></a>-->
+          <%if(buttonVoid){%>
+          <a href="javascript:void(0)" title="作废" style="color:#f2655d" class="icon-times-circle js-to-void" data-index="<%=index%>" data-type="0" data-id="<%=item.id%>" data-size="<%=item.size%>" data-name="<%=item.name%>"></a>
+          <%}%>
+          <%}%>
+
+      </td>
+    </tr>
+    <%})%>
+    <%}else{%>
+    <tr class="tr-no-data">
+      <td colspan="5" >暂无附件</td>
+    </tr>
+    <%}%>
+  </script>
+
+  <!--附件-->
+  <script id="attachment-data" type="text/template">
+    <tr>
+    <th width="46" >序号</th>
+    <th width="200" >文件名称</th>
+    <th width="102" >上传用户</th>
+    <th width="150"  >上传时间</th>
+    <th >可操作</th>
+    </tr>
+    <% if(datas.length>0){ %>
+    <%_.each(datas, function(item,index,list){%>
+    <tr class=" <% if(index%2) { %>interlaced-th <%}%>">
+      <td><%=index+1%></td>
+      <td title="<%=item.name%>">
+          <div class="file-icon <%=item.style%>"><%=item.name%></div>
+      </td>
+      <td title=""><%=item.createBy%></td>
+      <td title="<%=item.createDttm2%>"><%=item.createDttm2%> </td>
+      <td>
+        <a href=<%=item.path%> title="下载" class="icon-download js-tr-download bill-read-status"></a>
+        <% if(item.isMyself){ %>
+        <a href="javascript:void(0)" title="删除" data-type="0" data-index="<%=index%>" class="icon-trash-o js-tr-delete"></a>
+        <%}%>
+          <!--暂未开放-->
+        <!--<a href="javascript:void(0)" title="授权" data-index="<%=index%>" class="icon-lock js-tr-authorization"></a>-->
+        <!--<a href="javascript:void(0)" title="个人文件柜" data-index="<%=index%>" class="icon-star js-tr-collection"></a>-->
+      </td>
+    </tr>
+    <%})%>
+    <%}else{%>
+    <tr class="tr-no-data">
+      <td colspan="5" >暂无附件</td>
+    </tr>
+    <%}%>
+  </script>
+  <!-- jquery 框架 1.11 -->
+  <script src = "${base}/edenui/common/js/jquery.js"></script>
+  <script src = "${base}/edenui/common/js/underscore.js"></script>
+   <script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src = "${base}/form/resources/common/plupload/plupload.full.min.js"></script>
+
+<script>
+
+  var project ="${base}";
+var url=project+"/admin/attachmentInfo/selectByTable.action";
+  var selectURL = project+"/admin/incoming/queryIncoming.action";
+  var downloadsrc;
+ var datas=[];
+
+  //正文数据
+  var textDatas=[];
+
+ var $tableKeyId="${fileId!}";
+
+  //增加上传的文件
+  var addFileList=[];
+  //上传的文件列表
+  var addFileListPost=[];
+  //删除的文件
+  var delFileList=[];
+
+  //正文的删除和上传
+
+  var addFileListText=[];
+  //上传的文件列表
+  var addFileListTextPost=[];
+
+  var delFileListText=[];
+
+
+
+  var linkData=[];
+
+  var $docId;
+
+
+  //历次版本的按钮
+  var historyControlData=[];
+
+
+  var refreshTime=500;
+  //显示
+  var isSameText=true,
+      isSameFile=true;
+
+
+  //上传控件定义
+
+  var newUploader;
+  var fileUpload;
+
+  //是否显示作废按钮
+  var buttonVoid;
+
+
+  var maskShow=window.top.$urlParam("wfs");
+  $(function() {
+
+      //初始化 二维码tableKey
+      window.top.globalParams.qrCode.tableKey=$tableKeyId;
+      window.top.globalParams.qrCodeOther.tableKey=$tableKeyId;
+
+      //是否显示作废按钮
+      if(window.top.globalParams.djsn=="oa_send_document"&&window.top.globalParams.nodeName=="bms"){
+          buttonVoid=true;
+      }
+      else{
+          buttonVoid=false;
+      }
+
+      //只读状态
+      if(maskShow){
+          $("body").prepend("<div class='bill-read-mask'></div>");
+      }
+
+
+        historyBtnControl();
+        linkDataShow();
+        historyInit();
+
+
+
+      //正文顶部按钮
+      $("#btn_text .button").click(function(){
+          var $this=$(this),
+              $id=$this.attr("id");
+
+
+          var businessId=window.top.data_dataset2.first();
+
+          if(!businessId){
+              window.top.layer.msg("请先保存");
+              return;
+          }
+
+          //编辑文档
+          if($id=="edit_btn"){
+            window.top.operateDocByDatasetName('dataset2',1,'无模版');
+          }
+          //查看
+          else if($id=="check_btn"){
+              window.top.operateDocByDatasetName('dataset2',2);
+          }
+          //批阅
+          else if($id=="mark_btn"){
+              window.top.operateDocByDatasetName('dataset2',5)
+          }
+
+          //下载
+          else if($id=="down_btn"){
+              window.top.downloadDoc();
+          }
+
+          //鉴章
+          else if($id=="seal_btn"){
+            window.top.openSealPage();
+          }
+          //起草正文
+          else if($id=="sendDraft_btn"){
+              window.top.globalParams.draftText=1;
+              window.top.operateDocByDatasetName('dataset2',1,'无模版');
+          }
+          //生成二维码
+          else if($id=="create_code_btn"){
+
+              if($tableKeyId.length<1){
+
+                  window.top.layer.msg("请先上传一个附件");
+                  return;
+
+              }
+
+              window.top.globalParams.qrCode.tableKey=$tableKeyId;
+              window.top.globalParams.qrCodeOther.tableKey=$tableKeyId;
+
+              textDatas.forEach(function(value){
+                  if(value.name.indexOf(".tif")>(-1)){
+                      window.top.globalParams.qrCode.name=value.name;
+                      window.top.globalParams.qrCode.size=value.size;
+                  }
+                if(value.name.indexOf(".bmp")>(-1)){
+                  window.top.globalParams.qrCodeOther.name=value.name;
+                  window.top.globalParams.qrCodeOther.size=value.size;
+                }
+              });
+
+              window.top.createQRCode();
+
+
+          }
+
+
+      });
+
+
+    $("#grid_search").click(function(){
+
+       var $recordId=window.top.data_dataset2.first();
+     
+       if($recordId){
+        $docId=$recordId;
+         window.top.fileManageSeacrh();
+       }
+       else{
+        window.top.layer.msg("请先保存");
+       }
+     
+
+
+    });
+
+
+
+    if ($tableKeyId.length > 0) {
+
+      fileInit();
+
+  }
+    else{
+        datas.sort(function(b,a){
+            return (a.time)-(b.time)
+        });
+
+        textDatas.sort(function(b,a){
+            return (a.time)-(b.time)
+        });
+      $('#main_text').html(_.template($('#text-data').html()));
+      $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+
+   
+    }
+
+    //链接列表删除
+    $(document).on("click",".js-link-del",function(){
+
+        var $this=$(this),
+                $index=$this.data("index"),
+                $id=$(this).data("id");
+
+        window.top.layer.confirm('是否删除此链接', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            var delUrl=project+"/admin/documentRelateLink/delRelateLink.action";
+            $.post(delUrl, {"ids":$id}, function(data) {
+                if(data.result=="success"){
+                    window.top.layer.msg(data.message);
+                    linkData.splice($index, 1);
+                    $('#link_table').html(_.template($('#link-data').html(), linkData));
+                }
+                else{
+                    window.top.layer.msg(data.message);
+                }
+            });
+        }, function(){
+
+        });
+
+    });
+
+          //上传历次版本文件
+
+
+      fileUpload = new plupload.Uploader({ //实例化一个plupload上传对象
+          runtimes : 'html5,silverlight,flash,html4',
+          browse_button :'chooseFile',
+          url : project+"/servlet/uploadServlet",
+          max_file_size:"300M",
+          unique_names :true,
+          filters:[
+              {title : "允许上传的文件", extensions : "*"}
+          ],
+          flash_swf_url : project+'/form/resources/common/plupload/Moxie.swf',
+          silverlight_xap_url : project+'/form/resources/common/plupload/Moxie.xap'
+      });
+
+      fileUpload.init(); //初始化
+
+      //绑定文件上传进度事件
+      fileUpload.bind('FileUploaded',function(up,file,result){
+
+      });
+
+      fileUpload.bind('FilesAdded',function(uploader,files){
+
+          var isGoing=false;
+          var isSizeExist=false;
+          var fileSize=files.length-1;
+          isSizeExist=files[fileSize].size?false:true;
+          for(var tx= 0,tmax=textDatas.length;tx<tmax;tx++){
+
+              files.forEach(function(value){
+                  if(value.size===textDatas[tx].size&&value.name===textDatas[tx].name){
+                      isGoing=true;
+                  }
+              });
+
+              if(isGoing){
+                  break;
+              }
+          }
+
+          if(isSizeExist){
+
+              window.top.layer.msg("控件加载失败，重新加载...");
+              setTimeout(function(){
+                  window.top.layer.closeAll('dialog'); //关闭信息框
+                  window.location.reload();
+              },refreshTime);
+
+              return;
+          }
+          if(isGoing){
+              window.top.layer.msg("请勿上传已有的文件");
+              return;
+          }
+
+
+
+
+          fileUpload.start(); //开始上传
+          for (var i = 0, max= files.length; i<max;i++) {
+
+              var uploadIsSame=true;
+              var addFileListIsSame=true;
+              for (var j= 0,jmanx=textDatas.length;j<jmanx;j++) {
+                  if((textDatas[j].name)==(files[i].name)&&(textDatas[j].size)==(files[i].size)){
+                      uploadIsSame=false;
+                      break;
+                  }
+              }
+              if (uploadIsSame) {
+                  textDatas.push({
+
+                      "createBy":"${Session.name!}",
+                      "createDttm": "",
+                      "createDttm2": getNowFormatDate(),
+                      "time":changeMilliSeconds(getNowFormatDate()),
+                      "dataValid": files[i].dataValid,
+                      "directoryId": files[i].directoryId,
+                      "id": files[i].id,
+                      "lastUpdateDttm": files[i].lastUpdateDttm,
+                      "name": files[i].name,
+                      "style":classStyle(files[i].name),
+                      "path":encodeURI(downloadsrc+"/"+(new Date().getFullYear())+"/"+(new Date().getMonth()+1)+"/"+(new Date().getDate())+"/"+files[i].size+"@"+files[i].name).replace(/\+/g,"%2B"),
+                      "primaryKey": "",
+                      "size": files[i].size,
+                      "tableKey": "",
+                      "tableKeyId": "",
+                      "tableName": "",
+                      "isMyself":true,
+                      "remark":"1"
+                  });
+
+
+                  //判断是否新增的文件已经存于  addFileListText 过滤去重
+                  for(var k= 0,kmax=addFileListText.length;k<kmax;k++){
+                      if((addFileListText[k].name)==(files[i].name)&&(addFileListText[k].size)==(files[i].size)){
+                          addFileListIsSame=false;
+                          break;
+                      }
+                  }
+                  if(addFileListIsSame){
+                      addFileListText.push({
+                          id: files[i].id,
+                          name: files[i].name,
+                          size: files[i].size,
+                          remark: ""
+                      });
+                  }
+                  isSameText=true;
+              }
+              else{
+                  isSameText=false;
+                  window.parent.layer.msg("请勿上传已有的文件");
+              }
+          }
+
+          datas.sort(function(b,a){
+              return (a.time)-(b.time)
+          });
+
+          textDatas.sort(function(b,a){
+              return (a.time)-(b.time)
+          });
+          $('#main_text').html(_.template($('#text-data').html(), textDatas));
+          window.top.layer.msg("上传中...",{time:600000});
+
+      });
+
+
+      //绑定文件上传进度事件
+      fileUpload.bind('UploadProgress',function(uploader,file){
+
+      });
+
+      fileUpload.bind('UploadComplete',function(uploader,files){//附件上传完毕后
+//            if(fileRespondTop.error=="1"){
+//                window.top.layer.msg(fileRespondTop.message);
+//            }
+//            else{
+//                saveText("上传成功");
+//            }
+
+          saveText("上传成功");
+      });
+      //上传失败
+      fileUpload.bind('Error', function(up, err) {
+          $('.'+err.file.id).remove();
+          window.top.layer.msg(err.file.name+"上传失败，请重新上传");
+          up.refresh();
+      });
+
+
+
+      //背景材料上传
+      newUploader = new plupload.Uploader({ //实例化一个plupload上传对象
+          runtimes : 'html5,silverlight,flash,html4',
+          browse_button :'uploadFile',
+          url : project+"/servlet/uploadServlet",
+          max_file_size:"300M",
+          unique_names :true,
+          filters:[
+              {title : "允许上传的文件", extensions : "*"}
+          ],
+          flash_swf_url : project+'/form/resources/common/plupload/Moxie.swf',
+          silverlight_xap_url : project+'/form/resources/common/plupload/Moxie.xap'
+      });
+      newUploader.init(); //初始化
+      //绑定文件上传进度事件
+      newUploader.bind('FileUploaded',function(up,file,result){
+
+      });
+
+      newUploader.bind('FilesAdded',function(uploader,files){
+          var isGoing=false;
+          var isSizeExist=false;
+          var fileSize=files.length-1;
+          isSizeExist=files[fileSize].size?false:true;
+          for(var tx= 0,tmax=datas.length;tx<tmax;tx++){
+
+              files.forEach(function(value){
+                  if(value.size===datas[tx].size&&value.name===datas[tx].name){
+                      isGoing=true;
+                  }
+              });
+
+              if(isGoing){
+                  break;
+              }
+          }
+
+          if(isSizeExist){
+
+              window.top.layer.msg("控件加载失败，重新加载...");
+              setTimeout(function(){
+
+                  window.top.layer.closeAll('dialog'); //关闭信息框
+                  window.location.reload();
+              },refreshTime);
+
+              return;
+          }
+          if(isGoing){
+              window.top.layer.msg("请勿上传已有的文件");
+              return;
+          }
+
+          newUploader.start(); //开始上传
+          for (var i = 0, max= files.length; i<max;i++) {
+              var uploadIsSame=true;
+              var addFileListIsSame=true;
+              for (var j= 0,jmanx=datas.length;j<jmanx;j++) {
+                  if((datas[j].name)==(files[i].name)&&(datas[j].size)==(files[i].size)){
+                      uploadIsSame=false;
+                      break;
+                  }
+              }
+              if (uploadIsSame) {
+                  datas.push({
+                      "createBy":"${Session.name!}",
+                      "createDttm": "",
+                      "createDttm2": getNowFormatDate(),
+                      "time":changeMilliSeconds(getNowFormatDate()),
+                      "dataValid": files[i].dataValid,
+                      "directoryId": files[i].directoryId,
+                      "id": files[i].id,
+                      "lastUpdateDttm": files[i].lastUpdateDttm,
+                      "name": files[i].name,
+                      "style":classStyle(files[i].name),
+                      "path": encodeURI(downloadsrc+"/"+(new Date().getFullYear())+"/"+(new Date().getMonth()+1)+"/"+(new Date().getDate())+"/"+files[i].size+"@"+files[i].name).replace(/\+/g,"%2B"),
+                      "primaryKey": "",
+                      "size": files[i].size,
+                      "tableKey": "",
+                      "tableKeyId": "",
+                      "tableName": "",
+                      "isMyself":true
+                  });
+
+
+                  //判断是否新增的文件已经存于  addFileList 过滤去重
+                  for(var k= 0,kmax=addFileList.length;k<kmax;k++){
+                      if((addFileList[k].name)==(files[i].name)&&(addFileList[k].size)==(files[i].size)){
+                          addFileListIsSame=false;
+                          break;
+                      }
+                  }
+                  if(addFileListIsSame){
+                      addFileList.push({
+                          id: files[i].id,
+                          name: files[i].name,
+                          size: files[i].size,
+                          remark: ""
+                      });
+                  }
+                  isSameFile=true;
+              }
+              else{
+                  isSameFile=false;
+                  window.parent.layer.msg("请勿上传已有的文件");
+              }
+          }
+          datas.sort(function(b,a){
+              return (a.time)-(b.time)
+          });
+
+          textDatas.sort(function(b,a){
+              return (a.time)-(b.time)
+          });
+
+          $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+          window.top.layer.msg("上传中...",{time:600000});
+      });
+
+
+      newUploader.bind('UploadProgress',function(uploader,file){//绑定文件上传进度事件
+
+      });
+      newUploader.bind('UploadComplete',function(uploader,files){//附件上传完毕后
+
+//            if(fileRespondBot.error=="1"){
+//                window.top.layer.msg(fileRespondBot.message);
+//            }
+//            else{
+//
+//                saveFile("上传成功");
+//
+//            }
+
+          saveFile("上传成功");
+      });
+
+      newUploader.bind('Error', function(up, err) {//上传失败
+          $('.'+err.file.id).remove();
+          window.top.layer.msg(err.file.name+"上传失败，请重新上传");
+          up.refresh();
+      });
+
+
+    //授权
+    $(document).on("click",".js-tr-authorization",function(){
+
+      window.top.layer.msg("程序员GG们正在努力开发中,请耐心等待...");
+    });
+    //个人文件柜
+    $(document).on("click",".js-tr-collection",function(){
+      window.top.layer.msg("程序员GG们正在努力开发中,请耐心等待...");
+
+    })
+      //作废
+      $(document).on("click",".js-to-void",function(){
+          var $this=$(this),
+              $id= $this.data("id"),
+              $name=$this.data("name"),
+               $size=$this.data("size"),
+               $index=$this.data("index");
+          var isEnd=window.top.layer.confirm('是否作废此文件？', {
+              btn: ['确定','取消']
+                  }, function(){
+
+              var xmldata="{addFileList:[{id:'"+(new Date().getTime())+"',name:'"+$name+"',size:'"+$size+"',remark:'-1'}],delFileList:[{id:'"+$id+"',name:'"+$name+"',size:'"+$size+"'}]}";
+              var fileUrl=project+"/admin/wfUpload/wfFileUpload.action";
+              $.post(fileUrl,{"wf_id":"${wf_id!}","fileJson":xmldata,"fileId":$tableKeyId},function(data){
+
+
+                  textDatas[$index].name=$name+"（此文件已作废）";
+                  textDatas[$index].remark="-1";
+                  $('#main_text').html(_.template($('#text-data').html()));
+                  window.top.layer.msg($name+"已作废");
+
+              })
+
+
+                    }, function(){
+
+                  });
+              });
+
+    //删除
+    $(document).on("click",".js-tr-delete",function(){
+        var delSame=true;
+        var index=parseInt($(this).data("index"));
+
+
+        var isEnd=window.top.layer.confirm('是否删除此文件？', {
+
+            btn: ['确定','取消']
+        }, function(){
+            window.top.layer.msg("删除中...");
+            for(var k= 0,kmax=delFileList.length;k<kmax;k++){
+                if((delFileList[k].name)==(datas[index].name)&&(delFileList[k].size)==(datas[index].size)){
+                    delSame=false;
+                    break;
+                }
+
+            }
+            if(delSame){
+                delFileList.push({
+                    "id":datas[index].id,
+                    "size":datas[index].size,
+                    "name":datas[index].name
+                });
+            }
+
+            datas.splice(index,1);
+            datas.sort(function(b,a){
+                return (a.time)-(b.time)
+            });
+
+            textDatas.sort(function(b,a){
+                return (a.time)-(b.time)
+            });
+            $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+            isSameFile=true;
+            saveFile("删除成功");
+
+        }, function(){
+
+        });
+    });
+
+
+        //删除
+    $(document).on("click",".js-tr-delete-text",function(){
+        var delSame=true;
+        var index=parseInt($(this).data("index"));
+
+        var isEnd=window.top.layer.confirm('是否删除此文件？', {
+
+            btn: ['确定','取消']
+        }, function(){
+            window.top.layer.msg("删除中...");
+            for(var k= 0,kmax=delFileListText.length;k<kmax;k++){
+                if((delFileListText[k].name)==(textDatas[index].name)&&(delFileListText[k].size)==(textDatas[index].size)){
+                    delSame=false;
+                    break;
+                }
+
+            }
+
+            if(delSame){
+                delFileListText.push({
+                    "id":textDatas[index].id,
+                    "size":textDatas[index].size,
+                    "name":textDatas[index].name
+                });
+            }
+
+            textDatas.splice(index,1);
+
+            datas.sort(function(b,a){
+                return (a.time)-(b.time)
+            });
+
+            textDatas.sort(function(b,a){
+                return (a.time)-(b.time)
+            });
+            $('#main_text').html(_.template($('#text-data').html(), textDatas));
+            isSameText=true;
+            saveText("删除成功");
+
+
+        }, function(){
+
+        });
+
+    });
+
+      //下载
+    $(document).on("click",".js-tr-download",function(){
+    	var $download=$(this).attr("href");
+      if($download.indexOf("javascript:")>-1){
+         window.top.layer.msg("先保存，才能下载");
+      }
+
+
+    });
+
+  });
+
+  $(window).load(function(){
+     // billAuto();
+     // window.top.oneClickLi();
+  });
+
+  function saveFile(title){
+
+      var dataPost=[];
+
+      var preListLength=(addFileListPost.length-1);
+      preListLength.length=0;
+      addFileList.forEach(function(value,index){
+          if(index>preListLength){
+              dataPost.push({
+                  id:value.id,
+                  name:value.name,
+                  size:value.size,
+                  remark:value.remark
+              })
+          }
+          addFileListPost.push({
+              id:value.id,
+              name:value.name,
+              size:value.size,
+              remark:value.remark
+          });
+      });
+
+
+
+      var xmldata="";
+      xmldata+="{addFileList:[";
+      for(var j= 0,jmax=dataPost.length;j<jmax;j++){
+          var dot=(dataPost.length>(j+1))?',':'';
+          xmldata+="{id:'"+dataPost[j].id+"',name:'"+dataPost[j].name+"',size:'"+dataPost[j].size+"',remark:''}"+dot+"";
+      }
+      xmldata+="],";
+      xmldata+="delFileList:[";
+      for(var k= 0,kmax=delFileList.length;k<kmax;k++){
+          var dot=(delFileList.length>(k+1))?',':'';
+          xmldata+="{id:'"+delFileList[k].id+"',name:'"+delFileList[k].name+"',size:'"+delFileList[k].size+"'}"+dot+"";
+      }
+      xmldata+="]}";
+
+
+      var fileUrl=project+"/admin/wfUpload/wfFileUpload.action";
+      $.post(fileUrl,{"wf_id":"${wf_id!}","fileJson":xmldata,"fileId":$tableKeyId},function(data){
+          $tableKeyId=data.datas.fileId;
+          if(isSameFile){
+              window.top.layer.msg(title);
+          }
+      })
+
+
+  }
+
+
+
+  //保存正文信息
+  function  saveText(title){
+
+      var dataPost=[];
+      var preListLength=(addFileListTextPost.length-1);
+      preListLength.length=0;
+      addFileListText.forEach(function(value,index){
+          if(index>preListLength){
+              dataPost.push({
+                  id:value.id,
+                  name:value.name,
+                  size:value.size,
+                  remark:value.remark
+              })
+          }
+          addFileListTextPost.push({
+              id:value.id,
+              name:value.name,
+              size:value.size,
+              remark:value.remark
+          });
+      });
+      var xmldata="";
+    xmldata+="{addFileList:[";
+    for(var j= 0,jmax=dataPost.length;j<jmax;j++){
+      var dot=(dataPost.length>(j+1))?',':'';
+      xmldata+="{id:'"+dataPost[j].id+"',name:'"+dataPost[j].name+"',size:'"+dataPost[j].size+"',remark:'1'}"+dot+"";
+    }
+    xmldata+="],";
+    xmldata+="delFileList:[";
+    for(var k= 0,kmax=delFileListText.length;k<kmax;k++){
+      var dot=(delFileListText.length>(k+1))?',':'';
+      xmldata+="{id:'"+delFileListText[k].id+"',name:'"+delFileListText[k].name+"',size:'"+delFileListText[k].size+"'}"+dot+"";
+    }
+    xmldata+="]}";
+
+
+    var fileUrl=project+"/admin/wfUpload/wfFileUpload.action";
+    $.post(fileUrl,{"wf_id":"${wf_id!}","fileJson":xmldata,"fileId":$tableKeyId},function(data){
+        $tableKeyId=data.datas.fileId;
+        if(isSameText){
+            window.top.layer.msg(title);
+        }
+    })
+
+
+  }
+
+
+  //保存正文
+
+
+
+  function getNowFormatDate() {
+    var date = new Date();
+    var seperator1 = "-";
+    var seperator2 = ":";
+    var month = date.getMonth() + 1;
+    var strDate = date.getDate();
+
+    var getHours=date.getHours();
+    var getMinutes=date.getMinutes();
+    var getSeconds=date.getSeconds();
+
+    if (month >= 1 && month <= 9) {
+      month = "0" + month;
+    }
+
+    if (strDate >= 0 && strDate <= 9) {
+      strDate = "0" + strDate;
+    }
+
+      if (getHours >= 0 && getHours <= 9) {
+          getHours = "0" + getHours;
+      }
+      if (getMinutes >= 0 && getMinutes <= 9) {
+          getMinutes = "0" + getMinutes;
+      }
+      if (getSeconds >= 0 && getSeconds <= 9) {
+          getSeconds = "0" + getSeconds;
+      }
+
+    var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+            + " " + getHours + seperator2 + getMinutes
+            + seperator2 + getSeconds;
+    return currentdate;
+  }
+  function linkDataShow(){
+
+     var father = window.top;
+
+         $docId=father.data_dataset2.first();
+
+        var linkurl=project+"/admin/documentRelateLink/selectRelateLink.action?docId="+$docId;
+        linkData.length=0;
+        $.post(linkurl,function(data) {
+            if(data.success){
+              var result=data.data;
+              result.forEach(function(value){
+                linkData.push({
+                  "docId":value.docId,
+                  "link":project+value.link+"&wfs=read",
+                  "title":(value.title).replace(/<br>/g,""),
+                  "id":value.id
+                });
+              });
+              $('#link_table').html(_.template($('#link-data').html(), linkData));
+
+            }
+          
+
+        });
+       
+ }
+  function fileInit(){
+
+        $.ajax({
+      type: 'post',
+      url: url,
+      data: {
+        "tableName": "oa_document_attachment",
+        "tableKey": "id",
+        "tableKeyId": $tableKeyId
+      },
+      dataType: 'json',
+      success: function (data) {
+        datas.length = 0;
+        if (data.result == "success") {
+          var message = data.message;
+          downloadsrc = data.path;
+          for (var i = 0, max = message.length; i < max; i++) {
+              if( message[i].remark=="1"|| message[i].remark=="2"||message[i].remark=="3"||message[i].remark=="4"||message[i].remark=="-1"){
+              textDatas.push({
+              "createBy": message[i].username,
+              "createDttm": message[i].createDttm,
+              "createDttm2": message[i].createDttm2,
+              "time":changeMilliSeconds(message[i].createDttm2),
+              "dataValid": message[i].dataValid,
+              "directoryId": message[i].directoryId,
+              "id": message[i].id,
+              "lastUpdateDttm": message[i].lastUpdateDttm,
+              "name": message[i].name,
+              "style":classStyle(message[i].name),
+              "path": encodeURI(downloadsrc + message[i].path).replace(/\+/g,"%2B"),
+              "primaryKey": message[i].primaryKey,
+              "size": message[i].size,
+              "tableKey": message[i].tableKey,
+              "tableKeyId": message[i].tableKeyId,
+              "tableName": message[i].tableName,
+              "isMyself":((message[i].createBy)=="${Session.userid!}" || (message[i].canDeletePerson)=="${Session.userid!}")?true:false,
+               "remark":message[i].remark
+            });
+              }else if(message[i].remark=="5"){
+            	  
+              }
+//              else if( message[i].remark=="2"){
+//                  textDatas.push({
+//                      "createBy": message[i].username,
+//                      "createDttm": message[i].createDttm,
+//                      "createDttm2": message[i].createDttm2,
+//                      "time":changeMilliSeconds(message[i].createDttm2),
+//                      "dataValid": message[i].dataValid,
+//                      "directoryId": message[i].directoryId,
+//                      "id": message[i].id,
+//                      "lastUpdateDttm": message[i].lastUpdateDttm,
+//                      "name": message[i].name,
+//                      "style":classStyle(message[i].name),
+//                      "path": encodeURI(downloadsrc + message[i].path),
+//                      "primaryKey": message[i].primaryKey,
+//                      "size": message[i].size,
+//                      "tableKey": message[i].tableKey,
+//                      "tableKeyId": message[i].tableKeyId,
+//                      "tableName": message[i].tableName,
+//                      "isMyself":(message[i].createBy)=="${Session.userid!}"?true:false
+//                  });
+//              }
+              else{
+                 datas.push({
+              "createBy": message[i].username,
+              "createDttm": message[i].createDttm,
+              "createDttm2": message[i].createDttm2,
+              "time":changeMilliSeconds(message[i].createDttm2),
+              "dataValid": message[i].dataValid,
+              "directoryId": message[i].directoryId,
+              "id": message[i].id,
+              "lastUpdateDttm": message[i].lastUpdateDttm,
+              "name": message[i].name,
+              "style":classStyle(message[i].name),
+              "path": encodeURI(downloadsrc + message[i].path).replace(/\+/g,"%2B"),
+              "primaryKey": message[i].primaryKey,
+              "size": message[i].size,
+              "tableKey": message[i].tableKey,
+              "tableKeyId": message[i].tableKeyId,
+              "tableName": message[i].tableName,
+              "isMyself":((message[i].createBy)=="${Session.userid!}" || (message[i].canDeletePerson)=="${Session.userid!}")?true:false,
+               "remark":message[i].remark
+            });
+              }
+
+          }
+            datas.sort(function(b,a){
+                return (a.time)-(b.time)
+            });
+
+            textDatas.sort(function(b,a){
+                return (a.time)-(b.time)
+            });
+          $('#attachment_table').html(_.template($('#attachment-data').html(), datas));
+          $('#main_text').html(_.template($('#text-data').html()));
+
+
+            //更新二维码信息
+            if(textDatas.length){
+                textDatas.forEach(function(value){
+                    if(value.name.indexOf(".tif")>(-1)){
+                        window.top.globalParams.qrCode.name=value.name;
+                        window.top.globalParams.qrCode.size=value.size;
+                    }
+                  if(value.name.indexOf(".bmp")>(-1)){
+                    window.top.globalParams.qrCodeOther.name=value.name;
+                    window.top.globalParams.qrCodeOther.size=value.size;
+                  }
+                });
+            }
+        }
+
+
+      },
+      error: function () {
+      }
+    });
+
+ }
+    function historyInit(){
+        var historyUrl=project+"/admin/documentData/getVersionFile.action?recordId="+$docId;
+        var windowLocation=(window.top.location.href).toString();
+
+        var windowBase=windowLocation.split("form")[0];
+
+        $.ajax({
+            url:historyUrl,
+            type:'post',
+            data:{},
+           // async : false,
+            error:function(){
+            },
+            success:function(data){
+                var historyData=data.datas;
+
+                //起草正文文字替换为编辑,历次版本存在的情况下
+                if(historyData.length){
+                    $('#sendDraft_btn').text('编辑正文');
+                }
+                var title;
+                //发文
+                if(window.top.globalParams.djsn=="oa_send_document"){
+                    title=$(window.parent.document).find("#TITLE").val();
+                }
+                // 专项事务
+                else if (window.top.globalParams.djsn=="oa_sptrain_audit"){
+            	   title=$(window.parent.document).find("#title").val();
+                }
+                //会议
+                else{
+                   title=$(window.parent.document).find("#SUBJECT").val()
+                }
+                
+
+                historyData.forEach(function(value,index){
+                    textDatas.push({
+                        "createBy": value.userName,
+                        "createDttm": value.fileDate,
+                        "createDttm2": (value.fileDate).replace(".0",""),
+                        "time":changeMilliSeconds((value.fileDate).replace(".0","")),
+                        "dataValid": "",
+                        "directoryId": "",
+                        "id":"history"+value.fileID,
+                        "lastUpdateDttm": "",
+                        "name": title,
+                        "style":classStyle(title),
+                        "path":encodeURI(windowBase+"admin/documentData/downVersionFile.action?fileId="+value.fileID+"&type="+value.type).replace(/\+/g,"%2B"),
+                        "primaryKey": "",
+                        "size": value.fileSize,
+                        "tableKey": "",
+                        "tableKeyId": "",
+                        "tableName": "",
+                        "isMyself":false,
+                        "remark":value.remark
+                    });
+                });
+
+
+
+                //更新二维码信息
+
+
+                if(textDatas.length){
+                    textDatas.forEach(function(value){
+                        if(value.name.indexOf(".tif")>(-1)){
+                            window.top.globalParams.qrCode.name=value.name;
+                            window.top.globalParams.qrCode.size=value.size;
+                        }
+                      if(value.name.indexOf(".bmp")>(-1)){
+                        window.top.globalParams.qrCodeOther.name=value.name;
+                        window.top.globalParams.qrCodeOther.size=value.size;
+                      }
+                    });
+                }
+
+
+                datas.sort(function(b,a){
+                    return (a.time)-(b.time)
+                });
+
+                textDatas.sort(function(b,a){
+                    return (a.time)-(b.time)
+                });
+                $('#attachment_table').html(_.template($('#attachment-data').html()));
+
+
+
+                $('#main_text').html(_.template($('#text-data').html()));
+            }
+        });
+    }
+
+    function historyBtnControl(){
+        var obj=$.extend({},window.top.globalParams.topBtnText);
+        var $topDjsn=window.top.$urlParam("djsn");
+        var $topWfname=window.top.$urlParam("wfName");
+        //全省性会议按钮移除
+        if($topDjsn=="oa_meeting_info"&&$topWfname=="oa_provincial_meeting"){
+            obj.text=0;
+        }
+        if($topDjsn!="oa_send_document"){
+            obj.qrCode=0;
+        }
+
+        
+        historyControlData.push({
+            text:obj.text?"":"fn-hide",
+            edit:obj.edit?"":"fn-hide",
+            look:obj.look?"":"fn-hide",
+            marking:obj.marking?"":"fn-hide",
+            download:obj.download?"":"fn-hide",
+            seal:obj.seal?"":"fn-hide",
+            qrCode:obj.qrCode?"":"fn-hide",
+            sendDraft:obj.sendDraft?"":"fn-hide"
+        });
+        $('#btn_control').html(_.template($('#btn-control-html').html(),historyControlData));
+    }
+
+    function classStyle(name) {
+
+        if (name) {
+        var str = name.toString();
+        if (str.indexOf(".doc") > 0) {
+
+            return "file-icon-word"
+        }
+        else if (str.indexOf(".pdf") > 0) {
+            return "file-icon-pdf"
+
+        }
+        else if (str.indexOf(".tgw") > 0) {
+            return "file-icon-tiangu"
+        }
+        else {
+            return ""
+        }
+    }
+    }
+
+
+  //转换为毫秒
+  function changeMilliSeconds(time){
+      return new Date((time).replace(new RegExp("-","gm"),"/")).getTime()
+  }
+
+
+  function billAuto(){
+      setTimeout(function(){
+          var $father = $(window.parent.document),
+                  billHeight=$("#contentHmtl").height(),
+                  $autoHeight=billHeight+300;
+          $father.find("#attachmentdiv").height($autoHeight);
+          $father.find("#attachmentdiv").closest(".tab-page").height($autoHeight);
+      },2000);
+
+  }
+</script>
+</body>
+</html>

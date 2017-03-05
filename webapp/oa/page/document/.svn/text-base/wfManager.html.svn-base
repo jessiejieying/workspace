@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;">
+
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 左侧 -->
+        <td id="td_tree" style="width: 250px;">
+          <div class="container-left   pos-rel">
+            <div class="line border-bottom padding-left padding-top js-line-top">
+              <div class="form-group x10 ">
+                <div class="field field-icon-right">
+                  <input type="text"  id="search_tree" class="input left-tree-input" placeholder="搜索">
+                  <span class="tree-search-num js-tree-search-num">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="drop left-drop x1-right  margin-top">
+              <i class="icon icon-ellipsis-h"></i>
+              <ul class="drop-menu">
+                <li><a href="javascript:void(0)" data-id="0" class="icon icon-refresh js-tree-refresh"></a></li>
+                <li><a href="javascript:void(0)" data-id="1" class="icon-folder-open js-tree-open"></a></li>
+                <li><a href="javascript:void(0)" data-id="2" class="icon-folder js-tree-close"></a></li>
+              </ul>
+            </div>
+            <div class="tree-father overfl">
+              <div id="js_tree"></div>
+            </div>
+          </div>
+        </td>
+        <!-- 右侧 -->
+        <td class="ver-top">
+          <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+              <div class="form-group header-group">
+                <div class="button button-main js-add-account" id="add">新增办理单</div>
+                <div class="button  margin-left-in" id="delete">删除</div>
+              </div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th w_check="true" width="40" class="text-left"></th>
+                  <th w_index="billName" width="">办理单名</th>
+                  <th w_index="operate" width="140">操作</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script>
+
+var gridOne, jsTree;
+var key="${key}";
+var parentId;
+var selectURL = "${base}/admin/documentBill/selectBillList.action";
+$(function(){
+	layOut("#common_table","#grid_table");
+    //tree初始化
+    $("#js_tree").jstree({
+        "plugins" : ["search","contextmenu"],
+        "contextmenu":{
+         	"items":{
+            	"新建":{
+              		"label":"新建",
+              		"action":function(data){
+              			parentId = jsTree.get_selected()[0];
+              			var win = {text:"添加流程配置", url:"${base}/admin/documentConfig/wfEditWin.action?commonTree.parentId="+parentId,width:'900',height:'550', id:"addWfWin",'parentIfr':window};
+                        window.top.createWindow(win);					
+              		}
+           		},
+            	"修改":{
+              		"label":"修改",
+              		"action":function(data){
+              			parentId = jsTree.get_selected()[0];
+              			var win = {text:"修改流程配置", url:"${base}/admin/documentConfig/wfEditWin.action?id="+parentId,width:'900',height:'550', id:"updateWfWin",'parentIfr':window};
+                        window.top.createWindow(win);	
+              		}
+            	},
+            	"删除":{
+              		"label":"删除",
+              		"action":function(data){
+              			parentId = jsTree.get_selected()[0];
+              			layer.confirm('你确定要删除这些数据吗？', function(index){		   
+              			    $.post("${base}/admin/documentConfig/doDelOpenWf.action", {"commonTree.id":parentId}, function(result){
+              			        if(result.result=="success"){
+              			        	jsTree.refresh();
+              			        }
+              			        layer.msg(result.message);
+              			    });
+              			    
+              			    layer.close(index);
+              			});
+              		}
+            	}
+            }
+    	},
+		"themes": {
+		    "theme": "classic",
+		    "dots": true,
+		    "icons": false
+		},
+		'core' :{
+		    "check_callback" : true,
+		    'data' : {
+		     	'url' : "${base}/admin/commonTree/commonTreeAction!getTree.action?key="+key+"&etc=" + new Date().getTime(),
+		        'dataType':'json'	     	
+		    }
+		}
+    }).on("click.jstree",".jstree-anchor",function(e,data){
+    	parentId = jsTree.get_selected()[0];
+    	if(jsTree.is_leaf(parentId)){
+    		gridOne.changeUrl(selectURL +"?wfname=" + parentId + "&etc=" + new Date().getTime()); 
+    	}
+    }).on("loaded.jstree",function(e,data){
+    	jsTree = $('#js_tree').jstree();
+    	 jsTree.open_node("oa_document_wf");
+      	var allNode=jsTree.get_all_node();
+      	for(var i= 0,max=allNode.length;i<max;i++){
+       		var hasChild=jsTree.get_node(allNode[i]).children;
+        	if(hasChild.length<1){
+          		jsTree.set_icon(allNode[i],"jstree-file");
+        	}
+      	}
+    });
+
+    //树的拖曳 handles:{e:右边,s:下边}
+    $("#td_tree").resizable({
+        handles: "e",
+        helper: true,
+        maxHeight: 1000,
+        maxWidth: 1000,
+        minHeight:100,
+        minWidth: 250,
+        onStartResize: function () {},
+        onResize: function () {},
+        onStopResize: function () {
+          //将表头和表体的宽度设置成一样
+          $(".bsgrid-header").each(function(){
+            var $this=$(this);
+            $this.css({"width":$this.next(".bsgrid").width()})
+          });
+        }
+    });
+
+    //js树刷新，打开，关闭
+    $(document).on("click",".js-tree-refresh,.js-tree-open,.js-tree-close",function(){
+        var id=$(this).data("id");
+        if(id=="0"){
+            jsTree.refresh();
+        }
+        else if(id=="1"){
+            jsTree.open_all();
+        }
+        else if(id=="2"){
+            jsTree.close_all()
+        }
+    });
+
+    var to = false;
+    //jstree 搜索
+    $('#search_tree').keyup(function () {
+        if(to) { clearTimeout(to); }
+        to = setTimeout(function () {
+            var v = $('#search_tree').val();
+            $('#js_tree').jstree().search(v);
+          var counter=$("a:contains('"+v+"')").size();
+          $('.js-tree-search-num').text(counter);
+          if(v==""){
+            $('.js-tree-search-num').text("0");
+          }
+        }, 250);
+	});
+    
+  //grid初始化
+    gridOne=$.fn.bsgrid.init("manage_grid", {
+        url:'',
+        row_primary_key: "primaryKey",
+        autoLoad: true,
+        pageSizeSelect: true,
+        pageSize:15,
+        supportColumnMove:true,
+        complete:function(options, XMLHttpRequest, textStatus){
+
+        },
+        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+        },
+        additionalAfterRenderGrid:function(){
+            gridOne.initGrid();
+        }
+    });
+
+    
+    //工具条增加
+    $(document).on("click","#add",function(){
+		var parentId = jsTree.get_selected()[0];
+        if (jsTree.is_leaf(parentId)) {       
+          	var win = {text:"新增办理单", url:"${base}/admin/documentBill/documentBillEditWin.action?documentBill.wfname="+parentId,width:'950',height:'620', id:"addDocumentBillWin",'parentIfr':window};
+            window.top.createWindow(win);        
+        } else {
+            layer.msg('请选择叶节点！');
+        }
+    });
+    //工具条删除
+    $(document).on("click","#delete",function(){
+        var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+        
+        if(checkedRowsRecoreds.length < 1) {
+        	layer.msg('请至少选择一条数据');
+        	return
+        }
+        var idArr = [];
+        for(var i = 0, l = checkedRowsRecoreds.length; i < l; i++ ) {
+        	idArr[i] = checkedRowsRecoreds[i].id;
+        }
+		layer.confirm('你确定要删除这些数据吗？', function(index){		   
+		    $.post("${base}/admin/documentBill/deleteDocumentBill.action",  {"ids":idArr.join(",")}, function(result){
+		        if(result.resultFlag=="true"){
+		            gridOne.refreshPage();
+		        }
+		        layer.msg(result.message);
+		    });
+		    
+		    layer.close(index);
+		});
+        
+    });
+});
+
+function getRecord(selId) {
+	var getIndex = -1,getId="#grid_"+selId;
+    getIndex = $(getId).attr("index");
+    if(getIndex == -1){
+    	return null;
+    }
+	return gridOne.getRowRecord(gridOne.getRow(getIndex));
+}
+
+//删除
+function d(selId){
+    layer.msg("安全起见,暂时无法删除哦～,请数据库删除");
+    return;
+	var record = getRecord(selId);
+	if(record == null) {
+		return;
+	}
+  	layer.confirm('你确定要删除这些数据吗？', function(index){		   
+  		$.post("${base}/admin/documentBill/deleteDocumentBill.action",  {"ids":record.id}, function(result){
+	        if(result.resultFlag=="true"){
+	            gridOne.refreshPage();
+	        }
+	        layer.msg(result.message);
+	    });
+	    
+	    layer.close(index);
+	});
+}
+
+function e(id) {
+	var win = {text:"修改办理单", url:"${base}/admin/documentBill/documentBillEditWin.action?documentBill.id="+id,width:'950',height:'620', id:"updateDocumentBillWin",'parentIfr':window};
+    window.top.createWindow(win);    
+}
+
+function modelBillPop(id){
+
+    var item=getRecord(id);
+    var billId=item.id,
+        wfName=item.wfname;
+    var win = {text:"办理单模板权限", url:"${base}/admin/commonDispatch/billJurisdiction.action?billId="+billId+"&wfName="+wfName,width:window.top.$(window).width(),height:'550', id:"modelBillWin",'parentIfr':window};
+    window.top.createWindow(win);
+}
+
+
+</script>
+</body>
+</html>

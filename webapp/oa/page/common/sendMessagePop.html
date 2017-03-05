@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>eden</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+
+</head>
+<body  class="ms-controller" ms-controller="wrap">
+<div class="message-textarea-box">
+
+    <!--发送给个人 1-->
+    <div class="sendObj" ms-if="@mailMessageData.messageType==1">
+        <h4>发送至：</h4>
+        <div class="send-content">
+            <div id="massage_send_content">
+                <label ms-for="(index,el) in @mailMessageData.sendRange">
+                    <input ms-attr="{'data-id':el.id,'data-name':el.name,'data-post':el.post,'data-tel':el.tel,'data-unit':el.unit}" type="checkbox" checked="checked">{{el.name}}({{el.tel}})</label>
+            </div>
+        </div>
+    </div>
+    <!--发送给单位 2-->
+    <div ms-if="@mailMessageData.messageType==2" class="js-grid-father grid-father" style="position:relative;overflow-y:scroll;height:212px;padding-top:38px;">
+        <table class="table-fixed-header bsgrid-header" id="manage_grid_fixedHeader" style="width: 683px;position: fixed;left: 55px;"><thead><tr>
+            <th    width="30">
+                <input class="bsgrid_editgrid_check js-check-all"  checked="checked" type="checkbox">
+            </th>
+            <th width="40">序号</th>
+            <th  width="200" >单位</th>
+            <th >姓名</th>
+            <th width="100" >职务</th>
+            <th  width="150" >联系电话</th>
+        </tr>
+        </thead>
+        </table>
+    <table class="bsgrid" id="massage_send_content" style="border-top: 2px solid #71b8ec;">
+        <tr ms-for="(index,el) in @mailMessageData.sendRange">
+            <td width="30" style="padding-left: 0;text-align: center">
+                <label><input class="standard-checkbox"  checked="checked" ms-attr="{'data-id':el.id,'data-name':el.name,'data-post':el.post,'data-tel':el.tel,'data-unit':el.unit}" type="checkbox" value=""/></label>
+            </td>
+            <td  style="padding-left: 0;text-align: center;width: 40px;">{{index+1}}</td>
+            <td width="200" style="padding-left: 0;text-align: center">{{el.unit}}</td>
+            <td width="" style="padding-left: 0;text-align: center">{{el.name}}</td>
+            <td width="100" style="padding-left: 0;text-align: center">{{el.post}}</td>
+            <td width="150" style="padding-left: 0;text-align: center">{{el.tel}}</td>
+        </tr>
+        <tr ms-if="@mailMessageData.sendRange.length<1">
+            <td colspan="6" style="text-align: center;padding-left: 0;">暂无数据</td>
+        </tr>
+    </table>
+    </div>
+
+    <div class="add-phone">
+        <span>手动增加手机号码，多个手机号以逗号分开</span><input type="text" class="tool-bar-input" ms-duplex="@mailMessageData.telphones" id="message_phone" />
+    </div>
+    <div class="message-textarea">
+      <textarea id="message_textarea"  ></textarea>
+    </div>
+</div>
+<div class="text-center">
+<!--     发送间隔 -->
+<!--     <select class="input display-ib"  style="width:100px" ms-duplex="@mailMessageData.taskType"> -->
+<!--         <option value="1">单次</option> -->
+<!--         <option value="2">多次</option> -->
+<!--     </select> -->
+<!--         <span id="selectShow" ms-visible="@mailMessageData.taskType>1"> -->
+<!--         频率 -->
+<!--         <input type="text" ms-duplex="@mailMessageData.cycleHour" class="input display-ib"  style="width:100px"/> -->
+<!--         小时 -->
+<!--        </span> -->
+    <div class="button button-main margin-big-left" ms-click="@sureClick()" >确定</div>
+</div>
+<!-- jquery 框架 1.11 -->
+<script src = "${base}/edenui/common/js/jquery.js"></script>
+<script src = "${base}/form/resources/common/js/tool.js"></script>
+<script src = "${base}/edenui/common/js/underscore.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src = "${base}/edenui/common/js/avalon/avalon2.js"></script>
+<script>
+
+
+    var mailMessageFather=window.parent.mailMessageData;
+    
+    //参数配置表
+    avalon.config({
+        debug: false
+    });
+    var model = avalon.define({
+        $id: "wrap",
+        mailMessageData:{
+            'sendRange':[],
+            'telphones':'',
+            'content':'',
+            'taskType':1,
+            'cycleHour':1,
+            'messageType':1
+        },
+        sureClick:function() {
+
+            var isTure = true;
+            if (model.mailMessageData.telphones.length) {
+            var phoneData = page.trimAll(model.mailMessageData.telphones.replace(/，/g, ",").replace(/,/g, ",")).split(",");
+
+            for (var i = 0, max = phoneData.length; i < max; i++) {
+                if (!page.isMobile(phoneData[i])) {
+                    layer.msg(phoneData[i] + "不是正确的手机号码,请输入重新输入");
+                    isTure = false;
+                    break;
+                }
+            }
+        }
+            if(isTure){
+              //  mailMessageFather.content=model.mailMessageData.content;
+                  mailMessageFather.content=$("#message_textarea").val();
+                mailMessageFather.taskType=model.mailMessageData.taskType;
+                mailMessageFather.cycleHour=model.mailMessageData.cycleHour;
+                mailMessageFather.sendRange.length=0;
+                mailMessageFather.telphones.length=0;
+                $("#massage_send_content label input").each(function(){
+                    var $this=$(this);
+                    if($this.prop("checked")){
+                        mailMessageFather.sendRange.push({
+                            'name':$this.data('name'),
+                            'id':$this.data('id'),
+                            'post':$this.data('post'),
+                            'tel':$this.data('tel'),
+                            'unit':$this.data('unit')
+                        });
+                    }
+                });
+
+                if (model.mailMessageData.telphones.length) {
+                    phoneData.forEach(function(value){
+                        mailMessageFather.telphones.push(value);
+                    });
+                }
+
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+
+            }
+
+        }
+    });
+
+
+    var page=(function(){
+        var obj={
+            init:function(){
+                this.getInitData();
+            },
+            isMobile:function(mobile){
+                return (/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/).test(mobile);
+
+            },
+            uniqMore:function(data,id){
+
+            },
+            trimAll:function(str){
+                // 取消所有空格
+                    var result;
+                    var is_global="g";
+                    result = str.replace(/(^\s+)|(\s+$)/g,"");
+                    if(is_global.toLowerCase()=="g")
+                    {
+                        result = result.replace(/\s/g,"");
+                    }
+                    return result;
+
+            },
+            getInitData:function(){
+
+                var pageSendRange=[];
+
+                //载入发送范围
+                mailMessageFather.sendRange.forEach(function(value){
+                    pageSendRange.push({
+                        'name':value.name,
+                        'id': value.id,
+                        'post':value.post,
+                        'tel':value.tel,
+                        'unit':value.unit
+                    });
+                });
+
+                model.mailMessageData.sendRange=pageSendRange;
+                model.mailMessageData.telphones=_.uniq(mailMessageFather.telphones).join(",");
+                model.mailMessageData.messageType=mailMessageFather.messageType;
+              //  model.mailMessageData.content=mailMessageFather.content;
+
+                $("#message_textarea").val(mailMessageFather.content);
+                model.mailMessageData.taskType=(mailMessageFather.taskType)?(mailMessageFather.taskType):1;
+                model.mailMessageData.cycleHour=(mailMessageFather.cycleHour)?(mailMessageFather.cycleHour):1;
+            }
+        }
+        return obj;
+    })();
+    $(function() {
+        page.init();
+
+        $(".js-check-all").change(function(){
+            var $this=$(this);
+            if($this.prop("checked")){
+                $("#massage_send_content label input").prop("checked",true);
+            }
+            else{
+                $("#massage_send_content label input").prop("checked",false);
+            }
+        });
+
+        $(document).on("change","#massage_send_content label input",function(){
+            if(!$(this).prop("checked")){
+                $(".js-check-all").prop("checked",false);
+            }
+        });
+        
+
+    });
+
+</script>
+</body>
+</html>

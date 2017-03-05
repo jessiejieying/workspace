@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>eden</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <style>
+        .no-pass-textarea{
+            height: 80px;
+            width:100%;
+            border: 0;
+            background-color: #fff;
+            color: #2f2f2f;
+            padding: 5px;
+            margin-top:10px;
+        }
+    </style>
+
+    <script src = "${base}/edenui/common/js/jquery.js"></script>
+    <script src ="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+    <script src = "${base}/edenui/common/js/avalon/avalon2.js"></script>
+    <script>
+
+        //参数配置表
+        avalon.config({
+            debug: false
+        });
+        var model = avalon.define({
+            $id: "wrap",
+            dataList:[],
+            isTextArea:false,
+            textArea:'',
+            save:function(){
+
+                var isGoging=false;
+                var url="${base}/admin/withoutReason/saveWithoutInfo.action";
+
+                var reasonData=[];
+
+                var otherContent=model.textArea;
+                model.dataList.forEach(function(value){
+
+
+                    if(value.check){
+                        reasonData.push(value.id);
+                    }
+                    //其他
+                    if(value.id=="999"){
+                        if(!value.check){
+                            otherContent="";
+                        }
+                        else{
+
+                            if(otherContent.length<1){
+                                layer.msg("请填写其他理由！");
+                                isGoging=true;
+                            }
+                        }
+                    }
+                });
+
+
+                if(isGoging){
+                    return;
+                }
+
+                var obj={
+                    "wfId":window.top.globalParams.wfid,
+                    "reasonId":reasonData.join(","),
+                    "other":otherContent
+                }
+                $.post(url,obj,function(data){
+                    layer.msg(data.message);
+                    setTimeout(function(){
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index); //再执行关闭
+                    },500);
+                });
+
+            }
+        });
+
+        var page=(function(){
+            var obj={
+                init:function(){
+                    var url="${base}/admin/withoutReason/getWithoutReasonInfo.action?etc="+new Date().getTime()+"&wfId="+window.top.globalParams.wfid;
+                    $.getJSON(url,function(data){
+
+                        if(data.data.length){
+                            var listInit=[];
+                            data.data.forEach(function(value){
+                                listInit.push({
+                                    'id':value.id,
+                                    'name':value.name,
+                                    'check':parseInt(value.selected)?true:false
+                                });
+                            });
+                            model.dataList=listInit;
+                        }
+
+                        model.textArea=data.other;
+                        listInit.forEach(function(val){
+                            if(val.id=="999"){
+                                if(val.check){
+                                    model.isTextArea=true;
+                                }
+                            }
+                        });
+
+                    });
+                }
+
+
+
+            }
+            return obj
+        })()
+
+        $(function() {
+            page.init();
+            $(document).on("click",".js-field-selection",function(){
+                if($(this).prop("checked")){
+                    model.isTextArea=true;
+                }
+                else{
+                    model.isTextArea=false;
+                }
+            });
+        });
+
+
+    </script>
+</head>
+<body  class="ms-controller export-data-by-field" ms-controller="wrap">
+<div id="exportFieldHtmlIn" class="export-choice-content " style="height: 270px;padding-bottom:20px;margin-top: 0px;border: 0;background-color: #fff;">
+    <label class="field-selection-label" ms-for="(index,el) in @dataList" style="display: block;">
+        <div><input type="checkbox" ms-duplex-checked='el.check'   ms-class="{'js-field-selection':el.id=='999'}">{{el.name}}</div>
+        <textarea ms-visible="@isTextArea"  ms-duplex="@textArea" style="border: 2px solid #76aff6" class="no-pass-textarea js-textarea-show" ms-if="el.name==='其他'"></textarea>
+    </label>
+</div>
+
+<div class="text-center bot">
+    <button class="button button-main" ms-click="@save()">保存</button>
+</div>
+</body>
+</html>

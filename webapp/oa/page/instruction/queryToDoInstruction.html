@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;">
+<div class="container-layout line">
+	<#include "/aufw/page/include/script.html">
+        <table style="width: 100%;" id="common_table">
+            <tr>
+				<td class="ver-top">
+					<div class="grid-table-top" id="grid_table">
+						<div class="js-tool-bar">
+							<div class="form-group header-group">
+							 <#if separateColumn?? && separateColumn=="0">
+								<div class="button button-main js-add-account" id="instruction_add" onclick="instructionAdd()">省领导批示登记</div>
+							 </#if>
+                               <!--  <select id="search_file_type" class="input  margin-left-in" style="width: 150px;" name="instructionType">
+							       <option value="">批示类型</option>
+							       <option value="0">领导批示</option>
+							       <option value="2">批示反馈</option>
+						       </select> -->
+						      <!--  <#if separateColumn?? && separateColumn == "0">
+						           <input type="hidden" value="0" id="search_file_type" name="instructionType"/>
+						           <input type="hidden" value="0" id="separateColumn"/>
+							   <#elseif separateColumn?? && separateColumn == "1">
+							   	   <input type="hidden" value="0" id="search_file_type" name="instructionType"/>
+							   	   <input type="hidden" value="0" id="separateColumn"/>
+							   <#elseif separateColumn?? && separateColumn == "2">
+							   	   <input type="hidden" value="2" id="search_file_type" name="instructionType"/>
+							   <#else>
+							      <input type="hidden" value="" id="search_file_type" name="instructionType"/>
+							   </#if>  -->
+								<span class="header-title margin-left-out ldSpan">批示领导:</span>
+                                <input id="instructionLeader" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                                <div class="button button-main margin-left-out" id="senior_grid_search">搜索</div>
+								<div class="button js-level-search margin-left-in">高级搜索<i class="li-icon-arrow-down"></i></div>
+							</div>
+							<div class="level-searh form-group header-group" style="display: none;">
+								<span id="receiveDateSpan" class="header-title">来文时间:</span>
+								<div id="receiveDateDiv" class="display-ib margin-top0">
+                                    <input name="fromStartDate" id="fromStartDate" class="Wdate tool-bar-input input-father ft12" style="cursor: pointer;height: 26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd', maxDate:'#F{$dp.$D(\'fromEndDate\')||\'2025-10-01\'}'})" size="15" type="text">
+                                    <span class="header-title margin-left-in">至</span>
+                                    <input id="fromEndDate" style="cursor: pointer;height: 26px;" size="15" class="Wdate tool-bar-input input-father margin-left-in" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'fromStartDate\')}',maxDate:'2025-10-01'})"
+										name="fromEndDate" type="text">
+								</div>
+							    <span class="header-title margin-left-out">批示内容:</span>
+								<input id="instructionContent" type="text" style="width:110px;" class="tool-bar-input margin-left-in" placeholder="" />
+								<span class="header-title margin-left-out">来文标题:</span>
+								<input id="fromTitle" type="text" style="width:110px;" class="tool-bar-input margin-left-in" placeholder="" />
+								<span class="header-title margin-left-out">批示序号:</span>
+								<input id="instructionOrder" style="width:110px;" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+								<#if separateColumn?? && separateColumn == "2">
+								<span class="header-title margin-left-out">反馈单位:</span>
+								<input id="fromDept" style="width:110px;" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+								</#if>
+							</div>
+						</div>
+						<div class="js-grid-father grid-father">
+							<table id="manage_grid" class="bsgrid">
+								<tr>
+									<th w_index="id" w_hidden="true" class="hidden"></th>
+									<th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+									<th width="40">序号</th>
+									<th w_index="instructionOrder" width="120">批示序号</th>
+									<#if separateColumn?? && separateColumn!="2">
+										<th w_index="fromDept" width="100">来文单位</th>
+									</#if>
+									<th w_index="fromTitle2">来文标题</th>
+									<th w_index="instructionContent" >批示内容</th>
+									<th w_index="instructionDateNew" width="80">批示时间</th>
+									<#if separateColumn?? && separateColumn=="1">
+									<th w_index="sendToExchangeTimeStr" width="140">下发时间</th>
+									<th w_index="feeBackSituationStatus" width="60">是否反馈</th>
+									<th w_index="feeBackSituation" width="60">反馈情况</th>
+									</#if>
+									<#if separateColumn?? && separateColumn=="0">
+										<th w_index="remark" width="125">备注</th>
+									</#if>
+									<#if separateColumn?? && separateColumn=="2">
+										<th w_index="fromDept" width="200">反馈单位</th>
+									</#if>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!--表单、流程，基于jquery的方法-->
+	<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+	<script src="${base}/oa/resource/js/task.js"></script>
+	<script src="${base}/oa/resource/js/instructionUtils.js"></script>
+	<script>
+var version='1';
+var wf_name='oa_leader_instruction';
+var versionFB='1';
+var wf_nameFB='oa_leader_instruction_fb';
+var gridOne;
+var instType = "${instType}";//todo
+var instructionType = "${instructionType}";
+var separateColumn = "${separateColumn}";
+var selectURL = "${base}/admin/instruction/queryByCondition.action?iType=toDo&instructionType="+instructionType+"&separateColumn="+separateColumn;
+var showURL = "${base}/form/fceform/common/run.html?djtype=eden&is_oa_bill=true&actionId=show&djsn=oa_leader_instruction_form&wfId=";
+$(function(){
+	if("1"==separateColumn || "2" == separateColumn){
+		$(".ldSpan").css("margin-left","0px");
+	}
+    layOut("#common_table","#grid_table");
+
+    //grid初始化
+     gridOne=$.fn.bsgrid.init("manage_grid", {
+        url:selectURL + "&etc="+new Date().getTime(),
+        row_primary_key: "primaryKey",
+        autoLoad: true,
+        pageSizeSelect: true,
+        pageSize:15,
+        complete:function(options, XMLHttpRequest, textStatus){
+        },
+        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+        },
+        additionalAfterRenderGrid:function(){
+        	gridOne.initGrid();
+        	$("#manage_grid tbody tr").each(function(){
+        		var $this=$(this);
+        		    $("td",this).eq(1).css({"padding-left":"8px"});
+        			$index=parseInt($this.attr("index"));
+        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+        			if(separateColumn == "1"){
+        				$this.find("td").eq(9).css({"text-align":"center","padding-left":"0px"});
+        				$this.find("td").eq(10).css({"text-align":"center","padding-left":"0px"});
+        			}
+        	});
+       
+    }});
+
+    //工具条搜索 异步交互
+    $(document).on("click","#grid_search",function(){
+        var clu = $("#search").val();
+        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+        var instructionOrder = $("#search_instruction_order").val()=='请输入关键字'?'':$("#search_instruction_order").val();
+        var symbol = "?";
+        if(selectURL.indexOf("?")>0){
+        	symbol = "&";
+        }
+        gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+    });
+
+    //工具条高级搜索 展开
+    $(document).on("click",".js-level-search",function(){
+        girdTable(this);
+		$('.li-icon-arrow-down').toggleClass('li-icon-arrow-top');
+    });
+
+    //工具条高级搜索 异步交互
+    $(document).on("click","#senior_grid_search",function(){
+       	var requsetUrl = requestStr(selectURL,instType);
+        gridOne.changeUrl(requsetUrl);
+    });
+    $(document).on("change","#search_file_type",function(){
+    	var requsetUrl = requestStr(selectURL,instType);
+        gridOne.changeUrl(requsetUrl);
+    });
+});
+//查看任务
+function show(id){
+	var task_name = "";
+	var item = getRecord(id);
+	window.open(showURL + item.wfId);
+}
+
+
+ //省领导批示登记
+function instructionAdd(){
+	initWorkflow(wf_name,"",version);
+ }
+ //省领导批示反馈登记
+function instructionFeedBackAdd(){
+	initWorkflow(wf_nameFB,"",versionFB);
+ }
+ 
+</script>
+</body>
+</html>

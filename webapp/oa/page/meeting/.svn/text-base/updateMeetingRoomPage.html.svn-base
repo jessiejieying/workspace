@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html style="height:100%;+overflow-x:hidden;">
+<head>
+	<title>Custom item</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" type="text/css"
+	href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+	<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+	<style>
+	#myForm:after{
+	clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+	}
+	#myForm{  zoom:1;}
+	</style>
+</head>
+<body style="height:100%;+overflow-x:hidden;background:#fff;">
+	<div id="myForm" style="float:none;"></div>
+	<div style="height:20px;overflow:hidden;clear:both;"></div>
+</body>
+<script src="${base}/aufw/resources/common/js/jquery.js"></script>
+<script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+<script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+<script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+<script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+<script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+<script
+	src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+<script
+	src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+	<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+<script>
+		var myForm, formData,data;
+		
+		$(function(){
+			doOnLoad();
+			$('#picture_pick').html("[修改图片]");
+		});
+
+		function doOnLoad() {
+		//data = new dhtmlXDataStore({
+			//url : "${base}/admin/meetingEquipment/selectModel.action",
+			//datatype : "json"
+		//});
+		
+		//dhtmlxAjax.get("${base}/admin/meetingEquipment/selectModel.action",function(x){
+			//var res = x.xmlDoc.responseText;
+			//var jsx=JSON.parse(res);
+			//console.log(jsx[1])
+			//for(var i in jsx){
+				//for(var j in jsx[i]){
+					//console.log(jsx[i][j].model);
+					
+				//}
+			//}
+		//});
+		var imgSrcUrl="${meetingRoom.picture!}";
+		//imgSrcUrl=encodeURIComponent(imgSrcUrl);
+		//alert(imgSrcUrl)
+		formData = [
+				{ type:"settings", position:"label-left", labelWidth:"90", inputWidth:50 },
+				{type:"fieldset", label:"会议室信息", inputWidth:"720", offsetLeft:10,
+				list:[{type:"hidden", offsetTop:5, list:[
+						{ type:"hidden",name:"meetingRoom.id",value:"${meetingRoom.id}"},
+						{ type:"avatar", name:"picture", url:'${base}/admin/attachmentInfoManager/attachmentInfoAction!uploadPhoto.action', label:"会议室照片", value:imgSrcUrl,inputWidth:200 }
+					]},{type:"hidden", offsetTop:5, list:[
+						{ type:"input", name:"meetingRoom.name", value:"${meetingRoom.name!}",validate:"NotEmpty", label:"会议室名称", inputWidth:200,required:true},
+						{ type:"newcolumn", offset:40},
+						{ type:"input", name:"meetingRoom.adress", value:"${meetingRoom.adress!}", label:"会议室地址", inputWidth:200 }
+					]},{type:"hidden", offsetTop:5, list:[
+														{ type:"input", name:"meetingRoom.capcity", value:"${meetingRoom.capcity!}",validate:"ValidNumeric", label:"容纳人数", inputWidth:200 ,validate:'isInt' },
+						{ type:"newcolumn", offset:40},
+						{ type:"input", name:"meetingRoom.deskType", value:"${meetingRoom.deskType!}", label:"桌型布置", inputWidth:200 }
+					]},{type:"hidden", offsetTop:5, list:[
+						{ type:"select", name:"meetingRoom.isDeskMove", value:"${meetingRoom.isDeskMove!}",label:"桌椅可否移动", inputWidth:200,  options:[
+								{text:"是", value:"1"}
+								,
+								<#if meetingRoom.isDeskMove == 0>
+								{text:"否", value:"0",selected:true}
+								<#else>
+								{text:"否", value:"0"}
+								</#if>
+							] },
+						{ type:"newcolumn", offset:40},
+						/*{ type:"input", name:"address", value:"", label:"主席台人数", inputWidth:100 , required:true, validate:"NotEmpty" }*/
+						{ type:"hidden",name:"meetingRoom.rostrumpersonnum",value:""},
+						{type:"label",label:"主席台人数",labelWidth:90},{type:"newcolumn",offset:4},{type:"input",name:"zhuxi_rows",value:"${meetingRoom.rostrumRow!}",label:"排",inputWidth:72,position:"label-right",labelWidth:20,validate:'isInt'},{type:"newcolumn"},{type:"input",name:"zhuxi_conut",value:"${meetingRoom.rostrumMan!}",label:"人",inputWidth:72,position:"label-right",labelWidth:20,validate:'isInt'}
+					]},{type:"hidden", offsetTop:5, list:[{ type:"input", name:"meetingRoom.price", value:"${meetingRoom.price!}", label:"使用价格", inputWidth:200 ,validate:'isInt' },
+					              						{ type:"newcolumn", offset:40},
+					            						{ type:"select", name:"meetingRoom.status", value:"", label:"使用状态", inputWidth:200, options:[
+					            								<#if meetingRoom.status == 0>
+					            						{text:"不可使用", value:"0",selected:true}
+					            												,{text:"可以使用", value:"1"}
+					            					<#else>
+					            						{text:"可以使用", value:"1",selected:true}
+					            												,{text:"不可使用", value:"0"}
+					            					</#if>
+					            							] }
+					            					]},{type:"fieldset",label:"设备",inputWidth:"645",offsetLeft:15,offsetTop:10,
+						list:[
+						      
+						  
+					{ type:"hidden",name:"meetingRoom.equipment",value:""},
+							
+							  {type:"hidden", offsetTop:5, list:[
+							                                      { type:"hidden"},
+								{ type:"select",id:"equipmentId100", name:"equipmentType100", value:"",label:"讲台",labelWidth:60, inputWidth:100,options:[
+										{text:"无", value:"0"},
+										
+										<#assign rostrumEquipValue="0" />
+										<#if equipmentValueMap?exists&&equipmentValueMap.get(100?int)?exists> 
+											<#assign rostrumEquipValue=equipmentValueMap.get(100?int) />
+										</#if> 
+										
+									
+										<#if rostrumEquipValue=="1"> 
+									 	  {text:"有", value:"1",selected:true}
+									 	  <#else> 
+												{text:"有", value:"1"}
+									 	</#if> 
+									 	
+										
+										] 
+								}
+							    ,                               
+							                                                                           
+							/* ]
+							}
+							 */
+							
+							<#if equipmentMap?exists>
+				                <#list equipmentMap?keys as typekey> 
+							
+				                <#if (typekey_index+1)%3?int==0>    <#-- 第1列 -->
+				                
+				               		 ,{type:"hidden", offsetTop:5, list:[
+				               		                                     
+				               	      { type:"hidden"},   
+				               	<#else>   
+				               		{type:"newcolumn",offset:40},
+				                </#if> 
+				                
+
+								{ type:"select",id:"equipmentId${typekey}", name:"equipmentType${typekey}", value:"",label:"${typeValueMap.get(typekey)}",labelWidth:60, inputWidth:100,options:[
+									
+									{text:"无", value:"0"},
+									
+									 <#assign typeItems = equipmentMap.get(typekey)>
+									 <#if typeItems?exists> 
+										 <#list typeItems?keys as ikey>
+										 
+												
+											  <#if equipmentValueMap?exists&&ikey==equipmentValueMap.get(typekey)> 
+											 	   {text:"${typeItems.get(ikey)!}", value:"${ikey}",selected:true} 
+											 	  <#else> 
+											 	 {text:"${typeItems.get(ikey)!}", value:"${ikey}"} 
+											 	</#if> 
+											 	
+										 
+											
+										 <#if ikey_has_next>
+											,
+										</#if>  
+										 </#list>
+									</#if> 
+									
+									
+								] }
+							  
+				                <#if !typekey_has_next>   <#-- 最后一列 -->
+				           
+								 		]
+										}
+			               	
+							 	<#else>
+				            		<#if  (typekey_index+1)%3!=2>
+							
+				 						,
+           						</#if>
+				 					<#if  (typekey_index+1)%3==2>  <#-- 第3列 -->
+									 		]
+											}
+				               		
+				                	</#if>  
+				                </#if>
+							
+							  </#list>
+					       </#if>
+							
+							
+							
+							
+						]
+					},{type:"fieldset",label:"备注",inputWidth:"645",offsetLeft:15,offsetTop:10,
+						list:[{ type:"input",rows:5, name:"meetingRoom.remark", value:"${meetingRoom.remark!}",  inputWidth:600 }
+						]
+					}
+					,
+					{
+						type:"hidden", offsetTop:5, list:[
+						{ type:"label", labelWidth:250 },
+						{ type:"newcolumn" },
+						{ type:"button", value:"确定", name:"send" },
+					/* 	{ type:"newcolumn"},
+						{ type:"button",value:"取消",name:"cancel"} */
+					]
+					}
+
+					
+				]}
+					
+			];
+			myForm = new dhtmlXForm("myForm", formData);
+			$("#picture_img").attr("src","${meetingRoom.picture!}");
+			myForm
+				.attachEvent(
+						'onButtonClick',
+						function(id) {
+						
+							if (id == 'send') {
+								getSelectValue();
+							    sendUrl = "${base}/admin/meetingRoom/updateMeetingRoom.action";
+								myForm.send(sendUrl, "post", function(data) {
+									var datatest = eval("("
+											+ data.xmlDoc.responseText + ")");
+									$.dialog.tips(datatest.message);
+									 var par_ifr = window.ParentIframe;
+									 
+									 setTimeout(function(){window.top.closeWin('updateMeetingRoom');},1000);
+									
+									 // par_ifr.pictureInit();
+									 par_ifr.simpleSearch();
+								});
+								
+							}else if (id == 'cancel') {		
+								myForm.disableItem('send');
+								myForm.disableItem('cancel');
+
+							}
+						
+						});
+						
+		
+		}
+		
+		function getSelectValue(){
+			var shebeiValue='';
+			var count='';
+			$("select[name^='equipmentType']").each(function(){
+				 
+			    var name=$(this).attr("name");
+			    var type=name.substr('equipmentType'.length);
+			    var value=$(this).val();
+			   // alert($(this).val()+" "+$(this).attr("name")+" "+type);
+			    shebeiValue=shebeiValue+type+"#"+value+",";
+			    
+			  });
+		
+			shebeiValue=shebeiValue.substring(0,shebeiValue.length-1);
+			myForm.setItemValue('meetingRoom.equipment',shebeiValue);
+			//alert(myForm.getItemValue('zhuxi_rows'));
+			count=count+myForm.getItemValue("zhuxi_rows")+","+myForm.getItemValue("zhuxi_conut");
+			//console.log(count);
+			myForm.setItemValue('meetingRoom.rostrumpersonnum',count);
+		}
+		
+	</script>
+</html>
+

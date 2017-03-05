@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>eden</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <script>
+        var project="${base}";
+    </script>
+    <script src ="${base}/edenui/common/js/jquery.js"></script>
+    <script src ="${base}/form/resources/common/js/tool.js"></script>
+    <script src="${base}/form/resources/common/js/edenApi.js"></script>
+    <script src ="${base}/edenui/common/js/underscore.js"></script>
+    <script src ="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+    <script src ="${base}/edenui/common/js/avalon/avalon2.js"></script>
+    <script src ="${base}/edenui/common/js/template_bill.js"></script>
+    <script src="${base}/edenui/common/js/jq_plugins/niceScrollBar/jquery.nicescroll.min.js"></script>
+</head>
+<body  ms-controller="wrap"  class="export-data-by-field ms-controller" >
+<table  class="other-bsgrid oa-form-grid" ms-css="@tableHeader">
+    <tr style="border-bottom: 0">
+        <th width="80">节点名称</th>
+        <th ms-for="(index,el) in @headList"  ms-css="{cursor:'pointer'}" ms-attr="{title:el.name,'data-step':el.id}" ms-click="@currentStep(el)"> <span>{{el.name}}</span></th>
+    </tr>
+</table>
+    <div class="margin-top">
+        <label class="margin-left" style="cursor: pointer;">
+            <input type="checkbox" class="ver-bottom"/>生效
+        </label>
+    </div>
+    <div class="margin-left margin-right" id="tableContent"  ms-css="@tableContentDiv">
+      <table  class="other-bsgrid oa-form-grid js-table-content" style="width:100%;">
+              <tr ms-for="(index,el) in @listNode" class="js-td">
+                  <td width="80"  ms-attr="{title:el.title}">{{el.title}}</td>
+                  <td ms-for="($index,$el) in el.status" valign="middle">
+                      <label ms-attr="{index:$index}" style="display: block;text-align: center;cursor: pointer">
+                          <input ms-duplex-checked="$el.check"    ms-attr="{value:$index,'data-nodename':$el.nodeName,'data-stepid':$el.stepId,'data-stepname':$el.stepName,'data-nodeid':$el.nodeId}" style="cursor: pointer" class="js-input" type="checkbox"/>
+                      </label>
+                  </td>
+              </tr>
+      </table>
+      </div>
+</body>
+<script type="text/template" id="exportFieldHtml">
+    <div id="exportFieldHtmlIn" class="export-choice-content">
+    </div>
+    <div class="text-center bot">
+        <div  class="button common-skin-btn-syle01" id="checked_all" style="">全部选中</div>
+        <div  class="button common-skin-btn-syle01" id="cancel_all" style="">全部取消</div>
+        <div  class="button common-skin-btn-syle01" id="sure_field_selection" style="">确定</div>
+    </div>
+</script>
+<script type="text/template" id="exportField">
+    <%_.each(currentStepData, function(item){%>
+    <label class="field-selection-label">
+        <%if(item.check){%>
+        <input type="checkbox" class="js-field-selection" data-nodename="<%=item.nodename%>" data-nodeid="<%=item.nodeid%>"  checked="checked" data-stepid="<%=item.stepid%>"/><%=item.nodename%>
+        <%}else{%>
+        <input type="checkbox" class="js-field-selection" data-nodename="<%=item.nodename%>" data-nodeid="<%=item.nodeid%>"   data-stepid="<%=item.stepid%>"/><%=item.nodename%>
+        <%}%>
+
+    </label>
+    <%});%>
+</script>
+</html>

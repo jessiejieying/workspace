@@ -1,0 +1,193 @@
+
+<#include "/oa/page/billcommon/printhead.html">
+<body >
+<div style="width: 606px;margin-left:78px;padding-top: 83px;"  id="showHtml">
+  <h1 style="color: #ef655d;" class="text-center margin-bottom padding-small-bottom">${billData.billTitle!}</h1>
+    <!-- 密级度 -->
+    <div style="clear: both;"></div>
+    <div style="">
+    <span style="font-size: 16px;float: left;width: 202px;color:#ef655d;text-align: left;padding-left: 20px;margin-bottom: 8px;">密级：
+      <span style="font-size: 14px;color: #000;">${billData.dataset1.secret_level!}</span>
+    </span>
+    <span style="font-size: 16px;float: left;width: 202px;color:#ef655d;text-align: center;margin-bottom: 8px;">紧急程度：
+      <span style="font-size: 14px;color: #000;">${billData.dataset1.urgency_level!}
+    </span>
+    </span>
+
+    <span style="font-size: 16px;float: right;width: 202px;color:#ef655d;text-align: right;padding-right: 20px;margin-bottom: 8px;">编号：
+        <span style="font-size: 14px;color: #000;">${billData.dataset1.instruction_no!}</span>
+    </span>
+    </div>
+    <div style="clear: both;"></div>
+
+  <table  style="font-size: 16px;width: 100%;border: 1px solid #ef655d;color:#ef655d;">
+
+      <tr style="height: 48px;">
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d; width:90px;">批示人</td>
+          <td >
+              <table  style="height: 48px;" >
+                  <tr>
+                      <td width="213" height="47" style="border-bottom:1px solid #ef655d;vertical-align: middle;text-align:center;">
+                          <span style="color:#000;font-size: 14px;">${billData.dataset1.instruction_leader!}</span>
+                      </td>
+                      <td width="90" style="height: 100%;border-left: 1px solid #ef655d;border-right: 1px solid #ef655d;text-align:center;vertical-align: middle;border-bottom:1px solid #ef655d;color:#ef655d;width: 90px;" >签批日期
+                      </td>
+                      <td width="213" style="border-bottom:1px solid #ef655d;vertical-align: middle; text-align: center;">
+                          <span style="color:#000;font-size: 14px;">${(billData.dataset1.instruction_date?string("yyyy-MM-dd"))!}</span>
+                      </td>
+                  </tr>
+              </table>
+          </td>
+      </tr>
+      <tr style="height: 48px;">
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d; width:90px;">批示序号</td>
+          <td >
+              <table  style="height: 48px;" >
+                  <tr>
+                      <td width="213" height="47" style="border-bottom:1px solid #ef655d;vertical-align: middle;text-align:center;">
+                          <span style="color:#000;font-size: 14px;">${billData.dataset1.instruction_order!}</span>
+                      </td>
+                      <td width="90" style="height: 100%;border-left: 1px solid #ef655d;border-right: 1px solid #ef655d;text-align:center;vertical-align: middle;border-bottom:1px solid #ef655d;color:#ef655d;width: 90px;" >收文日期
+                      </td>
+                      <td width="213" style="border-bottom:1px solid #ef655d;vertical-align: middle; text-align: center;">
+                          <span style="color:#000;font-size: 14px;">${(billData.dataset1.receive_date?string("yyyy-MM-dd"))!}</span>
+                      </td>
+                  </tr>
+              </table>
+          </td>
+      </tr>
+      <tr style="height: 48px;">
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d; width:90px;">来文文号</td>
+          <td >
+              <table  style="height: 48px;" >
+                  <tr>
+                      <td width="213" height="47" style="border-bottom:1px solid #ef655d;vertical-align: middle;text-align:center;">
+                          <span style="color:#000;font-size: 14px;">${billData.dataset1.from_no!}</span>
+                      </td>
+                      <td width="90" style="height: 100%;border-left: 1px solid #ef655d;border-right: 1px solid #ef655d;text-align:center;vertical-align: middle;border-bottom:1px solid #ef655d;color:#ef655d;width: 90px;" >来文单位
+                      </td>
+                      <td width="213" style="border-bottom:1px solid #ef655d;vertical-align: middle; text-align: center;">
+                          <span style="color:#000;font-size: 14px;">${billData.dataset1.from_dept!}</span>
+                      </td>
+                  </tr>
+              </table>
+          </td>
+      </tr>
+      <tr >
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;">来文标题<br>（字<i style="padding: 0 9px;"></i>号）</td>
+          <td height="79" style="border-bottom:1px solid #ef655d;vertical-align: middle;">
+              <p style="color:#000;font-size: 14px;padding-left: 16px;">${billData.dataset1.from_title!}</p>
+      </tr>
+      <tr>
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;">批示内容</td>
+          <td height="79" style="border-bottom:1px solid #ef655d;vertical-align: middle;">
+              <p style="color:#000;padding-left:16px;font-size: 14px;">${billData.dataset1.instruction_content!}</p>
+      </tr>
+      <tr>
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;">秘书处<br>拟办意见</td>
+          <td style="height: 149px;vertical-align:middle;border-bottom:1px solid #ef655d;" >
+              <div style="font-size:14px;color: #000;padding:0 16px;">
+                  <#if billData.adviceDb_2??&& (billData.adviceDb_2?size>0)>
+                      <#list billData.adviceDb_2! as entry>
+                          <div class='js-leader-advice' data-user='${entry.name}' data-advice='' id='${entry.id}'>
+                              <p class='js-leader-advice-content'>
+                                  <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                      <span style="display:none;">${entry.advice_content}</span>
+                                      <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}.gif" alt="222">
+                                      <#else>
+                                          <span style="line-height: 24px;">${entry.advice_content}</span>
+                                  </#if>
+
+                              </p>
+                              <p  style="text-align:right;" >${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                          </div>
+                      </#list>
+                  </#if>
+              </div>
+          </td>
+      </tr>
+      <tr>
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;">审批意见</td>
+          <td style="height: 149px;vertical-align:middle;border-bottom:1px solid #ef655d;" >
+              <div style="font-size:14px;color: #000;padding:0 16px;">
+                  <#if billData.adviceDb_1??&& (billData.adviceDb_1?size>0)>
+                      <#list billData.adviceDb_1! as entry>
+                          <div class='js-leader-advice' data-user='${entry.name}' data-advice='' id='${entry.id}'>
+                              <p class='js-leader-advice-content'>
+                                  <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                      <span style="display:none;">${entry.advice_content}</span>
+                                      <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}.gif" alt="222">
+                                      <#else>
+                                          <span style="line-height: 24px;">${entry.advice_content}</span>
+                                  </#if>
+
+                              </p>
+                              <p  style="text-align:right;" >${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                          </div>
+                      </#list>
+
+                  </#if>
+              </div>
+          </td>
+      </tr>
+
+
+      <tr>
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;">结果反馈</td>
+          <td height="48" style="border-bottom:1px solid #ef655d;vertical-align: middle;">
+              <p style="color:#000;padding-left:16px;font-size: 14px;">${billData.dataset1.result_feedback!}</p>
+      </tr>
+      <tr>
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;">抄送</td>
+          <td height="48" style="border-bottom:1px solid #ef655d;vertical-align: middle;">
+              <span style="color:#000;padding-left:16px;">${billData.dataset1.copy_object!}</span>
+      </tr>
+      <tr>
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;">发送短信</td>
+          <td height="79" style="border-bottom:1px solid #ef655d;vertical-align: middle;text-align:center;">
+              <img style="position:relative;top: -3px;margin-right: 2px;"  src="${base}/edenui/common/images/<#if ((billData.dataset1.send_message_flag)!(1))==1>billcheck.png<#else>billcheckno.png</#if>" alt=""/>是
+              <img style="position:relative;top: -3px;margin-right: 2px;"  src="${base}/edenui/common/images/<#if ((billData.dataset1.send_message_flag)!(1))==0>billcheck.png<#else>billcheckno.png</#if>" alt=""/>否
+            </td>
+      </tr>
+
+
+
+
+      <tr style="height: 48px;">
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d; width:90px;">需要反馈</td>
+          <td >
+              <table  style="height: 48px;" >
+                  <tr>
+                      <td width="213" height="47" style="border-bottom:1px solid #ef655d;vertical-align: middle;text-align:center;">
+                          <img style="position:relative;top: -3px;margin-right: 2px;"  src="${base}/edenui/common/images/<#if ((billData.dataset1.need_feedback_flag)!(1))==1>billcheck.png<#else>billcheckno.png</#if>" alt=""/>是
+                          <img style="position:relative;top: -3px;margin-right: 2px;"  src="${base}/edenui/common/images/<#if ((billData.dataset1.need_feedback_flag)!(1))==0>billcheck.png<#else>billcheckno.png</#if>" alt=""/>否
+                      </td>
+                      <td width="90" style="height: 100%;border-left: 1px solid #ef655d;border-right: 1px solid #ef655d;text-align:center;vertical-align: middle;border-bottom:1px solid #ef655d;color:#ef655d;width: 90px;" >反馈期限
+                      </td>
+                      <td width="213" style="border-bottom:1px solid #ef655d;vertical-align: middle; text-align: center;">
+                          <span style="color:#000;font-size: 14px;">${(billData.dataset1.need_feedback_time?string("yyyy-MM-dd"))!}</span>
+                      </td>
+                  </tr>
+              </table>
+          </td>
+      </tr>
+
+      <tr>
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;">短信内容</td>
+          <td height="48" style="border-bottom:1px solid #ef655d;vertical-align: middle;">
+              <p style="color:#000;padding-left:16px;font-size: 14px;">${billData.dataset1.message_content!}</p>
+      </tr>
+      <tr>
+          <td style="text-align:center;vertical-align:middle;border-right:1px solid #ef655d;">备注</td>
+          <td height="48" style="vertical-align: middle;">
+              <p style="color:#000;padding-left:16px;font-size: 14px;">${billData.dataset1.remark!}</p>
+      </tr>
+  </table>
+    <div style="clear: both;"></div>
+    <span style="font-size: 14px;color:#000;float: right;width: 87px;text-align: center;margin-top: 10px;">${billData.dataset1.contact_phone!}</span>
+    <span style="font-size: 16px;color:#ef655d;float: right;margin-top: 10px;">电话：</span>
+    <span style="font-size: 14px;color:#000;float: right;width: 87px;text-align: center;margin-top: 10px;">${billData.dataset1.contact_user!}</span>
+    <span style="font-size: 16px;color:#ef655d;float: right;margin-top: 10px;">联系人：</span>
+</div>
+</body>
+    <#include "/oa/page/billcommon/printfooter.html">

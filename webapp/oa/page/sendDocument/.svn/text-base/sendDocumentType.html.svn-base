@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+    <#include "/aufw/page/include/head.html">
+        <#include "/aufw/page/include/loading.html">
+</head>
+
+<body style="height:100%;">
+<div class="container-layout line">
+    <table style="width: 100%;" id="common_table">
+        <tr>
+            <!-- 右侧 -->
+            <td class="ver-top">
+                <div class="grid-table-top" id="grid_table">
+                    <div class="js-tool-bar">
+                        <div class="level-searh form-group header-group padding-bottom-0">
+                            <span class="header-title">文种:</span>
+                            <select id="documentType" datatype="*" class="input  statistics-select margin-left-in" style="width: 100px;">
+                                <option value="">全部</option>
+                                <#list sendDocumentDocumentType as dataDict>
+                                    <option title="${dataDict.displayName}" value="${dataDict.dictValue}">${dataDict.displayName}</option>
+                                </#list>
+                            </select>
+                            <span class="header-title margin-left-out">年度:</span>
+							<span id="yearDiv" onclick="yearOrMonth();">
+								<input id="year" name="year" class="tool-bar-input margin-left-in" style="cursor: pointer;width: 45px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+							</span>
+                            <span class="header-title margin-left-out">月份：</span>
+                            <select  class="input margin-left-in statistics-select" style="width: 68px;" id="month" onclick="yearOrMonth();">
+                                <option value="">全部</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                            <span class="header-title margin-left-out">标题:</span>
+							<input id="search_text" type="text" class="tool-bar-input margin-left-in" style ='margin-left: 27px;' placeholder="输入关键字" />
+							<span class="header-title margin-left-out">字号:</span>
+							<input id="search_fileChar" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+                            </div>
+                            <div class="form-group header-group ">
+                            <div id="titleGroup" style="margin-top: 0px">
+                                <span class="header-title">查询日期:</span>
+                            	<span id="fromStartDateDiv">
+    								<input id="fromStartDate" name="fromStartDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height: 26px;" onclick="starttimeslot();" size="19" type="text">
+    								 <span class="header-title margin-left-in  margin-right-in">至</span>
+    								<input id="fromEndDate" name="fromEndDate" style="cursor: pointer;height: 26px;" class="Wdate tool-bar-input " onclick="endtimeslot();" size="19" type="text">
+    							</span>	
+								<span class="header-title margin-left-out">主办处室:</span>
+								<input id="search_draftDept" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+								
+                                <div class="button button-main margin-left-out" id="grid_search">搜索</div>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="js-grid-father grid-father">
+                        <table id="manage_grid" class="bsgrid">
+                            <tr>
+                                <th w_index="id" w_hidden="true" class="hidden"></th>
+                                <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+                                <th w_index="true" width="40">序号</th>
+                                <th w_index="title" width="">公文标题</th>
+                                <th w_index="draftDept" width="75">拟稿处室</th>
+                                <th w_index="signManStr" width="75">签发领导</th>
+                                <th w_index="signDateStr" width="75">签发时间</th>
+                                <th w_index="flowNo" width="75">流水号</th>
+                                <th w_index="documentNo" width="180">字号</th>
+                                <th class="hidden" w_hidden="true"></th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<#include "/aufw/page/include/script.html">
+
+    <!--表单、流程，基于jquery的方法-->
+    <script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+    <script src="${base}/oa/resource/js/task.js"></script>
+
+
+    <script>
+        var gridOne;
+        var selectURL = "${base}/admin/sendDocument/sendDocumentAction!querySendDocument.action";
+        var version='1';
+        var wf_name='oa_send_document';
+        var wfType="${wfType!}";
+        $(function(){
+            layOut("#common_table","#grid_table");
+            gridOne=$.fn.bsgrid.init("manage_grid", {
+                url:selectURL + "?etc="+new Date().getTime(),
+                row_primary_key: "primaryKey",
+                autoLoad: true,
+                pageSizeSelect: true,
+                pageSize:15,
+                complete:function(options, XMLHttpRequest, textStatus){
+                },
+                additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+                },
+                additionalAfterRenderGrid:function(){
+                    gridOne.initGrid();
+                    $("#manage_grid tbody tr").each(function(){
+                        $("td",this).eq(1).css("padding-left","8px");
+                        $("td",this).eq(1).css({"text-align":"center","padding-left":"0px"});
+                        $("td",this).eq(2).css({"text-align":"center","padding-left":"0px"});
+                        $("td",this).eq(4).css({"text-align":"center","padding-left":"0px"});
+                        $("td",this).eq(5).css({"text-align":"center","padding-left":"0px"});
+                        $("td",this).eq(6).css({"text-align":"center","padding-left":"0px"});
+                        $("td",this).eq(7).css({"text-align":"center","padding-left":"0px"});
+                        var $this=$(this),
+                                $index=parseInt($this.attr("index"));
+                        $this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+                    });
+                }
+            });
+
+            $("#incoming_add").click(function(){
+                initWorkflow('oa_pg_incoming_document','收文登记','1');
+            });
+            //工具条搜索
+            $(document).on("click","#grid_search",function(){
+            	var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+            	var draftDept = $("#search_draftDept").val()=='请输入关键字'?'':$("#search_draftDept").val();
+            	var criteriaFileChar = $("#search_fileChar").val()=='请输入关键字'?'':$("#search_fileChar").val();
+                gridOne.changeUrl(encodeURI(encodeURI(selectURL + "?etc=" + new Date().getTime() + "&documentType=" + $('#documentType').val()
+                + "&startDate=" + $('#fromStartDate').val() + "&endDate=" + $('#fromEndDate').val()
+                + "&year=" + $('#year').val() + "&month=" + $('#month').val()+"&title="+value +"&draftDept="+draftDept+"&criteriaFileChar="+criteriaFileChar)));
+            });
+            $(document).on("change","#documentType",function(){
+            	var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+            	var draftDept = $("#search_draftDept").val()=='请输入关键字'?'':$("#search_draftDept").val();
+            	var criteriaFileChar = $("#search_fileChar").val()=='请输入关键字'?'':$("#search_fileChar").val();
+                gridOne.changeUrl(encodeURI(encodeURI(selectURL + "?etc=" + new Date().getTime() + "&documentType=" + $('#documentType').val()
+                + "&startDate=" + $('#fromStartDate').val() + "&endDate=" + $('#fromEndDate').val()
+                + "&year=" + $('#year').val() + "&month=" + $('#month').val()+"&title="+value +"&draftDept="+draftDept+"&criteriaFileChar="+criteriaFileChar)));
+            });
+            
+
+        });
+
+
+        function execute(url){
+            var task_name = "";
+            var project = '${base}';
+            project += url;
+            window.open(project,"_blank");
+        }
+
+        //选择开始时间段时间时，年度月份选项清空
+        function starttimeslot(){
+            var year = document.getElementById("year");
+            $('#year').val("");
+            var month = document.getElementById("month");
+            month.options[0].selected=true;
+            WdatePicker({dateFmt:'yyyy-MM-dd', maxDate:'#F{$dp.$D(\'fromEndDate\')||\'2025-10-01\'}'});
+        }
+
+        //选择结束时间段时间时，年度月份选项清空
+        function endtimeslot(){
+            var year = document.getElementById("year");
+            $('#year').val("");
+            var month = document.getElementById("month");
+            month.options[0].selected=true;
+            WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'fromStartDate\')}',maxDate:'2025-10-01'})
+        }
+
+        function yearOrMonth(){
+            document.getElementById("fromStartDate").value="";
+            document.getElementById("fromEndDate").value="";
+        }
+
+        //屏幕分辨率小于1024，右侧排版 
+        if($(window).width() <= 1024){
+          $("#titleGroup").css({"width":"100%","margin-left":"-10px"});
+        }
+
+    </script>
+
+</html>

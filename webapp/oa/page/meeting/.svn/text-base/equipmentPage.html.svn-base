@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+</head>
+
+<body style="height: 100%;">
+	<div id="grid_wrap" style="width: 100%; height: 100%; overflow: hidden; display: none;">
+	
+		<div id="grid_toolbar" class="ed-toolbar">
+
+			<@f.operateRight operate="/admin/meetingRoom!insertEquipment.action">
+			<a id="user_add" class="btn btn-info">添加设备</a>
+				 </@f.operateRight >
+              <@f.operateRight operate="/admin/meetingRoom!deleteEquipment.action">
+					<a id="user_delete" class="btn btn-warning">删除</a>
+					</@f.operateRight >
+				<select name="" id="search">grid_toolbar_ul
+						<option value="criteriaNumber">设备编号</option>
+				</select>
+				<input id="search_text" class="search_text" value="请输入关键字"
+					name="" type="text">
+				<input class="btn btn-info" name="" onClick="SimpleSearch()" value="搜 索" type="button">
+				<a id="selectAll" class="btn">全选</a>
+				<a id="advanced_search_btn" class="btn">高级搜索</a>
+	
+			<div id="advanced_search_bar" class="ed-advanced-search-bar">
+				<table align="center">
+					<tr>
+						<td><label for="snumber">编号：</label></td>
+						<td><input id="snumber" name="snumber" type="text"></td>
+						<td><label for="stype">设备类型：</label></td>
+						<td>
+							<select id="stype" name="stype" value=""type="text">
+								<option value="">全部</option>
+								<#list eqiupmentSelect as dataDict>
+									<option value="${dataDict.dictValue}">${dataDict.displayName}</option>
+								</#list>
+						</td>
+						<td><label for="sname">设备名称：</label></td>
+						<td><input id="sname" name="sname" type="text"></td>
+						<td><label for="sstatus">设备状态：</label></td>
+						<td>
+							<select id="sstatus" name="sstatus" value=""type="text">
+								<option value="">全部</option>
+								<#list statusSelect as dataDict>
+									<option value="${dataDict.dictValue}">${dataDict.displayName}</option>
+								</#list>
+						</td>
+						<td><input class="btn btn-info" name="advancedSearch" onClick="advancedSearch()" value="搜 索" type="button"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		
+		
+		<div id="grid" style="width: 100%;"></div>
+		<div class="ed-grid-page">
+		<div id="grid_page"></div>
+		</div>
+	</div>
+</body>
+<#include "/aufw/page/include/script.html">
+<script>
+
+var layout, grid, data, form,tabbar,option,sendUrl;
+window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+function init() {
+	var parentId;
+
+    layout = new dhtmlXLayoutObject(document.body, "1C");
+	
+    layout.cells('a').hideHeader();
+	
+    layout.attachEvent('onResizeFinish', page_layout);
+    layout.attachEvent('onPanelResizeFinish', page_layout);
+	
+    data = new dhtmlXDataStore({
+        url     :"${base}/admin/meetingEquipment/selectEquipments.action?etc="+new Date().getTime(),
+        datatype:"json"
+    });
+	
+	layout.cells('a').attachObject('grid_wrap');
+	
+    grid = new dhtmlXGridObject('grid');
+    grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+    grid.setHeader(" ,设备编号,设备类型,设备名称,存放地点,可否移动,使用价格,状态,操作");
+    grid.setColumnIds("check,number,type,name,adress,isMove,price,status,operate");
+    grid.setInitWidths("30,*,*,*,*,*,*,*,180");
+    grid.setColTypes("ch,ro,co,ro,ro,co,ro,co,link");
+	<#list eqiupmentSelect as equipment>                                                                         
+			grid.getCombo(2).put(${equipment.dictValue},'${equipment.displayName}');
+	</#list>
+	<#list isMoveSelect as move>                                                                         
+			grid.getCombo(5).put(${move.dictValue},'${move.displayName}');
+	</#list>
+	<#list statusSelect as status>                                                                         
+			grid.getCombo(7).put(${status.dictValue},'${status.displayName}');
+	</#list>
+    grid.enablePaging(true, 20, 999, 'grid_page', true);//启用分页
+    grid.setPagingSkin("toolbar");//设置分页底部
+    grid.init();
+    grid.attachEvent("onCheck", function (rId, cInd, state) {
+        grid.selectRowById(rId);
+    });
+   // grid.attachEvent("onRowSelect", doOnRowSelected);
+    grid.sync(data);
+	//grid.setEditable(false);
+
+  
+
+    var formData = [
+        { type:"settings", position:"label-left", labelWidth:"65", inputWidth:50 },
+        {
+            type:"fieldset", label:"设备信息", inputWidth:"660", offsetLeft:10,
+            list: [
+                    {
+                        type: "hidden", offsetTop: 5, list: [                   
+                        { type: "input", name: "equipment.number", value: "", label: "设备编号", inputWidth:200, required: true, validate: "NotEmpty" },
+						{ type: "input", name: "equipment.name", value: "", label: "设备名称", inputWidth:200},
+						{ type: "input", name: "equipment.brand", value: "", label: "设备品牌", inputWidth:200 },
+						{ type: "select", name: "equipment.isMove", label: "可否移动", inputWidth:200,options: [
+                            <#list isMoveSelect as move>                                                                  
+								{text:"${move.displayName}", value:"${move.dictValue}"}
+								<#if move_has_next>
+									,
+								</#if>
+							</#list>
+							]
+						},
+						{ type: "input", name: "equipment.price", value: "", label: "使用价格", inputWidth:200,validate:'isNum'},
+                        { type: "newcolumn", offset:40 },
+                        { type: "input", name: "equipment.adress", value: "", label: "存放地点", inputWidth:200 },	
+						{ type: "input", name: "equipment.model", value: "", label: "设备型号",required: true,validate: "NotEmpty" ,inputWidth:200},
+                        { type: "select", name: "equipment.type", label: "设备类型", inputWidth:200, options: [                         
+								<#list eqiupmentSelect as equipment>                                                                  
+								{text:"${equipment.displayName}", value:"${equipment.dictValue}"}
+								<#if equipment_has_next>
+									,
+								</#if>
+							</#list>
+									]},		
+						{ type: "select", name: "equipment.status",label: "设备状态", inputWidth:200 , options: [
+                            <#list statusSelect as status>                                                                  
+								{text:"${status.displayName}", value:"${status.dictValue}"}
+								<#if status_has_next>
+									,
+								</#if>
+							</#list>
+							]
+						},
+						]},
+                    {
+                        type: "hidden", offsetTop: 5, list: [
+                        { type: "input", name: "equipment.remark", rows: 3, inputWidth: 515, label: "备注" }
+                     ]
+                    }, {
+                        type: "hidden", offsetTop: 5, list: [
+						{ type:"label", labelWidth:270 },
+						{ type:"newcolumn" },
+						{ type:"button", value:"确定", name:"send" }
+                    ]
+                    }
+                ]
+        }
+        ];
+             
+
+dhxWins = new dhtmlXWindows();
+dhxWins.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+w1 = dhxWins.createWindow("w1", 20, 30, 700, 500);
+w1.setText("设备信息");	
+w1.center();
+dhxWins.attachEvent('onClose', function (win) {
+w1.hide();
+});
+w1.hide(); 
+form = w1.attachForm(formData);//returns a dhtmlxForm object 
+
+form.setSkin('dhx_terrace');
+form.disableItem('send');
+form.bind(grid);
+
+form.attachEvent("onChange", function (id, value){
+    if(form.isItemEnabled('send')){
+        //confirm_form();
+    }
+});
+
+form.attachEvent('onButtonClick', function (id) {
+    if(id=='send'){
+    	if(option=="update"){
+    		sendUrl="${base}/admin/meetingEquipment/updateEquipment.action?equipment.id="+equipmentId;
+    	}
+    	else if(option=="add"){
+    		sendUrl="${base}/admin/meetingEquipment/insertEquipment.action";
+    	}
+    	form.send(sendUrl,"post",function(data){
+		var datatest = eval("(" + data.xmlDoc.responseText + ")");
+		if(datatest.result=="success"){
+    			SimpleSearch();
+    			form.disableItem('send');
+    			option="no";
+				w1.hide();
+    		}
+			$.dialog.tips(datatest.message);
+    	}
+    			);
+    }
+});
+page_layout();
+}
+
+
+
+function refresh_data(){
+    //var path="${base}/admin/meetingEquipment/selectEquipments.action?treeId=" +parent_id+"&etc="+new Date().getTime();
+	var path="${base}/admin/meetingEquipment/selectEquipments.action?etc="+new Date().getTime();
+    data.clearAll();
+    data.load(path,"json");
+    window.data.data.url=path;
+}
+
+/* function doOnRowSelected(id) {
+    if(!window._add_new_child){
+        layout.cells("b").view("def").setActive();
+        updateFormBtn({
+            "dataStore":data,
+            "grid":grid,
+            "rowId":id,
+            "forms":[form]
+        });
+		var item=data.item(id);
+        addForm(item);
+	    form.disableItem("send");
+        window._add_new_child=false;
+    }else{
+        return false;
+    }
+}
+ */
+function addForm(item){
+  		form.setItemValue("equipment.number",item.number);
+  		form.setItemValue("equipment.name",item.name);
+  		form.setItemValue("equipment.brand",item.brand);
+  		form.setItemValue("equipment.isMove",item.isMove);
+  		form.setItemValue("equipment.price",item.price);
+  		form.setItemValue("equipment.adress",item.adress);
+  		form.setItemValue("equipment.model",item.model);
+  		form.setItemValue("equipment.type",item.type);
+  		form.setItemValue("equipment.status",item.status);
+  		form.setItemValue("equipment.remark",item.remark);
+  	}
+	
+function hasFunction(orgCode,rollback){
+    $.ajax({
+        type: "POST",
+        async: false,
+        url: "${base}/admin/user/hasFunctionAuth.action?etc="+new Date().getTime(),
+        data: "orgCode="+orgCode,
+        success: function(msg){
+            if(msg.result=="success"){
+                rollback();
+            }else{
+                $.dialog.tips(msg.message);
+            }
+        }
+    });
+}
+
+function toolbar_func(id) {
+    if (id == 'add') {
+        addId=new Date();
+        var add_data={
+        		id:addId
+        };
+		//var win = {text:"添加组织", //url:"${base}/admin/org/addOrgWin.action?parentTree.orgId="+parent_id,width:'650',height:'350', //id:"addOrgWin",'parent_ifr':window}
+        //window.top.createWindow(win);
+        option="add";
+        data.add(add_data,0);
+        grid.selectRowById(addId);
+		//form.setItemFocus("equipment.number");
+        form.enableItem("send");
+		w1.show();
+    }
+
+    if (id == 'edit') {
+        //form.unlock();
+    }
+    if (id == 'delete') {
+        var row_id = grid.getCheckedRows(0);
+        if (row_id == '') {
+            $.dialog.tips('请至少选择一条数据！');
+            return;
+        }
+        row_id = row_id.split(',');
+        if (row_id.length == 0) return;
+        $.dialog.confirm('你确定要删除这些数据吗？', function () {
+            var idArr = new Array();
+            for (var i = 0; i < row_id.length; i++) {
+                idArr.push(data.item(row_id[i]).id);
+            }
+            $.post("${base}/admin/meetingEquipment/deleteEquipment.action", {"equipment.id":idArr.join(",")},function(result){
+            	if(result.result="success"){                      
+                   SimpleSearch();
+				   $.dialog.tips(result.message);
+            	}
+            });
+        });
+    }
+}
+
+    function  advancedSearch(){
+		data.clearAll();
+		var number= $("#snumber").val();
+		var type= $("#stype").val();
+		var name= $("#sname").val();
+        //var price= $("#sprice").val();
+        var status= $("#sstatus").val();
+		var s = "equipment.number="+number+"&equipment.type="+type+"&equipment.name="+name+
+		"&equipment.status="+status;
+		var url = '${base}/admin/meetingEquipment/selectEquipments.action?'+s+"&etc="+new Date().getTime();
+		window.data.data.url = url
+		data.load(url);
+    }
+	//searchBarCommon('advanced_search_bar',30,'advanced_search_btn','grid_toolbar','grid');
+searchToggle('advanced_search_btn','advanced_search_bar');
+
+
+function r(id) {       //重置密码
+    grid.selectRowById(id);
+
+    $.dialog.confirm('你确定要重置该设备的密码？', function () {
+        $.post("${base}/admin/user/resetPw.action", {"idArr":id}, function(result){
+            $.dialog.tips(result.tips);
+        });
+    });
+}
+
+function d(id) {       //删除 grid中的一行数据
+     grid.selectRowById(id);
+    $.dialog.confirm('你确定要删除这条数据？', function () {
+       
+        $.post("${base}/admin/meetingEquipment/deleteEquipment.action", {"equipment.id":id}, function(result){
+        	if(result.result=="success"){
+        		 SimpleSearch();
+        	}
+                $.dialog.tips(result.message);
+        });
+    });
+    form.disableItem("send");
+}
+
+function e(id) {      //编辑 grid中的一行数据
+    //alert(id);
+	option = "update";
+	equipmentId = id;
+    grid.selectRowById(id);
+	var item=data.item(id);
+    addForm(item);
+    form.setItemFocus("number");
+    form.enableItem("send");
+	 
+	w1.show();
+	
+
+}
+
+function a(selId){
+    grid.selectRowById(selId);
+    var item = data.item(selId);
+
+    if(selId){
+        var win = {text:"权限授予", url:"${base}/admin/user/addAuthWin.action?accountInfo.accountName="+window.encodeURI(item.accountName), id:"addAuthWin", openType:1}
+        window.top.createTab(win);
+    }else{
+        $.dialog({
+            lock: true,
+            content: '请选择授权设备记录',
+            icon: 'error',
+            ok:  true
+        });
+    }
+}
+
+function u(selId){
+    grid.selectRowById(selId);
+    var item = data.item(selId);
+    if(selId){
+        window.top.createWindow({
+            'text':'设备关联角色',
+            'id':'user_link_role',
+            'url':'${base}/admin/user/assignUserRoleWin.action?accountInfo.accountName='+window.encodeURI(item.accountName),
+            'width':'750',
+            'height':'520'
+        });
+    }
+}
+
+function SimpleSearch(){
+    data.clearAll();
+    var value = $("#search_text").val()=='请输入关键字'? '':$("#search_text").val();
+	if(value==''){
+		var url = '${base}/admin/meetingEquipment/selectEquipments.action?etc='+new Date().getTime();
+	}else{
+		var url = '${base}/admin/meetingEquipment/selectEquipments.action?equipment.number='+window.encodeURI(value)+"&etc="+new Date().getTime();
+	}
+    window.data.data.url = url
+    data.load(url);
+	 $("#search_text").val('请输入关键字');
+}
+
+function page_layout() {
+    var wrap_height = $('#tree_wrap').height();
+    var grid_wrap_height = $('#grid_wrap').height();
+    $('#tree').height(wrap_height - 33);
+    $('#grid').height(grid_wrap_height - 43 - 35);
+    if (grid)    grid.setSizes();
+
+}
+
+$(function () {
+    setTimeout(init, 0);
+    
+    
+    $('#selectAll').bind('click',function(){
+    	var ids = grid.getAllRowIds();
+    	//console.log(ids);
+    	var idsArr = ids.split(',');
+    	//alert(idsArr.length);
+    	var nowPage = grid.currentPage;
+    	var pageItemsLength = grid.rowsBufferOutSize;
+    	var allItemsLength = grid.rowsBuffer.length;
+    	
+    	var forBigen = pageItemsLength*(nowPage-1);
+    	var forOver = pageItemsLength*(nowPage);
+    	if (forOver>allItemsLength){
+    		forOver = allItemsLength
+    	}
+    	for(i=forBigen;i<forOver;i++){
+    		var forId = idsArr[i];
+    		var check = grid.cellById(forId, 0).getValue();
+    		//console.log(check);
+    		if (check == 1) {
+        		check = 0;
+        	} else {
+        		check = 1;
+        	}
+    		grid.cellById(forId, 0).setValue(check);
+    	}
+    	
+    })
+    
+    
+    
+    //$('#grid_toolbar_ul li').last().addClass('last');
+    $('#grid_toolbar a').click(function () {
+        var id = $(this).attr('id');
+        if(!id) return;
+        id=id.substring(5);
+        toolbar_func(id);
+    });
+
+
+
+    $("#user_auth").click(function(){
+        var selId = grid.getSelectedId()
+        var item = data.item(selId);
+
+        if(selId){
+            var win = {text:"权限授予", url:"${base}/admin/user/addAuthWin.action?accountInfo.accountName="+item.accountName, id:"addAuthWin"}
+            window.top.createWindow(win);
+        }else{
+            $.dialog({
+                lock: true,
+                content: '请选择授权设备记录',
+                icon: 'error',
+                ok:  true
+            });
+        }
+    });
+
+    $("#search_text").focus(function () {
+        if ($(this).val() == this.defaultValue) {
+            $(this).val('');
+        }
+    }).blur(function () {
+                if ($(this).val() == '') {
+                    $(this).val(this.defaultValue);
+                }
+            });
+})
+</script>
+</html>

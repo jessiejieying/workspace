@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+<style type="text/css">
+  .bsgrid td{
+    text-align:center;
+    padding-left:0px;
+  }
+</style>
+<link href="${base}/form/resources/chosen_v1.2.0/chosen.css" type="text/css" rel="stylesheet" />
+</head>
+<body style="height: 100%;" class="statistics">
+  <#include "/aufw/page/include/loading.html">
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+
+          <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+			<div class="form-group statistics-condition">
+				<span class="span-bold">年度：</span>
+				<input  name="year" id="year" class="Wdate tool-bar-input" style="cursor: pointer;height:25px;width: 60px;"
+						onclick="WdatePicker({dateFmt:'yyyy'})"	size="19" type="text">
+				<span class="span-bold">月份：</span>
+				<input  name="startMonth" id="startMonth" class="Wdate tool-bar-input" style="cursor: pointer;height:25px;width: 45px;"
+						onclick="WdatePicker({dateFmt:'M'})"	size="19" type="text">	
+				至
+				<input  name="endMonth" id="endMonth" class="Wdate tool-bar-input" style="cursor: pointer;height:25px;width: 45px;"
+						onclick="WdatePicker({dateFmt:'M'})"	size="19" type="text">
+				<span class="span-bold">批示领导:</span>
+				<span >
+					<select id="instructionLeader" style="background-color:transparent;width:120px; font-size: 15px;color:#000;" data-placeholder="找不到" class="display-ib">
+						  <option value="" >---请选择---</option>
+						 <#if leaders??>
+						   <#list leaders as item>
+						     <option value="${(item.instruction_leader)!}">${(item.instruction_leader)!}</option>
+						   </#list>
+						</#if>
+				</select>
+				</span>
+				<div  class="button common-skin-btn-syle01 js-statistics" id="report_total">统计</div>
+				<div id="exportButton" class="button common-skin-btn-syle01 js-statistics" style="margin-left:2px;">导出</div>
+			</div>
+			<div class="statistics-tab">
+				<div class="clearfix">
+					<div id="exportButton" class="tab-btn" style="display:none;">导出</div>
+					<!-- <div id="print_button" class="tab-btn">打印</div> -->
+				</div>
+
+				<div class="tab-content-show"><span id="condition" style="margin-left:-10px;"></span><span style="float:right;margin-right:20px;">统计时间： ${.now ?string("yyyy.MM.dd")}</span></div>
+			</div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                   <th width="40">序号</th>
+                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+                  <th w_index="year" width="200">年度</th>
+                  <th w_index="draft_dept" >处室</th>
+                  <th w_index="total" width="200">总计</th>
+                  <th w_index="archive_total" width="200">归档数量</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script src="${base}/edenui/common/js/jq_plugins/highcharts/highcharts.js"></script>
+  <script src="${base}/form/resources/chosen_v1.2.0/chosen.jquery.js"></script>
+  <script>
+	var gridOne;
+	var selectURL = "${base}/admin/instruction/instReportByYearDept.action?iType=${instType}";
+	var exportURL = "${base}/admin/instruction/instReportByYearDeptExport.action?iType=${instType}";
+	var time = [  ];
+	var chartReadData = [];
+	var chartDealData = [];
+	var chartTotalData = [];
+	var chart;
+	var condition = "";
+	$(function() {
+		layOut("#common_table", "#grid_table");
+
+	    //统计功能
+    	$(document).on("click","#report_total",function(){
+    		  var year = $("#year").val();
+  	        var startMonth = $("#startMonth").val();
+  	        var endMonth=$("#endMonth").val();
+  	        var symbol = "?wfName=oa_leader_instruction";
+  	        if(selectURL.indexOf("?")>0){
+  	        	symbol = "&wfName=oa_leader_instruction";
+  	        }
+	        var instructionLeader=$("#instructionLeader").val();
+	        gridOne.changeUrl(selectURL + symbol + '&year=' + window.encodeURI(year) +'&startMonth=' + window.encodeURI(startMonth) +"&endMonth="+window.encodeURI(endMonth) + '&etc='+new Date().getTime()+"&instructionLeader="+window.encodeURI(instructionLeader));
+		});
+
+	    //导出功能
+    	$(document).on("click","#exportButton",function(){
+	        var startYearV = $("#startYear").val();
+	        var endYearV = $("#endYear").val();
+	        var symbol = "?wfName=oa_leader_instruction";
+	        if(selectURL.indexOf("?")>0){
+	        	symbol = "&wfName=oa_leader_instruction";
+	        }
+	        var instructionLeader=$("#instructionLeader").val();
+	        window.location = exportURL+ symbol + '&startYear=' + window.encodeURI(startYearV) +'&endYear=' + window.encodeURI(endYearV) + '&etc='+new Date().getTime()+"&instructionLeader="+window.encodeURI(instructionLeader);
+		});
+
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?wfName=oa_leader_instruction&etc=" + new Date().getTime(),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				$("#condition").html(gridData.condition);
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+	        		$index=parseInt($this.attr("index"));
+	        		$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+				time = [];
+				chartData = [];
+				var data = gridOne.getAllRecords();
+ 				for(var i = 0,l = data.length; i < l; i++){
+					time[i] = data[i].year;
+					chartReadData[i] = data[i].read;
+					chartDealData[i] = data[i].deal;
+					chartTotalData[i] = data[i].total;
+				} 
+			}
+		});
+ 
+		$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印", url:"${base}/admin/documentStatistics/incomingStatisticByYearPrintWin.action?etc=" + new Date().getTime(),width:'900',height:'550', id:"incomingStatisticByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});		
+         
+		
+		 //处理选择领导框
+	    $('#instructionLeader').chosen({
+			 "no_results_text":"找不到"
+		 });
+	});
+	
+	</script>
+</body>
+</html>

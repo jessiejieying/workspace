@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+<title>Eden</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+<!--<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">-->
+<!--<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">-->
+<!--<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/list.css">-->
+<!--<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/icon.css">-->
+
+<!--<script src="${base}/aufw/resources/common/js/validRule.js"></script>-->
+</head>
+<body >
+<div class="historyWfHtml">
+<div class="clearfix">
+    <div class="select-left">选择历史流程：</div>
+    <select id="wfStep"  class="select-right input">
+        <#if dataMap?exists>
+            <#list dataMap?keys as key>
+                <option value="${key}" >${dataMap.get(key)}</option>
+            </#list>
+        </#if>
+    </select>
+</div>
+    <div class="text-center" style="margin-top: 50px;">
+					<input class="button common-skin-btn-syle01"  id="save_btn" type="button" value="退回" />
+    </div>
+</div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jquery_migrate.min.js"></script>
+<!--<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>-->
+<!--<script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>-->
+<!--<script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>-->
+<!--<script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>-->
+<script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+<!--<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>-->
+<!--<script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>-->
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script>
+    var op;
+    function init(){
+    	op='${request.getParameter("op")}';
+    	var goStepId=$('#wfStep').val();
+    	
+    	if(!op||!goStepId)
+    	{
+    		var show="op不能为空";
+    		if(!goStepId)
+        	{
+    			show="此流程不能退回！";
+        	}
+    		layer.msg(show);
+    		setTimeout(function(){
+                window.top.closeWin('selectHistoryWfPage');
+            },3000);
+    	}
+    }
+     $(function(){
+         init();
+        $("#save_btn").click(function(){
+        	
+        	var wfid='${request.getParameter("wfId")}';
+
+        	var actionid='${request.getParameter("actionId")!}';
+        	var instanceid='${request.getParameter("instanceId")!}';
+        
+        	var goStepId=$('#wfStep').val();
+
+        	if(op&&wfid&&goStepId)
+        	{
+        		var sKey="";
+        		var ret="";
+        		if(op=="do_revoke_finish") //重启流程
+            	{
+        			sKey ="${base}/servlet/WorkflowPortal?operate=do_revoke_finish&wf_id=" + wfid + "&step_id=" +  goStepId;
+        			ret="重启成功！";
+            	}else if(op=="do_goback") //回退
+            	{
+            		sKey ="${base}/servlet/WorkflowPortal?operate=do_goback&wf_id=" + wfid + "&step_id=" +  goStepId;
+    				sKey += "&action_id=" + actionid;
+    				if (instanceid != null && instanceid != "" && instanceid != "undefined")
+    					sKey += "&dynamic_instance_id=" + instanceid;
+    				ret="退回成功！";
+            	}
+        		
+        		 var button = $(this);
+                button.prop("disabled",true);
+                layer.msg("正在退回...");
+
+ 		       $.post(sKey, function (msg) {
+ 			      //  button.attr("disabled", false).val("确定");
+                   button.prop("disabled",false);
+ 			        var result = newXml(msg);
+					var bResult = $(result).find('n').eq(0).text();
+                    var resultContent=$(result).find('n').eq(1).text();
+
+					if (bResult == "false") {
+						//var falseInfo = $(result).find('message').text();
+						//layer.msg(falseInfo, 5);
+                        layer.msg(resultContent);
+					} else {
+                        layer.msg(resultContent);
+						try {
+		                      if(parentIfr.SimpleSearch){
+		                    	  parentIfr.SimpleSearch();
+		                      }
+		                      window.edenCallBack();
+		                  } catch (e) {
+
+		                  }
+		                  afterSave();
+					}
+ 		        });  
+
+        	}else{
+        		 layer.msg("操作发生错误！");
+        	}
+        	  
+        });
+    })
+     function afterSave(){
+
+         try{
+
+             window.top.refreshIndex();
+         }catch (e) {
+
+         }
+
+         setTimeout(function(){
+             window.top.close();
+         },1000);
+// 	    setTimeout(function(){
+//            window.top.closeWin("selectHistoryWfPage");
+// 		},500);
+
+   }
+</script>
+</html>

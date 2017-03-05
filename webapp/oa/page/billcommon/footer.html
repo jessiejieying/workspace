@@ -1,0 +1,245 @@
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src = "${base}/edenui/common/js/underscore.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+<script src="${base}/edenui/common/js/plugins/My97DatePicker/WdatePicker.js"></script>
+<script src="${base}/form/resources/common/js/tool.js"></script>
+<script src="${base}/form/resources/common/js/edenApi.js"></script>
+<script src="${base}/form/resources/common/js/bill.js"></script>
+<script >
+    var wfId=$urlParam("wfId");
+    var billName=$urlParam("billName");
+    var maskShow=window.top.$urlParam("wfs");
+    var stepId=window.top.$urlParam("stepId");
+    (function($){
+        $.fn.autoTextarea = function(options) {
+            var defaults={
+                maxHeight:null,//文本框是否自动撑高，默认：null，不自动撑高；如果自动撑高必须输入数值，该值作为文本框自动撑高的最大高度
+                minHeight:0 //默认最小高度，也就是文本框最初的高度，当内容高度小于这个高度的时候，文本以这个高度显示
+            };
+            var opts = $.extend({},defaults,options);
+            return $(this).each(function() {
+                $(this).bind("paste cut keydown keyup focus blur",function(){
+                    var height,style=this.style;
+                    this.style.height =  opts.minHeight + 'px';
+                    if (this.scrollHeight > opts.minHeight) {
+                        if (opts.maxHeight && this.scrollHeight > opts.maxHeight) {
+                            height = opts.maxHeight;
+                            style.overflowY = 'scroll';
+                        } else {
+                            height = this.scrollHeight;
+                            style.overflowY = 'hidden';
+                        }
+                        style.height = height  + 'px';
+                    }
+                });
+            });
+        };
+    })(jQuery);
+    $(function(){
+        $(".js-auto-textarea").autoTextarea();
+        textAuto();
+    });
+
+    $(window).load(function(){
+        billPage.init();
+        window.top.oneClickLi();
+    });
+
+    var billPage=(function(){
+        var obj={
+            init:function(){
+                this.billAuto();
+                this.control();
+                window.top.loadOtherInit();
+            },
+            //设置全部只读状态
+            setOnlyRead:function(){
+                //只读状态
+                if(maskShow){
+                    //原来为添加遮罩层，现改为控制所有权限
+                    ///  $("body").prepend("<div class='bill-read-mask'></div>");
+                    //设置相对于的节点操作
+                    var dataDisabled=["select"],
+                        dataReadOnly=["input","textarea"],
+                        dataHide=[".js-oa-bill-choice",".form-bill-agree"],
+                        dataRemoveClass=["js-choice-input","js-bill-checkbox-box"],
+                        dataRemove=[".td-choice-input-tip",".js-leader-advice-del",".js-leader-advice-edit"];
+                    dataDisabled.forEach(function (value) {
+                        if($(value).length){
+                            $(value).prop("disabled", true);
+                        }
+                    });
+                    dataReadOnly.forEach(function (value) {
+                        if($(value).length){
+                            $(value).prop("readonly", true);
+                        }
+                    });
+                    dataHide.forEach(function (value) {
+                        if($(value).length){
+                            $(value).hide();
+                        }
+                    });
+                    dataRemoveClass.forEach(function (value) {
+                        if($("."+value).length){
+                            $("."+value).removeClass(value);
+                        }
+                    });
+                    dataRemove.forEach(function (value) {
+                        if($(value).length){
+                            $(value).remove();
+                        }
+                    });
+                }
+            },
+            billAuto:function(){
+                var $father = $(window.parent.document),
+                        billHeight=$("#showHtml").height(),
+                        $autoHeight=billHeight+300;
+                $father.find("#billdiv").height($autoHeight);
+                $father.find("#billdiv").closest(".tab-page").height($autoHeight);
+                //统一内页
+                $father.find(".tab-page").height($autoHeight);
+                $father.find("#tab4").height($autoHeight);
+            },
+            control:function(){
+                //收文角色 除了领导意见之外的都可以修改，
+                var oaPgIncomingRole="840eceaec8b14532822c5867faf70d34";
+                var isAllOpen=window.top.globalParams.roleId.indexOf(oaPgIncomingRole)>(-1)?true:false;
+
+                var $father = $(window.parent.document);
+                var billId=($father.find("#billId").val().length>1)?$father.find("#billId").val():$father.find("#sel_dropdownlist29").val();
+                //收文流程 法制办  权限控制
+                if(window.top.globalParams.djsn==="oa_pg_incoming_form"&&$father.find("#sel_dropdownlist29").val()==="c5cf56a063e94481af6a62203e90ad8c"){
+                    billId="c5cf56a063e94481af6a62203e90ad8c";
+                }
+                var nodeAll="${base}/admin/documentBill/getBillInfo.action"+"?etc="+new Date().getTime()+"&documentBill.id="+(billId);
+                var nodeStatusUrl="${base}/admin/documentBill/getBillAuthInfo.action?etc="+new Date().getTime();
+                $.getJSON(nodeAll,function(result){
+                    var billContent=eval((result.datas.billContent));
+                    var nodeAllData=[];
+                    if(billContent.length>0){
+                        billContent.forEach(function(value){
+                            nodeAllData.push({
+                                "bill_field":value.id,
+                                "auth":false
+                            });
+                        });
+                    }
+                    $.getJSON(nodeStatusUrl,{
+                        "wfName":window.top.globalParams.wfName,
+                        "billId":billName
+                    },function(data){
+                        //data-node 表示绑定多个节点
+                        var datas;
+                        if(data.datas.length){
+                            datas=data.datas.filter(function(value){
+                                return value.auth==="true"&&value.step_id===stepId;
+                            });
+                            nodeAllData.forEach(function(value){
+                                for(var i= 0,max=datas.length;i<max;i++){
+                                    if(value.bill_field===datas[i].bill_field){
+                                        value.auth=true;
+                                        break;
+                                    }
+                                }
+                            });
+                            nodeAllData.forEach(function(value) {
+                                var $this = $("#" + value.bill_field);
+                                var nodeName = value.bill_field;
+                                var isOpen = value.auth ? false : true;
+
+                                var nodeType = ($this[0].tagName).toLowerCase();
+                                //默认为开启状态，当isOpen为true时为开启，否则就是关闭状态
+                                //如果都关闭，那此处视为全部开放权限
+                                if(datas.length<1){
+                                    isOpen=false;
+                                }
+                                if (isOpen) {
+                                    if (nodeType === "select") {
+                                        $this.prop("disabled", true);
+
+                                        if ($this.data("node")) {
+                                            var nodeBtn = $this.data("node").split("|");
+
+                                            nodeBtn.forEach(function (value) {
+                                                if ($("#" + value).length) {
+                                                    $("#" + value).prop("disabled", true);
+                                                    if((($("#" + value)[0].tagName).toLowerCase())==="button"){
+                                                        $("#" + value).hide();
+
+                                                    }
+                                                }
+                                            });
+                                        }
+                                        //权限开启
+                                        if(isAllOpen){
+                                            $this.prop("disabled", false);
+                                        }
+                                    }
+                                    else if(nodeType === "textarea"||nodeType === "input"){
+                                        //保持字体的颜色，不然disabled更佳
+                                        $this.prop("readonly", true);
+
+                                        if ($this.data("node")) {
+                                            var nodeBtn = $this.data("node").split("|");
+
+                                            nodeBtn.forEach(function (value) {
+                                                if ($("#" + value).length) {
+                                                    $("#" + value).prop("readonly", true);
+                                                    if((($("#" + value)[0].tagName).toLowerCase())==="button"){
+                                                        $("#" + value).hide();
+
+                                                    }
+                                                }
+                                            });
+                                        }
+                                        //权限开启
+                                        if(isAllOpen){
+                                            $this.prop("readonly", false);
+                                        }
+                                    }
+                                    else if (nodeType === "button") {
+                                        $this.prop("disabled", true);
+
+                                        if ($this.data("node")) {
+                                            var nodeBtn = $this.data("node").split("|");
+
+                                            nodeBtn.forEach(function (value) {
+                                                if ($("#" + value).length) {
+                                                    $("#" + value).prop("disabled", true);
+                                                    if((($("#" + value)[0].tagName).toLowerCase())==="button"){
+                                                        $("#" + value).hide();
+
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                    //意见栏
+                                    else if (nodeType === "td") {
+                                        $this.find(".td-choice-input").removeClass("js-choice-input").css({"cursor": "text"});
+                                        $this.find(".js-leader-advice-del").remove();
+                                        $this.find(".js-leader-advice-edit").remove();
+                                        $this.find(".td-choice-input-tip").remove();
+                                        $this.find(".form-bill-agree").remove();
+                                    }
+                                }
+                            });
+                        }
+                        //设置只读状态的办理单
+                        obj.setOnlyRead();
+                    });
+                });
+            }
+        }
+        return obj;
+    })();
+
+    // 初始化自动 textarea
+    function textAuto(){
+        $(".js-auto-textarea").each(function(){
+            $(this).blur();
+        });
+    }
+</script>
+</html>

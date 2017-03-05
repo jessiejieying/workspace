@@ -1,0 +1,139 @@
+@charset "utf-8";
+html{
+	overflow: hidden;
+	height:100%;
+	width:100%;
+	background:#1f86c3 url("../images/bg-top.jpg") center top no-repeat;
+}
+.login_area {
+    font-family: '宋体','微软雅黑', Verdana, sans-serif, serif;
+	width: 100%;
+	margin-top: 256px;
+  padding-top: 30px;
+	position: relative;
+	font-size: 14px;
+    font-weight: bold;
+   border-top: 1px solid #fff;
+  .inputs_wrap {
+	width: 360px;
+	margin: 0 auto;
+
+  }
+  .form-group{
+	margin: 0;
+	padding: 0;
+	margin-top: 15px;
+	.field{
+	  .input-help{
+		position: absolute;
+		left: 380px;
+		top: 15px;
+		font-weight: normal;
+		ul{
+		  width:300px;
+		  li{
+			color: #fff20e;
+		  }
+		}
+		
+	  }
+	  .field-left{
+		width: 60px;
+		text-align: right;
+		padding-right: 12px;
+		color:#fff;
+		height: 40px;
+		line-height: 40px;
+	  }
+	  .field-right{
+		width: 300px;
+		border: 1px solid #0c6aae;
+		border-radius: 2px;
+		height: 40px;
+		background-color: #fff;
+		.input{
+		  padding: 11px 0px 11px 10px;
+		  border: 0;
+		  border-radius:0;
+		  font-size: 14px;
+		  color: #b2b2b2;
+		  font-weight: normal;
+		  width: 100%;
+		  background-color:transparent;
+		}
+		box-shadow: 0 0 5px #0c6aae;
+		-webkit-box-shadow: 0 0 5px #0c6aae;
+	  }
+	  .login_btn {
+		height: 44px;
+		border: 1px solid #066aa5;
+		background-color:#0f75b1;
+		box-shadow: 0 2px 0 #186897,2px 0px 0 #186897;
+
+		.input{
+		  background-color:transparent;
+		  outline: none;
+		  color: #fff;
+		  cursor: pointer;
+		  text-align: center;
+		  margin: 0 10px;
+		  width: 280px;
+		  font-weight: bold;
+		  padding: 14px 0;
+		}
+		&:hover{
+		  background-color:#066aa5;
+		}
+
+	  }
+	}
+
+  }
+  .form-group-btn{
+	margin-top:40px;
+  }
+
+}
+
+.password_word {
+	position: absolute;
+	left: 66px;
+	top:56px;
+	color: #8a8a8a;
+}
+.copyRight {
+	width:360px;
+	font-size: 12px;
+	color:#fff;
+  	position: absolute;
+  	left: 50%;
+  	margin-left: -180px;
+  	text-align: center;
+  	bottom: 70px;
+  	span{
+	  margin-left: 47px;
+	}
+}
+.id_tips {
+	position: absolute;
+	left: 258px;
+	width: 200px;
+	color: #F00;
+	top: 23px;
+	display:none;
+}
+.pwd_tips {
+	position: absolute;
+	left: 258px;
+	width: 200px;
+	color: #F00;
+	top: 78px;display:none;
+}
+.check_tips{
+	position: absolute;
+	left: 208px;
+	width: 300px;
+	color: #F00;
+	top: 130px;display:none;
+}
+

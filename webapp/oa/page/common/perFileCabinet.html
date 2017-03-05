@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html style="overflow:hidden;">
+<head>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+</head>
+<body class="personal-file-cabinet ms-controller" ms-controller="wrap">
+<div class="container-layout line">
+    <table style="width: 100%;" id="common_table">
+        <tr>
+            <!-- 左侧 -->
+            <td id="td_tree">
+                <div class="left-menu">
+                    <ul class="left-menu-ul">
+                        <li class="left-menu-ul-li">
+                            <span class="li-header" ms-click="fileContentToggle()">
+                                <i class="icon-caret-down icon-caret-up js-caret"></i>文件分组
+                            </span>
+
+                            <div class="file-content js-file-content">
+                                <div class="file-input">
+                                    <input placeholder="请输入文件标题" type="text" id="file_search" ms-duplex="@change" class=""/>
+                                    <span style="display: none">{{@change}}</span>
+                                    <i ms-click="@addFile()" title="添加文件" class="icon-plus  file-add"></i>
+                                </div>
+                                <ul class="in-ul js-in-ul">
+                                    <li ms-click="@fileUrlUpdate()">
+                                        <i class="icon-folder-o li-left"></i>
+                                        <span class="li-mid">全部分组</span>
+                                    </li>
+                                    <li ms-for="($index,el) in @fileData" ms-visible="el.isShow">
+                                        <i class="icon-folder-o li-left"></i>
+                                        <span class="li-mid" ms-text="el.name"></span>
+                                        <i class="li-right icon-trash-o" title="删除文件" ms-click="@fileDel(el,$index,$event)"></i>
+                                    </li>
+                                    <li ms-click="@fileUrlUpdate()">
+                                        <i class="icon-folder-o li-left"></i>
+                                        <span class="li-mid">未分组</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="left-menu-ul-li li-pl12">我上传的</li>
+                        <li class="left-menu-ul-li li-pl12">我的收藏</li>
+                        <li class="left-menu-ul-li li-pl12">我的分享</li>
+                    </ul>
+                </div>
+            </td>
+            <td class="left-menu-line"></td>
+            <!-- 右侧 -->
+            <td class="ver-top">
+                <div class="grid-table-top" id="grid_table">
+                    <div class="js-tool-bar">
+                        <div class="form-group header-group">
+                            <div class="button button-main js-add-account float-left" >上传文件</div>
+                            <div class="button button-main js-add-account float-left margin-left-in"  ms-click="@gridDel()">删除
+                            </div>
+                            <div class="button button-main js-add-account float-left margin-left-in" >分享</div>
+                            <div class="button button-main js-add-account float-left margin-left-in" ms-click="@fileChangeTo()">转移至
+                            </div>
+                            <input id="search_text" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字"/>
+
+                            <div class="button button-main margin-left-in"  ms-click="@gridSearch()">搜索</div>
+                            <div class="button js-level-search margin-left-in">高级搜索<i class="li-icon-arrow-down"></i></div>
+                        </div>
+                        <div class="level-searh form-group header-group" style="display: none;">
+                            <span class="header-title">姓名:</span>
+                            <input id="senior_orgName" type="text" class="tool-bar-input margin-left-in" placeholder=""/>
+                        </div>
+                    </div>
+                    <div class="js-grid-father grid-father">
+                        <table id="manage_grid" class="bsgrid">
+                            <tr>
+                                <th w_index="id" w_hidden="true" class="hidden"></th>
+                                <th w_check="true" width="40"></th>
+                                <th w_index="fileName">文件标题</th>
+                                <th w_index="groupName">分组</th>
+                                <th w_index="addTime">上传日期</th>
+                                <th w_index="operateHtml">操作</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+<script id="addNewGroup" type="text/template">
+    <div class="new-group-add">
+        <span class="add-top">路径：文件分组</span>
+
+        <div class="group-li">
+            <div class="group-name"><i>*</i> 名称：</div>
+            <div class="group-content-input">
+                <input id="add_input" type="text"/>
+            </div>
+        </div>
+        <div class="text-center">
+            <button class="button button-main" id="add_file">确定</button>
+        </div>
+    </div>
+</script>
+<script id="group_change_to" type="text/template">
+    <div class="file-group-change-to">
+        <div class="new-group-add">
+            <span class="add-top">路径：文件分组</span>
+            <div class="group-li">
+                <div class="group-name"><i>*</i> 名称：</div>
+                <div class="group-content-input">
+                    <input  type="text"/>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="button button-main">确定</div>
+            </div>
+        </div>
+    </div>
+</script>
+<!-- jquery 框架 1.11 -->
+<script src="${base}/edenui/common/js/jquery.min.js"></script>
+
+<!-- jquery插件：弹出层、提示 -->
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+
+<script src="${base}/edenui/common/js/underscore.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/niceScrollBar/jquery.nicescroll.min.js"></script>
+
+<!--布局-->
+<script src="${base}/edenui/common/js/jquery.resizable.js"></script>
+<!--jquery bsgrid-->
+<script src="${base}/edenui/common/js/jq_plugins/bsgrid/grid.zh-CN.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/bsgrid/grid.extend.min.js"></script>
+<!--公用的js文件-->
+<script src="${base}/edenui/common/js/common.js"></script>
+<script src="${base}/edenui/common/js/avalon/avalon2.js"></script>
+<script>
+    //个人文件柜的id值
+    var filePerIds = [];
+    var gridOne, jsTree, orgCode;
+    var searchStatus = false;
+    var selectURL = "${base}/admin/fileCabinet/queryAllCabinet.action";
+
+    var perFileCabGlobal={
+        init:function(){
+            this.scrollInit();
+            this.gridInit();
+        },
+        //自适应滚动条
+        scrollInit:function(){
+            var $height = $("#td_tree").height() - 210;
+            $(".js-in-ul").height($height);
+            //隐藏左侧滚动条
+            $(".js-in-ul").niceScroll({
+                cursoropacitymax: 0,
+                cursorborder: "none"
+            });
+        },
+        //grid初始化
+        gridInit:function(){
+            gridOne = $.fn.bsgrid.init("manage_grid", {
+                url: selectURL + "?etc=" + new Date().getTime(),
+                row_primary_key: "primaryKey",
+                autoLoad: true,
+                pageSizeSelect: true,
+                pageSize: 15,
+                complete: function (options, XMLHttpRequest, textStatus) {
+
+                },
+                additionalBeforeRenderGrid: function (parseSuccess, gridData, options) {
+                },
+                additionalAfterRenderGrid: function () {
+
+                    gridOne.initGrid();
+                    var trData = gridOne.getAllRecords();
+                    if(trData.length>0){
+
+                        $("#manage_grid  tbody tr").each(function (index) {
+
+                            var $this = $(this);
+                            $this.find("td").eq(5).html(trData[index].operateHtml);
+
+                        });
+                    }
+
+                }
+            });
+        }
+    }
+    avalon.config({
+        debug: false
+    });
+    var model = avalon.define({
+        $id: "wrap",
+        fileData: [],
+        change:"",
+        addFile: function () {
+            //已经存在的文件
+            var fileNameData=[];
+             model.fileData.forEach(function (value) {
+                 fileNameData.push(value.name);
+            });
+            fileNameData.push("全部组织");
+            fileNameData.push("未分组");
+            var message = layer.open({
+                type: 1,
+                title: "新建分组",
+                area: ["650px", "306px"],
+                content: $("#addNewGroup").html(),
+                success: function (layero, index) {
+                    $("#add_file").click(function () {
+                        var isGoing = false;
+                        var $val = $("#add_input").val();
+                        if ($val.length < 1) {
+                            layer.msg("文件名称不能为空!");
+                            isGoing = true;
+                        }
+                        for (var i = 0, max = fileNameData.length; i < max; i++) {
+                            if (fileNameData[i] == ($val)) {
+                                layer.msg("该文件已经存在!");
+                                isGoing = true;
+                            }
+                        }
+                        if (isGoing) {
+                            return;
+                        }
+                        var addUrl = "${base}/admin/fileCabinet/insertGroup.action";
+                        layer.msg("新建中...");
+                        $("#add_file").prop("disabled",true);
+
+                        $.post(addUrl, {
+                            groupName: $val
+                        }, function (data) {
+                            $("#add_file").prop("disabled",false);
+                            if (data.result) {
+                                layer.msg(data.message);
+                                model.fileData.push({
+                                    "name": $val,
+                                    "id": data.id,
+                                    "groupType": "",
+                                    "isShow": true
+                                })
+                            }
+                            else {
+                                layer.msg(data.message);
+                            }
+                            setTimeout(function () {
+                                layer.closeAll();
+                            }, 500);
+
+                        });
+                    });
+                }
+            })
+        },
+        //搜索文件
+        fileSearch:"",
+        fileContentToggle: function () {
+            $(".js-file-content").slideToggle();
+            $(".js-caret").toggleClass("icon-caret-up");
+        },
+        //删除文件
+        fileDel: function (obj, $index, event) {
+            event.stopPropagation();
+            var confirm = layer.confirm("是否要删除文件" + obj.name, {
+                btn: ['确定', '取消']
+            }, function () {
+                var fileUrl = "${base}/admin/fileCabinet/deleteGroup.action";
+                $.post(fileUrl, {
+                    id: obj.id
+                }, function (result) {
+                    layer.msg("删除成功!");
+                    gridOne.refreshPage();
+                    model.fileData.splice($index, 1);
+                });
+            }, function () {
+
+            })
+        },
+        //批量删除
+        gridDel: function () {
+            var $ids = [];
+            var trData = gridOne.getCheckedRowsRecords();
+            if (trData.length < 1) {
+                window.top.layer.msg("请至少勾选一个！");
+                return;
+            }
+            else {
+                trData.forEach(function (value) {
+                    $ids.push(value.id);
+                });
+            }
+            fileDel($ids.join(","));
+        },
+        //文件转移
+        fileChangeTo: function () {
+            filePerIds.length = 0;
+            var trData = gridOne.getCheckedRowsRecords();
+            if (trData.length < 1) {
+                window.top.layer.msg("请至少勾选一个！");
+                return;
+            }
+            else {
+                trData.forEach(function (value) {
+                    filePerIds.push(value.id);
+                });
+            }
+            var win = {
+                text: "选择文件分组", url: "${base}/admin/commonDispatch/perFileCabinetPop.action",
+                width: '650',
+                height: '468',
+                id: "addOrgWin",
+                parentIfr: window
+            };
+            window.top.createWindow(win);
+        },
+        fileUrlUpdate: function () {
+            window.top.layer.msg("开发中...");
+        },
+        //搜索grid
+        gridSearch:function(){
+            var clu = $("#search").val();
+            var value = $("#search_text").val() == '请输入关键字' ? '' : $("#search_text").val();
+            gridOne.changeUrl(selectURL + "?" + clu + '=' + window.encodeURI(value) + "&userInfo.depCode=" + orgCode + '&etc=' + new Date().getTime());
+        },
+        //下一个搜索
+        nextGridSearch:function(){
+            var orgName = $("#senior_orgName").val();
+            gridOne.changeUrl(selectURL + "?criteriaUserName=" + window.encodeURI(orgName) + "&userInfo.depCode=" + orgCode + '&etc=' + new Date().getTime());
+        }
+    });
+    model.$watch('change', function(a,b) {
+        var $val =a;
+        if (searchStatus) {
+            clearTimeout(searchStatus);
+        }
+        searchStatus = setTimeout(function () {
+
+            //过滤搜索到的数组
+            model.fileData.forEach(function (value) {
+                var content = value.name;
+                if (content.indexOf($val) > -1) {
+                    value.isShow = true;
+                }
+                else {
+                    value.isShow = false;
+                }
+            });
+        }, 10);
+    });
+    $(function () {
+        //获取分组列表
+        $.getJSON("${base}/admin/fileCabinet/queryCabinetGroup.action", function (result) {
+            model.fileData.clear;
+            var data = result.data;
+            if (data.length > 1) {
+                var totalData = [];
+                data.forEach(function (value) {
+                    totalData.push({
+                        "name": value.groupName,
+                        "id": value.id,
+                        "groupType": value.type,
+                        "isShow": true
+                    });
+                });
+                model.fileData = totalData;
+            }
+        });
+        layOut("#common_table", "#grid_table");
+
+        perFileCabGlobal.init();
+
+
+        //工具条高级搜索
+        $(document).on("click", ".js-level-search", function () {
+            girdTable(this);
+            $('.li-icon-arrow-down').toggleClass('li-icon-arrow-top');
+        });
+
+    });
+
+    function getRecord(selId) {
+        var getIndex = -1, getId = "#grid_" + selId;
+        getIndex = $(getId).attr("index");
+        if (getIndex == -1) {
+            return null;
+        }
+        return gridOne.getRowRecord(gridOne.getRow(getIndex));
+    }
+    //编辑文件
+    function fileEdit(id) {
+        filePerIds.length = 0;
+        filePerIds.push(id);
+        var win = {
+            text: "选择文件分组", url: "${base}/admin/commonDispatch/perFileCabinetPop.action",
+            width: '650',
+            height: '468',
+            id: "addOrgWin",
+            parentIfr: window
+        };
+        window.top.createWindow(win);
+    }
+
+    //删除文件
+    function fileDel(id) {
+        var $ids = [];
+        id.toString().split(",").forEach(function (value) {
+            $ids.push(value);
+        });
+
+        var confirm = layer.confirm("是否要删除文件", {
+            btn: ['确定', '取消']
+        }, function () {
+            var fileUrl = "${base}/admin/fileCabinet/deleteFileCabinet.action";
+            $.post(fileUrl, {"ids": $ids.join(",")}, function (data) {
+                if (parseInt(data.result)) {
+                    gridOne.refreshPage();
+                }
+                layer.msg(data.message);
+            });
+        }, function () {
+
+        })
+    }
+
+
+</script>
+</body>
+</html>

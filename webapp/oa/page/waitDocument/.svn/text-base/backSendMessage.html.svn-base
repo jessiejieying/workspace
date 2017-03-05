@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line" style="margin 0 auto;margin-right:15px;">
+	    <table class="wrongReg-table" style="width: 722px;margin-left: auto;margin-right: auto;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	          		
+	          		
+	          	 <div class="wrong-text-title wrong-reg-table" style="margin-top:16px; margin-bottom:5px;">接收人:</div>
+	             <div class="js-grid-father grid-father" style="margin-top:0px; margin-bottom:66px;">
+	              <table id="manage_grid" class="bsgrid" >
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="30"></th>
+	                  <th w_index="true" width="37">序号</th>
+	                  <th w_index="unit" width="232">来文单位</th>
+	                  <th w_index="name" width="131">姓名</th>
+	                  <th w_index="post" width="131">职务</th>
+	                  <th w_index="number" width="131">电话</th>
+	                </tr>
+	              </table>
+	          	 </div>
+	          	 
+	          
+				  <div class="wrong-text-title wrong-reg-table" style="margin-top:-100px;margin-bottom:8px;">消息内容:</div>
+					  <div class="tool-bar-li line">
+						  <textarea rows="6" style="width:722px;height:100px;padding-top:5px;line-height:19px;text-indent:2em;" id="SMS_content"></textarea>
+					  </div>
+				   <div style="width:722px;height:25px;margin:0 auto;text-align:center;">
+<!--                        发送间隔 -->
+<!--                        <select class="input display-ib" id="selectFrequency" style="width:100px"> -->
+<!--                            <option value="1">单次</option> -->
+<!--                            <option value="2">多次</option> -->
+<!--                        </select> -->
+<!--         <span id="selectShow" style="display:none;"> -->
+<!--         频率 -->
+<!--         <input id="hour" type="text" class="input display-ib" value="1" style="width:100px"/> -->
+<!--         小时 -->
+<!--        </span> -->
+				       <div class="button common-skin-btn-syle01" id="conform_add">确认</div>
+				   </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script>
+	
+	var commonTels;
+	var commonMailContent;
+	var commonTableKeyId;
+	var commonTableName;
+	var commonTaskType;
+	var commonCycleHour;
+
+	var gridOne;
+	var selectURL = "${base}/admin/waitDocument/queryBackMessagePage.action";
+	$(function(){
+
+        $(document).on("change","#selectFrequency",function(){
+            var $this=$(this);
+            $("#selectShow").hide();
+            if($this.val()==="1"){
+                $("#selectShow").hide();
+            }
+            else{
+                $("#selectShow").show();
+            }
+        })
+
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime() +"&waitDocumentId=${id!}",
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:3,
+		      showPageToolbar:true,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		    	  $("#SMS_content").text(gridData.mail);
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+		    	$("#manage_grid tbody tr").each(function(){
+	        		$("td",this).eq(1).css("padding-left","8px");
+	        		$("td",this).css({"padding-left":"0px","text-align":"center"});
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+		      }
+		 });
+
+		 //确认发送短信
+		 $(document).on("click","#conform_add",function(){
+			var checkedRowsRecords=gridOne.getCheckedRowsRecords();
+			if(checkedRowsRecords.length<=0){
+				layer.msg("请选择一条数据");
+				return;
+			}
+			if($("#SMS_content").val()==""){
+				layer.msg("请填写消息内容");
+				$("#SMS_content").focus();
+				return;
+			}
+		 	var tels = "";
+		 	var j = 0;//有效号码的条数
+		 	var myreg = /^[1][358][0-9]{9}$/;
+		 	for(var i=0;i<checkedRowsRecords.length;i++){
+		 		var tel = checkedRowsRecords[i].number;
+		 		if(tel!=null && tel!="" && myreg.test(tel)){
+		 			if(j!=0)
+			 			tels += ",";
+		 			tels += tel;
+		 			j++;
+		 		}
+		 	}
+		 	
+		 	commonTels = tels;
+		 	commonMailContent = $("#SMS_content").val();
+			commonTableKeyId = "${id!}";
+			commonTableName = "oa_back_document";
+			commonTaskType = $("#selectFrequency").val();
+			commonCycleHour = $("#hour").val();
+			
+			window.top.messageObj={
+					commonTels:tels,
+				 	commonMailContent:$("#SMS_content").val(),
+					commonTableKeyId:"${id!}",
+					commonTableName:"oa_back_document",
+					commonTaskType:$("#selectFrequency").val(),
+					commonCycleHour:$("#hour").val(),
+					
+			}
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+
+		  });
+
+		
+	});
+
+	
+	
+</script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html style="overflow:auto; height:100%;">
+<head>
+    <#include "/aufw/page/include/head.html">
+        <style type="text/css">
+            .form-pt88 {
+                padding-top: 0px;
+            }
+
+            td {
+                height: 40px;
+                color: #ef655d;
+                vertical-align: middle;
+                text-align: center;
+                font-family: '黑体';
+            }
+
+            td .content {
+                text-align: left;
+                padding-left: 19px;
+                color: #2f2f2f;
+                font-family: '宋体';
+                font-size: 14px;
+            }
+            .common-skin-btn-syle01 {
+                color: #fff;
+                border-color: #4786d5;
+                background-color: #5b97e1;
+            }
+
+            .common-skin-btn-syle01:hover {
+                color: #fff;
+                border-color: #3bd;
+                background-color: #3bd;
+            }
+        </style>
+</head>
+<body onload="load();" style="overflow-y:scroll;">
+<object id="TGPDFPlugIn" classid="clsid:04DDDFAA-0AC0-4D47-9315-9F442F65D403" width="0" height="0">
+    <embed name="TGPDFPlugIn" type="application/nptseal-TGPDFPlugIn" width="0" height="0"></embed>
+</object>
+<input type="hidden" id="meetingId" value="${(meetingInfo.id)!}"/>
+<input type="hidden" id="meetingIsBack" value="${(meetingInfo.isBack)!}"/>
+<input type="hidden" id="meetingFlow" value="
+      <#if flowDics??>
+        <#list flowDics as item>
+          <#if (item.dictDesc)?trim==(meetingInfo.meetingType)?trim>
+             ${(item.dictValue)?trim}
+          </#if>
+        </#list>
+      </#if>
+   "/>
+
+<h1 class="text-center" style="margin-top:16px;margin-bottom:16px;color:#ef655d;margin-left: 100px;margin-right: 100px;">${(meetingInfo.subject)!}</span></h1>
+
+<div class="form-print  form-pt88" style="width:720px;margin-left: auto;margin-right: auto;" id="showHtml">
+    <table style="font-size:15px;width:720px;border: 1px solid #ef655d;color:#ef655d;font-family:'宋体';">
+        <tr style="height:41px;">
+            <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+                <table style="width:720px;" frame="void">
+                    <tr>
+                        <td style="width: 130px;border-right: 1px solid #ef655d;text-align:center;vertical-align:middle;">
+                            来文单位
+                        </td>
+                        <td style="" class="content">${(meetingInfo.mainOrg)!}</td>
+                        <td style="width:93px;color:#ef655d;height: 100%;border-right:1px solid #ef655d;border-left: 1px solid #ef655d;">
+                            联系人
+                        </td>
+                        <td style="width: 122px;" class="content">${(meetingInfo.linkPeople)!}</td>
+                        <td style="width: 99px;border-left: 1px solid #ef655d;border-right: 1px solid #ef655d;color:#ef655d;padding: 0 5px;">
+                            联系电话
+                        </td>
+                        <td style="width: 122px;" class="content"> ${(meetingInfo.linkPhone)!}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+                <table style="width:100%;" frame="void">
+                    <tr>
+                        <td style="border-right:1px solid #ef655d;width:130px;height:41px;">会议名称</td>
+                        <td style="width:590px;" class="content" colspan="5">${meetingInfo.subject!}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr style="height:41px;">
+            <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+                <table style="width:100%;" height="100%" frame="void">
+                    <tr>
+                        <td style="border-right:1px solid #ef655d;width:130px">拟邀请省领导</td>
+                        <td style="width:590px;" class="content" colspan="5">${(meetingInfo.attendanceLeader)!}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+                <table style="width:100%;" frame="void">
+                    <tr>
+                        <td style="border-right:1px solid #ef655d;width:130px;height:41px;">会议内容（议程）</td>
+                        <td style="width:590px;height:41px;padding-top: 10px;padding-bottom: 10px;line-height: 20px;" class="content" colspan="5">
+                            ${meetingInfo.meetingContent!}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr style="height:82px;">
+            <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+                <table style="width:100%;" height="100%" frame="void">
+                    <tr>
+                        <td style="border-right:1px solid #ef655d;width:130px">会议主要情况</td>
+                        <td style="width:590px;margin:0px;">
+                            <table style="font-size:15px;color:#ef655d;font-family:'宋体';margin:0; border:0px solid #ef655d;">
+                                <tr>
+                                    <td style="border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;width:82px;height:41px;">
+                                        时间
+                                    </td>
+                                    <td style="width:232px;height:41px;border-right:1px solid #ef655d;border-bottom:1px solid #ef655d;"
+                                        class="content">${(meetingInfo.meetingDateFreemark)!}
+                                    </td>
+                                    <td style="width:131px;height:41px;border-bottom:1px solid #ef655d;border-right:1px solid #ef655d;">
+                                        规模（人数）
+                                    </td>
+                                    <td style="width:145px;height:41px;border-bottom:1px solid #ef655d;"
+                                        class="content">${(meetingInfo.meetingSize)!}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border-right:1px solid #ef655d;width:82px;height:41px;">地点</td>
+                                    <td style="width:232px;border-right:1px solid #ef655d;height:41px;" class="content">
+                                        ${(meetingInfo.location)!}
+                                    </td>
+                                    <td style="width:131px;border-right:1px solid #ef655d;height:41px;">经费（万元）</td>
+                                    <td style="width:145px;height:41px;" class="content">
+                                        ${(meetingInfo.meetingMoney)!}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';" colspan="2">
+                <table style="width:100%;" height="100%" frame="void">
+                    <tr>
+                        <td style="border-right:1px solid #ef655d;width:130px">附&nbsp;&nbsp;&nbsp;&nbsp;件</td>
+                        <td style="width:590px;padding-top: 10px;padding-bottom: 10px;line-height: 20px;" class="content" colspan="5">
+                            <#if attachmentInfoList?? && attachmentInfoList.size() &gt; 0>
+                                <#list attachmentInfoList as attachmentInfo>
+                    <span style="display: inline-block;">
+                      <a class="file-icon js-href-change" href="${(attachmentInfo.path)!}" data-href="${(attachmentInfo.path)!}" style="display:block;padding-left: 20px;"  data-name="${(attachmentInfo.name)!}"><font color="blue">${attachmentInfo_index+1}.${(attachmentInfo.name)!}</font></a>
+                    </span>
+                                    <#if (attachmentInfo.name)?index_of("tgw")!=-1>
+                       <span style="display: inline-block;" class="js-link-father" data-size="" data-name="${(attachmentInfo.name)!}" style="margin-left:10px;">
+                          <i style="display: inline-block;" data-href="${(attachmentInfo.path)!}" title="解密" class="icon-unlock-alt js-unlock"></i>
+                       </span>
+                                    </#if>
+                                </#list>
+                                <#else>
+                                    没有附件！
+                            </#if>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <div style="text-align:center;width:724px;margin-top:10px;">
+        <#if meetingInfo.isBack!=2>
+            <div class="button common-skin-btn-syle01 js-add-account" id="meetingInfo_back">退文</div>
+        </#if>
+        <div class="button common-skin-btn-syle01 js-add-account" id="meetingInfo_province_register">全省性会议登记</div>
+    </div>
+</div>
+<div id="provice_html" style="display: none!important;"></div>
+<script id="provice_choice" type="text/template">
+    <ul class="pop-choice-small js-pop-ul">
+        <%_.each(proviceData, function(item){%>
+        <li data-name="<%=item.flowName%>"><%=item.flowDescribe%></li>
+        <%});%>
+    </ul>
+</script>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jquery_migrate.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/edenui/common/js/plugins/My97DatePicker/WdatePicker.js"></script>
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<!-- 首页引用 -->
+<script src="${base}/edenui/common/js/ed_index.js"></script>
+
+<!--公用的js文件-->
+<script src="${base}/edenui/common/js/common.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+
+</html>
+<script type="text/javascript">
+    //天谷空间开始
+    var TGGovDocumentCtrl;    //加密解密控件
+    var TGPDFPlugIn;		  //天谷印章控件
+    var tempPath;
+
+    var proviceData = [];
+
+    function hrefChange(){
+        $(".js-href-change").each(function(){
+        	
+        	var $this=$(this),
+			path=$this.data("href").split("path=");
+			$this.attr("href",encodeURI(path[0]+"path="+path[1]).replace(/\+/g,"%2B"));
+            
+        });
+    }
+    function load() {
+        TGPDFPlugIn = getPluginObjcet("TGPDFPlugIn");
+        attach_event();
+    }
+    function getPluginObjcet(objname) {
+        if (!isIEBrowser()) {
+            if (document.embeds && document.embeds[objname])
+                return document.embeds[objname];
+        } else return document.getElementById(objname);
+    }
+    function attach_event() {
+        try {
+            TGPDFPlugIn.attachEvent("OnEventFinish", jsFire_TGPDFPlugInCallback);
+        }
+        catch (e) {
+            return false;
+        }
+        return true;
+    }
+
+    function jsFire_TGPDFPlugInCallback(eventID, errorCode, result) {
+        switch (eventID) {
+            case 10101:
+                var $linkFather = $thisFatherLink;
+                var dataSize = $linkFather.data("size");
+                var dataName = ($linkFather.data("name").toString()).split(".")[0];
+                var outInfo;
+                var outInfoLen;
+                TGPDFPlugIn.GetCurrentDocInfo(1, outInfo, outInfoLen); // 获取当前文件缓存路径
+
+                TGPDFPlugIn.CloseCurrentDoc();
+
+                if (tempPath) {
+                    var delJson = encodeURI("{method:'decryptPdf',tableKeyId:'${(meetingInfo.id)!}',name:'" + dataName + ".tgw',size:'" + dataSize + "',userid:'${userid!}',tableName:'oa_meeting_info'}");
+                    var location = "http://" + window.location.host + "/${base}/servlet/sealUploadServlet";
+
+					var destPath = tempPath.substring(0,tempPath.lastIndexOf("."))+"_temp.pdf";
+    				
+    				var Res = TGPDFPlugIn.DecodeDocument(tempPath, destPath, 0);
+                    TGPDFPlugIn.UploadFileToServer(location, destPath, encodeURIComponent(dataName + ".pdf"), delJson);
+                    window.location.reload();
+                }
+                break;
+            case 11201:
+            	tempPath = result;
+                ShowResultMessage("获取当前文件路径" + errorCode, result)
+                break;
+            case 11202:
+                ShowResultMessage("文档缓存路径" + errorCode, result)
+                break;
+            case 11203:
+                ShowResultMessage("文档总页数" + errorCode, result)
+                break;
+            case 11204:
+                ShowResultMessage("文档当前页码" + errorCode, result)
+                break;
+            case 11205:
+                ShowResultMessage("签章个数" + errorCode, result)
+                break;
+            case 11206:
+                ShowResultMessage("签章信息字符串形式" + errorCode, result)
+                break;
+            case 11207:
+                ShowResultMessage("签章信息文件路径" + errorCode, result)
+                break;
+            case 11300:
+                SignContext = errorCode;
+                ShowResultMessage("签名环境", errorCode)
+                break;
+            case 12600:
+                ShowResultMessage("上传文件" + errorCode, result)
+                alert("解密完成!");
+                break
+            default:
+                if (eventID / 100 == 104) {
+                    ShowResultMessage("签名结果" + errorCode, result)
+                }
+                break;
+        }
+    }
+    function ShowResultMessage(msg, result) {
+        var resultMsg = "";
+        try {
+            resultMsg = TGPDFPlugIn.GetErrorMsg(result);
+        } catch (e) {
+
+        }
+    }
+    function isIEBrowser() {
+        return (navigator.appName.indexOf("Microsoft Internet") != -1);
+    }
+    //天谷控件结束
+    $(function () {
+ 		hrefChange();
+        init();
+        //解密
+        $(document).on("click", ".js-unlock", function () {
+
+            $this = $(this);
+            $thisFatherLink = $this.closest(".js-link-father");
+            layer.msg("正在解密");
+            //var getAPath=($this.closest(".js-link-father").find(".js-a-path").attr("href")).split("path=");
+            var getAPath = ($this.data("href")).split("path=");
+            // fileDecrypt();
+            var windowLocation = (window.location).toString();
+            var windowBase = windowLocation.split("admin")[0]
+            var location = "http://" + window.location.host + "${base}/admin/documentData/sealPdf.action?path=" + getAPath[1];
+            TGPDFPlugIn.LoadPDF(encodeURI(encodeURI(location)));   // 加载服务器端加密文件
+        });
+
+        //会议退文弹出框  start           jq_gice_index.js
+        $(document).on("click", "#meetingInfo_back", function () {
+            var meetingInfo_id = $("#meetingId").val();
+            if (meetingInfo_id == "" || meetingInfo_id == null || meetingInfo_id == "undefined") {
+                layer.msg("会议ID值为空");
+                return;
+            }
+            var win = {
+                "text": "会议退文单",
+                "url": "${base}/admin/backMeeting/addBackMeetingInfo.action?meetingInfo.id=" + meetingInfo_id,
+                "width": "900",
+                "height": "570",
+                "parentIfr": parentIfr
+            };
+            window.top.createWindow(win);
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index);
+        });
+        //待收会议转入全省性会议的功能
+        $(document).on("click", "#meetingInfo_province_register", function () {
+
+            // provincialMeetingAdd();
+            var flowName=($("#meetingFlow").val()).replace(/\s+/g,"");
+            if(flowName!=null && flowName!=undefined && flowName!=""){
+             	proviceLoad(flowName);
+            	return;
+            }
+            var contentHtml = $("#provice_html").html(_.template($('#provice_choice').html()));
+            if (proviceData.length < 1) {
+                layer.msg("流程没有配置成功！");
+            }
+            else if (proviceData.length == 1) {
+
+                proviceLoad(proviceData[0].flowName);
+            }
+            else if (proviceData.length > 1) {
+
+                var message = layer.open({
+                    type: 1,
+                    title: "会议登记",
+                    area: ["200px", ""],
+                    content: contentHtml,
+                    success: function (layero, index) {
+                        $(".js-pop-ul li").click(function () {
+                            var $name = $(this).data("name");
+                            proviceLoad($name);
+                            layer.closeAll('page');
+
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    function init() {
+
+        var url = "${base}/admin/meetingDict/getProvinceMeetingFlow.action";
+        $.getJSON(url, function (data) {
+
+            if (parseInt(data.flag)) {
+                var result = data.data;
+                result.forEach(function (value) {
+                    proviceData.push({
+                        "flowDescribe": value.flowDescribe,
+                        "flowName": value.flowName
+                    });
+                });
+            }
+
+        });
+
+    }
+
+    //全省性会议登记
+    function provincialMeetingAdd() {
+
+        var contentHtml = $("#provice_html").html(_.template($('#provice_choice').html()));
+
+        if (proviceData.length < 1) {
+            layer.msg("流程没有配置成功！");
+        }
+        else if (proviceData.length == 1) {
+            initWorkflow(proviceData[0].flowName, "", version);
+        }
+        else if (proviceData.length > 1) {
+
+            var message = layer.open({
+                type: 1,
+                title: "会议登记",
+                area: ["200px", ""],
+                content: contentHtml,
+                success: function (layero, index) {
+                    $(".js-pop-ul li").click(function () {
+                        var $name = $(this).data("name");
+                        layer.closeAll('page');
+                        // initWorkflow($name,"",version);
+                    });
+                }
+            });
+        }
+    }
+
+    function proviceLoad(wfName) {
+        var confirmDescripition;
+        if ($("#meetingIsBack").val() == "2") {
+            confirmDescripition = "已收会议已经转入过全省性会议！是否还需要转入？";
+        } else{
+        	confirmDescripition = "是否把待收会议转入全省性会议？";
+        }
+        var meetingInfoId = $("#meetingId").val();
+        if (meetingInfoId == "undefined" || meetingInfoId == undefined || meetingInfoId == null || meetingInfoId.replace(/\s+/g, "") == "") {
+            layer.msg("待收会议不存在，无法转入到全省性会议中，请刷新页面重试");
+            return;
+        }
+        //发送ajax请求判断厅发送的会议数量以及与去年的比较
+        var mainOrg = "${(meetingInfo.mainOrg)!}";
+        if (mainOrg == null || mainOrg == undefined || mainOrg.replace(/\s+/g, "") == "") {
+            layer.msg("来文单位为空，请填写来文单位");
+            return;
+        }
+        //var flowName = $("#meetingFlow").val();
+        var flowName=wfName;
+        flowName = flowName.replace(/\s+/g, "");
+        if (flowName == "" || flowName == undefined) {
+            layer.msg("流程无法配对，请检查流程配置");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "${base}/admin/departmentMeetingInfoNum/isDepartmentMeetingNum.action",
+            data: "departmentName=" + window.encodeURI(mainOrg),
+            success: function (data) {
+                if (data.flag == "1") {
+                    layer.confirm(data.result, {btn: ["确定", "取消"]}, function () {
+                        $.ajax({//发送Ajax请求开始
+                            type: "POST",
+                            url: "${base}/admin/backMeeting/dueInMeetingInfoToProvinceMeetingInfo.action",
+                            data: {
+                                "workFlowName": flowName,
+                                "id": meetingInfoId
+                            },
+                            //  data:"workFlowName=oa_provincial_meeting&id="+meetingInfoId,
+                            success: function (data) {
+                                if (data.flag == "1") {
+                                    layer.msg("待收会议转入全省性会议成功");
+                                    var wf_name = data.wfName;
+                                    var wf_id = data.wfId;
+                                    uf_doAction_pg_send(wf_id, wf_name, "", "1", null);
+                                    setTimeout(function () {
+                                        var index = parent.layer.getFrameIndex(window.name);
+                                        parent.layer.close(index);
+                                        parentIfr.gridOne.refreshPage();
+                                    }, 1000);
+                                    setTimeout(function () {
+                                        // uf_doAction_pg_send(wf_id,wf_name,"","1",null);
+                                    }, 1000);
+                                } else {
+                                    layer.msg(data.result);
+                                }
+                            }//请求服务器，获得服务器的返回数据，进行数据处理结束
+                        });//发送Ajax结束
+                    }, function () {
+                        //取消的function；
+                    });
+                } else {
+                    //处理会议总小于5时的处理
+                    //发送Ajax请求结束
+                    layer.confirm(confirmDescripition, {btn: ["确定", "取消"]},
+                            function () {//确定按钮的执行
+                                $.ajax({//发送Ajax请求开始
+                                    type: "POST",
+                                    url: "${base}/admin/backMeeting/dueInMeetingInfoToProvinceMeetingInfo.action",
+                                    data: {
+                                        "workFlowName": flowName,
+                                        "id": meetingInfoId
+                                    },
+                                    //  data:"workFlowName=oa_provincial_meeting&id="+meetingInfoId,
+                                    success: function (data) {
+                                        if (data.flag == "1") {
+                                            layer.msg("待收会议转入全省性会议成功");
+                                            var wf_name = data.wfName;
+                                            var wf_id = data.wfId;
+                                            uf_doAction_pg_send(wf_id, wf_name, "", "1", null);
+                                            setTimeout(function () {
+                                            	parentIfr.gridOne.refreshPage();
+                                                var index = parent.layer.getFrameIndex(window.name);
+                                                parent.layer.close(index);
+                                                
+                                            }, 1000);
+                                            setTimeout(function () {
+                                                // uf_doAction_pg_send(wf_id,wf_name,"","1",null);
+                                            }, 1000);
+                                        } else {
+                                            layer.msg(data.result);
+                                        }
+                                    }//请求服务器，获得服务器的返回数据，进行数据处理结束
+                                });//发送Ajax结束
+                            },
+                            function (index) {//取消按钮的执行
+                            });
+                    //end
+                }
+            }//success结束
+        });
+
+    }
+
+    //附件信息文件添加图标
+    function classStyle() {
+      var arrSpan = [];
+      for (var i = 0; i < $(".file-icon").length; i++) {
+        arrSpan.push($(".file-icon").eq(i).data("name"))
+      }
+      $.each(arrSpan, function(i, item) {
+        if (item.indexOf(".doc") > -1) {
+          $(".file-icon").eq(i).addClass("file-icon-word");
+        } else if (item.indexOf(".pdf") > -1) {
+          $(".file-icon").eq(i).addClass("file-icon-pdf");
+        } else if (item.indexOf(".tgw") > -1) {
+          $(".file-icon").eq(i).addClass("file-icon-tiangu");
+        } else {
+          return ""
+        }
+      });
+
+    }
+    classStyle();
+
+</script>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+<link rel="stylesheet" type="text/css" href="${base}/oa/resource/style/css/imgList.css">
+	<style>
+	.container{width:auto !important; height:auto !important;}
+	</style>
+</head>
+
+<body style="height: 100%;">
+	<div id="grid_wrap" style="width: 100%; height: 100%; overflow: hidden; display: none;">
+		
+		<div id="grid_toolbar" class="ed-toolbar">
+			 <@f.operateRight operate="/admin/meetingRoom!insertMeetingRoom.action">
+				<a id="user_add" class="btn btn-info">添加会议室</a>
+			 </@f.operateRight >
+             <@f.operateRight operate="/admin/meetingRoom!deleteMeetingRoom.action">
+					<a id="user_delete" class="btn btn-warning">删除</a>
+			</@f.operateRight >
+				<select name="" id="search" style="width:100px;">grid_toolbar_ul<option value="criteriaName">会议名称</option>
+				</select>
+				<input id="search_text" class="search_text" value="请输入关键字"
+					name="" type="text">
+				<input class="btn btn-info" name=""
+					onClick="simpleSearch()" value="搜 索" type="button">
+			<!-- 	<a id="selectAll" class="btn">全选</a> -->
+				<a id="advanced_search_btn" class="btn">高级搜索</a>
+				
+				<a class="btn btn-info" title="以图片形式展现" id="listShowPicture">图</a>
+				<a class="btn btn-info" title="以列表形式展现" id="listShowList">列表</a>
+			</div>
+
+			
+
+			<div id="advanced_search_bar" class="ed-advanced-search-bar">
+			<table align="center">
+			<tr>
+				<td><label for="sname">会议室名称：</label></td>
+				<td><input id="sname" name="sname" type="text"> </td>
+				<td><label for="sadress">地址：</label></td>
+				<td><input id="sadress" name="sadress" type="text"> </td>
+				<td><label for="sstatus">状态：</label></td>
+				<td>
+					<select id="sstatus" name="sstatus" value=""type="text">
+								<option value="">全部</option>
+								<#list statusSelect as dataDict>
+									<option value="${dataDict.dictValue}">${dataDict.displayName}</option>
+								</#list>
+				</td>
+				<td><input class="btn btn-info" name="advancedSearch" onClick="advancedSearch()" value="搜 索" type="button"></td>
+			</tr>
+			</table>
+			</div>
+		
+		
+			<div id="grid" style="overflow:auto;"></div>
+	
+		<div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	      </div>
+		
+	</div>
+	<div id="form_maskA"
+		style="background: #ffffff; z-index: 99999; display: none; position: absolute; top: 0; left: 0; height: 0px; width: 0px;"></div>
+	<div id="form_maskB"
+		style="background: #ffffff; z-index: 99999; display: none; position: absolute; top: 0; left: 0; height: 0px; width: 00px;"></div>
+</body>
+
+<script src="${base}/oa/resource/js/ImgListPlug.js"></script>
+<#include "/aufw/page/include/script.html">
+
+
+<script>
+	var layout, grid, data, tabbar, option, sendUrl,listShowR=0;
+	window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+	function init(listShow) {
+	    listShowR = listShow;
+		var parentId;
+
+		layout = new dhtmlXLayoutObject(document.body, "1C");
+
+		layout.cells('a').hideHeader();
+
+		layout.attachEvent('onResizeFinish', page_layout);
+		layout.attachEvent('onPanelResizeFinish', page_layout);
+
+		data = new dhtmlXDataStore({
+			url : "${base}/admin/meetingRoom/selectMeetingRoom.action"+'?etc='+new Date().getTime(),
+			datatype : "json"
+		});
+
+		layout.cells('a').attachObject('grid_wrap');
+
+		if(listShow===1){
+			grid = new dhtmlXGridObject('grid');
+			grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+			grid.setHeader(" ,会议名称,地址,容纳人数,使用价格,状态,操作");
+			grid.setColumnIds("check,name,adress,capcity,price,status,operate");
+			grid.setInitWidths("30,120,*,60,60,80,180");
+			grid.setColTypes("ch,ro,ro,ro,ro,co,link");
+			<#list statusSelect as status>                                                                         
+			grid.getCombo(5).put(${status.dictValue},'${status.displayName}');
+			</#list>
+			
+
+			grid.enablePaging(true, 18, 999, 'grid_page', true);//启用分页
+			grid.setPagingSkin("toolbar");//设置分页底部
+			grid.init();
+			grid.attachEvent("onCheck", function(rId, cInd, state) {
+				grid.selectRowById(rId);
+			});
+			grid.attachEvent("onRowSelect", doOnRowSelected);
+			grid.sync(data);	         // grid从 DataStore中同步数据
+		}else if(listShow===0){
+			pictureInit("${base}/admin/meetingRoom/selectMeetingRoom.action?hasPic=1&etc="+new Date().getTime());
+		}
+        page_layout();     
+	}
+
+	 function pictureInit (url) {
+    	$('#grid').empty();
+		var seeting={
+				containsSize:{width:1000,height:600}, 				//设置imgList大小
+				renderTo:$("#grid"),			 					//设置父容器位置
+				enableShowDetails:true   							//是否显示详情
+			}
+		var iList = new imgListObject(seeting);					//新建imgList对象
+		iList.init();											//执行初始化操作
+		iList.hideTitle();											//执行初始化操作
+		var dataForm={
+				id:"id",
+				imgUrl:"picture",
+				title:"name",
+				info1:{name:"地址",value:"adress"},
+				info2:{name:"容纳人数",value:"capcity"},
+				info3:{name:"使用价格",value:"price"},
+				details:[
+					{type:"title",value:"name"},
+					{type:"line",name:"地址",value:"adress"},
+					{type:"line",name:"价格",value:"price"},
+					{type:"line",name:"容纳人数",value:"capcity"},
+					{type:"line",name:"卓型布置",value:"deskType"},
+					{type:"textarea",name:"备注",value:"remark"}
+				]
+			}
+		iList.setDataForm(dataForm);
+		//data数据其中id(title,i1,i2,i3)不可变，后面的值可以变
+		var jsonurl=url;
+		iList.loadJson(jsonurl);	
+		iList.hideTitle();						//获取数据并渲染
+		//console.log(iList);
+		operation={							//设置操作函数，key为id value为a标签文本内容
+				deletes:"删除",
+				update:"修改",
+				checkDate:"查看日程"
+			}
+		iList.setFunction(operation); 		//添加操作函数
+		//detail={title:"name",li1:"",li1:"shebei",li2:""}
+		$(".deletes").bind("click",function(){
+			var imgId = $(this).parent().attr("id");
+			d(imgId);
+		});
+		$(".checkDate").bind("click",function(){
+			var imgId = $(this).parent().attr("id");
+			see(imgId);
+		});
+		$(".update").bind("click",function() {
+			var imgId = $(this).parent().attr("id");
+			e(imgId);
+		});
+    }
+
+	function doOnRowSelected(id) {
+		
+	}
+	function hasFunction(orgCode, rollback) {
+		$.ajax({
+			type : "POST",
+			async : false,
+			url : "${base}/admin/user/hasFunctionAuth.action?etc="
+					+ new Date().getTime(),
+			data : "orgCode=" + orgCode,
+			success : function(msg) {
+				if (msg.result == "success") {
+					rollback();
+				} else {
+					$.dialog.tips(msg.message);
+				}
+			}
+		});
+	}
+
+	function toolbar_func(id) {
+		if (id == 'add') {
+			var win = {text:"添加会议室", url:"${base}/admin/meetingRoom/addMeetingRoomPage.action",width:'769',height:'500', id:"addMeetingRoomPage",'parent_ifr':window}
+        window.top.createWindow(win);
+		option = "add";
+			if(listShowR===0){ //图片形式
+				$("#listShowPicture").click();
+			}else if(listShowR===1){
+				grid.selectRowById(id);
+			}	
+		}
+
+		if (id == 'edit') {
+			//form.unlock();
+		}
+		if (id == 'delete') {
+			var row_id = grid.getCheckedRows(0);
+			if (row_id == '') {
+				$.dialog.tips('请至少选择一条数据！');
+				return;
+			}
+			row_id = row_id.split(',');
+			if (row_id.length == 0)
+			{
+				return;
+			}
+				
+			$.dialog.confirm('你确定要删除这些数据吗？', function() {
+				var idArr = new Array();
+				for ( var i = 0; i < row_id.length; i++) {
+					idArr.push(data.item(row_id[i]).id);
+				}
+				$.post("${base}/admin/meetingRoom/deleteMeetingRoom.action", {
+					"meetingRoom.id" : idArr.join(",")
+				}, function(result) {
+					if (result.result = "success") {
+						simpleSearch();
+						$.dialog.tips(result.message);
+					}
+				});
+			});
+		}
+	}
+	
+	 function  advancedSearch(){
+		data.clearAll();
+		var name= $("#sname").val();
+		var adress= $("#sadress").val();
+		//var capcity= $("#scapcity").val();
+        //var price= $("#sprice").val();
+        var status= $("#sstatus").val();
+		var s = "meetingRoom.name="+name+"&meetingRoom.adress="+adress+"&meetingRoom.status="+status;
+		var url = '${base}/admin/meetingRoom/selectMeetingRoom.action?'+s+'&etc='+new Date().getTime();
+		loadFullData(url)
+    }
+	 
+	 function loadFullData(url){	 
+		if(listShowR===0){
+			url=url+"&hasPic=1";
+			pictureInit(url);
+		}else{
+			window.data.data.url = url
+			data.load(url);
+		}
+	 }
+	 $('#advanced_search_btn').unbind('click');
+	//searchBarCommon('advanced_search_bar',30,'advanced_search_btn','grid_toolbar','grid');
+	searchToggle('advanced_search_btn','advanced_search_bar');
+	function r(id) { //重置密码
+		grid.selectRowById(id);
+
+		$.dialog.confirm('你确定要重置该会议室的密码？', function() {
+			$.post("${base}/admin/user/resetPw.action", {
+				"idArr" : id
+			}, function(result) {
+				$.dialog.tips(result.tips);
+			});
+		});
+	}
+
+	function d(id) { //删除 grid中的一行数据
+		$.dialog.confirm('你确定要删除这条数据？', function() {
+
+			$.post("${base}/admin/meetingRoom/deleteMeetingRoom.action", {
+				"meetingRoom.id" : id
+			}, function(result) {
+				if (result.result == "success") {
+					simpleSearch();
+				}
+				$.dialog.tips(result.message);
+				//pictureInit();
+			});
+		});
+	}
+
+	function e(id) { //编辑 grid中的一行数据
+		//alert(id);
+		option = "update";
+		var win = {text:"修改会议室", url:"${base}/admin/meetingRoom/updateMeetingRoomPage.action?meetingRoom.id="+id,width:'769',height:'500', id:"updateMeetingRoom",'parent_ifr':window}
+        window.top.createWindow(win);
+	}
+
+	function see(id) { 
+		//alert(id);
+		//var item = data.item(id);
+		//var status=item.status;
+		var win = {text:"查看预定", url:"${base}/admin/meetingRoom/calendarPage.action?meetingRoom.id="+id+"&etc="+new Date().getTime(),width:'1024',height:'600', id:"calendar",'parent_ifr':window}
+        window.top.createWindow(win);
+	}
+	
+	function a(selId) {
+		grid.selectRowById(selId);
+		var item = data.item(selId);
+
+		if (selId) {
+			var win = {
+				text : "权限授予",
+				url : "${base}/admin/user/addAuthWin.action?accountInfo.accountName="
+						+ window.encodeURI(item.accountName),
+				id : "addAuthWin",
+				openType : 1
+			}
+			window.top.createTab(win);
+		} else {
+			$.dialog({
+				lock : true,
+				content : '请选择授权会议室记录',
+				icon : 'error',
+				ok : true
+			});
+		}
+	}
+
+	function u(selId) {
+		grid.selectRowById(selId);
+		var item = data.item(selId);
+		if (selId) {
+			window.top
+					.createWindow({
+						'text' : '会议室关联角色',
+						'id' : 'user_link_role',
+						'url' : '${base}/admin/user/assignUserRoleWin.action?accountInfo.accountName='
+								+ window.encodeURI(item.accountName),
+						'width' : '750',
+						'height' : '520'
+					});
+		}
+	}
+
+	function simpleSearch() {
+		data.clearAll();
+		var value = $("#search_text").val() == '请输入关键字' ? ''
+				: $("#search_text").val();
+		if (value == '') {
+			var url = '${base}/admin/meetingRoom/selectMeetingRoom.action'+'?etc='+new Date().getTime();
+;
+		} else {
+			var url = '${base}/admin/meetingRoom/selectMeetingRoom.action?meetingRoom.name='
+					+ window.encodeURI(value)+'&etc='+new Date().getTime();
+		}
+		loadFullData(url);
+		$("#search_text").val('请输入关键字');
+	}
+
+	function page_layout() {	
+		
+		var grid_wrap_width = $('#grid_wrap').width();
+		var grid_wrap_height = $('#grid_wrap').height();
+		$('#grid').height(grid_wrap_height - 40);
+		$('#grid').width(grid_wrap_width);
+		if(listShowR==1)
+		{
+			
+			$('#grid').height($('#grid_wrap').height() - 40-35);
+		}
+		
+		$('.xhdr').each(function(){
+			$(this).siblings('div.objbox').find('.obj').width($('#grid').width()-10);
+			$(this).siblings('div.objbox').find('th').eq(1).css('width','auto');
+		});	
+		
+		 if(grid)    grid.setSizes();  
+
+	}
+	function showGrid(itemId){
+		listShow=1;
+        grid = new dhtmlXGridObject('grid');
+		grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		grid.setHeader(" ,会议名称,地址,容纳人数,使用价格,状态,操作");
+		grid.setColumnIds("check,name,adress,capcity,price,status,operate");
+		grid.setInitWidths("30,*,*,*,*,*,180");
+		grid.setColTypes("ch,ro,ro,ro,ro,co,link");
+		
+		<#list statusSelect as status>                                                                         
+			grid.getCombo(5).put(${status.dictValue},'${status.displayName}');
+		</#list>
+
+		grid.enablePaging(true, 18, 999, 'grid_page', true);//启用分页
+		grid.setPagingSkin("toolbar");//设置分页底部
+		grid.init();
+		grid.attachEvent("onCheck", function(rId, cInd, state) {
+			grid.selectRowById(rId);
+		});
+		grid.attachEvent("onRowSelect", doOnRowSelected);
+		grid.sync(data);	
+		page_layout();
+			
+		grid.selectRowById(itemId);
+	}
+
+	
+	
+	
+	$(function() {
+		var delId=$('#user_delete');
+		if(delId)
+		{
+			delId.css("display","none");
+		}
+		
+		
+		 setTimeout(function(){init(0);}, 0);   
+		$('#listShowPicture').click(function(){
+			init(0);
+			$("#grid_page").empty();
+			
+			if(delId)
+			{
+				delId.css("display","none");
+			}
+			
+			$('#grid').css('overflow','auto');
+			$('#grid').height($('#grid_wrap').height()- 40);
+			
+		});
+		
+	$('#listShowList').click(function(){
+		if(delId)
+		{
+			delId.css("display","inline-block");
+		}
+		
+			init(1,false);
+			$('#grid').css('overflow','hidden');
+			$('#grid').height($('#grid_wrap').height() - 40-35);
+	})
+	$('#selectAll').bind('click', function() {
+			var ids = grid.getAllRowIds();
+			//console.log(ids);
+			var idsArr = ids.split(',');
+			//alert(idsArr.length);
+			var nowPage = grid.currentPage;
+			var pageItemsLength = grid.rowsBufferOutSize;
+			var allItemsLength = grid.rowsBuffer.length;
+
+			var forBigen = pageItemsLength * (nowPage - 1);
+			var forOver = pageItemsLength * (nowPage);
+			if (forOver > allItemsLength) {
+				forOver = allItemsLength
+			}
+			for (i = forBigen; i < forOver; i++) {
+				var forId = idsArr[i];
+				var check = grid.cellById(forId, 0).getValue();
+				//console.log(check);
+				if (check == 1) {
+					check = 0;
+				} else {
+					check = 1;
+				}
+				grid.cellById(forId, 0).setValue(check);
+			}
+
+		})
+		//$('#grid_toolbar_ul li').last().addClass('last');
+		$('#grid_toolbar a').click(function() {
+			var id = $(this).attr('id');
+			if (!id)
+				return;
+			id = id.substring(5);
+			toolbar_func(id);
+		});
+		
+		//searchBarCommon('advanced_search_bar',20,'advanced_search_btn','grid_toolbar','grid');
+		
+		$("#user_auth")
+				.click(
+						function() {
+							var selId = grid.getSelectedId()
+							var item = data.item(selId);
+
+							if (selId) {
+								var win = {
+									text : "权限授予",
+									url : "${base}/admin/user/addAuthWin.action?accountInfo.accountName="
+											+ item.accountName,
+									id : "addAuthWin"
+								}
+								window.top.createWindow(win);
+							} else {
+								$.dialog({
+									lock : true,
+									content : '请选择授权会议室记录',
+									icon : 'error',
+									ok : true
+								});
+							}
+						});
+
+		$("#search_text").focus(function() {
+			if ($(this).val() == this.defaultValue) {
+				$(this).val('');
+			}
+		}).blur(function() {
+			if ($(this).val() == '') {
+				$(this).val(this.defaultValue);
+			}
+		});
+	})
+</script>
+</html>

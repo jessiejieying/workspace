@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+	<title>Eden</title>
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+	<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+	<link rel="stylesheet"
+				href="${base}/edenui/common/js/jq_plugins/jstree/themes/default/style.min.css" />
+</head>
+<body>
+<div class="clearfix layer-choice-pop">
+	<div class="layer-choice-header">
+		<span>选择范围</span>
+		<div class="layer-header-select clearfix">
+			<div class="select-box float-left">
+				<select class="input" id="select_choice">
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class=" layer-choice-content">
+		<div class="layer-choice-content-header clearfix">
+			<span>选择范围</span>
+			<span class="padding-left">选择范围</span>
+		</div>
+		<div class="layer-choice-content-body clearfix">
+			<div class="body-choice-left">
+				<ul id="select_choice_left">
+				</ul>
+			</div>
+			<div class="body-choice-right" style="height: 312px;overflow-y: auto">
+				<div class="choice-content js-choice-content"></div>
+			</div>
+		</div>
+	</div>
+	<div class="layer-choice-footer clearfix">
+		<div class="button common-skin-btn-syle01 float-left" id="select_all">全选</div>
+		<div class="button common-skin-btn-syle01 float-left margin-little-left" id="select_clear">清除</div>
+		<div class="button common-skin-btn-syle01 float-right" id="select_sure">确定</div>
+	</div>
+</div>
+
+<div id="js_tree" class="hidden"></div>
+<script id="option_data" type="text/template">
+	<%_.each(datas, function(item){%>
+		<li><%=item.username%></li>
+	<%});%>
+</script>
+	</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/jstree/jstree.min.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<script>
+//分组action${base}/admin/myGroup/queryMyGroup.action"?etc="+new Date().getTime()+"&myGroup.dataValid=1&myGroup.groupType=2"
+//分组下人员action${base}/admin/myGroup/queryMyGroupEmp.action"?etc="+new Date().getTime()+"&myGroupEmp.dataValid=1&myGroupEmp.empType=2&myGroupEmp.groupId="
+	//存储右侧的数据
+	var  rightData=[];
+	var datas=[];
+	$(function(){
+		//选择
+		$(document).on("click","#select_choice_left li",function(){
+			var $this=$(this);
+			var changeData=$this.text();
+			rightData.push(changeData);
+			updateData();
+		});
+
+		$.getJSON("${base}/admin/myGroup/queryMyGroup.action",function(result){
+			var option="";
+			if(result.success) {
+				var resultData = result.data;
+				for (var i = 0, max = resultData.length; i < max; i++) {
+					option += "<option value='" + resultData[i].groupId + "'>" + resultData[i].groupName + "</option>";
+				}
+
+				$("#select_choice").html(option);
+
+				if (resultData.length > 0) {
+				$.post("${base}/admin/myGroup/queryEmpInfo.action", {"orgId": resultData[0].groupId}, function (result) {
+					datas.length = 0;
+					if (result.success) {
+						var resultData = result.data;
+						for (var i = 0, max = resultData.length; i < max; i++) {
+							datas.push({
+								"id": resultData[i].id,
+								"username": resultData[i].username
+							});
+						}
+					}
+
+					$('#select_choice_left').html(_.template($('#option_data').html(), datas));
+				});
+			}
+			}
+
+
+			});
+
+
+
+		$("#select_choice").change(function(){
+			$.post("${base}/admin/myGroup/queryEmpInfo.action", {"orgId":$("#select_choice option:selected").val()}, function(result){
+				datas.length=0;
+				if(result.success){
+					var resultData=result.data;
+					for(var i= 0,max=resultData.length;i<max;i++){
+						datas.push({
+							"id":resultData[i].id,
+							"username":resultData[i].username
+						});
+					}
+				}
+
+				$('#select_choice_left').html( _.template($('#option_data').html(), datas) );
+		    });
+		});
+		//全选
+		$(document).on("click","#select_all",function(){
+			var option=$("#select_choice_left li");
+			for(var i= 0,max=option.length;i<max;i++){
+				rightData.push(option.eq(i).text());
+			}
+			updateData();
+		});
+
+		//清除
+		$(document).on("click","#select_clear",function(){
+			rightData.length=0;
+			updateData();
+		});
+
+		//确定
+		$(document).on("click","#select_sure",function(){
+
+
+
+			var tagName=parentIfr.$choice[0].tagName.toLowerCase();
+			if(tagName=="input"){
+				parentIfr.$choice.val(rightData.join(";"));
+			}
+
+			else if(tagName=="textarea"){
+				parentIfr.$choice.html(rightData.join(";"));
+			}
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+
+		});
+
+		$(document).on("click",".js-choice-btn",function(){
+			var $this=$(this),
+							text=$.trim($this.find("span").text().toString());
+
+			for(var i= 0,max=rightData.length;i<max;i++){
+
+				if(rightData[i]==text){
+					rightData.splice(i,1);
+					break;
+				}
+			}
+
+			updateData();
+		});
+	});
+
+	function updateData(){
+		if(rightData.length>1){
+			unique(rightData);
+		}
+
+		var contentHtml='';
+
+		for(var i= 0,max=rightData.length;i<max;i++){
+
+			contentHtml+="<div class='choice-content-btn js-choice-btn'><span>"+rightData[i]+"</span><i class='icon-times'></i></div>";
+		}
+
+		$(".js-choice-content").html(contentHtml);
+
+	}
+
+	//数组去重
+	function unique(data) {
+		data = data || [];
+		var a = {};
+		for (var i=0; i<data.length; i++) {
+			var v = data[i];
+			if (typeof(a[v]) == 'undefined'){
+				a[v] = 1;
+			}
+		};
+		data.length=0;
+		for (var i in a){
+			data[data.length] = i;
+		}
+
+	}
+</script>
+</html>

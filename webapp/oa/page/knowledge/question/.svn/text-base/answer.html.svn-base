@@ -1,0 +1,241 @@
+<!doctype html>
+<html style="height:100%;">
+<head>
+<meta charset="utf-8">
+    <title>知识收藏</title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+    <script>
+        setSkinsCss("listCss,iconCss");
+    </script>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+     <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+<style>
+*{ margin:0; padding:0;}
+li{ list-style:none;}
+a{ text-decoration:none; outline:none;}
+
+body{background-color:#f1f1f1;}
+.top{min-width:850px; width:auto !important; width:850px; height:0; background-color:#09345d;display:none;}
+.top_box{ width:850px; height:88px; margin:0 auto; overflow:hidden;}
+.title{ display:block; float:left; font-size:26px; font-family:"微软雅黑"; color:#fff; line-height:88px; letter-spacing:4px; margin-left:15px; margin-right:110px; }
+.search_box{ float:left; margin-top:31px;}
+
+.search01{ width:350px; height:33px; background-color:#fff; border:1px solid #eaeaea; font-size:14px; line-height:33px; font-family:"微软雅黑";float:left;}
+.search_btn01{ border:none; vertical-align:middle;float:left;}
+
+.Ask{ float:left; margin-left:24px; margin-top:31px; }
+.Ask a{ display:block; width:120px; height:35px; border-radius:8px; background-color:#2c6aa6; color:#fff; line-height:35px; text-align:center; font-size:16px; font-family:"微软雅黑";}
+.Ask a:hover{  background-color:#277aca;}
+
+.container{ width:100%; height:auto;}
+.answer_box{ width:824px; border-left:1px solid #ededed;border-right:1px solid #ededed; border-bottom:1px solid #ededed;margin:0 auto; background-color:#fff;padding:15px 0 20px 24px;}
+.question a{ font-size:16px; font-family:"微软雅黑"; color:#334b6a; background-image:url(${base}/oa/page/knowledge/question/images/question_icon.png); background-repeat:no-repeat; background-position:left center; padding-left:25px;}
+.question_details{ overflow:hidden;}
+.asker{ float:left;}
+.asker a{ font-size:14px; color:#a6a6a6; line-height:28px;}
+.ask_time{ float:right;margin-right:28px;}
+.ask_time a{font-size:14px; color:#a6a6a6; line-height:28px; }
+.answer_text{ width:800px; height:223px; margin-top:20px;}
+.answer_btn a{display:block; width:120px; height:35px; margin:0 auto; margin-top:30px; font-size:16px; font-family:"微软雅黑"; color:#fff; text-align:center; line-height:35px; background-color:#2c6aa6; border-radius:4px;}
+.answer_btn a:hover{ background-color:#277aca;}
+
+.answers_box{width:824px; border-left:1px solid #ededed;border-right:1px solid #ededed; border-bottom:1px solid #ededed;margin:0 auto; background-color:#fff; padding-bottom:30px;padding-top:18px;padding-left:24px; margin-top:10px;}
+.num{ margin-bottom:10px;}
+.num a{ font-size:14px; font-family:"微软雅黑"; color:#333333;}
+.answers_box li{ width:800px; border-bottom:1px dashed #cccccc; padding-bottom:20px;}
+.answers_top{ overflow:hidden;padding-right:22px;padding-top:8px;}
+.answerer{ display:block; float:left; font-size:14px; color:#2869fc;}
+.answer_time{ display:block; float:right;  font-size:14px; color:#a6a6a6}
+.answers_middle a{ display:block; width:800px; font-size:14px; color:#333333; line-height:22px; margin-top:5px;}
+.answers_bottom a{ display:block; margin-left:748px; color:#2c6aa6; text-decoration:underline; font-size:14px; font-weight:bold;}
+.answers_bottom a:hover{ color:#36F;}
+.answers_middle span{display:block; width:800px; font-size:14px; color:#333333; line-height:18px; margin-top:5px;}
+.write_comment{width:777px;padding-top:8px;display:none;}
+.top_comment{width:777px;height:10px;overflow:hidden; background:url(${base}/oa/page/knowledge/question/images/top_comment.png) no-repeat;}
+.center_comment{width:737px; background:url(${base}/oa/page/knowledge/question/images/center_comment.png) repeat-y;padding:0 20px; padding-top:5px; position:relative;}
+.comment_text{ width:716px; height:32px; border:1px solid #ededed; padding-left:15px;color:#666;}
+.comment_btn{padding-left:635px; overflow:hidden; margin-top:10px; width:100px; height:35px; border-bottom:1px solid #ededed;}
+.cancel{ display:block; float:left; font-size:14px; color:#393939; margin-right:10px;}
+.release{display:block; float:left; width:50px; height:21px; border-radius:4px; background-color:#3692ea; font-size:14px; color:#fff; text-align:center;}
+.cancel:hover{ text-decoration:underline;}
+.release:hover{ text-decoration:underline;}
+.comment_details{ width:733px; margin:0 auto; border-bottom:1px dashed #e5e5e5; padding-bottom:10px;padding-top:10px;}
+.comment_top{ font-size:14px; color:#666666; }
+.comment_top span{padding:0 5px;}
+.comment_bottom {font-size:14px; color:#333333;padding-top:10px;padding-left:5px;}
+.bottom_comment{width:777px;height:3px;overflow:hidden;background:url(${base}/oa/page/knowledge/question/images/bottom_comment.png) no-repeat; font-size:14px;}
+.comment_zd{ position:absolute;left:0;bottom:0;height:1px;overflow:hidden; background:#fff; width:100%;}
+</style>
+<meta charset="utf-8">
+<title>回答</title>
+</head>
+
+<body>
+<div class="top" style="display:none;">
+	<div class="top_box">
+    	<a class="title">知识问答</a>
+        <div class="search_box">
+        	<input class="search01" ><input class="search_btn01" type="image" src="${base}/oa/page/knowledge/question/images/search_btn01.png">
+        </div>
+        <div class="Ask"><a href="javascript:void(0)">我要提问</a></div>
+    </div>	
+</div>
+<div class="container">
+	<div class="answer_box" id="question">
+    	
+        <div class="answer_text"><textarea id="answerContent" style="width:792px;height:180px;line-height:18px;font-size:14px;padding:4px;color:#666;">请在这里输入内容</textarea></div>
+        <div class="answer_btn"><a href="javascript:void(0)" onclick="answer();">提交回答</a></div>
+    </div>
+    <div class="answers_box">
+    	<div id="num" class="num"></div>
+        <div class="answers_content">
+        	<ul>
+            	<li id="answers">
+                	 
+                     
+                </li>
+                
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+	var questionId="${knowledgeAnswer.id}";
+	$(function(){
+		myInit();
+		
+		$('#answerContent').bind('focus',function(){
+			$(this).css('color','#000');
+			if($(this).val()=="请在这里输入内容"){
+				$(this).val("");
+			}			
+		});
+		
+		$('#answerContent').bind('blur',function(){
+			$(this).css('color','#666');
+			if($.trim($(this).val())==""){
+				$(this).val("请在这里输入内容");
+			}			
+		});
+		
+	});
+	function myInit(){
+		jQuery.post("${base}/admin/question/fetchByCriteria.action?etc="+new Date().getTime(), 
+    			{"id":questionId}, function (loader) {
+    				var data=loader.data;
+    				var item=data[0];
+    				var ele="<div class='question'><a>"+item.questionTitle+"</a></div>";
+    				ele+="<div class='question_details'><div class='asker'><a>提问者： </a><a>"+item.createBy+"</a>";
+    				ele+="</div><div class='ask_time'><a>"+item.createDttm1+"</a></div></div>";
+    				$("#question").prepend(ele);
+    				fillAnswers();
+		},"json");   
+	}
+	
+	function fillAnswers(){
+		jQuery.post("${base}/admin/answer/fetchByCriteria.action?etc="+new Date().getTime(), 
+    			{"questionId":questionId}, function (loader) {
+    				$("#num").append("<a>"+loader.totalCount+"个回答</a>")
+    				var data=loader.data;
+    				var ele="";
+    				for(var key in data){
+    					var item=data[key];
+        				ele+="<div class='answers_top'><a href='javascript:void(0)' class='answerer'>"+item.createBy+"</a>";
+        				ele+="<a href='javascript:void(0)' class='answer_time'>"+item.createDttm1+"</a></div>";
+        				ele+="<div class='answers_middle'><span>"+item.answerContent+"</span></div>";
+        				ele+="<div id="+item.id+" class='answers_bottom'><a  href='javascript:void(0)' onclick='fillComment(&quot;"+item.id+"&quot;)'>评论</a></div>";
+        				ele+="<div class='write_comment'><div class='top_comment'></div><div class='center_comment' id='center_comment_"+item.id+"'></div> <div class='bottom_comment'></div></div>";
+        				
+    				}	
+    				$("#answers").append(ele);
+		},"json");   
+	}
+	function fillComment(answerId){
+		$('#'+answerId).next('.write_comment').slideToggle('fast');
+		jQuery.post("${base}/admin/comment/fetchByCriteria.action?etc="+new Date().getTime(), 
+    			{"dataId":answerId}, function (loader) {
+    				var data=loader.data;
+    				$("#center_comment_"+answerId).empty();
+    				var ele="<div class='comment_zd'></div><input id='commentText_"+answerId+"' class='comment_text' onblur=blurObj("+"this"+") onfocus=focusObj("+"this"+") value='写下你的评论'>";
+    				ele+=" <div class='comment_btn'><a class='cancel' href='javascript:void(0)' title='取消' onclick='cancelComment(&quot;"+answerId+"&quot;)' ></a> <a class='release' href='javascript:void(0)' onclick='addComment(&quot;"+answerId+"&quot;)'>发布</a></div>";
+    				
+    				for(var key in data){
+    					var item=data[key];
+    					ele+="<div class='comment_details'>";
+    					ele+="<div class='comment_top'><span>"+item.createBy+"</span><span>"+item.createDttm1+"</span></div>";
+    					ele+="<div class='comment_bottom'><span>"+item.content+"</span></div>";
+    					ele+="</div>";     			   
+    				}	
+    				 $("#center_comment_"+answerId).append(ele);
+		},"json");   
+	}
+	
+	function cancelComment(answerId){
+		$('#'+answerId).next('.write_comment').slideToggle('fast');
+		$("#center_comment_"+answerId).empty();		
+	}
+	
+	function addComment(answerId){
+		var commentText=$("#commentText_"+answerId).val();
+		if(commentText==null||commentText==""||commentText=="写下你的评论"){
+			$.dialog.tips("评论不能为空");
+			return;
+		}
+		$.post("${base}/admin/comment/insert.action?etc"+new Date().getTime(), {"knowledgeComment.dataType":"2","knowledgeComment.dataId":answerId,"knowledgeComment.content":commentText}, function(result){
+            if(result.result=="success"){
+            	fillComment(answerId);
+            }
+            $.dialog.tips(result.message);
+            $('#'+answerId).next('.write_comment').slideToggle('fast');
+        });
+	}
+	function answer(){
+		var answerContent=$("#answerContent").val();
+		if(answerContent==null||answerContent==""||answerContent=="请在这里输入内容"){
+			$.dialog.tips("答案不能为空");
+			return;
+		}
+		$.post("${base}/admin/answer/insert.action?etc"+new Date().getTime(), {"knowledgeAnswer.questionId":questionId,"knowledgeAnswer.answerContent":answerContent}, function(result){
+            if(result.result=="success"){
+            	ParentIframe.SimpleSearch();
+            	window.top.closeWin("answerWin");
+            }
+            $.dialog.tips(result.message);
+        });
+	}
+	
+
+	function focusObj(obj){
+		$(obj).css('color','#000');
+		if(obj.value=="写下你的评论"){
+			$(obj).val("");
+		}
+	}
+	
+	function blurObj(obj){
+		$(obj).css('color','#666');
+		if($.trim(obj.value)==""){
+			$(obj).val("写下你的评论");
+		}
+	}	
+	
+</script>
+</body>
+</html>

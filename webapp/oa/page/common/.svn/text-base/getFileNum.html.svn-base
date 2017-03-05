@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>eden</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <style>
+        .file-num {
+            width: 100%;
+            padding-left: 10px;
+            border: 0;
+            background-color: transparent;
+            color: #000;
+        }
+    </style>
+    <script src="${base}/edenui/common/js/jquery.js"></script>
+    <script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+    <script src="${base}/edenui/common/js/avalon/avalon2.js"></script>
+    <script>
+        //参数配置表
+        avalon.config({debug: false});
+        var model = avalon.define({
+            $id: "wrap",
+            content: [],
+            tableContentDiv: {
+                'margin-top': '44px',
+                'height': '230px',
+                'overflow-y': 'scroll',
+                'overflow-x': 'hidden'
+            },
+            tableHeader: {
+                "position": "fixed",
+                "left": "10px",
+                "top": "6px",
+                'border': '2px solid #98cef4',
+                'width': "1113px"
+            },
+            listNode: [],
+            getFile: function (index, el) {
+                var url = "${base}/admin/documentFileNumber/createFileNumber.action",
+                        obj = {
+                            "swungDash":page.exchangeName(el.name)
+                        }
+                page.loadStart();
+                $.post(url, obj, function (data) {
+                    page.loadEnd();
+                    if (data.resultFlag == "true") {
+                        var messgae = data.message.split("@@");
+                        var content = page.exchangeName(el.name) + "〔20" + messgae[0] + "〕" + messgae[1] + "号";
+                        model.listNode[index].content = content;
+                    }
+                    else {
+                        window.top.layer.msg("获取文号失败!");
+                    }
+                });
+            },
+            saveNum: function (index, el) {
+                var url = "${base}/admin/documentFileNumber/updateFileNumber.action?etc=" + new Date().getTime();
+                var $index = $(".js-get-fileNum").eq(index).val().split("〕")[1].split("号")[0];
+                var obj = {
+                    "swungDash": page.exchangeName(el.name),
+                    "index": $index
+                }
+                page.loadStart();
+                $.post(url, obj, function (data) {
+                    page.loadEnd();
+                    if (data.resultFlag == "true") {
+                        window.top.layer.msg("保存成功！");
+                    }else {
+                        window.top.layer.msg("保存失败！");
+                    }
+                });
+
+            },
+            cancelNum: function (index, el) {
+                var url = "${base}/admin/documentFileNumber/updateFileNumber.action?etc=" + new Date().getTime();
+                var $index = $(".js-get-fileNum").eq(index).val().split("〕")[1].split("号")[0];
+
+                var $$index=parseInt($index)>1?(parseInt($index)-1):0;
+                var obj = {
+                    "swungDash": el.name,
+                    "index":$$index
+                }
+                page.loadStart();
+                $.post(url, obj, function (data) {
+                    page.loadEnd();
+                    if (data.resultFlag == "true") {
+                        var before=$(".js-get-fileNum").eq(index).val().split("〕")[0];
+                        var content=before+"〕"+$$index+"号";
+                        model.listNode[index].content = content;
+                        window.top.layer.msg("取消成功！");
+                    }else {
+                        window.top.layer.msg("取消失败！");
+                    }
+                });
+            }
+        });
+        var page = (function () {
+            var obj = {
+                init: function () {
+                    this.getHeight();
+                    this.getNodeList();
+                },
+                getHeight: function () {
+                    model.tableContentDiv.height = ($(window).height() - 50) + "px";
+                },
+                layout: function () {
+                    var $width = parseInt($("#tableContent")[0].scrollWidth);
+                    model.tableHeader.width = $width + "px";
+                },
+                exchangeName:function(str){
+                    if(str=="行政规范性文件发文立项审批件"){
+                        return "发文立项审批"
+                    }
+                   return str
+                },
+                loadStart: function () {
+                    var index = layer.load(2, {
+                        // shade: [0.5, '#000']
+                        //scrollbar: false //0.1透明度的白色背景
+                    });
+                    setTimeout(function () {
+                        obj.loadEnd();
+                    }, 2000);
+                },
+                loadEnd: function () {
+                    layer.closeAll('loading');
+                },
+                getNodeList: function () {
+                    var initData = [];
+                    var url = "${base}/admin/documentBill/selectBillList.action?wfname=oa_send_document&etc=" + new Date().getTime();
+                    var obj = {
+                        "pageSize": 999,
+                        "curPage": 1,
+                        "sortName": "",
+                        "sortOrder": "",
+                        "page.curPage": 1,
+                        "page.count": 999
+                    };
+                    $.post(url, obj, function (data) {
+                        var result = data.data;
+                        if (result.length) {
+                            result.forEach(function (value) {
+                                initData.push({
+                                    "name": value.billName,
+                                    "id": value.id,
+                                    "content": ""
+                                })
+                            });
+                            model.listNode = initData;
+                            page.layout();
+                        }
+                    });
+                }
+            }
+            return obj
+        })();
+        $(function () {
+            page.init();
+        });
+    </script>
+</head>
+<body ms-controller="wrap" class="export-data-by-field ms-controller">
+<table class="other-bsgrid oa-form-grid" ms-css="@tableHeader">
+    <tr style="border-bottom: 0">
+        <th width="300">文件名称</th>
+        <th>文号</th>
+        <th width="300">操作</th>
+    </tr>
+</table>
+<div class="margin-left margin-right" id="tableContent" ms-css="@tableContentDiv">
+    <table class="other-bsgrid oa-form-grid js-table-content" style="width:100%;">
+        <tr class="js-td" ms-for="(index,el) in @listNode">
+            <td width="300" ms-attr="{title:el.name}">{{el.name}}</td>
+            <td ms-attr="{title:el.content}"><input class="file-num js-get-fileNum" ms-attr="{value:el.content}"
+                                                    type="text"></td>
+            <td style="text-align: center;padding-left: 0;" width="300">
+                <button class="button button-main" ms-click="@saveNum(index,el)">保存</button>
+                <button class="button button-main margin-small-left margin-small-right" ms-click="@getFile(index,el)">获取</button>
+                <button class="button button-main" ms-click="@cancelNum(index,el)">取消</button>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

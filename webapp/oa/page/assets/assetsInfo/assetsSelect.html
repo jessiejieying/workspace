@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+    <head>
+    <meta charset="utf-8">
+    <title>资产登记</title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+ <!--    <script src="${base}/aufw/resources/common/js/setskins.js"></script> -->
+    
+     <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/freshtop/css/list.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/freshtop/css/icon.css">
+<!--     <script>
+        setSkinsCss("listCss,iconCss");
+    </script> -->
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    </head>
+
+    <body style="height:100%;">
+
+<!--  body 的style  应属性加上 height:100%;   是为了计算页面高度   -->
+
+<div id="tree_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+      <div id="tree_search" class="tree_search"></div>
+      <div id="tree" style="width:100%; padding-top: 3px;"></div>
+    </div>
+
+<!-- tree_wrap 这个 div 用于放置 左侧树和搜索树的工具栏 -->
+
+<div id="grid_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+      <div id="grid_toolbar" style="height:30px; width:100%;">
+    <ul id="grid_toolbar_ul" class="toolbar_ul">
+    	
+           <li>
+           	<select name="" id="search">
+        		<option value="assetsRegister.assetsName">资产名称</option>
+        		<option value="assetsRegister.assetsNum">资产编号</option>
+   			</select>
+           </li>
+          <li>
+        <input id="search_text" class="search_text" value="请输入关键字" name="" type="text">
+      </li>
+          <li>
+        <input class="search_btn search_icon" name="" onClick="SimpleSearch()" value="查 找" type="button">
+      </li>
+       <!--    <li id="advanced_search_btn" class="advanced_search">高级查找</li> -->
+          
+          <li btn_id="submit" class="add_icon"><a href="javascript:void(0)">选择添加</a></li>
+          
+        </ul>
+        <div id="advanced_search_bar" class="advanced_search_bar">
+        <table cellpadding="0" cellspacing="0" border="0" align="center">
+           <tr>
+            <td><label for="assetsName">资产名称：</label><input  id='assetsName' name="assetsName" type="text" value=""></td>
+           	<td><label for="assetsNum">资产编号：</label><input  id='assetsNum' name="assetsNum" type="text" value=""></td>
+            <td><label for="assetsModel">型号：</label><input  id='assetsModel' name="assetsModel" type="text" value="" /></td>
+            <td><label for="storePlace">存放地点：</label>
+                <select  id='storePlace' name="storePlace">
+                    <option value="">全部</option>
+                    <#if storePlaceList??>
+                        <#list storePlaceList as dist>
+                           <option value="${dist.dictValue}">${dist.displayName}</option>
+                        </#list>
+                    </#if>
+                </select>
+            </td>
+           </tr>
+           <tr>
+           	<td><label for="category">类别：</label>
+           		<select  id='category' name="category">
+                    <option value="">全部</option>
+           			<#if categoryList?exists>
+           			 <#list categoryList as dist>
+           				<option value="${dist.dictValue}">${dist.displayName}</option>
+					 </#list>
+					</#if>
+				</select>
+           	</td>
+            <td><label for="type">类型：</label>
+                <select  id='type' name="type">
+                     <option value="">全部</option>
+                    <#if assetsTypeList?exists>
+                     <#list assetsTypeList as dist>
+                        <option value="${dist.dictValue}">${dist.displayName}</option>
+                     </#list>
+                    </#if>
+                </select>
+            </td>
+            <td><input class="search_btn search_icon" name="advancedSearch" onClick="advancedSearch()" value="查 找" type="button"></td>
+           </tr>
+         </table>
+        </div>
+  </div>
+      <div id="grid" style="width:100%;"></div>
+      <div id="grid_page" class="grid_page" style="width:100%;height:18px; padding-top:10px;"></div>
+    </div>
+</body>
+    <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+ 
+    
+    
+    <script>
+    var layout,tree,treeSearch,grid,data,form,form2,tabbar,option,sendUrl,knowledgeId;
+    var version='1';
+   var selectUrl="${base}/admin/assetsRegister/selectStock.action?etc="+ new Date().getTime()+"&";
+    var isFromConsum=false; //是否是从资产领用过来
+    
+	 window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+    <!--    设置dhtmlx各组件用到的图片的的路径-->
+    function init() {       //初始化 方法
+    	
+    	var from=getQueryString("from");  //
+    	if(from=="page")  //为资产领用和资产归还的选择的
+    	{
+    		selectUrl+="from=page";
+    		isFromConsum=true;
+    	}
+    	
+        layout = new dhtmlXLayoutObject(document.body, "1C");     //添加一个 3L的layout
+        layout.cells('a').hideHeader();         //隐藏 cell a 的 标题 ， b c 同理
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        <!-- 为layout添加监听事件    -->
+        <!-- onResizeFinish 为在layout大小变了之后触发 -->
+        <!-- onPanelResizeFinish 为在layout中一块区域大小变了之后触发 -->
+		
+        data = new dhtmlXDataStore({
+            url: selectUrl,
+            datatype: "json"
+        });     //添加一个 为DataStore
+	
+        layout.cells('a').attachObject('grid_wrap');
+        // 在 layout的 cell b上添加 ID为 grid_wrap 的div
+        grid = new dhtmlXGridObject('grid');
+        // 把 grid 添加到  ID为 grid的div中
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        if(isFromConsum)
+        {
+        	var amountIndex=getQueryString("amountIndex"); //添加资产时取哪种数量
+        	if(amountIndex==3)  //领用时选择，要用的字段unuseAmount
+        	{
+                grid.setHeader(" ,资产编号,资产名称,未领用数量");
+                grid.setColumnIds("check,assetsNum,assetsName,unuseAmount");
+                grid.setInitWidths("30,130,130,*");
+                grid.setColTypes("ch,ro,ro,ro");
+      
+        	}else if(amountIndex==2){   //归还时选择，要用的字段unuseAmount
+        		  grid.setHeader(" ,资产编号,资产名称,已领用数量");
+                  grid.setColumnIds("check,assetsNum,assetsName,useAmount");
+                  grid.setInitWidths("30,130,130,*");
+                  grid.setColTypes("ch,ro,ro,ro");
+        		
+        	}
+        	
+        	
+        }else{
+        	 //设置 grid上 图片的路径
+            grid.setHeader(" ,资产编号,资产名称,实际数量");
+            //设置 grid每列的标题
+            grid.setColumnIds("check,assetsNum,assetsName,realAmount");
+            //设置 grid每列的数据  对应 json中的哪条数据
+            grid.setInitWidths("30,130,130,*");
+            //设置 每列的宽度
+            grid.setColTypes("ch,ro,ro,ro");
+            //设置每列的 类型
+        }
+       
+        
+        
+
+        grid.init();
+        // 初始化grid
+        grid.enablePaging(true,15,9999, 'grid_page', true);
+        //添加 grid的分页
+        //grid.enablePaging(fl, pageSize, pagesInGrp, parentObj, showRecInfo, recInfoParentObj)
+/*          @参数: fl - true|false - 是否分页
+        *   @参数: pageSize - 每页的行数
+        *   @参数: pagesInGrp - 可见的页面的数量
+        *   @参数: parentObj - 放置分页的 div的ID
+        *   @参数: showRecInfo - true|false - enable|disable showing of additional info about paging state
+        *   @参数: recInfoParentObj - ID or container which will be used for showing paging state
+*/
+
+        grid.setPagingSkin("toolbar");   //设置 分页的皮肤
+        grid.sync(data);                // grid从 DataStore中同步数据
+	
+
+        page_layout();      // 调用page_layout方法   ,方法的声明在下面
+    }
+	
+	function  SimpleSearch(){
+		data.clearAll();
+		var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+		var clu = $("#search").val();
+		var url = selectUrl+"&"+clu+'='+window.encodeURI(value);
+		window.data.data.url = url;
+		data.load(url);
+    }
+
+ /*    function  advancedSearch(){
+		data.clearAll();
+		var assetsName = $("#assetsName").val();
+		var assetsNum = $("#assetsNum").val();
+		var assetsModel = $("#assetsModel").val();
+		var storePlace = $("#storePlace").val();
+		var category = $("#category").val();
+        var type = $("#type").val();
+	    var s = "assetsRegister.assetsName="+assetsName+"&assetsRegister.assetsNum="+assetsNum+"&assetsRegister.assetsModel="+assetsModel+"&assetsRegister.storePlace="+storePlace+"&assetsRegister.category="+category+"&assetsRegister.type="+type;
+		var url = '${base}/admin/assetsRegister/selectStock.action?'+s;
+		window.data.data.url = url;
+		data.load(url);
+    } */
+
+   /** 获取url参数**/
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    }
+
+
+
+
+    function toolbar_func(id){           // grid上面 的那些按钮的 功能
+        if (id == 'submit') {
+        	 var row_id = grid.getCheckedRows(0);
+ 	        if (row_id == '') {
+ 	            $.dialog.tips('请至少选择一条数据！');
+ 	            return;
+ 	        }
+ 	        row_id = row_id.split(',');
+ 	        if (row_id.length == 0) return;
+ 	        
+ 	      var isAddType= getQueryString("addType"); //是否作为登记资产的选择
+   			if(!isAddType)
+   			{
+   				 addToGrid(id,row_id)
+   				
+   			}else{
+   				 addToInput(id,row_id);
+   				
+   			}
+ 		        
+        }
+      
+    }
+	
+    
+    function addToGrid(id,row_id)
+    {
+    	var pRowIdVal = "";  
+	     
+    	var amountIndex=getQueryString("amountIndex"); //添加资产时取哪种数量
+  		if(!amountIndex)
+  		{
+  			amountIndex=1;
+  		}
+    	
+    	var parentAttr=window.parent;
+    	
+    	if(isFromConsum)
+    	{
+    		parentAttr=$(window.top.document).find('.dhtmlx_wins_body_inner').eq(0).find('iframe')[0].contentWindow;
+    	}
+    	 
+	        var pRowId = parentAttr.grid.getAllRowIds(',').split(',');
+	        
+	        for(i=0;i<pRowId.length;i++){ 
+	        	pRowIdVal = pRowIdVal + pRowId[i] + "-";
+	        }
+	        
+
+	        for(i=0;i<row_id.length;i++){
+	        	
+	        	var assets_num=data.item(row_id[i]).assetsNum;
+	        	
+	        	if( pRowIdVal.indexOf(assets_num) < 0){  //用来防止重复
+	        		
+	        		//var aid=data.item(row_id[i]).id;
+	        	
+	        		var assets_name=data.item(row_id[i]).assetsName;
+	        		
+	        		var amount=data.item(row_id[i]).realAmount;
+	        		
+	        		if(amountIndex==2) //取useAmount
+	        		{
+	        			amount=data.item(row_id[i]).useAmount;
+	        		}
+	        		if(amountIndex==3) //取unuseAmount
+	        		{
+	        			amount=data.item(row_id[i]).unuseAmount;
+	        		}
+	        		if(amount<=0)
+	        		{
+	        			alert(assets_name+" 相关数量已为0，不能选择");
+	        			return;
+	        		}
+	        		var aid=assets_num+"$$$"+amount;
+	        		
+	        		parentAttr.grid.addRow(aid,[" ",assets_num,assets_name,1],1); 
+	        		if(!isFromConsum)
+			        {
+			        	parentAttr.setRelevanceid();
+			        }
+	        		
+		
+	        	}
+	        }
+	   	  
+	   window.parent.closeWin('assetsSelect');
+    }
+	
+    function  addToInput(id,row_id)
+    {
+    	if(row_id.length>0)
+    	{
+    		var assets_num=data.item(row_id[0]).assetsNum;
+        	var assets_name=data.item(row_id[0]).assetsName;
+    		var assets_model=data.item(row_id[0]).assetsModel;
+        	//$($(window.top.document).find('.dhtmlx_wins_body_inner').eq(0).find('iframe')[0].contentWindow.document.getElementById('assetsName')).val(assets_name)
+        	var ob=$($(window.top.document).find('.dhtmlx_wins_body_inner').eq(0).find('iframe')[0].contentWindow.document).find('.dhtmlx_wins_body_inner').eq(0).find('iframe')[0].contentWindow;
+        	ob.document.getElementById('assetsNum').value=assets_num;
+        	ob.document.getElementById('assetsName').value=assets_name;
+        	ob.document.getElementById('assetsModel').value=assets_model;
+        	ob.document.getElementById('assetsNum').readOnly = true;
+        	ob.document.getElementById('assetsName').readOnly = true;
+        	ob.document.getElementById('assetsModel').readOnly = true;
+        	window.parent.closeWin('assetsAddSelect');
+    		
+    	}
+    	 
+    	 
+    }
+    
+
+	function e(id) {      //编辑 grid中的一行数据
+        w1.show();
+        option = "update";
+        grid.selectRowById(id);
+        form.setItemFocus("title");
+        form.enableItem("send");
+    }
+
+    function page_layout() {                 // page_layout为控制页面布局的方法 ，  用于自适应窗口的大小
+        var grid_wrap_height = $('#grid_wrap').height();  //得到 ID为  grid_wrap 的div的高度
+        $('#grid').height(grid_wrap_height - 33 -35);    //设置  ID为  grid 的div的高度
+        if(grid)    grid.setSizes();                   // 如果grid 存在，则 让 grid 适应下窗口的大小
+
+    }
+    $(function () {
+        setTimeout(init, 0);                        //在 页面加载好后，触发init方法；
+		$('#grid_toolbar_ul li').last().addClass('last');   //为grid上面的一排按钮中的最后一个li添加一个为‘last’的class
+        $('#grid_toolbar_ul li').click(function(){       //那些按钮 点击之后 触发 toolbar_func 方法
+            var id=$(this).attr('btn_id');
+            toolbar_func(id);
+        });
+		
+		$("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+
+		
+    })
+</script>
+</html>

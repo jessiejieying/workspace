@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="form-group header-group">
+					<#if wfType?? && wfType=="noDo">
+						<@f.operateRight operate="/admin/sptrain/sptrainAuditAufw.action">
+							<div class="button button-main js-add-account" id="transaction_approval">新建事务</div>
+						</@f.operateRight> 
+					</#if>
+
+						<span class="span-bold margin-left-out header-title">事由:</span>
+                        <input id="documentTitle" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+                        <span class="span-bold margin-left-out header-title">发文代字:</span>
+						<select  class="input margin-left-in statistics-select" style="width:130px;" id="documentType">
+							<option value="">全部</option>
+							<#list documentType as dataDict>                                                                         
+								<option title="${dataDict.documentType}" value="${dataDict.documentType}">${dataDict.documentType}</option>
+							</#list>
+						</select>
+						<span class="header-title margin-left-out">主办处室:</span>
+						<select id="draftDept" class="input margin-left-in statistics-select" style="width:143px;" name="age">
+							<#if (listAllOrg?size>1)>
+								<option value="">全部</option>
+							</#if>
+							<#list listAllOrg as dataDict>
+                                <option title="${dataDict.orgName}">${dataDict.orgName}</option>
+							</#list>
+						</select>
+						<div class="button button-main margin-left-in" id="grid_search">搜索</div>
+					</div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                   <#if wfType?? && wfType=="noDo">
+	                    <th w_check="true" width="30"></th>
+	                    <#elseif  wfType?? && wfType=="hasDo">
+	                  	<th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+	                   </#if>
+	                  <th w_index="true" width="40">序号</th>
+	                  <th w_index="title" width="">事由</th>
+	                  <th w_index="incomigDateStr" width="85">拟稿日期</th>
+	                  <th w_index="documentNo" width="160">文号</th>
+	                  <th w_index="draftDept" width="120">主办处室</th>
+	                  <th w_index="applicantMan" width="100">申请人</th>
+	                  <th w_index="taskName" width="130">办理状态</th>
+	                  <#if wfType?? && wfType=="noDo">
+	                  	<th w_index="upperUser" width="100">上一办理人</th>
+	                  <#elseif  wfType?? && wfType=="hasDo">
+	                  	<th w_index="executor" width="100">当前办理人</th>
+	                  </#if>
+
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+			
+
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/sptrain/querySptrain.action";
+	var version='1';
+    var wf_name='oa_sptrain_audit';
+    var wfType="${wfType!}";
+	$(function(){
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:encodeURI(encodeURI(selectURL + "?etc="+new Date().getTime() + "&documentTitle=" + $('#documentTitle').val() + "&documentType="+$('#documentType').val() +"&wfType="+wfType)),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+		    	
+	        	$("#manage_grid tbody tr").each(function(){
+	        		$("td",this).eq(1).css("padding-left","8px");
+	        		$("td",this).css({"text-align":"center","padding-left":"0px"});
+	        		$("td",this).eq(3).css({"text-align":"left","padding-left":"15px"});
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+					});
+		      }
+		  });
+		
+		$("#transaction_approval").click(function(){
+            initWorkflow('oa_sptrain_audit','专项事务审批','1');
+		});
+
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	        gridOne.changeUrl(encodeURI(encodeURI(selectURL + "?wfType=" + wfType + "&documentTitle=" +$('#documentTitle').val() + "&documentType="+$('#documentType').val() + "&draftDept="+ $('#draftDept').val() + '&etc='+new Date().getTime())));
+	    });
+	    
+	    $("#draftDept").on("change",function(){
+	    	gridOne.changeUrl(encodeURI(encodeURI(selectURL + "?wfType=" + wfType + "&documentTitle=" +$('#documentTitle').val() + "&documentType="+$('#documentType').val() + "&draftDept="+ $('#draftDept').val() + '&etc='+new Date().getTime())));
+	    });
+	    
+	});
+	
+	 //执行任务
+    function execute(id){
+    	var task_name = "";
+		var item = getRecord(id);
+		if("hasDo" == wfType){
+			var project = window.top.base;
+			project += '/form';
+			var surl = surl = project + "/fceform/common/run.html?djsn=oa_sptrain_audit&djtype=eden&actionId=view&is_oa_bill=true&wfs=doing&wfId="+item.wfId;
+
+			 window.open(surl,"_target"); 
+   		 }else{
+   			uf_doAction(item.wfId,wf_name,task_name,version,null);
+   		 }
+    }
+	
+</script>
+
+</html>

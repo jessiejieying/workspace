@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+<title>Eden</title>
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+	<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css" id="style_css"/>
+</head>
+<body>
+ <form action="" class="wait-form">
+ 	<h1 style="margin-left: 30px;margin-right: 30px;">${(backDocument.fileTitle)!}</h1>
+ 	<div class="form-print-header" style="float:right;margin-right: 70px;margin-bottom: 10px;">
+		<span class="header-right" style="color: #ef655d;">退文编号：
+			<input class="td-text-left" type="text" style="border: none;" id="backNo" value="${(backDocument.backNo)!}">
+		</span>
+	</div>
+ <table class="wait-table">
+ 	<tr>
+ 		<td class="td-left" height="50">来文单位</td>
+ 		<td>
+ 			<table class="intable">
+				<tr>
+					<td class="td-text-left" style="text-align: left;padding-left: 0px;" id="radioId">						
+						<lable>${(backDocument.fileUnit)!}</lable>
+					</td>
+					<td class="td-mid" width="108" height="50">发文字号</td>
+ 					<td width="256">
+ 						<input id="fileChar" type="text" class="td-input" value="${(backDocument.fileChar)!}">
+ 					</td>
+				</tr>
+ 			</table>
+ 		</td>
+ 	</tr> 
+ 	<tr>
+ 		<td class="td-left" height="50">紧急程度</td>
+ 		<td>
+ 			<table class="intable">
+ 				<tr>
+ 					<td class="td-text-left" id="radioId">						
+						<span>${(backDocument.fileImpLevel)!}</span>
+ 					</td>
+ 					<td class="td-mid" width="108" height="50">来文日期</td>
+ 					<td width="256" style="text-align: left;">
+ 						<span>${(backDocument.fileDateStr)!}</span>
+ 					</td>
+ 				</tr>
+ 			</table>
+ 		</td>
+ 	</tr>
+ 	<tr>
+ 		<td class="td-left" height="50">附件信息</td>
+ 		<td style="text-align: left;">
+ 			<#list attachmentInfos as obj>
+		     	<a class="file-icon" href="${(obj.path)!}" data-name="${(obj.name)!}" style="padding-right: 20px;display: block"><font color="blue">${(obj.name)!}</font></a>
+		    </#list>
+ 		</td>
+ 	</tr>
+ 	<tr>
+ 		<td class="td-left" height="70">秘书处<br>退文理由</td>
+ 		<td style="text-align: left;padding-right: 20px;padding-top: 14px;padding-bottom: 14px;">
+ 			<span style="line-height:1.7;">${(backDocument.backReasonWin)!}</span>
+ 		</td>
+ 	</tr>
+ 	<tr>
+        <td class="td-left">主办处(室)<br>退文理由</td>
+        <td style="padding-left: 20px;">
+            <textarea id="unit_reason" style="text-align: left;height:60px;padding-top: 10px;">${(backDocument.unitReason)!}</textarea>
+        </td>
+    </tr>
+ 	<tr>
+ 	<tr>
+ 		<td class="td-left" height="50">备&nbsp; 注</td>
+ 		<td style="text-align: left;padding-right: 20px;">
+ 			<span>${(backDocument.remark)!}</span>
+ 		</td>
+ 	</tr>
+ 	<tr>
+ 		<td class="td-left" height="50">退文时间</td>
+ 		<td>
+ 			<table class="intable">
+ 				<tr>
+ 					<td class="td-text-left" style="text-align: left;padding-left: 0px;" id="">						
+						<span>${(backDocument.fileBackDateStr)!}</span>
+ 					</td>
+ 					<td class="td-mid" width="108" height="50">签收时间</td>
+ 					<td width="256" style="text-align: left;">
+ 						<#if '未签收'==backDocument.fileReceiveStatus >
+			 				<span>未签收</span>
+					    <#else>
+					    	<span>${(backDocument.backSignDateStr)!}</span>
+					    </#if>
+ 					</td>
+ 				</tr>
+ 			</table>
+ 		</td>
+ 	</tr>
+ </table>
+ <!-- <div class="text-center margin-large-top">
+ 	<label class="message-tip"><input id="smsRemind" type="checkbox"> 是否短信提醒 </label> 
+ 	<div class="button common-skin-btn-syle01 " id="back">退  文</div>
+ 	<div class="button common-skin-btn-syle01 " id="incoming_add">收文登记</div>
+ </div>  -->
+  <div class="text-center margin-large-top" style="margin-bottom: 45px;">
+  	 	<#if '未签收'==backDocument.fileReceiveStatus >
+			 <div class="button common-skin-btn-syle01 js-add-account"  id="cuiban_backDocument">催收</div>
+			 <div class="button common-skin-btn-syle01 js-add-account"  id="take_backDocument">收回</div>
+	    </#if>
+      <div class="button common-skin-btn-syle01 js-add-account"  id="mesage_record">短息记录</div>
+  </div>
+ 
+ </form>
+<div id="form_add" ></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var userId = "${(userInfo.userId)!}";
+
+    function afterSave(){
+	    setTimeout(function(){
+	    	parentIfr.gridOne.refreshPage();
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+    }
+    
+    function init(){
+ 		
+    }
+
+	$(function(){
+		
+		$("#incoming_add").click(function(){
+			var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+            if(checkedRowsRecoreds.length != 1) {
+            	layer.msg('请选择一条数据');
+            	return
+            }
+			initWorkflow('oa_pg_incoming_document','收文登记','1');
+		});
+		
+	   //点击催办
+	   $(document).on("click","#cuiban_backDocument",function(){
+		   var win={text:"发送短信",url:"${base}/admin/waitDocument/inComingUrgencyPage.action?id=${(backDocument.waitDocumentId)!}",width:'813',height:'500','parentIfr':window};
+	       window.top.createWindow(win);
+	   });
+	   
+	   //点击收回退文
+	   $(document).on("click","#take_backDocument",function(){
+		   var url = "${base}/admin/documentToExchange/takeBackDocument.action?waitDocumentId=${(backDocument.waitDocumentId)!}";
+		   $.post(url, function(data){
+			   window.top.layer.msg(data.message);
+			   afterSave();
+		   });
+		   
+	   });
+		   
+       //短信记录
+	   $(document).on("click","#mesage_record",function(){
+		   var win={text:"短信记录",url:"${base}/admin/waitDocument/inCominMessageRecord.action?id=${(backDocument.waitDocumentId)!}",width:'900',height:'550','parentIfr':window};
+	       window.top.createWindow(win);
+	   });
+	});
+	
+    //附件信息文件添加图标
+    function classStyle(){
+        var arrSpan = [];
+        for (var i = 0; i < $(".file-icon").length; i++) {
+            arrSpan.push($(".file-icon").eq(i).data("name"))
+        }
+        $.each(arrSpan,function(i,item){
+            if(item.indexOf(".doc") > -1){
+                $(".file-icon").eq(i).addClass("file-icon-word");
+            }else if(item.indexOf(".pdf") > -1){
+                $(".file-icon").eq(i).addClass("file-icon-pdf");
+            }else if(item.indexOf(".tgw") > -1){
+                $(".file-icon").eq(i).addClass("file-icon-tiangu");
+            }else{
+                return ""
+            }
+        });
+
+    }
+    classStyle();
+</script>
+</html>

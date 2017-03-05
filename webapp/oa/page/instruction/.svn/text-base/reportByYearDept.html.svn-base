@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+<style type="text/css">
+  .bsgrid td{
+    text-align:center;
+    padding-left:0px;
+  }
+  .cursor-pointer{
+      cursor: pointer;
+      position:relative;
+      top: 1px;
+  }
+  .cursor-pointer input{
+      vertical-align: -2px;
+  }
+</style>
+<link href="${base}/form/resources/chosen_v1.2.0/chosen.css" type="text/css" rel="stylesheet" />
+</head>
+<body style="height: 100%;" class="statistics">
+
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+            <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+            <div class="form-group statistics-condition header-group padding-bottom-0">
+				<span class="header-title">统计选项:</span>
+				<div id="fromStartDateDiv" class="tool-bar-input margin-left-in">
+				     <label for="byYearLeader" class="cursor-pointer float-left" >
+                         <input  type="radio" name="statisticType" value="reportByYearDept"  class="js-radio-check margin-top0" id="byYearLeader" checked>
+                         <span class="">按年度、登记处室</span>
+                     </label>
+				     <label for="reportByYearAndMonthDept" class="cursor-pointer float-left margin-left-in" >
+                         <input  type="radio" name="statisticType" value="reportByYearAndMonthDept"  class="js-radio-check margin-top0" id="reportByYearAndMonthDept">
+                         <span class="">按年度、月份、登记处室</span>
+                     </label>
+				</div>
+				<div  class="button button-main margin-left-out js-statistics" id="report_total" >统计</div>
+				<div id="exportButton" class="button button-main margin-left-in js-statistics" >导出</div>
+		    </div>
+			    <div class="form-group statistics-condition header-group" >
+					<span id="reportByYearDept" style="margin-left:0px;" class="statisticTypeStyle">
+						<span class="header-title">年<i style="padding: 0 12px;"></i>度:</span>
+						<input  name="startYear" id="startYear" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy'})"	size="19" type="text">
+						<span class="margin-left-in header-title">至</span>
+						<input  name="endYear" id="endYear" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy'})"	size="19" type="text">
+						</span>
+						<span id="reportByYearAndMonthDept" style="margin-left:0px;display:none;" class="statisticTypeStyle">
+					       <span class="header-title">年<i style="padding: 0 12px;"></i>度:</span>
+				           <input  name="year" id="year" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy'})"	size="19" type="text">
+				           <span class="header-title margin-left-out">月份：</span>
+				           <input  name="startMonth" id="startMonth" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;"
+					      	onclick="WdatePicker({dateFmt:'M'})"	size="19" type="text">	
+                            <span class="header-title margin-left-in">至</span>
+
+				           <input  name="endMonth" id="endMonth" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'M'})"	size="19" type="text">
+					    </span>
+						<span class="header-title margin-left-out">批示领导:</span>
+						<span class="margin-left-in">
+							<select id="instructionLeader" style="background-color:transparent;width:120px; font-size: 15px;color:#000;" data-placeholder="找不到" class="">
+								  <option value="" >---请选择---</option>
+								 <#if leaders??>
+								   <#list leaders as item>
+								     <option value="${(item.instruction_leader)!}">${(item.instruction_leader)!}</option>
+								   </#list>
+								</#if>
+						</select>
+						</span>
+			</div>
+			
+			<div class="statistics-tab">
+				<div class="clearfix">
+					<div id="exportButton" class="tab-btn" style="display:none;">导出</div>
+                </div>
+
+				<div class="tab-content-show">
+					<span id="condition" class="float-left"></span>
+					<span style="float:right;margin-right:14px;">统计时间： ${.now ?string("yyyy.MM.dd")}</span></div>
+			</div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                   <th width="40">序号</th>
+                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+                  <th w_index="year" width="200">年度</th>
+                  <th w_index="draft_dept" >处室</th>
+                  <th w_index="total" width="200">总计</th>
+                  <th w_index="archive_total" width="200">归档数量</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script src="${base}/edenui/common/js/jq_plugins/highcharts/highcharts.js"></script>
+  <script src="${base}/form/resources/chosen_v1.2.0/chosen.jquery.js"></script>
+  <script>
+	var gridOne;
+	var selectURL = "${base}/admin/instruction/instReportByYearDept.action";
+	var exportURL = "${base}/admin/instruction/instReportByYearDeptExport.action";
+	var time = [  ];
+	var chartReadData = [];
+	var chartDealData = [];
+	var chartTotalData = [];
+	var chart;
+	var condition = "";
+	$(function() {
+		layOut("#common_table", "#grid_table");
+	    $(".js-radio-check").change(function(){
+            var index=$(".js-radio-check").index($(this));
+            $(".statisticTypeStyle").hide().eq(index).show();
+        });
+
+	    //统计功能
+    	$(document).on("click","#report_total",function(){
+    		var url="";
+    		var iType= $("input[name='statisticType']:checked").val();
+    	    if(iType==undefined || iType.replace(/\s+/,"")==""){
+    	    	layer.msg("请选择统计类型");
+    	    	return;
+    	    }
+
+    	    var symbol = "?wfName=oa_leader_instruction";
+  	        if(selectURL.indexOf("?")>0){
+  	        	symbol = "&wfName=oa_leader_instruction";
+  	        }
+    	    if(iType=="reportByYearDept"){
+    	    	 var startYearV = $("#startYear").val();
+    		     var endYearV = $("#endYear").val();
+    		     url=selectURL+symbol +"&iType="+iType+ '&startYear=' + window.encodeURI(startYearV) +'&endYear=' + window.encodeURI(endYearV);
+    	    }else if(iType=="reportByYearAndMonthDept"){
+    	    	  var year = $("#year").val();
+    	  	      var startMonth = $("#startMonth").val();
+    	  	      var endMonth=$("#endMonth").val();
+    	  	      url=selectURL+symbol +"&iType="+iType+'&year=' + window.encodeURI(year) +'&startMonth=' + window.encodeURI(startMonth) +"&endMonth="+window.encodeURI(endMonth);
+    	    }
+	        var instructionLeader=$("#instructionLeader").val();
+	        //alert(url)
+	        gridOne.changeUrl(url +'&etc='+new Date().getTime()+"&instructionLeader="+window.encodeURI(instructionLeader));
+		});
+
+	    //导出功能
+    	$(document).on("click","#exportButton",function(){
+    		var url="";
+    		var iType= $("input[name='statisticType']:checked").val();
+    	    if(iType==undefined || iType.replace(/\s+/,"")==""){
+    	    	layer.msg("请选择统计类型");
+    	    	return;
+    	    }
+
+    	    var symbol = "?wfName=oa_leader_instruction";
+  	        if(exportURL.indexOf("?")>0){
+  	        	symbol = "&wfName=oa_leader_instruction";
+  	        }
+    	    if(iType=="reportByYearDept"){
+    	    	 var startYearV = $("#startYear").val();
+    		     var endYearV = $("#endYear").val();
+    		     url=exportURL+symbol +"&iType="+iType+ '&startYear=' + window.encodeURI(startYearV) +'&endYear=' + window.encodeURI(endYearV);
+    	    }else if(iType=="reportByYearAndMonthDept"){
+    	    	  var year = $("#year").val();
+    	  	      var startMonth = $("#startMonth").val();
+    	  	      var endMonth=$("#endMonth").val();
+    	  	      url=exportURL+symbol +"&iType="+iType+'&year=' + window.encodeURI(year) +'&startMonth=' + window.encodeURI(startMonth) +"&endMonth="+window.encodeURI(endMonth);
+    	    }
+    	    var instructionLeader=$("#instructionLeader").val();
+	        window.location = url+ '&etc='+new Date().getTime()+"&instructionLeader="+window.encodeURI(instructionLeader);
+		});
+
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?wfName=oa_leader_instruction&etc=" + new Date().getTime(),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				$("#condition").html(gridData.condition);
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+	        		$index=parseInt($this.attr("index"));
+	        		$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+				time = [];
+				chartData = [];
+				var data = gridOne.getAllRecords();
+ 				for(var i = 0,l = data.length; i < l; i++){
+					time[i] = data[i].year;
+					chartReadData[i] = data[i].read;
+					chartDealData[i] = data[i].deal;
+					chartTotalData[i] = data[i].total;
+				} 
+			}
+		});
+ 
+		$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印", url:"${base}/admin/documentStatistics/incomingStatisticByYearPrintWin.action?etc=" + new Date().getTime(),width:'900',height:'550', id:"incomingStatisticByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});		
+
+		 //处理选择领导框
+	    $('#instructionLeader').chosen({
+			 "no_results_text":"找不到"
+		 });
+	});
+	
+	</script>
+</body>
+</html>

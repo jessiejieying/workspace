@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+<link href="${base}/form/resources/chosen_v1.2.0/chosen.css" type="text/css" rel="stylesheet" />
+<#include "/aufw/page/include/head.html">
+  <style type="text/css">
+   .bsgrid td{
+     text-align:center;
+     padding-left:0px;
+  }
+</style>
+</head>
+<body style="height: 100%;" class="statistics">
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+            <div class="grid-table-top" id="grid_table">
+                <div class="js-tool-bar">
+                    <div class="form-group statistics-condition header-group">
+                        <span class="span-bold header-title">年度：</span>
+                        <input name="startDate" id="startDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy', maxDate:'#F{$dp.$D(\'endDate\')||\'2025\'}'})" size="19" type="text">
+                        <span class="margin-left-in header-title">至</span>
+                        <input id="endDate" style="cursor: pointer;height: 26px;" size="19" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy',minDate:'#F{$dp.$D(\'startDate\')}',maxDate:'2025'})" name="endDate" type="text">
+                        <div id="titleGroup" style="margin-top: 0px">
+                          <span class="span-bold header-title margin-left-out">审批类型：</span>
+                          <select id="meetingtype" class="tool-bar-input"  style="width:130px;height:26px;">
+                              <option value="">全部</option>
+                              <option value="oa_meeting_program_approval">会议方案</option>
+                              <option value="oa_meeting_notification_approval">会议通知</option>
+                          </select>
+                          <span class="span-bold header-title margin-left-out">拟稿处室：</span>
+                          <input id="mainOrg" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                          <div  class="button button-main margin-left-out js-statistics">统计</div>
+                          <div id="exportButton" class="button button-main js-statistics margin-left-in">导出</div>
+                        </div>
+              </div>
+                    <div class="statistics-tab">
+                        <div class="clearfix">
+                            <div id="" class="tab-btn" style="display:none;">导出</div>
+                        </div>
+                        <div class="tab-content-show">
+                            <span id="condition" class="float-left"></span>
+                            <span style="float:right;margin-right:14px;">统计时间：${.now?string("yyyy.MM.dd")}</span>
+                        </div>
+                    </div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th width="40">序号</th>
+                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+                  <th w_index="year" width="80">年度</th>
+                  <#list meetingTypeDictList as dict>
+                  <th w_index="count${dict_index}">${dict.dictName}</th>
+                  </#list>
+                  <th w_index="total" width="60">总计</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script>
+	var gridOne;
+	var selectURL = "${base}/admin/meeting/meetingInfoStatisticByYearAndMT.action";
+	var time = [  ];
+	var chartReadData = [];
+	var chartDealData = [];
+	var chartTotalData = [];
+	var chart;
+	var condition = "";
+	var arr = []; 
+	$(function() {
+
+		layOut("#common_table", "#grid_table");
+
+	//统计功能
+		$(".js-statistics").click(function(){
+		    var startDate= $("#startDate").val();
+		    var endDate=$("#endDate").val();
+		    var mainOrg= $("#mainOrg").val();
+		    var meetingtype=$("#meetingtype").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    }
+		      
+		    gridOne.changeUrl(selectURL + symbol + 'start_year=' + startDate +'&end_year='+endDate+ '&mainOrg=' + window.encodeURI(mainOrg) +"&meetingtype="+meetingtype+'&etc='+new Date().getTime());
+
+		});
+	     //验证起始日期和截止日期
+	     $(document).on("blur","#meeting_start_month",function(){
+       	var start_month=$("#meeting_start_month").val();
+       	var end_month=$("#meeting_end_month").val();
+       	if($.trim(end_month)!=""){
+       	   if($.trim(start_month)!=""){
+       		   if(parseInt(start_month)>parseInt(end_month)){
+       			   layer.msg("起始月份不能大于截止月份");
+       			   return;
+       		   }
+       	   }else{
+       		   layer.msg("请选择起始月份");
+       		   return;
+       	   }
+       	}
+       });
+       $(document).on("blur","#meeting_end_month",function(){
+       	var start_month=$("#meeting_start_month").val();
+       	var end_month=$("#meeting_end_month").val();
+       	if($.trim(end_month)!=""){
+       	   if($.trim(start_month)!=""){
+       		   if(parseInt(start_month)>parseInt(end_month)){
+       			   layer.msg("起始月份不能大于截止月份");
+       			   return;
+       		   }
+       	   }else{
+       		   layer.msg("请选择起始月份");
+       		   return;
+       	   }
+       	}
+       });
+       
+   //选择部门
+       
+       $(document).on("click","#mainOrg",function(){
+    	   var win={"text":"选择部门","url":"${base}/admin/department/openSelectDepartment.action?module=oa_meeting_info&isType=oa_provincial_meeting","width":"900","height":"550","parentIfr":window};
+           window.top.CommonInput=$(this);
+    	   window.top.createWindow(win);
+
+       });
+	    //导出功能
+    	$(document).on("click","#exportButton",function(){
+		    var startDate= $("#startDate").val();
+		    var endDate=$("#endDate").val();
+		    var mainOrg= $("#mainOrg").val();
+		    var meetingtype=$("#meetingtype").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    }
+	        window.location = "${base}/admin/meeting/meetingInfoStatisticByYearAndMTExport.action" + symbol + 'start_year=' + startDate + '&end_year='+endDate+'&mainOrg=' + window.encodeURI(mainOrg) +"&meetingtype="+meetingtype+ '&etc='+new Date().getTime();
+		});
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?etc=" + new Date().getTime(),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				$("#condition").html(gridData.condition);
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("tr","#manage_grid_bot").each(function(){
+					$("td",this).eq(1).css("padding-left","0px");					
+				});
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+	        		$index=parseInt($this.attr("index"));
+	        		$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+				time = [];
+				chartData = [];
+				var data = gridOne.getAllRecords();
+ 				for(var i = 0,l = data.length; i < l; i++){
+					time[i] = data[i].year;
+					chartReadData[i] = data[i].read;
+					chartDealData[i] = data[i].deal;
+					chartTotalData[i] = data[i].total;
+				}
+			}
+		});
+
+
+
+		$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印", url:"${base}/admin/documentStatistics/incomingStatisticByYearPrintWin.action?etc=" + new Date().getTime(),width:'900',height:'550', id:"incomingStatisticByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});
+		
+
+	});
+	
+
+		//初始化数据
+		function initData(){
+			var url="${base}/admin/department/selectDepartment.action";
+			param="module=oa_meeting_info&isType=oa_provincial_meeting";
+			$.ajax({
+				type:"POST",
+				url:url,
+				data:param,
+				async: false,
+				success:function(data){
+					arr=data.data;
+				}
+			});
+		}
+
+    //屏幕分辨率小于1024，右侧排版 
+    if($(window).width() <= 1024){
+      $("#titleGroup").css({"width":"100%","margin-left":"-10px"});
+    }
+	</script>
+</body>
+</html>

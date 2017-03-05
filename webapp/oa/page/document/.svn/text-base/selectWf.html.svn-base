@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+    <#include "/aufw/page/include/head.html">
+    <link rel = "STYLESHEET" type = "text/css" href = "${base}/aufw/resources/common/dhtmlx/types/ftypes.css">
+	<style>
+		#option { width: 350px; height: 230px; overflow: auto; }
+
+		.form_style .text_input { width: 200px; margin: 5px 0 5px 10px; background-color: #fff; line-height: 14px; height: 14px; padding: 5px; border: 1px solid #CCCCCC; }
+
+		.form_style .textarea { width: 200px; height: 60px; margin: 5px 0 5px 10px; line-height: 20px; padding: 5px; border: 1px solid #CCCCCC; }
+
+		#option_area .submit_btn_1 { margin-left: 30px; width: 50px; }
+
+		.btn .submit_btn_1 { margin: 0 10px; }
+	</style>
+</head>
+
+<body style = "height:100%;">
+<div id="tree_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+    <div id="tree_search" class = "tree-search"></div>
+    <div id="tree" style="width:100%; padding-top: 3px;"></div>
+    <div style="text-align:center;">
+    <a href="javascript:void(0)" class="btn btn-primary" onclick="initWf()">确定</a>
+    </div>
+</div>
+
+
+
+
+<#include "/aufw/page/include/script.html">
+
+<script>
+	var layout, treeObj, menu, tree, treeSearch, folder, canEdit, dhxWins, w1, folderInfo,sendUrl;
+	folderInfo = {type:'', parentId:'', nodeId:''};
+	canEdit = false;
+	var key="${key}";
+	
+	var helpDocumentId=null;
+	var helpDocumentTreeId=null;
+	var folderItem=new Array();
+	window.dhx_globalImgPath = "${base}/aufw/resources/common/dhtmlx/imgs/";
+	function init() {
+		
+		layout = new dhtmlXLayoutObject(document.body, "1C");
+		layout.cells('a').hideHeader();
+
+		layout.cells('a').setWidth(200);
+
+		layout.attachEvent('onResizeFinish', page_layout);
+		layout.attachEvent('onPanelResizeFinish', page_layout);
+
+		treeObj = layout.cells("a").attachObject('tree_wrap');
+		tree = new dhtmlXTreeObject("tree", "100%", "100%", 'root');
+		tree.openItem('root');  //默认展开
+		tree.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/csh_dhx_terrace/");
+		tree.enableSmartXMLParsing(true);
+		tree.setSkin('dhx_skyblue');
+		tree.enableTreeLines(true);;
+		tree.setDataMode('json');
+		tree.loadJSON("${base}/admin/documentConfig/selectOpenWfTree.action?key="+key+"&etc=" + new Date().getTime());
+		tree.attachEvent("onXLE", function (tree, id) {
+			var rootsAr = tree.getSubItems(id);//.split(",");
+			tree.openItem(rootsAr);
+		});
+		tree.attachEvent("onDblClick", function (id) {
+			
+			initWf()
+		      
+		});
+	/* 	tree.attachEvent("onRightClick", function (id, e) {
+			//tree.selectItem(id);
+			 var parent_id = tree.getSelectedItemId();
+	        var name =  tree.getUserData(parent_id,"name");
+
+           alert(key+" "+name)
+		}); */
+
+		treeSearch = new treeSearchBar('tree_search', tree);
+		//layout.cells('b').attachObject('toolbar_wrap');
+		
+		page_layout();
+	}
+
+
+	/**
+	 * 解析url参数
+	 * 
+	 */
+	function parser_request(url, parm) {
+		var reg = new RegExp("(^|&)" + parm + "=([^&]*)(&|$)");
+		var r = url.substr(url.indexOf("\?") + 1).match(reg);
+		if (r != null)
+			return unescape(r[2]);
+		return null;
+	}
+	
+	function toolbar_func(id) {
+	
+	}
+	
+
+	function initWf()
+	{
+		var id = tree.getSelectedItemId();
+		var name = tree.getItemText(id);
+	       
+	      var parentId=tree.getParentId(id); //上一节点
+	      
+	      var subids=tree.getSubItems(id);
+	      if(subids)
+	      {
+	    	//$.dialog.tips("此节点不是流程，不能打开！");
+	    	  return;
+	      }
+	      var addPram="&dtype="+parentId; //向url增加的参数
+	      var businessId=parser_request(window.location.href, "businessId"); //业务id，在待收公文里用到
+	      if(businessId)
+	      {
+	    	  addPram="&businessId="+businessId;
+	      }
+	      
+	      ParentIframe.initOaWf(id,addPram)
+	      window.top.closeWin('selectWf');
+		
+		
+	}
+
+	function page_layout() {
+		var wrap_height = $('#tree_wrap').height();
+		$('#tree').height(wrap_height - 93);
+	}
+
+	$(function () {
+		setTimeout(init, 0);
+		$('#toolbar_toolbar_ul li').click(function () {
+			var id = $(this).attr('type');
+			toolbar_func(id);
+		});
+	});
+</script>
+</body>
+</html>

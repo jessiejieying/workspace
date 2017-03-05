@@ -1,0 +1,28 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>var id = $urlParam('appId');
+function test(){
+}
+function submit(){
+    startAndDoWf('oa_meal_remove','1',test);//提交数据后执行流程
+}
+</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib dj_sn="oa_meal_remove" caption="oa_meal_remove" type="eden" isfile="是" center="  " posleft postop poswidth posheight toolbar="不带工具栏" window="当前窗口" BLONopen BLONopenBefore BLONclose userType alertType="1" isCheckPermit="否" billtaborder="<root><taborder>button1</taborder><taborder>textarea1</taborder></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:1;radio:0;listbox:1;textarea:1;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:1;text:2;hr:0;checkboxlist:0;radiolist:0;dropdownlist:0;grid:0;dataset:3;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" contxml="<root><label><id>label1</id></label><textarea><id>textarea1</id></textarea><button><id>button1</id></button><dataset><id>dataset3</id></dataset></root>" AutoResizeXml><LABEL style="POSITION: absolute; WIDTH: 65px; HEIGHT: 15px; TOP: 47px; LEFT: 42px" id=label1 onmovestart=moveStart() controltype="label" inputTag="否">取消原因：</LABEL><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; PADDING-TOP: 0px; TOP: 198px; LEFT: 102px" id=button1 onmovestart=moveStart() class=ef_button controltype="button" onclick='bill_onclick("submit()")'>确定</BUTTON><TEXTAREA style="POSITION: absolute; WIDTH: 326px; HEIGHT: 114px; TOP: 49px; LEFT: 106px" id=textarea1 onmovestart=moveStart() cols=65 controltype="textarea" china="取消审核原因" dataset="dataset3" field="remove_approve" value="textarea1" induce="否"></TEXTAREA><?xml:namespace prefix = fc /><fc:dataset id=dataset3 controltype="dataset" sqltrans="%F4%D8%E6%D8%D4%F6XrnbXrn%DA%F2%EC%E8Xrn%EC%D0%CC%E8%D8%D0%E6%CC%D0%EE%EE%F2%EC%FA%D8%CC%F6%D2Xrn%FC%DE%D8%F2%D8Xrn%E0%D6Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%D0%EE%EE%A0%D6XrrXr%80X%7C%96Xt%90Xr%7C" opensortno="1" isInAddStatus="否" pubpara="否" isaddemptyrec="否" isSubGrid="否" submittype="1" submitno="1" savetable="oa_meal_approve_tb" idtype="1" idparam="BBB" issubds="否" onValid='bill_ondatasetvalid("<dsid><id></id><remove_approve></remove_approve><remove_wf_id></remove_wf_id></dsid>")' onGetText='bill_ondatasetgettext("<dsid><id></id><remove_approve></remove_approve><remove_wf_id></remove_wf_id></dsid>")' onSetText='bill_ondatasetsettext("<dsid><id></id><remove_approve></remove_approve><remove_wf_id></remove_wf_id></dsid>")' format="<fields><field><fieldname>id</fieldname><datatype>字符</datatype><displaylabel>主键</displaylabel><size>32</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>否</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>remove_approve</fieldname><datatype>字符</datatype><displaylabel>取消审核原因</displaylabel><size>100</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>remove_wf_id</fieldname><datatype>字符</datatype><displaylabel>关联字段</displaylabel><size>32</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>$urlParam('wfId')</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>否</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>"></fc:dataset></DIV><div id='addHtml'></div> </body></html>

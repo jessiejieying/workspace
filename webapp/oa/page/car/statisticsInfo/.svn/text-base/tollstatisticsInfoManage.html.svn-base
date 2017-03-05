@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+	<style type="text/css">
+	
+	</style>
+</head>
+
+<body style="height:100%;">
+
+<!--  body 的style  应属性加上 height:100%;   是为了计算页面高度   -->
+
+<div id="tree_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+    <div id="tree_search" class="tree_search"></div>
+    <div id="tree" style="width:100%; padding-top: 3px;"></div>
+</div>
+
+<!-- tree_wrap 这个 div 用于放置 左侧树和搜索树的工具栏 -->
+
+<div id="grid_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+   <div id="grid_toolbar" class="ed-toolbar">
+   &nbsp;&nbsp;车辆&nbsp;&nbsp;
+<select id="car" class="search_text" value="车辆" name="" type="text">
+				<option value="车辆">不选择</option>
+				<#list carName as dataDict>
+				<option value="${dataDict.id}">${dataDict.licenseNum}</option>
+				</#list>
+				</select>&nbsp;&nbsp;类型&nbsp;&nbsp;
+
+                <select id="typeId" class="search_text" value="类型" name="type" type="text">
+				<option value="">不选择</option>
+				<option value="0">行车记录</option>
+					<#list maintainTypeSet as dataDict>                                                                         
+				<option value="${dataDict.dictValue}">${dataDict.dictName}</option>
+				</#list>
+				</select>&nbsp;&nbsp;开始日期&nbsp;&nbsp;
+
+                <input id="start_date" class="search_text" value="" name="" onClick="WdatePicker({dateFmt:'yyyy-MM-dd', maxDate:'#F{$dp.$D(\'end_date\')||\'2030-10-01\'}'})" type="text">
+ &nbsp;&nbsp;结束日期&nbsp;&nbsp;
+                <input id="end_date" class="search_text" value="" name="" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'start_date\')}',maxDate:'2030-10-01'})">
+
+                <input class="btn btn-info" name="" onClick="SimpleSearch()" value="查 找" type="button">
+			<a btn_id="reset" class="btn btn-warning">重置条件</a>
+	 </div>
+
+
+    <div id="grid" style="width:100%;"></div>
+	 <div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	    </div>
+
+</div>
+
+</body>
+
+<#include "/aufw/page/include/script.html">
+<script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+<script src="${base}/form/fceform/js/fcpub.js"></script>
+<script src="${base}/form/fceform/js/fcrundj.js"></script>
+<script src="${base}/form/fceform/js/tabpane.js"></script>
+
+
+<script>
+    var layout,treeObj,tree,treeSearch,grid,data,form,listShowR,isDetailR;;
+    var version='1';
+    var wf_name='meeting_manage';
+    
+	 window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+    <!--    设置dhtmlx各组件用到的图片的的路径-->
+    function init(listShow,isDetail) {       //初始化 方法
+	
+	
+	/* 	var calendar1,calendar2;
+		calendar1 = new dhtmlXCalendarObject("start_date");
+		calendar2 = new dhtmlXCalendarObject("end_date"); */
+        
+
+        layout = new dhtmlXLayoutObject(document.body, "1C");     //添加一个的layout
+
+
+        layout.cells('a').hideHeader();         //隐藏 cell a 的 标题 ， b c 同理
+
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        <!-- 为layout添加监听事件    -->
+        <!-- onResizeFinish 为在layout大小变了之后触发 -->
+        <!-- onPanelResizeFinish 为在layout中一块区域大小变了之后触发 -->
+
+        data = new dhtmlXDataStore({
+            url: "${base}/admin/tollStatisticsInfoManager/selectTollStatisticsInfos.action?etc="+ new Date().getTime(),
+            
+            datatype: "json"
+        });     //添加一个 为DataStore
+		
+
+        layout.cells('a').attachObject('grid_wrap');
+		if(listShow === 0){
+        // 在 layout的 cell b上添加 ID为 grid_wrap 的div
+        grid = new dhtmlXGridObject('grid');
+        // 把 grid 添加到  ID为 grid的div中
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        //设置 grid上 图片的路径
+       grid.setHeader(" ,序号,车辆,类型,费用,司机,时间");
+        //设置 grid每列的标题
+        grid.setColumnIds("check,id,carId,type,toll,driverId,date");
+        //设置 grid每列的数据  对应 json中的哪条数据
+        grid.setInitWidths("30,100,150,100,50,*,180");
+        //设置 每列的宽度
+          
+		grid.setColTypes("ch,ro,co,co,ro,co,ro");
+       	<#list carName as dataDict>                                                                         
+		grid.getCombo(2).put('${dataDict.id}','${dataDict.licenseNum}');
+		</#list>
+		grid.getCombo(3).put('0','行车记录');
+		<#list maintainTypeSet as dataDict>                                                                         
+		grid.getCombo(3).put(${dataDict.dictValue}, '${dataDict.dictName}');
+		</#list>
+	    <#list driverName as dataDict>
+		grid.getCombo(5).put('${dataDict.id}','${dataDict.name}');					
+		</#list>
+        grid.init();
+		//grid.setEditable(false);
+        // 初始化grid
+        grid.enablePaging(true,15,2, 'grid_page', true);
+        //添加 grid的分页
+        //grid.enablePaging(fl, pageSize, pagesInGrp, parentObj, showRecInfo, recInfoParentObj)
+/*          @参数: fl - true|false - 是否分页
+        *   @参数: pageSize - 每页的行数
+        *   @参数: pagesInGrp - 可见的页面的数量
+        *   @参数: parentObj - 放置分页的 div的ID
+        *   @参数: showRecInfo - true|false - enable|disable showing of additional info about paging state
+        *   @参数: recInfoParentObj - ID or container which will be used for showing paging state
+*/
+
+        grid.setPagingSkin("toolbar");   //设置 分页的皮肤
+        grid.sync(data);                // grid从 DataStore中同步数据
+
+
+
+		}else if(listShow === 1){
+				$('#grid').empty();
+				$('#grid').append("<ul id='pictureGrid' class='picture_grid'></ul>");
+				data.attachEvent("onXLE", function (){
+			  		//alert(data.first());
+					//alert(data.idByIndex(1));
+				  for(i=0;i<5;i++){
+					var itemId = data.idByIndex(i);
+					var imageSrc = data.item(itemId).imageSrc;
+					var vNumber = data.item(itemId).vNumber;
+					$('#pictureGrid').append("<li><img src='${base}/oa/page/cat/"+imageSrc+"'><span>"+vNumber+"</span></li>")
+					}
+				});
+	
+
+			}
+		
+
+		
+
+
+        page_layout();      // 调用page_layout方法   ,方法的声明在下面
+
+
+		//保存初始化列表展现形式
+		listShowR = listShow;
+		isDetailR = isDetail;
+
+    }
+
+function SimpleSearch(){
+    data.clearAll();
+    var clu = $("#search").val();
+    var car = $("#car").val()=='车辆'?'':$("#car").val();
+	
+	var start_date = $("#start_date").val()=='开始日期'?'':$("#start_date").val();
+	var end_date = $("#end_date").val()=='结束日期'?'':$("#end_date").val();
+    
+	var type=$("#typeId").val();
+	
+    var url = "${base}/admin/tollStatisticsInfoManager/selectTollStatisticsInfos.action?licenseNum="+car+"&startDate="+start_date+"&endDate="+end_date+"&type="+type+"&etc="+ new Date().getTime();
+    window.data.data.url = url
+    data.load(url);
+}
+
+
+	
+
+
+
+
+    function toolbar_func(id){           // grid上面 的那些按钮的 功能
+        if (id == 'reset') {
+		$(car).val(car.defaultValue);
+		
+		$(start_date).val(start_date.defaultValue);
+		$(end_date).val(end_date.defaultValue);
+        	
+        }
+    }
+    function page_layout() {                 // page_layout为控制页面布局的方法 ，  用于自适应窗口的大小
+        var grid_wrap_height = $('#grid_wrap').height();  //得到 ID为  grid_wrap 的div的高度
+        $('#grid').height(grid_wrap_height - 43 -35);    //设置  ID为  grid 的div的高度
+        if(grid)    grid.setSizes();                   // 如果grid 存在，则 让 grid 适应下窗口的大小
+
+    }
+    $(function () {
+        setTimeout(function(){init(0,0);}, 0);                        //在 页面加载好后，触发init方法；
+		
+		
+		$('#listShowList').click(function(){init(0,isDetailR);})
+		$('#listShowPicture').click(function(){init(1,isDetailR);})
+		$('#listShowDetail').click(function(){isDetailHover();})
+
+
+
+		//$('#grid_toolbar_ul li').last().addClass('last');   //为grid上面的一排按钮中的最后一个li添加一个为‘last’的class
+        $('#grid_toolbar a').click(function(){       //那些按钮 点击之后 触发 toolbar_func 方法
+            var id=$(this).attr('btn_id');
+            toolbar_func(id);
+        });
+		
+		$("#car").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+			
+	
+
+		//高级搜索展开
+		//searchBarCommon('advanced_search_bar',30,'advanced_search_btn','grid_toolbar','grid');
+		searchToggle('advanced_search_btn','advanced_search_bar');
+    })
+</script>
+</html>

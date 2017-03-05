@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+    <#include "/aufw/page/include/head.html">
+        </head>
+<body style="height:100%;">
+<div class="container-layout line">
+    <table style="width: 100%;" id="common_table">
+        <tr>
+            <!-- 右侧 -->
+            <td class="ver-top">
+                <div class="grid-table-top" id="grid_table">
+                    <div class="js-tool-bar padding">
+                    </div>
+                    <div class="js-grid-father grid-father">
+                        <table id="manage_grid" class="bsgrid">
+                            <tr>
+                                <th w_index="id" w_hidden="true" class="hidden"></th>
+                                <th w_index="true" width="40">序号</th>
+                                <th w_index="unit" width="">加印单位</th>
+                                <th w_index="count" width="50">份数</th>
+                                <th w_index="printDttm" width="140">加印时间</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+<#include "/aufw/page/include/script.html">
+    <!--表单、流程，基于jquery的方法-->
+    <script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+    <script src="${base}/oa/resource/js/task.js"></script>
+    <script>
+        var gridOne;
+        var selectURL = "${base}/admin/sendDocument/getPrintDocumentInfo.action?etc="+new Date().getTime()+"&wfId="+getUrlParam("wfId");
+        $(function(){
+            layOut("#common_table","#grid_table");
+            gridOne=$.fn.bsgrid.init("manage_grid", {
+                url:selectURL,
+                row_primary_key: "primaryKey",
+                autoLoad: true,
+                pageSizeSelect: true,
+                pageSize:15,
+                complete:function(options, XMLHttpRequest, textStatus){
+                },
+                additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+                },
+                additionalAfterRenderGrid:function(){
+                    gridOne.initGrid();
+                    $("#manage_grid tbody tr").each(function(){
+                        var $this=$(this),
+                                $index=parseInt($this.attr("index"));
+                        $this.find("td").eq(1).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+                    });
+                }
+            });
+
+        });
+
+        // 获取参数列表
+        function getUrlParam(name) {
+
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)return unescape(r[2]);
+            return null;
+
+        }
+    </script>
+
+</html>

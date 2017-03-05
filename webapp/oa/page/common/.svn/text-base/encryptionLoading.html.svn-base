@@ -1,0 +1,395 @@
+﻿
+<html>
+<head>
+  <meta http-equiv="x-ua-compatible" content="IE=10" >
+  <meta charset="utf-8">
+    <title>正文鉴章</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/control.css">
+    <script src = "${base}/edenui/common/js/jquery.js"></script>
+    <script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+    <script type="text/javascript">
+        var USBKeyApi;
+        var TGPDFPlugIn;
+        var SignContext;
+        var TGGovDocumentCtrl;
+        var loop = true;
+        var project ="${base}";	
+        var tempPath = "";
+        var encryRes = "";
+
+        $(function(){
+
+            $(window).resize(function(){
+
+                //计算对象的宽高
+                var $window=$(window);
+
+                $("#TGPDFPlugIn").height($window.height()-105);
+            });
+        });
+
+        function load() {
+            //计算对象的宽高
+            var $window=$(window);
+            $("#TGPDFPlugIn").height($window.height()-105);
+
+            TGPDFPlugIn = getPluginObjcet("TGPDFPlugIn");
+            TGGovDocumentCtrl = getPluginObjcet("TGGovDocumentCtrl");
+            
+            SetProjectInfo();
+            
+            TGPDFPlugIn.DisplayToolBar(0, 0);
+            
+            attach_event();
+
+            OpenWebFile();
+            encrypt();
+        }
+
+        function isIEBrowser() {
+            var isAtLeastIE11 = !!(navigator.userAgent.match(/Trident/) && !navigator.userAgent.match(/MSIE/));
+
+            if (isAtLeastIE11) {
+                return true;
+            }
+
+            return (navigator.appName.indexOf("Microsoft Internet") != -1);
+        }
+
+        function getPluginObjcet(objname) {
+            if (!isIEBrowser()) {
+                if (document.embeds && document.embeds[objname])
+                    return document.embeds[objname];
+            }
+            else {
+                return document.getElementById(objname);
+            }
+        }
+
+        function attach_event() {
+            try {
+                TGPDFPlugIn.attachEvent("OnEventFinish", jsFire_TGPDFPlugInCallback);
+            }
+            catch (e) {
+                return false;
+            }
+            return true;
+        }
+
+        //设置项目;
+        function SetProjectInfo() {
+            var Res = TGPDFPlugIn.SetProjectInfo(document.form1.projectname.value, document.form1.projectpassword.value);
+            ShowResultMessage("SetProjectInfo", Res);
+        }
+
+        //隐藏关键字
+        function SetHideKeywords() {
+            var Res = TGPDFPlugIn.SetHideKeywords(document.form1.keywords.value);
+            ShowResultMessage("SetHideKeywords", Res);
+        }
+
+        //加载本地PDF文档
+        function OnLoadPDF() {
+            var Res = TGPDFPlugIn.LoadPDF(document.form1.localFilePath.value);
+
+            ShowResultMessage("OnLoadPDF", Res);
+        }
+
+        //加载网络PDF文档
+        function OpenWebFile() {
+        	var windowLocation=(window.location).toString();
+        	var windowBase=windowLocation.split("admin")[0];
+    		
+          	var location=windowBase+"admin/documentData/sealPdf.action?path="
+		    var pdfPath=location+encodeURIComponent(window.parent.encryptionObj.pdfUrl);
+         	var Res = TGPDFPlugIn.LoadPDF(encodeURI(pdfPath));
+        }
+
+        //初始化签名环境
+        function InitSign() {
+            var Res = TGPDFPlugIn.InitSign(SignContext);
+            ShowResultMessage("InitSign", Res);
+        }
+
+        //隐藏工具栏
+        function DisplayToolBar() {
+            var Res = TGPDFPlugIn.DisplayToolBar(0, 0);
+            ShowResultMessage("DisplayToolBar", Res);
+        }
+
+        //显示工具栏
+        function PlayToolBar() {
+            var Res = TGPDFPlugIn.DisplayToolBar(1, 0);
+            ShowResultMessage("PlayToolBar", Res);
+        }
+
+        //关闭PDF文档
+        function ClosePDFFile() {
+            var Res = TGPDFPlugIn.CloseCurrentDoc();
+            ShowResultMessage("ClosePDFFile", Res);
+        }
+
+        //隐藏文件中的签章和水印
+        function DisplaySealAndWater() {
+            var Res = TGPDFPlugIn.SetSignImgVisiable(2, 0);
+            ShowResultMessage("ClosePDFFile", Res);
+        }
+
+        //显示文件中的签章和水印
+        function PlaySealAndWater() {
+            var Res = TGPDFPlugIn.SetSignImgVisiable(2, 1);
+            ShowResultMessage("PlaySealAndWater", Res);
+        }
+
+        //显示书签
+        function PlayBookmark() {
+            var Res = TGPDFPlugIn.DisplayBookmark(1);
+            ShowResultMessage("PlayBookmark", Res);
+        }
+
+        //隐藏书签
+        function DisplayBookmark() {
+            var Res = TGPDFPlugIn.DisplayBookmark(0);
+            ShowResultMessage("DisplayBookmark", Res);
+        }
+
+        function ToolBarButton() {
+            var Res = TGPDFPlugIn.DisplayToolBar(2, 205);
+            ShowResultMessage("ToolBarButton", Res);
+        }
+
+        //签名类型
+        function SetSignType() {
+            var Res = TGPDFPlugIn.SetSignType(SignContext, document.form1.signTypeList.value, Number(document.form1.certTypeList.value) + Number(document.form1.signWayList.value));
+            ShowResultMessage("SetSignType", Res);
+        }
+
+        //签名位置
+        function SetSignPos() {
+            var Res = TGPDFPlugIn.SetSignPos(SignContext, document.form1.signPage.value, document.form1.signPosX.value, document.form1.signPosY.value);
+            ShowResultMessage("SetSignPos", Res);
+        }
+
+        //批注信息
+        function SetApproveInfo() {
+            var Res = TGPDFPlugIn.SetApproveInfo(SignContext, document.form1.approveTypeList.value, document.form1.approveText.value, document.form1.approveFontSize.value, 
+            document.form1.approveFontList.value, document.form1.approveWidth.value, document.form1.approveHeight.value);
+            ShowResultMessage("SetApproveInfo", Res);
+        }
+
+        //云端账号
+        function SetSignAccount() {
+            var Res = TGPDFPlugIn.SetSignAccount(SignContext, document.form1.accountTypeList.value, document.form1.username.value, document.form1.password.value);
+            ShowResultMessage("SetSignAccount", Res);
+        }
+
+        //其他参数
+        function AddedSignParam() {
+            var Res = TGPDFPlugIn.AddedSignParam(SignContext, document.form1.signParamList.value, document.form1.signParam.value);
+            ShowResultMessage("AddedSignParam", Res);
+        }
+
+        //PDF签名
+        function Sign() {
+            var SignRes = 0;
+            var Res = TGPDFPlugIn.SignPDF(SignContext, SignRes);
+            ShowResultMessage("Sign", Res);
+        }
+
+        //验证签名
+        function VerifySign() {
+            var Res = TGPDFPlugIn.VerifyPDF(document.form1.verifyPage.value, 0);
+            ShowResultMessage("VerifySign", Res);
+        }
+
+        //获取当前文档的信息
+        function GetCurrentFileInfo() {
+            var outInfo;
+            var outInfoLen;
+            var Res = TGPDFPlugIn.GetCurrentDocInfo(document.form1.docInfoList.value, outInfo, outInfoLen);
+        }
+        
+        function ShowResultMessage(msg, result) {
+            var resultMsg = "";
+            try{
+                resultMsg = TGPDFPlugIn.GetErrorMsg(result);
+            }catch(e){
+
+            }
+            document.form1.Result.value += msg + ":" + result.toString() + resultMsg + "\n";
+            document.getElementById('Result').scrollTop = document.getElementById('Result').scrollHeight;
+        }
+        
+        function jsFire_TGPDFPlugInCallback(eventID, errorCode, result) {
+            switch(eventID)
+            {
+                case 11201:
+                    ShowResultMessage("获取当前文件路径" + errorCode, result)
+                    break;
+                case 11202:
+                	document.form1.filepath.value = result;
+                	tempPath = result;
+                    ShowResultMessage("文档缓存路径" + errorCode, result)
+                    break;
+                case 11203:
+                    ShowResultMessage("文档总页数" + errorCode, result)
+                    break;
+                case 11204:
+                    ShowResultMessage("文档当前页码" + errorCode, result)
+                    break;
+                case 11205:
+                    ShowResultMessage("签章个数" + errorCode, result)
+                    break;
+                case 11206:
+                    ShowResultMessage("签章信息字符串形式" + errorCode, result)
+                    break;
+                case 11207:
+                    ShowResultMessage("签章信息文件路径" + errorCode, result)
+                    break;
+                case 11300:
+                    SignContext = errorCode;
+                    ShowResultMessage("签名环境", errorCode)
+                    break;
+                case 12600:
+                	// 上传成功处理
+                	window.parent.paramsKeyBack=encryRes;
+                	var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                	//window.parent.location.reload();
+                	parent.layer.close(index); //再执行关闭
+                    break;
+                default:
+                    if (eventID / 100 == 104) {
+                        ShowResultMessage("签名结果" + errorCode, result)
+                    }
+                    break;
+            }
+        }
+
+        //设置文档视图缩放比例
+        function SetFileZoom() {
+            var Res = TGPDFPlugIn.SetDocViewZoom(document.form1.fileZoom.value);
+            ShowResultMessage("SetFileZoom", Res);
+        }
+
+        //跳转到指定页码
+        function GotoPage() {
+            var Res = TGPDFPlugIn.GotoPage(document.form1.gotoPage.value);
+            ShowResultMessage("GotoPage", Res);
+        }
+
+        //跳转到指定文本
+        function GotoText() {
+            var Res = TGPDFPlugIn.GotoText(document.form1.gotoText.value, 1);
+            ShowResultMessage("GotoText", Res);
+        }
+
+        //跳转到书签
+        function GotoBookMark() {
+            var Res = TGPDFPlugIn.GotoBookMark(document.form1.gotoBookMark.value);
+            ShowResultMessage("GotoBookMark", Res);
+        }
+
+        //打印控件中当前文件
+        function PrintFile() {
+            var Res = TGPDFPlugIn.PrintFile(document.form1.printList.value);
+            ShowResultMessage("PrintFile", Res);
+        }
+
+        //中间件操作
+        function ControlPDF() {
+        	document.form1.controlPDFList.value = 483;
+            TGPDFPlugIn.ControlPDF(document.form1.controlPDFList.value);
+        }
+
+        function changeControlPDFList() {
+            TGPDFPlugIn.ControlPDF(document.form1.controlPDFList.value);
+        }
+
+        //设置窗口位置
+        function ResizePlugin() {
+            var Res = TGPDFPlugIn.ResizePlugin(840, 10, 1640, 610);
+            ShowResultMessage("ResizePlugin", Res);
+        }
+        
+        function UploadFileToServerOnlySave(){
+        	loop = false;
+        	UploadFileToServer();
+        }
+        
+        function UploadFileToServerForEncrypt(){
+        	loop = true;
+        	UploadFileToServer();
+        }
+        
+        function encrypt() {
+        	loop = false;
+        	// 登录
+        	TGGovDocumentCtrl.LogIn('', '', 1);
+        	// 初始化加密环境
+        	var code = TGGovDocumentCtrl.SetReceverInfo_Init();
+        	
+        	// 设置收文单位
+        	for(var i=0;i<window.parent.encryptionObj.key.length;i++){
+        		TGGovDocumentCtrl.SetReceverInfo_Update(code,window.parent.encryptionObj.key[i],1,parseInt(window.parent.encryptionObj.paperNum));
+        	}
+        	
+        	var info = TGGovDocumentCtrl.SetReceverInfo_Finish(code);
+        	
+        	var outInfo;
+            var outInfoLen;
+        	TGPDFPlugIn.GetCurrentDocInfo(2, outInfo, outInfoLen); // 当前缓存路径
+        	
+        	var destpath = tempPath.split(".")[0]+ ".pdf";
+        	
+        	var filename = window.parent.encryptionObj.pdfName.split(".")[0] +".tgw"
+           
+        	encryRes = TGGovDocumentCtrl.GovDocEncrypt(tempPath, destpath);
+        	if(encryRes=="0"){
+				var serverUrl = "http://" +window.location.host + "${base}/servlet/sealUploadServlet";
+			
+				//alert(window.parent.encryptionObj.tgwId);
+				var delJson=encodeURI("{method:'encryptPdf',id:'"+window.parent.encryptionObj.tgwId+"',tableKeyId:'"+window.parent.encryptionObj.tableKeyId+"',name:'"+filename+"',size:'"+window.parent.encryptionObj.tgwSize + "',userid:'"+window.parent.encryptionObj.userid+"'}");
+        	
+	        	var Res = TGPDFPlugIn.UploadFileToServer(serverUrl, destpath, encodeURIComponent(filename), delJson);
+            	ShowResultMessage("GovDocEncrypt", res);
+        	}
+        	
+        }
+
+    </script>
+</head>
+<body onload="load();">
+    <form name="form1">
+    	<input type="text" id="filepath" name="filepath" value="" size="10" />
+        <table>
+            <tr>
+                <td><input type="button" value="设置项目信息" onclick="SetProjectInfo()" /></td>
+                <td>
+                    项目ID:<input type="text" id="projectname" name="projectname" value="1111563425" size="30" />
+                    项目密码:<input type="text" id="projectpassword" name="projectpassword" value="e762bda455290ef8e73b3ec2aa9b7896" size="30" />
+                </td>
+            </tr>    
+            <tr>
+                   <td>
+                       <input type="button" value="用户登录" onclick="LogIn()" />
+                       用户名:<input type="text" id="un" name="un" value="MIIDPjCCAqegAwIBAgIBPzANBgkqhkiG9w0BAQUFADBnMREwDwYDVQQqEwhUSU1FVkFMRTERMA8GA1UECBMIWkhFSklBTkcxETAPBgNVBAcTCEhBTkdaSE9VMREwDwYDVQQKEwhUSU1FVkFMRTEZMBcGA1UEAxMQVGltZXZhbGUgVXNlciBDQTAeFw0xMjA3MzEwMjU0MzdaFw0yMjA3MjkwMjU0MzdaMIG4MRswGQYDVQQDDBLlpKnosLfmtYvor5Xor4HkuaYxDzANBgNVBAYMBuS4reWbvTEPMA0GA1UECAwG5rWZ5rGfMQ8wDQYDVQQHDAbmna3lt54xETAPBgNVBAoMCHRpbWV2YWxlMREwDwYDVQQLDAh0aW1ldmFsZTEjMCEGCSqGSIb3DQEJARYUc2VydmljZUB0aW1ldmFsZS5jb20xGzAZBgNVBCoMEuWkqeiwt+a1i+ivleivgeS5pjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjImLlL3ioct1hviXXcp7gjBIiEq26Yd8CkBAxgDEnROeT5rJ1TD75UfeHXXfqALHtPUFD3d3NRuDBVkgBB+2cfb/nTa3WtVpX87JnVj8L+hNon7ctoF4yI7Cxqixgt10JpyWOMjv/c8CObWWS3T+TpejCUXhXXlEC+Gww0cb6p00Bv7ZE0H3h+3JyrwB+8Hy0IobNUTy9ORSUIJwlP8ANvyFzCExN3vZFJi6R1G0L0AfonrsTCon95GW7IBaqR8VwIq+AiJukkmPq+gsKbroMaAokRt1V7MzQyjgdqeukj2Lxzi3vOkKfL9zur4ih+fnPTNHt/hpiB9oYaDfXLLjMCAwEAAaMkMCIwCwYDVR0PBAQDAgTwMBMGA1UdJQQMMAoGCCsGAQUFBwMCMA0GCSqGSIb3DQEBBQUAA4GBAH8pE37uT2QZ5A6lRncVHKpVu0eUpx6Lr9UsJDWZQViSEDyzVoKGaXGsN1lm7W3RWaESWbsi/HiqG/yDGl66qDxyRJXwq1sTZKKYC/85XovY0jIsoivqddovCbMGN6yiIfZ/n6P3NUC+cn12vfqf8VkJW+z20boQF2vW8MoY1WTg" size="25" />
+                       密码:<input type="password" id="up" name="up" value="AaV39a3EJAD7p3i2Fa3PyNAW9GdJoxEejBrPO/iNLHcwRQlia/bJMxa0T/usfDnFqZ43uZURtfhT8A/oMwNXgUnDnVrPlZ5fjDx7ZBuIg1Qx56nunSrGUsNOjOJ+xBHRrhsxaPDtO91l/mPiCpKpgzWTUiy+ZlWThFkz3KTt3d4/kNfRPae2J3xtvZ9t0GYW5i4y5/aPCf48dd+pXo1LeOBX+7ZCMDflHT0500bMUiThgI8Nu5LxubRagsvIGjF3elZ+e6ER5CIEpIhkyf9C1g05RlXJy0wh0TwiNKJW+bhy5xyKv/7SNkjtEC3X1NeQ9mFy/4sM3TklS4O88gWG2Q==" size="25" />
+                   </td>
+               </tr>
+
+        </table>
+
+        <table><tr><td><textarea rows="6" cols="90" id="Result" name="Result"></textarea></td></tr></table>
+		 
+        <object id="TGPDFPlugIn" classid="clsid:04DDDFAA-0AC0-4D47-9315-9F442F65D403"  width="100%" height="600">
+            <embed name="TGPDFPlugIn" type="application/nptseal-TGPDFPlugIn" width="100%" height="100%"></embed>
+        </object>
+        
+        <object id="TGGovDocumentCtrl" name="TGGovDocumentCtrl" classid="CLSID:DBA9A5F0-586D-48C7-92E7-5F0A7C749E0E" width="0" height="0">
+	        <embed name="TGGovDocumentCtrl" width="0" height="0"></embed>
+	    </object>
+	   
+    </form>
+
+</body>
+</html>

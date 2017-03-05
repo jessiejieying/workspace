@@ -1,0 +1,106 @@
+<#include "/oa/page/billcommon/head.html">
+  <body>
+  <div class="form-print" id="showHtml">
+    <h1 class="text-center margin-bottom padding-small-bottom">${billData.billTitleTop!}<#if billData.billTitleBottom??><br>${billData.billTitleBottom!}</#if></h1>
+    <!-- 密级度 -->
+    <div class="form-print-header">
+    <span class=" header-left">密级：
+     <select id="FILE_DEGREE" class="secret-level">
+       <option value=""></option>
+       <#list billData.degreeList! as entry>
+         <option value="${entry.dictValue!}"
+         <#if entry.dictValue==billData.dataset1.file_degree!>selected="selected"</#if>
+         >${entry.displayName!}</option>
+       </#list>
+     </select>
+    </span>
+
+    <span class="header-mid">紧急程度：
+        <select id="URGENT_DEGREE" class="urgent-level">
+          <option value=""></option>
+          <#list billData.urgentList! as entry>
+            <option value="${entry.dictValue!}"
+            <#if entry.dictValue==billData.dataset1.urgent_degree!>selected="selected"</#if>
+            >${entry.displayName!}</option>
+          </#list>
+        </select>
+    </span>
+      <span class="header-right">编号： <input class="js-bill-load-only-number" type="text" id="SERIAL_NUMBER" value="${billData.dataset1.serial_number!}"/></span>
+    </div>
+    <table class="form-table">
+        <tr style="height: 48px;">
+          <td class="table-td-left" style="">来文单位</td>
+          <td style="border-bottom:1px solid #ef655d;">
+            <table class="form-intable" style="height: 48px;" frame="void">
+              <tr>
+                <td width="214" height="47">
+                <input class="td-input" type="text" id="FILE_UNIT" value="${billData.dataset1.file_unit!}"/>
+                </td>
+                <td width="100" class="td-infor-mid">收文日期</td>
+                <td width="100" height="47" ><input class="js-date-fill td-input-date"  type="text" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" id="INCOMING_DATE" value="${(billData.dataset1.incoming_date?string("yyyy-MM-dd"))!''}" />
+                </td>
+                <td width="80"  class="td-infor-mid">行政规范性文件
+                </td>
+                <td width="58">
+                  <select class="td-select-choice" id="text14">
+                    <option value="否" <#if "否"==billData.dataset1.type!>selected="selected"</#if>>否</option>
+                    <option value="是" <#if "是"==billData.dataset1.type!>selected="selected"</#if>>是</option>
+                  </select>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+            <td class="table-td-left td-pd10 ">来文标题<br>（字<i style="padding: 0 8px;"></i>号）</td>
+            <td height="79" class="td-left">
+                <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="FILE_TITLE" value="${(billData.dataset1.file_title?replace('<br>','\n'))!}">${(billData.dataset1.file_title?replace('<br>','\n'))!}</textarea>
+                <textarea class="td-input-area js-auto-textarea" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="FILE_CHAR" value="${(billData.dataset1.file_char?replace('<br>','\n'))!}">${(billData.dataset1.file_char?replace('<br>','\n'))!}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="table-td-left td-pd20">省法制办<br>意<i style="padding: 0 5px;"></i>见</td>
+            <td class="line-feed js-going-advice-td" data-type="100" id="affairs_office">
+                <div class="td-choice-input js-choice-input" data-msg="省法制办意见只能为一条">
+                    <#if billData.adviceDb_100??&& (billData.adviceDb_100?size>0)>
+                        <#list billData.adviceDb_100! as entry>
+                            <div class='js-leader-advice js-going-advice' data-user='${entry.create_by}' data-advice='' id='${entry.id}' >
+                                <#if entry_index==0>
+                                    <div class="going-advice">
+                                        <div class="form-bill-agree js-bill-agree"
+                                             data-type="<#if (billData.adviceDb_100?size>1)>1<#else>0</#if>">
+                                            <#if (billData.adviceDb_100?size>1)>
+                                                撤销
+                                                <#else>
+                                                    同意
+                                            </#if>
+                                        </div>
+                                    </div>
+                                </#if>
+                                <p class='js-leader-advice-content td-pr70' >
+                                    <#if (entry.advice_content?index_of("wfId"))!=(-1) >
+                                        <span style="display:none;">${entry.advice_content}</span>
+                                        <img width="100" height="60" src="${base}/iWebRevision/${entry.advice_content}" alt="意见">
+                                        <#else>
+                                            <span>${entry.advice_content}</span>
+                                    </#if>
+
+                                    <#if entry_index==0>
+                                        <i class='js-leader-advice-del icon-trash-o' title='删除'></i>
+                                        <i class='icon-edit js-leader-advice-edit' title='编辑'></i>
+                                    </#if>
+                                </p>
+
+                                <p class='js-leader-advice-last' >${entry.name}&nbsp;${entry.CREATE_DTTM}</p>
+                            </div>
+                        </#list>
+                        <#else>
+                            <span class="td-choice-input-tip" >点击输入</span>
+                    </#if>
+                </div>
+            </td>
+        </tr>
+
+    </table>
+  </body>
+  <#include "/oa/page/billcommon/footer.html">

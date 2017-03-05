@@ -1,0 +1,276 @@
+<!DOCTYPE html >
+<html style="height:100%;width:100%;">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title></title>
+	<script src="${base}/oa/page/car/driverInfo/scheduler/js/jquery-1.6.2.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="${base}/oa/page/car/driverInfo/scheduler/js/dhtmlxscheduler.js" type="text/javascript" charset="utf-8"></script>
+	<script src="${base}/oa/page/car/driverInfo/scheduler/My97DatePicker/WdatePicker.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" href="${base}/oa/page/car/driverInfo/scheduler/css/dhtmlxscheduler_dhx_terrace.css" type="text/css" media="screen"
+	      title="no title" charset="utf-8">
+	<style type="text/css" media="screen">
+		html, body {
+			margin: 0px;
+			padding: 0px;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		#my_form label {
+			width: 200px;
+		}
+
+		.dhx_wrap_section label {
+			margin: 0 5px 0 20px;
+		}
+
+		.time_style1 {
+			width: 115px;
+			text-indent: 5px;
+		}
+
+		.time_style2 {
+			width: 20px;
+		}
+
+		.event_title {
+			width: 65px;
+			font-size: 14px;
+			text-align: right;
+			font-weight: bold;
+			color: #747473;
+			padding-left: 10px;
+			float: left;
+		}
+
+		.event_title_input input {
+			width: 570px;
+			font-size: 14px;
+			margin-left: 10px;
+			border-width: 0;
+		}
+
+		#my_form .time_style1, #my_form .time_style2 { color: #000; }
+
+		#remind_option { display: none; }
+	</style>
+	<script type="text/javascript" charset="utf-8">
+		function format_date(date, plus) {    //plus 减少的分钟数
+			if(typeof date  !='object') return date;
+
+			if (plus) {
+				var old_time = date.getTime();
+				var s = parseInt(plus) * 60 * 1000;
+				old_time = old_time - s;
+				date = new Date(old_time);
+			}
+
+
+			var year = date.getFullYear();
+			var month = date.getMonth() + 1;
+			if (month.toString().length == 1)   month = '0' + month;
+			var day = date.getDate();
+			if (day.toString().length == 1)   day = '0' + day;
+			var hour = date.getHours();
+			if (hour.toString().length == 1)   hour = '0' + hour;
+			var min = date.getMinutes();
+			if (min.toString().length == 1)   min = '0' + min;
+			var time = year + '-' + month + '-' + day + ' ' + hour + ':' + min;
+			return time;
+		}
+
+		function toDate(string) {
+
+			var year = string.slice(0, 4);
+			var month = string.slice(5, 7);
+			month = parseInt(month) - 1;
+			var day = string.slice(8, 10);
+			var hour = string.slice(11, 13);
+			var min = string.slice(14, 16);
+			return new Date(year, month, day, hour, min);
+
+		}
+
+		function init() {
+		
+					var url=window.location.search;
+			
+			var ids=url.split('=');
+			var id=ids[1];
+		
+			scheduler.config.xml_date = "%Y-%m-%d %H:%i";
+			scheduler.config.details_on_dblclick = true;
+			scheduler.config.details_on_create = true;
+			scheduler.config.multi_day = true;
+			scheduler.config.scroll_hour = 9 ;
+			scheduler.init('scheduler_here',null,'month');
+			
+			    //    data = new dhtmlXDataStore({
+          //  url: "${base}/admin/orderInfoManager/selectOrderInfos.action",
+           // datatype: "json"
+      //  });    
+		
+			scheduler.load("${base}/admin/orderInfoManager/selectOrderInfos.action?orderInfo.driverId="+id+"&cancel=1&etc="+new Date().getTime(),"json");
+			//scheduler.load("cat.json","json");
+            //scheduler.load("./data/events.json", function () {
+            //    scheduler.showLightbox("1261150564");
+            //});
+
+		}
+
+
+		
+	
+		scheduler.showLightbox = function (id) {
+	var order=scheduler.getEvent(id);
+		var orderId=order.approve;
+
+
+		if(orderId==null){
+		
+	/* 	window.top.createWindow({
+                'text':'车辆预定',
+                'id':'CarOrder',
+                'url':'${base}/form/fceform/common/run.html?djsn=oa_car_order_apply_for_wf&djtype=eden_form',
+                'width':'700',
+                'height':'500',
+                parent_ifr:window
+				});
+		setTimeout(function(){window.location.reload()}, 1000);  */
+		
+		
+		}
+	else{
+	
+			window.top.createWindow({
+                'text':'订单详情',
+                'id':'CarOrder',
+                'url':'${base}/form/fceform/common/run.html?djsn=oa_car_order_detail_for_shceduler&djtype=eden_form&id='+order.id,
+                'width':'700',
+                'height':'500',
+                parent_ifr:window
+				});
+				}
+		};
+		
+
+		function save_form() {
+			var ev = scheduler.getEvent(scheduler.getState().lightbox_id);
+			ev.text = $("#title").val();
+			ev.description = $("#description").val();
+			ev.start_date = toDate($("#start_date").val());
+			ev.end_date = toDate($("#end_date").val());
+			ev.is_remind=$('#isRemind').is(':checked');
+			ev.remind_date=$('#remind_date').val();
+			ev.remind_type=$('#remind_type').val();
+			console.log(ev);
+			scheduler.endLightbox(true, $("#my_form")[0]);
+		}
+		function close_form() {
+			scheduler.endLightbox(false, $("#my_form")[0]);
+		}
+
+		function delete_event() {
+			var event_id = scheduler.getState().lightbox_id;
+			scheduler.endLightbox(false, $("#my_form")[0]);
+			scheduler.deleteEvent(event_id);
+		}
+
+		function show_data() {
+			
+			$('#test').html(scheduler.toJSON());
+
+		}
+
+
+	</script>
+</head>
+<body onLoad="init();" style="height:100%;width:100%;">
+<!--<div id="test" style="position:absolute; top:3px; left:200px; z-index:100000">
+	<input name="" value="数据" onClick="show_data()" type="button">
+</div>-->
+<div id="my_form" class="dhx_cal_light dhx_cal_light_wide"
+     style=" display:none; height:550px;width:900px; top: 40px; left: 313px;">
+	<div class="dhx_cal_ltitle">
+	
+	
+		<div class="event_title">
+			<label for="title">订单ID:</label>
+		</div>
+		<div
+				class="event_title_input">
+			<input type="text" name="title" value="" id="title">
+		</div>
+		
+				<div type="hidden">
+		<input type="text" name ="id" value="" id="name">
+		</div>
+		<div class="dhx_close_icon"></div>
+	</div>
+	
+	
+	<div class="dhx_cal_larea" style="height: 251px;">
+		<div class="dhx_wrap_section">
+			<div style="width: 65px;" class="dhx_cal_lsection">
+				<label style="margin:0;" for="description">申请人:</label>
+			</div>
+			<div class="dhx_cal_ltext">
+				<input name="use_by" id="use_by"></input>
+			</div>
+		</div>
+		
+		<div class="dhx_wrap_section">
+			<label style="margin-left:25px;" for="start_date">开始时间:</label>
+			<input class="time_style1" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'})" name="start_date" value="" id="start_date">
+			<label for="end_date">结束时间:</label>
+			<input class="time_style1" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'})" name="end_date" value="" id="end_date">
+		</div>
+		
+			<div class="dhx_wrap_section">
+			<label style="margin-left:25px;" for="approve">审批:</label>
+			<input class="time_style1" type="text"  name="approve" value="" id="approve">
+			<label for="end_date">反馈:</label>
+			<input class="time_style1" type="text"  name="feedback" value="" id="feedback">
+		</div>
+		
+		
+	</div>
+	
+	
+	
+	<div class="dhx_wrap_section">
+		<label><input id="to_driver_id" name="to_driver_id" type="checkbox" value="">通知司机</label>
+		<label><input id="to_contact_people" name="to_contact_people" type="checkbox" value="">通知联系人</label>
+
+
+	</div>
+	
+	
+	<div class="dhx_btn_set dhx_left_btn_set dhx_save_btn_set">
+		<div dhx_button="1" class="dhx_save_btn"></div>
+		<div onClick="save_form()">保存</div>
+	</div>
+	<div class="dhx_btn_set dhx_left_btn_set dhx_cancel_btn_set">
+		<div dhx_button="1" class="dhx_cancel_btn"></div>
+		<div onClick="close_form()">取消</div>
+	</div>
+	<div class="dhx_btn_set dhx_right_btn_set dhx_delete_btn_set" style="float:right;">
+		<div dhx_button="1" class="dhx_delete_btn"></div>
+		<div onClick="delete_event()">删除</div>
+	</div>
+</div>
+<div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
+	<div class="dhx_cal_navline">
+		<div class="dhx_cal_prev_button">&nbsp;</div>
+		<div class="dhx_cal_next_button">&nbsp;</div>
+		<div class="dhx_cal_today_button"></div>
+		<div class="dhx_cal_date"></div>
+		<div class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
+		<div class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
+		<div class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+	</div>
+	<div class="dhx_cal_header"></div>
+	<div class="dhx_cal_data"></div>
+</div>
+</body>
+</html>

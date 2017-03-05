@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+    <head>
+    <meta charset="utf-8">
+    <title>知识广场</title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+    <script>
+        setSkinsCss("listCss,iconCss");
+    </script>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    </head>
+
+    <body style="height:100%;">
+
+<!--  body 的style  应属性加上 height:100%;   是为了计算页面高度   -->
+
+<div id="tree_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+      <div id="tree_search" class="tree_search"></div>
+      <div id="tree" style="width:100%; padding-top: 3px;"></div>
+    </div>
+
+<!-- tree_wrap 这个 div 用于放置 左侧树和搜索树的工具栏 -->
+
+<div id="grid_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+      <div id="grid_toolbar" style="height:30px; width:100%;">
+    <ul id="grid_toolbar_ul" class="toolbar_ul">
+           <li>
+           	<select name="" id="search">
+        		<option value="knowledge.title">标题</option>
+        		<option value="knowledge.author">作者</option>
+   			</select>
+           </li>
+          <li>
+        <input id="search_text" class="search_text" value="请输入关键字" name="" type="text">
+      </li>
+          <li>
+        <input class="search_btn search_icon" name="" onClick="SimpleSearch()" value="查 找" type="button">
+      </li>
+          <li id="advanced_search_btn" class="advanced_search">高级查找</li>
+        </ul>
+        <div id="advanced_search_bar" class="advanced_search_bar">
+        <table cellpadding="0" cellspacing="0" border="0" align="center">
+           <tr>
+            <td><label for="title">标题：</label><input  id='title' name="title" type="text" value=""></td>
+           	<td><label for="author">作者：</label><input  id='author' name="author" type="text" value=""></td>
+            <td><label for="data1">发布时间：</label><input  id='data1' name="data1" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" value="">到：</label><input  id='data2' name="data2" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" value=""></td>
+           </tr>
+           <tr>
+            <td></td>
+            <td></td>
+            <td><input class="search_btn search_icon" name="advancedSearch" onClick="advancedSearch()" value="查 找" type="button"></td>
+           </tr>
+         </table>
+        </div>
+  </div>
+      <div id="grid" style="width:100%;"></div>
+      <div id="grid_page" class="grid_page" style="width:100%;height:18px; padding-top:10px;"></div>
+    </div>
+</body>
+    <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+    <script>
+    var layout,treeObj,tree,treeSearch,grid,data,data2,form,option,sendUrl,knowledgeId;
+    var version='1';
+    var wf_name='meeting_manage';
+    
+	 window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+    <!--    设置dhtmlx各组件用到的图片的的路径-->
+    function init() {       //初始化 方法
+        layout = new dhtmlXLayoutObject(document.body, "1C");     //添加一个 3L的layout
+        layout.cells('a').hideHeader();         //隐藏 cell a 的 标题 ， b c 同理
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        <!-- 为layout添加监听事件    -->
+        <!-- onResizeFinish 为在layout大小变了之后触发 -->
+        <!-- onPanelResizeFinish 为在layout中一块区域大小变了之后触发 -->
+		
+        data = new dhtmlXDataStore({
+            url: "${base}/admin/knowledgeSquare/selectForSquare.action",
+            datatype: "json"
+        });     //添加一个 为DataStore
+        /*data.attachEvent("onXLE", function (){
+           $.getJSON("${base}/admin/count/selectByMap.action",function(json){
+
+          });//添加一个 为DataStore
+        });*/
+	    
+        layout.cells('a').attachObject('grid_wrap');
+        // 在 layout的 cell b上添加 ID为 grid_wrap 的div
+        grid = new dhtmlXGridObject('grid');
+        // 把 grid 添加到  ID为 grid的div中
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        //设置 grid上 图片的路径
+        grid.setHeader(" ,标题,作者,发布时间,操作");
+        //设置 grid每列的标题
+        grid.setColumnIds("check,title,author,publishTime,operate");
+        //设置 grid每列的数据  对应 json中的哪条数据
+        grid.setInitWidths("30,*,100,150,150");
+        //设置 每列的宽度
+        grid.setColTypes("ch,ro,ro,ro,link");
+        //设置每列的 类型
+        grid.init();
+        // 初始化grid
+        grid.enablePaging(true,15,999, 'grid_page', true);
+        //添加 grid的分页
+        //grid.enablePaging(fl, pageSize, pagesInGrp, parentObj, showRecInfo, recInfoParentObj)
+/*          @参数: fl - true|false - 是否分页
+        *   @参数: pageSize - 每页的行数
+        *   @参数: pagesInGrp - 可见的页面的数量
+        *   @参数: parentObj - 放置分页的 div的ID
+        *   @参数: showRecInfo - true|false - enable|disable showing of additional info about paging state
+        *   @参数: recInfoParentObj - ID or container which will be used for showing paging state
+*/
+
+        grid.setPagingSkin("toolbar");   //设置 分页的皮肤
+        grid.attachEvent("onRowSelect", doOnRowSelected);
+        grid.sync(data);                // grid从 DataStore中同步数据
+        page_layout();      // 调用page_layout方法   ,方法的声明在下面
+        var formData = [
+            { type:"settings", position:"label-left", labelWidth:"65", inputWidth:50 },
+            {
+                type:"fieldset", label:"评论", inputWidth:"350", offsetLeft:10,
+                list:[
+                    {
+                        type:"hidden", offsetTop:5, list:[
+                        { type:"input", name:"content", value:"", label:"评论内容",rows:4, inputWidth:200 },
+                
+                    ]
+                    },
+                    { type:"newcolumn", offset:40},
+                    {
+                        type:"hidden", offsetTop:5, list:[
+                         {type:"label",labelWidth:230},
+                         {type:"newcolumn"},
+                         {type:"button",value:"确认",name:"send"}
+                    ]
+                    }
+                    ]
+            }
+            ];
+        dhxWins = new dhtmlXWindows();
+        dhxWins.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        w1 = dhxWins.createWindow("w1", 20, 30, 400,300);
+        w1.setText("知识评论"); 
+        w1.center();
+        dhxWins.attachEvent('onClose', function (win) {
+            w1.hide();
+        });
+        w1.hide(); 
+        form = w1.attachForm(formData);//returns a dhtmlxForm object 
+        form.setSkin('dhx_terrace');
+        form.disableItem('send');
+        form.attachEvent('onButtonClick', function (id) {
+            if(id=='send'){
+                var sendUrl="${base}/admin/knowledgeSquare/insertToComment.action";
+                var content = form.getItemValue("content");
+                $.post(sendUrl,{"knowledgeComment.content":content,"knowledgeComment.knowledgeId":knowledgeId},function(result){
+                   if(result.result=="success"){
+                        form.disableItem('send');
+                        w1.hide();
+                   }
+                //$.dialog.tips(data.xmlDoc.reponseText);
+                $.dialog.tips(result.message);
+                });
+            }
+        });
+    }
+	
+	function  SimpleSearch(){
+		data.clearAll();
+		var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+		var clu = $("#search").val();
+		var url = '${base}/admin/knowledgeSquare/selectForSquare.action?'+clu+'='+window.encodeURI(value);
+		window.data.data.url = url;
+		data.load(url);
+    }
+
+    function  advancedSearch(){
+		data.clearAll();
+		var title = $("#title").val();
+		var author = $("#author").val();
+		var data1 = $("#data1").val();
+		var data2 = $("#data2").val();
+	    var s = "knowledge.title="+title+"&knowledge.author="+author+"&data1="+data1+"&data2="+data2;
+		var url = '${base}/admin/knowledgeSquare/selectForSquare.action?'+s;
+		window.data.data.url = url;
+		data.load(url);
+    }
+
+    function doOnRowSelected(id) {
+        $.post("${base}/admin/count/insert.action",{"knowledgeCount.knowledgeId":id,"knowledgeCount.status":0},function(){
+
+        });
+    }
+  	//执行任务
+    function execute(id){
+    	
+    	//$.dialog.tips("未定义");
+    	var item=data.item(id);
+    	
+    	//showWFLatest(wf_name,item.wfId);
+    	
+    	var task_name='';
+   
+    	itsm_doAction(item.wfId,wf_name,task_name,version);
+    }
+
+	//查看流程图
+	function viewFlow(id){
+		var item=data.item(id);
+		showWfHistory(item.wfId);
+	}
+	
+	
+
+	
+	
+	searchBarCommon('advanced_search_bar',60,'advanced_search_btn','grid_toolbar','grid');
+
+	function goasWin(title,url) {           //弹出窗口
+		var isWin = window.top.dhxWins.isWindow('goasWin');
+		if (isWin == true) return;
+		window.top.createWindow(
+				{   id      :'goasWin',
+					text    : title,
+					setModal: true,
+					url     : url,
+					width   :'650',
+					height  :'500',
+					parent_ifr : window
+				}
+			);
+		}
+	
+	function collect (id) {
+        $.post("${base}/admin/knowledgeSquare/insertToCollect.action",{"knowledge.id":id},function(result){
+                $.dialog.tips(result.message);
+        });
+    }
+
+    function comment (id) {
+        knowledgeId=id;
+        w1.show();
+        form.setItemFocus("content");
+        form.enableItem("send");
+    }
+
+    function page_layout() {                 // page_layout为控制页面布局的方法 ，  用于自适应窗口的大小
+        var grid_wrap_height = $('#grid_wrap').height();  //得到 ID为  grid_wrap 的div的高度
+        $('#grid').height(grid_wrap_height - 33 -35);    //设置  ID为  grid 的div的高度
+        if(grid)    grid.setSizes();                   // 如果grid 存在，则 让 grid 适应下窗口的大小
+
+    }
+    $(function () {
+        setTimeout(init, 0);                        //在 页面加载好后，触发init方法；
+		$('#grid_toolbar_ul li').last().addClass('last');   //为grid上面的一排按钮中的最后一个li添加一个为‘last’的class
+        $('#grid_toolbar_ul li').click(function(){       //那些按钮 点击之后 触发 toolbar_func 方法
+            var id=$(this).attr('btn_id');
+            toolbar_func(id);
+        });
+		
+		$("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+
+		
+    })
+</script>
+</html>

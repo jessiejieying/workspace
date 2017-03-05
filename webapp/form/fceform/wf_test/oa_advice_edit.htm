@@ -1,0 +1,61 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>
+
+//type: 0：修改 1：删除
+function sub(isdel)
+{
+   var op="修改";
+   if(isdel==1)
+   {
+
+      if(!confirm("是否删除该意见？"))
+      {
+            return;
+       }
+
+     $('#text4').val(0);
+     op="删除";
+   }
+
+   doSubmitData(function () {
+	$.dialog.tips(op+"成功!");
+          var con=$('#textarea1').val();
+     var createBy=$('#text2').val();
+      var createDate=$('#text3').val();
+
+   try{
+		window.edenCallBack(con,createBy,createDate,isdel);
+
+	}catch (e){
+
+    }
+  
+    
+
+   });
+
+
+
+}
+
+</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib contxml="<root><label><id>label1</id><id>label2</id><id>label3</id></label><textarea><id>textarea1</id></textarea><button><id>button1</id><id>button2</id></button><text><id>text2</id><id>text3</id><id>text4</id></text><dataset><id>dataset1</id></dataset></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:3;radio:0;listbox:0;textarea:1;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:2;text:4;hr:0;checkboxlist:0;radiolist:0;dropdownlist:0;grid:0;dataset:1;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" isCheckPermit="否" alertType="1" userType BLONclose BLONopenBefore BLONopen window="当前窗口" posheight poswidth postop posleft center="  " isfile="是" type="eden_wf" caption="意见编辑" dj_sn="oa_advice_edit" billtaborder="<root><taborder>textarea1</taborder><taborder>button1</taborder><taborder>text2</taborder><taborder>text3</taborder><taborder>button2</taborder><taborder>text4</taborder></root>" AutoResizeXml toolbar="不带工具栏"><TEXTAREA style="POSITION: absolute; WIDTH: 345px; HEIGHT: 85px; TOP: 28px; LEFT: 102px" id=textarea1 onmovestart=moveStart() cols=67 controltype="textarea" value="textarea1" field="ADVICE_CONTENT" china="意见内容" dataset="dataset1" induce="否"></TEXTAREA><INPUT style="POSITION: absolute; WIDTH: 126px; HEIGHT: 20px; TOP: 129px; LEFT: 103px" id=text2 onmovestart=moveStart() size=22 controltype="text" field="CREATE_BY" china="创建人" dataset="dataset1"><LABEL style="POSITION: absolute; WIDTH: 65px; HEIGHT: 15px; TOP: 26px; LEFT: 29px" id=label1 onmovestart=moveStart() controltype="label" inputTag="否">意见内容：</LABEL><LABEL style="POSITION: absolute; WIDTH: 65px; HEIGHT: 15px; TOP: 127px; LEFT: 41px" id=label2 onmovestart=moveStart() controltype="label" inputTag="否">创建者：</LABEL><LABEL style="POSITION: absolute; WIDTH: 65px; HEIGHT: 15px; TOP: 166px; LEFT: 51px" id=label3 onmovestart=moveStart() controltype="label" inputTag="否">时间：</LABEL><INPUT style="POSITION: absolute; WIDTH: 124px; HEIGHT: 20px; TOP: 167px; LEFT: 104px" id=text3 onmovestart=moveStart() size=22 controltype="text" onclick="bill_onclick(&quot;WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})&quot;)" field="CREATE_DTTM" china="创建时间" dataset="dataset1"><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; TOP: 241px; PADDING-TOP: 0px; LEFT: 152px" id=button1 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("sub(0)")'>修改意见</BUTTON><?xml:namespace prefix = fc /><fc:dataset id=dataset1 controltype="dataset" format="<fields><field><fieldname>ADVICE_CONTENT</fieldname><datatype>字符</datatype><displaylabel>意见内容</displaylabel><size>512</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CREATE_BY</fieldname><datatype>字符</datatype><displaylabel>创建人</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CREATE_DTTM</fieldname><datatype>时间</datatype><displaylabel>创建时间</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>id</fieldname><datatype>字符</datatype><displaylabel>id</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>data_valid</fieldname><datatype>字符</datatype><displaylabel>data_valid</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>1</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" isInAddStatus="是" idtype="1" opensortno="1" isSubGrid="否" issubds="否" idparam="BBB" savetable="oa_document_advice" submitno="1" submittype="1" isaddemptyrec="否" pubpara="否" onValid='bill_ondatasetvalid("<dsid><ADVICE_CONTENT></ADVICE_CONTENT><CREATE_BY></CREATE_BY><CREATE_DTTM></CREATE_DTTM><id></id><data_valid></data_valid></dsid>")' onGetText='bill_ondatasetgettext("<dsid><ADVICE_CONTENT></ADVICE_CONTENT><CREATE_BY></CREATE_BY><CREATE_DTTM></CREATE_DTTM><id></id><data_valid></data_valid></dsid>")' onSetText='bill_ondatasetsettext("<dsid><ADVICE_CONTENT></ADVICE_CONTENT><CREATE_BY></CREATE_BY><CREATE_DTTM></CREATE_DTTM><id></id><data_valid></data_valid></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6Xrn%E0%D6Xr%94%D0%D6%FA%E0%D4%D8%CC%D4%EC%EA%F6%D8%EA%F6Xr%94%D6%D0%F6%D0%CC%FA%D0%E6%E0%D6Xr%94%D4%F2%D8%D0%F6%D8%CC%D2%u0100Xr%94Xrn%D4%F2%D8%D0%F6%D8%CC%D6%F6%F6%E8Xrn%94%B2%98%90%B6%98%CC%96%B6%B6%A8Xrn%DA%F2%EC%E8Xrn%EC%D0%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%D0%D6%FA%E0%D4%D8XrnXn%96Xn%90%FC%DE%D8%F2%D8Xrn%E0%D6Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%E0%D6XrrXr%80X%7C%96Xt%90Xr%7C"></fc:dataset><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; TOP: 241px; PADDING-TOP: 0px; LEFT: 246px" id=button2 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("sub(1)")'>删除意见</BUTTON><INPUT style="POSITION: absolute; WIDTH: 84px; DISPLAY: none; HEIGHT: 20px; TOP: 176px; LEFT: 294px" id=text4 onmovestart=moveStart() size=15 controltype="text" field="data_valid" china="data_valid" dataset="dataset1"></DIV><div id='addHtml'></div> </body></html>

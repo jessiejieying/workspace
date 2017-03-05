@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+<#include "/aufw/page/include/head.html">
+<style type="text/css">
+.bsgrid td{
+   text-align:center;
+   padding-left:0;
+}
+</style>
+</head>
+<body style="height: 100%;" class="statistics">
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+
+          <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+              <div class="form-group statistics-condition header-group">
+                  <span class="span-bold header-title">年度:</span>
+                  <input name="year" id="year" class="Wdate tool-bar-input" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy'})" size="19" type="text">
+                  <span class="span-bold header-title margin-left-out">月份:</span>
+                  <input name="startmonth" id="meeting_start_month" class="Wdate tool-bar-input" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'M'})" size="19" type="text">
+                  <span class="header-title margin-left-in">至</span>
+                  <input name="endMonth" id="meeting_end_month" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'M'})" size="19" type="text">
+                  <div  class="button button-main margin-left-out js-statistics">统计</div>
+                  <div id="exportButton" class="button button-main margin-left-in js-statistics">导出</div>
+              </div>
+                <div class="statistics-tab">
+                    <div class="clearfix">
+                        <div id="" class="tab-btn" style="display:none;">导出</div>
+                    </div>
+                    <div class="tab-content-show">
+                        <span id="condition" class="float-left"></span>
+                        <span style="float:right;margin-right:14px;">统计时间：${.now?string("yyyy.MM.dd")}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                    <th w_hidden="true" class="hidden"></th>
+                    <th width="40"></th>
+                    <th width="150"></th>
+                   <#list meetingLevelDictList as dict>
+                     <th  width="150" colspan="2">${dict.dictName}</th>
+                   </#list>
+                   <th colspan="2" width="150">三类会议(备案)</th>
+                   <th colspan="2" width="150">三类会议(审批)</th>
+                   <th colspan="2">总计</th>
+                </tr>
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th width="40">序号</th>
+                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+                  <th w_index="mainorg" width="150">申报单位</th>
+                  <#list meetingLevelDictList as dict>
+                    <th w_index="count1${dict_index}" width="75">上一年度</th>
+                    <th w_index="count0${dict_index}" width="75">本年度</th>
+                  </#list>
+                  <#list meetingwpDictList as dict>
+                      <th w_index="count1${meetingLevelDictList.size()+dict_index}" width="75">上一年度</th>
+                      <th w_index="count0${meetingLevelDictList.size()+dict_index}" width="75">本年度</th>
+                  </#list>
+                  <th w_index="total1">上一年度</th>
+                  <th w_index="total0">本年度</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script>
+	var gridOne;
+	var selectURL = "${base}/admin/meeting/meetingInfoStatisticByOrgMoM.action";
+	var time = [  ];
+	var chartReadData = [];
+	var chartDealData = [];
+	var chartTotalData = [];
+	var chart;
+	var condition = "";
+	$(function() {
+		layOut("#common_table", "#grid_table");
+
+	//统计功能
+		$(".js-statistics").click(function(){
+			var start_month=$("#meeting_start_month").val();
+		    var end_month=$("#meeting_end_month").val();
+		    var year= $("#year").val();
+		    var mainOrg= $("#mainOrg").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    }
+		      
+		    gridOne.changeUrl(selectURL + symbol + 'year=' + year +'&start_month='+start_month+"&end_month="+end_month+'&etc='+'&etc='+new Date().getTime());
+		});
+		//验证起始日期和截止日期
+	     $(document).on("focus","#meeting_start_month",function(){
+       	var start_month=$("#meeting_start_month").val();
+       	var end_month=$("#meeting_end_month").val();
+       	if($.trim(end_month)!=""){
+       	   if($.trim(start_month)!=""){
+       		   if(parseInt(start_month)>parseInt(end_month)){
+       			   layer.msg("起始月份不能大于截止月份");
+       			   return;
+       		   }
+       	   }else{
+       		layer.msg("请选择起始月份");
+       		   return;
+       	   }
+       	}
+       });
+       $(document).on("focus","#meeting_end_month",function(){
+       	var start_month=$("#meeting_start_month").val();
+       	var end_month=$("#meeting_end_month").val();
+       	if($.trim(end_month)!=""){
+       	   if($.trim(start_month)!=""){
+       		   if(parseInt(start_month)>parseInt(end_month)){
+       			layer.msg("起始月份不能大于截止月份");
+       			   return;
+       		   }
+       	   }else{
+       		layer.msg("请选择起始月份");
+       		   return;
+       	   }
+       	}
+       });
+	    //导出功能
+    	$(document).on("click","#exportButton",function(){
+    		var start_month=$("#meeting_start_month").val();
+		    var end_month=$("#meeting_end_month").val();
+		    var year= $("#year").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    }
+	        window.location = "${base}/admin/meeting/meetingInfoStatisticByOrgMoMExport.action" + symbol + 'year=' + year  +'&start_month='+start_month+"&end_month="+end_month+'&etc='+ '&etc='+new Date().getTime();
+		});
+
+
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?etc=" + new Date().getTime(),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				$("#condition").html(gridData.condition);
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				var totalRecord=gridOne.getAllRecords();
+				$("tr","#manage_grid_bot").each(function(){
+					$("td",this).eq(1).css("padding-left","0px");					
+				});
+				$("#manage_grid_bot tbody tr").each(function(index){
+					var $this=$(this);
+	        		$index=parseInt($this.attr("index"));
+	        		$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        		var record=gridOne.getRecord(index);
+	        		if($this.find("td").eq(1).html()!=totalRecord.length){
+	        			if(record.total0>record.total1){
+		        		    $("td",$this).each(function(){
+		        		    	$(this).css("color","red");
+		        		    });
+		        		}	
+	        		}
+				});
+				time = [];
+				chartData = [];
+				var data = gridOne.getAllRecords();
+ 				for(var i = 0,l = data.length; i < l; i++){
+					time[i] = data[i].year;
+					chartReadData[i] = data[i].read;
+					chartDealData[i] = data[i].deal;
+					chartTotalData[i] = data[i].total;
+				}
+			}
+		});
+
+
+
+		$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印", url:"${base}/admin/documentStatistics/incomingStatisticByYearPrintWin.action?etc=" + new Date().getTime(),width:'900',height:'550', id:"incomingStatisticByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});
+
+	});
+	
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>
+
+var isAddUser=$urlParam('isAddUser');  //是否是增加传阅人
+
+function load()
+{
+   var mainDataset=window.data_readpassdb; 
+   var dataItem=mainDataset.item(mainDataset.idByIndex(0));
+  
+   var isPassing=0; //是否正在传阅
+     if(dataItem)
+    {
+        if(dataItem.data_valid==1)
+        {
+           if(!isAddUser)
+           {
+		       $.dialog.alert('此公文已开启传阅,请先停止传阅或添加传阅人！');
+		   
+               setTimeout(function(){
+
+				 try {
+                       window.edenCallBack(); 
+                    } catch (e) {
+
+					}  
+				},2000);
+
+           }
+           
+            isPassing=1;
+        }
+	
+    }
+    if(isAddUser&&isPassing==0)
+    {
+        $.dialog.alert('当前未在传阅！');
+       
+
+         setTimeout(function(){
+
+				 try {
+                       window.edenCallBack(); 
+                    } catch (e) {
+
+				}  
+		},2000);
+     }
+	 
+	 var orgId= $urlParam('orgId');
+	 var notSelect= $urlParam('notSelect');
+	 var orgTree=window.selTree_tree;
+	 if(orgId)
+    {
+       orgTree.selectItem(orgId);
+       var name=orgTree.getAttribute(orgId,"text");
+       $('#selTxt_tree').text(name);
+      
+    }
+	if(notSelect==1) //不能选择的
+    {
+	  $('#sel_tree').attr('disabled','disabled');
+	  $('#sel_btn_tree').unbind( "click" );
+	 
+
+   }
+   changeOrg()
+	 $('#grid_grid1 .hdrcell:first').append('<input style="margin-left:-15px;width:16px;height:16px;" type="checkbox"  class="check_all" id="checkAll" onclick="selectAllCheck(this)">');
+	var grid=getGrid('grid1');
+	grid.enableStableSorting(true);
+	grid.attachEvent("onRowDblClicked", function(rId,cInd){
+	  addItemCommon(rId);
+	});  
+ 
+}
+function changeOrg(){
+	var id=window.selTree_tree.getSelectedItemId();
+	var org_code=window.selTree_tree.getUserData(id,'org_code');
+	if(!org_code)
+	{
+	  org_code="";
+	}
+	var sql = "SELECT a.account_name, b.user_name FROM ea_account_info a LEFT JOIN ea_user_info b ON a.user_id = b.user_id WHERE a.dep_code LIKE '"+org_code+"%'";
+	setDsSql('ds1', sql);
+	refreshDsById('ds1');
+
+}
+function addItemCommon(id){
+	var grid=getGrid('grid1');
+	var checkedID;
+	if(id){
+	checkedID=id+"";
+	}else{
+	checkedID=grid.getCheckedRows(0);
+	}
+	var ds=getDs('ds1');
+	var sel=$('#userSel');
+	if(checkedID.length>0){
+		checkedID=checkedID.split(',');
+		for (var i = 0; i < checkedID.length; i++) {
+			var id = checkedID[i];
+			var thisItem=ds.item(id);
+			$('#user_'+thisItem.account_name).remove();
+			sel.append('<option id="user_'+thisItem.account_name+'" value="'+thisItem.account_name+'">'+thisItem.user_name+'</option>');
+
+		}
+	}else{
+		$.dialog.tips('请至少选上一人!',2);
+	}
+
+}
+function delItemCommon(){
+	$("#userSel option:selected").remove();
+}
+
+function btn_ok(){
+	var userId=[];
+	var userName=[];
+	$("#userSel option").each(function(){
+		userId.push($(this).val());
+		userName.push($(this).text());
+	});
+	
+	if(isAddUser)  //增加传阅人时
+	{
+		
+		var newpassers=$('#text2').val(); 
+	   
+		for(var i=0;i<userId.length;i++)
+		{
+		  
+			if(userId[i])
+			{
+				newpassers=addPasser(userId[i],newpassers);
+			}
+		
+		}
+		userId=newpassers;
+		$('#text2').val(userId);
+		doSub();
+		
+	}else{  //开启传阅时
+	   var title=$urlParam('title');
+	  title=decodeURI(title);
+	  $('#titleId').val(title)
+
+	  //设置可传阅
+	  $('#dataValidId').val(1);
+		$('#text2').val(userId);
+		
+		var wfId=$urlParam('wfId');
+		var getShowUrlAction=project+"/admin/documentwf/getShowUrlByWfid.action?wfId="+wfId;
+	  	$.post(getShowUrlAction,"",function(result){
+	          if(result)
+			  {
+			     var showPassSendUrl=result.showUrl;
+				 if(showPassSendUrl)
+				 {
+					//  var showPassSendUrl=$urlParam('showPassSendUrl');
+					showPassSendUrl=showPassSendUrl+"&pass=1";
+					showPassSendUrl=decodeURIComponent(showPassSendUrl);
+						$('#showUrlId').val(showPassSendUrl)
+				       doSub();
+				 }else{
+				   $.dialog.tips("提交失败!");
+				 }
+			  }
+		});
+	}
+
+	
+
+	
+	
+}
+
+
+function doSub()
+{
+	doSubmitData(function () {
+		$.dialog.tips("传阅成功!");
+		  
+		 window.setTimeout(function () {
+						try {
+						   window.edenCallBack(); 
+						} catch (e) {
+
+						}
+		   }, 300);
+	  
+
+   });
+
+}
+
+//添加传阅人
+function addPasser(addpasser,signs)
+{
+
+	var returnSign="";
+	     if(signs)
+	     {
+			 var hasName=0;  //是否已经包含了
+			 var valspl=signs.split(",");  //排重
+			 for(var i=0;i<valspl.length;i++)
+			{
+				
+				 if(addpasser==valspl[i])
+			     {
+					 hasName=1; //有了该阅者 
+					 
+			     }
+				 
+			}
+			 if(hasName==0) //加入阅者
+		     {
+				 signs+=","+addpasser;
+		     }
+			 returnSign=signs;
+			 
+	     }else{  //前面没有阅者
+	    	 
+	    	 
+	    	 returnSign=addpasser;
+	     }
+	
+	return returnSign;
+}
+function selectAllCheck(obj){
+	window.event? window.event.cancelBubble = true : e.stopPropagation();
+	var grid=getGrid('grid1');
+		var ids = grid.getAllRowIds();
+    	//console.log(ids);
+    	var idsArr = ids.split(',');
+    	//alert(idsArr.length);
+    	var nowPage = grid.currentPage;
+    	var pageItemsLength = grid.rowsBufferOutSize;
+    	var allItemsLength = grid.rowsBuffer.length;
+    	
+    	var forBigen = pageItemsLength*(nowPage-1);
+    	var forOver = pageItemsLength*(nowPage);
+    	if (forOver>allItemsLength){
+    		forOver = allItemsLength
+    	}
+		if($(obj).is(':checked')){
+		 for(i=forBigen;i<forOver;i++){
+    		var forId = idsArr[i];
+    		var check = grid.cellById(forId, 0).getValue();
+    		grid.cellById(forId, 0).setValue(1);
+    	} 
+		}else{
+			for(i=forBigen;i<forOver;i++){
+    		var forId = idsArr[i];
+    		var check = grid.cellById(forId, 0).getValue();
+    		grid.cellById(forId, 0).setValue(0);
+    	}
+		}	
+}
+</script><script >document.styleSheets[0].addRule("fc\\:fc_code","behavior: url(../../fceform/htc/fc_code.htc)",0);</script><script >document.styleSheets[0].addRule("fc\\:webgrid","behavior: url(../../fceform/htc/webgrid.htc)",0);</script><script src='../../fceform/js/fcwebgrid.js'></script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib userType BLONopenBefore BLONclose center="  " BLONopen="load()" toolbar="不带工具栏" dj_sn="selReadPasserUser" type="eden_form" caption="选择传阅用户" window="当前窗口" posleft postop poswidth posheight isfile="是" billtaborder="<root><taborder>grid1</taborder><taborder>userSel</taborder><taborder>button3</taborder><taborder>tree</taborder><taborder>button4</taborder><taborder>button5</taborder><taborder>text2</taborder><taborder>titleId</taborder><taborder>showUrlId</taborder><taborder>dataValidId</taborder></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:3;radio:0;listbox:1;textarea:0;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:5;text:5;hr:0;checkboxlist:0;radiolist:0;dropdownlist:1;grid:0;dataset:1;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" contxml="<root><label><id>label2</id><id>label3</id></label><listbox><id>userSel</id></listbox><button><id>button3</id><id>button4</id><id>button5</id></button><text><id>text2</id><id>titleId</id><id>showUrlId</id><id>dataValidId</id></text><dropdownlist><id>tree</id></dropdownlist><grid><id>grid1</id></grid><dataset><id>ds1</id><id>readpassdb</id></dataset></root>" alertType="1" isCheckPermit="否" AutoResizeXml><?xml:namespace prefix = fc /><fc:dataset id=ds1 controltype="dataset" idtype="1" opensortno="1" issubds="否" submitno="1" submittype="4" isaddemptyrec="否" pubpara="否" isSubGrid="否" format="<fields><field><fieldname>account_name</fieldname><datatype>字符</datatype><displaylabel>账户名</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>user_name</fieldname><datatype>字符</datatype><displaylabel>姓名</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><account_name></account_name><user_name></user_name></dsid>")' onGetText='bill_ondatasetgettext("<dsid><account_name></account_name><user_name></user_name></dsid>")' onSetText='bill_ondatasetsettext("<dsid><account_name></account_name><user_name></user_name></dsid>")' sqltrans="%B4%98%A6%98%94%B6Xn%96Xn%90Xn%80%D0j%D0%D4%D4%EC%F8%EA%F6%CC%EA%D0%E8%D8Xr%94Xn%96Xn%90Xn%80%D2j%F8%F4%D8%F2%CC%EA%D0%E8%D8Xn%96Xn%90%9A%B2%AC%A8Xn%96Xn%90Xn%80%D8%D0%CC%D0%D4%D4%EC%F8%EA%F6%CC%E0%EA%DA%ECXrn%D0Xn%96Xn%90%A6%98%9A%B6Xrn%A2%AC%A0%AAXrn%D8%D0%CC%F8%F4%D8%F2%CC%E0%EA%DA%ECXrn%D2Xrn%AC%AAXrn%D0j%F8%F4%D8%F2%CC%E0%D6XrnXt%96Xrn%D2j%F8%F4%D8%F2%CC%E0%D6"></fc:dataset> <fc:webgrid onkeydown='bill_ongridkeydown("<grid1><col></col><col></col></grid1>")' id=grid1 ondblclick='bill_ongriddblclick("<grid1><col></col><col></col></grid1>")' onclick='bill_ongridclick("<grid1><col></col><col></col></grid1>")' dataset="ds1" controltype="grid" format="<cols><col><fname>account_name</fname><cname>账户名</cname><width>50</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col><col><fname>user_name</fname><cname>姓名</cname><width>50</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col></cols>" visible="是" height="238" width="379" top="42" left="28" autowidth="undefined" bodyrowheight="-1" bodyrows="20" autoheight="undefined" autoappend="undefined" readonly="否" showCheckbox="是" colSort="str,str" colType="ro,ro" colWidth="200,*" isPage="是">
+<TABLE style="BORDER-COLLAPSE: collapse; TABLE-LAYOUT: fixed; TOP: 0px; LEFT: 0px" id=t cellSpacing=0 cellPadding=1 frame=box>
+<TBODY>
+<TR class=fcGridFirstRow>
+<TD></TD></TR></TBODY></TABLE></fc:webgrid><BUTTON style="POSITION: absolute; WIDTH: 75px; HEIGHT: 25px; TOP: 314px; LEFT: 310px" id=button3 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("btn_ok()")'>确定</BUTTON><SELECT style="POSITION: absolute; WIDTH: 140px; HEIGHT: 220px; TOP: 40px; LEFT: 511px" id=userSel onmovestart=moveStart() multiple size=8 controltype="listbox" datasourceName async="否" temptext tempvalue check="1" sql sqltrans></SELECT> <fc:fc_code id=tree class=ef_design_dropdownlist onchange='bill_onclick("changeOrg()")' field="undefined" dataset="undefined" controltype="dropdownlist" datasourceName="" format="" FieldNameList="" isTreeNewSql="0" isShowTree="1" xml="" multiselect="否" addrow="否" blnempty="否" blninput="是" rootNodeId="B00001" visible="是" sqltrans="%F4%D8%E6%D8%D4%F6Xrn%EC%F2%DC%CC%E0%D6XrnXr%94Xrn%EE%D0%F2%D8%EA%F6%CC%E0%D6XrnXr%94Xrn%EC%F2%DC%CC%EA%D0%E8%D8XrnXr%94Xrn%EC%F2%DC%CC%D4%EC%D6%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%EC%F2%DC%CC%F6%F2%D8%D8Xrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%EC%F2%DC%CC%F4%D8%F0Xr%94%EC%F2%DC%CC%D4%EC%D6%D8" height="23" width="185" top="12" left="144" position="absolute" align="undefined" sql2="undefined" enabled="false"></fc:fc_code><LABEL style="POSITION: absolute; WIDTH: 109px; FONT-FAMILY: 宋体; HEIGHT: 23px; TOP: 16px; FONT-WEIGHT: bold; LEFT: 33px" id=label2 onmovestart=moveStart() controltype="label" inputTag="否">按所在部门查询：</LABEL><BUTTON style="POSITION: absolute; WIDTH: 75px; HEIGHT: 25px; TOP: 95px; LEFT: 425px" id=button4 class=ef_button title=添加人员 onmovestart=moveStart() controltype="button" onclick='bill_onclick("addItemCommon()")'>&gt;&gt;</BUTTON><BUTTON style="POSITION: absolute; WIDTH: 75px; HEIGHT: 25px; TOP: 142px; LEFT: 426px" id=button5 class=ef_button title=删除人员 onmovestart=moveStart() controltype="button" onclick='bill_onclick("delItemCommon()")'>&lt;&lt;</BUTTON><LABEL style="POSITION: absolute; WIDTH: 128px; FONT-FAMILY: 宋体; HEIGHT: 22px; TOP: 16px; FONT-WEIGHT: bold; LEFT: 513px" id=label3 onmovestart=moveStart() controltype="label" inputTag="否">已添加的人员：</LABEL><fc:dataset id=readpassdb controltype="dataset" idtype="8" opensortno="1" issubds="否" idparam="BBB" savetable="oa_document_readpass" submitno="1" submittype="1" isaddemptyrec="否" pubpara="否" isSubGrid="否" isInAddStatus="是" format="<fields><field><fieldname>id</fieldname><datatype>字符</datatype><displaylabel>id</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>title</fieldname><datatype>字符</datatype><displaylabel>title</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>wf_id</fieldname><datatype>字符</datatype><displaylabel>流程id</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>$urlParam('wfId')</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>dtype</fieldname><datatype>字符</datatype><displaylabel>类型：如正式文</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>$urlParam('dtype')</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>readers</fieldname><datatype>字符</datatype><displaylabel>传阅的人</displaylabel><size>500</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>show_url</fieldname><datatype>字符</datatype><displaylabel>show_url</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>$urlParam('showPassSendUrl')</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>data_valid</fieldname><datatype>整数</datatype><displaylabel>data_valid</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>1</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>create_dttm</fieldname><datatype>时间</datatype><displaylabel>创建时间</displaylabel><size>19</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>GetTime()</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><id></id><title></title><wf_id></wf_id><dtype></dtype><readers></readers><show_url></show_url><data_valid></data_valid><create_dttm></create_dttm></dsid>")' onGetText='bill_ondatasetgettext("<dsid><id></id><title></title><wf_id></wf_id><dtype></dtype><readers></readers><show_url></show_url><data_valid></data_valid><create_dttm></create_dttm></dsid>")' onSetText='bill_ondatasetsettext("<dsid><id></id><title></title><wf_id></wf_id><dtype></dtype><readers></readers><show_url></show_url><data_valid></data_valid><create_dttm></create_dttm></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6XrnbXrn%DA%F2%EC%E8Xrn%EC%D0%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%F2%D8%D0%D6%EE%D0%F4%F4XrnXn%96Xn%90%FC%DE%D8%F2%D8Xrn%FC%DA%CC%E0%D6Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%FC%DA%A0%D6XrrXr%80X%7C%96Xt%90Xr%7CXrn%D0%EA%D6Xrn%D6%D0%F6%D0%CC%FA%D0%E6%E0%D6Xt%96p"></fc:dataset><INPUT style="POSITION: absolute; WIDTH: 110px; DISPLAY: none; HEIGHT: 20px; TOP: 352px; LEFT: 176px" id=text2 onmovestart=moveStart() china="传阅的人" field="readers" dataset="readpassdb" controltype="text"><INPUT style="POSITION: absolute; WIDTH: 110px; DISPLAY: none; HEIGHT: 20px; TOP: 317px; LEFT: 132px" id=titleId onmovestart=moveStart() china="title" field="title" dataset="readpassdb" controltype="text"><INPUT style="POSITION: absolute; WIDTH: 110px; DISPLAY: none; HEIGHT: 20px; TOP: 379px; LEFT: 68px" id=showUrlId onmovestart=moveStart() china="show_url" field="show_url" dataset="readpassdb" controltype="text"><INPUT style="POSITION: absolute; WIDTH: 110px; DISPLAY: none; HEIGHT: 20px; TOP: 397px; LEFT: 351px" id=dataValidId onmovestart=moveStart() china="data_valid" field="data_valid" dataset="readpassdb" controltype="text"></DIV><div id='addHtml'><style>
+
+</style>
+</div> </body></html>

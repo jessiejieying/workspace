@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+<html >
+<head><meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>会议报名表</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/apply.css">
+  <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+  <style>
+  .oa-form-grid td a{ font-size:13px;}
+  .findSame td{
+    color:red;
+  }
+   .findSame td a{
+    color:red;
+  }
+  #entry_table td{
+    padding-left:0px;
+    text-align:center;
+  }
+  #leave_table td{
+    padding-left:0px;
+    text-align:center;
+  }
+  </style>
+</head>
+<body>
+  <div class="oa-meeting-entry" style="padding-top: 10px;width:900px;">
+   <div class="clearfix"  style="width: 900px;margin: 0 auto;">
+       <h6 class="form-ft-song margin-bottom">参会人员名单</h6>
+       <table id="entry_table" class="bsgrid oa-form-grid  border-top-blue margin-bottom20 centerBlock" style="width: 900px !important;" >
+           <tr  class="nodrop nodrag">
+               <th width="40" class="padding-left8">序号</th>
+               <th width="80" >姓名</th>
+               <th width="40" class="padding-left8">性别</th>
+               <th width="100">所属单位</th>
+               <th width="100">职务/职称</th>
+               <th width="100">电话</th>
+               <th width="60" >民族</th>
+               <th width="100">备注</th>
+               <th width="60">房间号</th>
+               <th width="60">座位号</th>
+               <th width="100">报名时间</th>
+               <th width="60">转移位置</th>
+           </tr>
+           
+           <#list meetingJoinPeopleList! as mPeople>
+             <#if mPeople.color??>
+                <tr class="findSame js-body-tr" id="${mPeople.id!}">
+                   <td><span class="js-sequence"></span></td>
+                   <td title="${mPeople.name!}">${mPeople.name!}</td>
+                   <td title="<#if mPeople.sex?? && mPeople.sex=1>男<#else>女</#if>"><#if mPeople.sex?? && mPeople.sex=1>男<#else>女</#if></td>
+                   <td title="${mPeople.signOrg!}"><a target="_blank" onclick="meetingSignView('${meetingId!}','${mPeople.signOrg!}')">${mPeople.signOrg!}</a></td>
+                   <td title="${mPeople.duty!}">${mPeople.duty!}</td>
+                   <td title="${mPeople.phone!}">${mPeople.phone!}</td>
+                   <td title="${mPeople.nation!}">${mPeople.nation!}</td>
+                   <td title="${mPeople.remark!}">${mPeople.remark!}</td>
+                   <td title="${mPeople.room!}" class="padding-left8"><input style="width: 90%;border:0;" class="td-input js-room" type="text" value="${mPeople.room!}"/></td>
+                   <td title="${mPeople.seat!}" class="padding-left8"><input style="width: 90%;border:0;" class="td-input js-seat" type="text" value="${mPeople.seat!}"/></td>
+                   <td title="${(mPeople.createDttm)?datetime}">${(mPeople.createDttm)?datetime}</td>
+                   <td title="">
+                   <select class="serialNumber" >
+                    <#list 1..meetingJoinPeopleList.size() as i>
+                   <option value="${i}" <#if i=(mPeople_index+1)> selected="selected" </#if>>${i}</option>
+                    </#list>
+                   </select>
+                   </td>
+               </tr>
+              <#else>
+                 <tr class="js-body-tr" id="${mPeople.id!}">
+                   <td><span class="js-sequence"></span></td>
+                   <td title="${mPeople.name!}">${mPeople.name!}</td>
+                   <td title="<#if mPeople.sex?? && mPeople.sex=1>男<#else>女</#if>"><#if mPeople.sex?? && mPeople.sex=1>男<#else>女</#if></td>
+                   <td title="${mPeople.signOrg!}"><a target="_blank" onclick="meetingSignView('${meetingId!}','${mPeople.signOrg!}')">${mPeople.signOrg!}</a></td>
+                   <td title="${mPeople.duty!}">${mPeople.duty!}</td>
+                   <td title="${mPeople.phone!}">${mPeople.phone!}</td>
+                   <td title="${mPeople.nation!}">${mPeople.nation!}</td>
+                   <td title="${mPeople.remark!}">${mPeople.remark!}</td>
+                   <td title="${mPeople.room!}" class="padding-left8"><input style="width: 90%;border:0;" class="td-input js-room" type="text" value="${mPeople.room!}"/></td>
+                   <td title="${mPeople.seat!}" class="padding-left8"><input style="width: 90%;border:0;" class="td-input js-seat" type="text" value="${mPeople.seat!}"/></td>
+                   <td title="${(mPeople.createDttm)?datetime}">${(mPeople.createDttm)?datetime}</td>
+                   <td title="">
+                   <select class="serialNumber" >
+                    <#list 1..meetingJoinPeopleList.size() as i>
+                   <option value="${i}" <#if i=(mPeople_index+1)> selected="selected" </#if>>${i}</option>
+                    </#list>
+                   </select>
+                   </td>
+               </tr>
+             </#if>
+            
+           </#list>
+       </table>
+       <div class="float-right margin-top" style="display:none;">
+           <button class="button common-skin-btn-syle01" id="">上移</button>
+           <button class="button common-skin-btn-syle01" id="">下移</button>
+           <button class="button common-skin-btn-syle01 " id="">增加行</button>
+           <button class="button common-skin-btn-syle01 " id="">插入行</button>
+           <button class="button common-skin-btn-syle01" id="">删除行</button>
+       </div>
+   </div>
+  <br/>
+  <div class="clearfix centerBlock"  style="width: 900px;margin: 0 auto;">
+  <h6 class="form-ft-song margin-bottom">请假人员名单</h6>
+  <table id="leave_table" class="bsgrid oa-form-grid  border-top-blue margin-bottom20 centerBlock"style="width: 900px !important;">
+      <tr  class="nodrop nodrag">
+          <th width="40"class="padding-left8">序号</th>
+          <th width="80">姓名</th>
+          <th width="40" class="padding-left8">性别</th>
+          <th width="100"  >所属单位</th>
+          <th width="100">职务/职称</th>
+          <th width="100">电话</th>
+          <th width="60" >民族</th>
+          <th width="100">备注</th>
+          <th width="60">房间号</th>
+          <th width="60">座位号</th>
+          <th width="100">报名时间</th>
+          <th width="60">转移位置</th>
+      </tr>
+    <#list meetingLeavePeopleList! as mPeople>
+      <#if mPeople.color??>
+         <tr class="findSame js-body-tr" id="${mPeople.id!}">
+		     <td><span class="js-sequence"></span></td>
+		     <td title="${mPeople.name!}">${mPeople.name!}</td>
+		     <td title="<#if mPeople.sex?? && mPeople.sex=1>男<#else>女</#if>"><#if mPeople.sex?? && mPeople.sex=1>男<#else>女</#if></td>
+		     <td title="${mPeople.signOrg!}"><a target="_blank"  onclick="meetingSignView('${meetingId!}','${mPeople.signOrg!}')">${mPeople.signOrg!}</a></td>
+		     <td title="${mPeople.duty!}">${mPeople.duty!}</td>
+		     <td title="${mPeople.phone!}">${mPeople.phone!}</td>
+		     <td title="${mPeople.nation!}">${mPeople.nation!}</td>
+		     <td title="${mPeople.remark!}">${mPeople.remark!}</td>
+		     <td title="${mPeople.room!}"  class="padding-left8"><input style="width: 90%; border:0;" class="td-input js-room" type="text" value="${mPeople.room!}"/></td>
+		     <td title="${mPeople.seat!}"  class="padding-left8"><input style="width: 90%;border:0;" class="td-input js-seat" type="text" value="${mPeople.seat!}"/></td>
+		     <td title="${mPeople.createDttm?datetime!}">${mPeople.createDttm?datetime!}</td>
+         <td title="">
+                   <select class="serialNumber" >
+                    <#list 1..meetingJoinPeopleList.size() as i>
+                   <option value="${i}" <#if i=(mPeople_index+1)> selected="selected" </#if>>${i}</option>
+                    </#list>
+                   </select>
+                   </td>
+          </tr>
+      <#else>
+        <tr class="js-body-tr" id="${mPeople.id!}">
+	      <td><span class="js-sequence"></span></td>
+	      <td title="${mPeople.name!}">${mPeople.name!}</td>
+	      <td title="<#if mPeople.sex?? && mPeople.sex=1>男<#else>女</#if>"><#if mPeople.sex?? && mPeople.sex=1>男<#else>女</#if></td>
+	      <td title="${mPeople.signOrg!}"><a target="_blank"  onclick="meetingSignView('${meetingId!}','${mPeople.signOrg!}')">${mPeople.signOrg!}</a></td>
+	      <td title="${mPeople.duty!}">${mPeople.duty!}</td>
+	      <td title="${mPeople.phone!}">${mPeople.phone!}</td>
+	      <td title="${mPeople.nation!}">${mPeople.nation!}</td>
+	      <td title="${mPeople.remark!}">${mPeople.remark!}</td>
+	      <td title=""  class="padding-left8"><input style="width: 90%; border:0;" class="td-input js-room" type="text" value="${mPeople.room!}"/></td>
+	      <td title=""  class="padding-left8"><input style="width: 90%;border:0;" class="td-input js-seat" type="text" value="${mPeople.seat!}"/></td>
+	      <td title="${mPeople.createDttm?datetime!}">${mPeople.createDttm?datetime!}</td>
+        <td title="">
+                   <select class="serialNumber" >
+                    <#list 1..meetingJoinPeopleList.size() as i>
+                   <option value="${i}" <#if i=(mPeople_index+1)> selected="selected" </#if>>${i}</option>
+                    </#list>
+                   </select>
+                   </td>
+        </tr>
+      </#if>
+    </#list>
+  </table>
+     <div class="float-right margin-top" style="display:none;">
+         <button class="button common-skin-btn-syle01" id="">上移</button>
+         <button class="button common-skin-btn-syle01" id="">下移</button>
+         <button class="button common-skin-btn-syle01 " id="">增加行</button>
+         <button class="button common-skin-btn-syle01 " id="">插入行</button>
+         <button class="button common-skin-btn-syle01" id="">删除行</button>
+     </div>
+
+  </div>
+  <div class="clearfix centerBlock"  style="width: 900px;margin: 0 auto;margin-top:10px;">
+      <h6 class="form-ft-song margin-bottom">上报情况</h6>
+      <table id="report_table" class="bsgrid oa-form-grid  border-top-blue margin-bottom20 centerBlock" style="width:900px!important;" >
+          <tr class="">
+              <td width="95">已上报单位(${signSituationMap.hasFeedbackCount!0})</td>
+              <td>${signSituationMap.hasFeedbackOrg!}</td>
+          </tr>
+          <tr class="">
+              <td width="95">未上报单(${signSituationMap.toFeedbackCount!0})</td>
+              <td>${signSituationMap.toFeedbackOrg!}</td>
+          </tr>
+      </table>
+  </div>
+      <div class="text-center margin-top margin-bottom" style="">
+        <div class="button common-skin-btn-syle01 js-add-account"  id="save">保存</div>
+         <div class="button common-skin-btn-syle01 js-add-account"  id="cuiban_meetingInfo">催办</div>
+         <div class="button common-skin-btn-syle01 js-add-account"  id="mesage_record">短息记录</div>
+          <button class="button common-skin-btn-syle01 js-add-account" id="export">导出</button>
+      </div>
+      <div class="text-center margin-top margin-bottom" style="display:none;">
+      <button class="button common-skin-btn-syle01" id="">保存</button>
+      <button class="button common-skin-btn-syle01" id="">关闭</button>
+      <button class="button common-skin-btn-syle01" id="">报名表导出</button>
+      <button class="button common-skin-btn-syle01" id="">查看联网信息</button>
+      <button class="button common-skin-btn-syle01" id="">查看签收情况</button>
+      <button class="button common-skin-btn-syle01" id="">查找</button>
+      </div>
+  </div>
+
+  <!-- jquery 框架 1.11 -->
+  <script src = "${base}/edenui/common/js/jquery.js"></script>
+  <script src = "${base}/edenui/common/js/underscore.js"></script>
+   <script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+  <script src = "${base}/form/resources/common/plupload/plupload.full.js"></script>
+  <script src = "${base}/edenui/common/js/ed_index.js"></script>
+  <script src="${base}/edenui/common/js/jq_plugins/tablednd/jquery.tablednd.min.js"></script>
+<script>
+  var project ="${base}";
+   $(function(){
+	   //催办开始
+	   $(document).on("click","#cuiban_meetingInfo",function(){
+		   var meetingInfo_id=$("#meetingId").val();
+		   var win={"text":"发送短信","url":"${base}/admin/backMeeting/inComingUrgencyPage.action?id=${meetingId!}&type=oa_meeting_info_people_list","width":"813","height":"460","parentIfr":window};
+	       window.top.createWindow(win);
+	   });
+	   //催办结束
+	   
+	     //短信记录
+	   $(document).on("click","#mesage_record",function(){
+		   var win={"text":"短信记录","url":"${base}/admin/backMeeting/inCominMessageRecord.action?id=${meetingId!}&type=oa_meeting_info_people_list","width":"900","height":"550","parentIfr":window};
+	       window.top.createWindow(win);
+	   });
+	      trSort();
+       //按下拉框排序
+     var start;
+     var end;
+       $("#entry_table .serialNumber").bind("click", function(){
+           start = parseInt($(this).val());
+       });
+       $("#entry_table .serialNumber").bind("change", function(){
+           end = parseInt($(this).val());
+           if(start < end){
+               for(var i = start; i<=end-1; i++){
+                   doit(i, i+1);
+               }
+               trSort();
+               selectSort();
+           }
+           if(start > end){
+               for(var i = start; i>=end+1; i--){
+                   doit(i-1, i);
+               }
+               trSort();
+               selectSort();
+           }
+
+       });
+        $("#leave_table .serialNumber").bind("click", function(){
+           start = parseInt($(this).val());
+       });
+       $("#leave_table .serialNumber").bind("change", function(){
+           end = parseInt($(this).val());
+           if(start < end){
+               for(var i = start; i<=end-1; i++){
+                   doit2(i, i+1);
+               }
+               trSort();
+               selectSort();
+           }
+           if(start > end){
+               for(var i = start; i>=end+1; i--){
+                   doit2(i-1, i);
+               }
+               trSort();
+               selectSort();
+           }
+
+       });
+       //行拖动
+       $('.bsgrid').tableDnD({
+           scrollAmount:5,//上下移动鼠标光标时，页面会自动的上下滚动的像素值，默认值为5个像素。
+           sensitivity:10,//灵敏度，默认值是10。
+           dragHandle:null,//默认NUll，即拖动一行，可以自定义拖动某个cell。
+           onDragClass:"myDragClass",//拖拽时样式,可以自定义样式；
+           //onDragStart:开始拖动时事件函数，在拖拽开始时我们需要做一些处理时可以定义该函数。
+
+           onDragStart:function(){
+
+           },
+           //onDrop：拖拽结束事件函数，在拖拽结束后我们需要做一些处理时可以定义该函数。
+           onDragStop:function(){
+               trSort();
+               selectSort();
+           }
+       });
+	   
+	   
+	   
+	   //
+    //人员增加
+    $(document).on("click","#join_add,#leave_add",function(){
+        var $this=$(this);
+        var table=$this.attr("id").split("_add")[0];
+        var tr='<tr class="js-body-tr" id=""><td width="40"><span class="js-sequence"></span><td width="80" title="" class="padding-left0"><input style="width: 70px;" class="td-input js-name padding-left10  border-null " type="text" value=""/></td><td width="40" title="" class="padding-left8"><select class="td-select js-sex"><option value="1">男</option><option value="2">女</option></select></td><td width="100" title="">${signOrgName!}</td><td width="100" title="" class="padding-left0"><input style="width: 90px;" class="td-input js-duty padding-left10 border-null" type="text" value=""/></td><td title="" width="60" class="padding-left0"><input style="width: 50px;" class="td-input js-nation padding-left10 border-null" type="text" value="汉族"/></td><td width="100" title="" class="padding-left0"><input style="width: 90px;" class="td-input js-phone padding-left10 border-null" type="text" value=""/></td><td width="100" title="" class="padding-left0"><input style="width: 90px;" class="td-input js-remark padding-left10 border-null" type="text" value=""/></td></tr>';
+        $("#"+table+"_table").append(tr);
+        indexSort("#"+table+"_table");
+      });
+    //人员选中
+    $(document).on("click","#join_table tr,#leave_table tr",function(){
+        var $this=$(this);
+        $this.addClass('tr-selected').siblings().removeClass('tr-selected');
+      });
+    //人员插入行
+    $(document).on("click","#join_insert,#leave_insert",function(){
+           var $this=$(this);
+           var table=$this.attr("id").split("_insert")[0];
+           var seleted=$("#"+table+"_table").find(".tr-selected");
+           if(seleted.length>0){
+            var tr='<tr class="js-body-tr" id=""><td width="40"><span class="js-sequence"></span><td width="80" title="" class="padding-left0"><input style="width: 70px;" class="td-input js-name padding-left10 border-null" type="text" value=""/></td><td width="40" title="" class="padding-left8"><select class="td-select js-sex"><option value="1">男</option><option value="2">女</option></select></td><td width="100" title="">${signOrgName!}</td><td width="100" title="" class="padding-left0"><input style="width: 90px;" class="td-input js-duty padding-left10 border-null" type="text" value=""/></td><td width="60" title="" class="padding-left0"><input style="width: 50px;" class="td-input js-nation padding-left10 border-null" type="text" value="汉族"/></td><td width="100" title="" class="padding-left0"><input style="width: 90px;" class="td-input js-phone padding-left10 border-null " type="text" value=""/></td><td width="100" title="" class="padding-left0"><input style="width: 90px;" class="td-input js-remark padding-left10 border-null " type="text" value=""/></td></tr>';
+               seleted.after(tr);
+            indexSort("#"+table+"_table");
+          }else{
+            layer.msg("请选中要插入的列");
+          }
+          });
+    //人员删除
+    $(document).on("click","#join_del,#leave_del",function(){
+          var $this=$(this);
+          var table=$this.attr("id").split("_del")[0];
+          var seleted=$("#"+table+"_table").find(".tr-selected");
+          if(seleted.length>0){
+            seleted.remove();
+            indexSort("#"+table+"_table");
+          }else{
+            layer.msg("请选中要删除的列");
+          }
+
+          });
+	   //
+   });
+   
+   
+   
+   
+  function meetingSignView(meetingId,signOrg){
+      window.top.createWindow({
+          'text':'查看会议报名',
+          'id':'meetingId',
+          'url':"${base}/admin/meeting/meetingSignView.action?meetingId="+meetingId+"&signOrg="+signOrg,
+          'width':'1024',
+          'height':'570',
+          'parent_ifr':window
+      });
+
+  }
+  $(document).on("click","#save",function(){
+      var joinList=[],
+          leaveList=[];
+      $("#entry_table .js-body-tr").each(function(){
+          var $this=$(this);
+          joinList.push(JSON.stringify({
+              "id":$this.attr("id"),
+              "sequence":$this.find(".js-sequence").html(),
+              "room":$this.find(".js-room").val(),
+              "seat":$this.find(".js-seat").val()
+          }));
+      });
+      $("#leave_table .js-body-tr").each(function(){
+          var $this=$(this);
+          leaveList.push(JSON.stringify({
+              "id":$this.attr("id"),
+              "sequence":$this.find(".js-sequence").html(),
+              "room":$this.find(".js-room").val(),
+              "seat":$this.find(".js-seat").val()
+          }));
+      });
+      var xmlData='{';
+      xmlData+='"joinList":['+joinList.join(",")+'],';
+      xmlData+='"leaveList":['+leaveList.join(",")+']';
+      xmlData+="}";
+      var url="${base}/admin/meeting/meetingSignManageSave.action";
+      $.post(url, {"dataJson":xmlData}, function(data) {
+          layer.msg(data.result);
+      });
+  });
+  
+  //导出按钮
+  $(document).on("click","#export",function(){
+	  window.location = "${base}/admin/meeting/meetingSignExport.action?meetingId=${meetingId!}&etc="+new Date().getTime();
+
+  });
+   
+  function doit(f, t) {
+      $("#entry_table tr:nth-child(" + (f+1) + ")").insertAfter($("#entry_table tr:nth-child(" + (t+1) + ")"));
+  }
+  function doit2(f, t) {
+      $("#leave_table tr:nth-child(" + (f+1) + ")").insertAfter($("#leave_table tr:nth-child(" + (t+1) + ")"));
+  }
+
+//排序
+  function trSort(){
+      var len = $('#entry_table tr').length;
+      for(var i = 1;i<len;i++){
+          $('#entry_table tr:eq('+i+') td:first .js-sequence').text(i);
+      }
+      var len = $('#leave_table tr').length;
+      for(var i = 1;i<len;i++){
+          $('#leave_table tr:eq('+i+') td:first .js-sequence').text(i);
+      }
+
+
+  }
+  function selectSort(){
+        var len = $('#entry_table tr').length;
+        for(var i = 1;i<len;i++){
+            $('#entry_table tr:eq('+i+') td:last .serialNumber').val(i);
+        }
+      var len = $('#leave_table tr').length;
+      for(var i = 1;i<len;i++){
+          $('#leave_table tr:eq('+i+') td:last .serialNumber').val(i);
+      }
+
+    }
+
+
+  
+</script>
+</body>
+</html>

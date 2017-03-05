@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;">
+	<#include "/aufw/page/include/loading.html">
+	<div class="container-layout line">
+		<#include "/aufw/page/include/script.html">
+		<table style="width: 100%;" id="common_table">
+			<tr>
+				<td class="ver-top">
+					<div class="grid-table-top" id="grid_table">
+						<div class="js-tool-bar">
+							<div class="form-group ">
+							<select id="search"
+									class="input display-ib margin-small-left"
+									style="width: 100px;" name="age">
+									<option value="title">标题</option>
+								</select>
+								<div class="display-ib input-father">
+									<input id="search_text" type="text" class=" tool-bar-input"
+										id="grid_input" placeholder="输入关键字" />
+								</div>
+								<div class="button common-skin-btn-syle01" id="grid_search">搜索</div>
+								<div class="button js-level-search">高级搜索</div>
+							</div>
+							<div class="level-searh form-group" style="display: none;">
+								<span>文号:</span>
+								<div class="display-ib ">
+									<input id="documentNo" type="text" class="tool-bar-input"
+										placeholder="" />
+								</div>
+								<span>任务状态:</span>
+								<div class="display-ib ">
+									<input id="task_name" type="text" class="tool-bar-input"
+										placeholder="" />
+								</div>
+								<div class="button common-skin-btn-syle01"
+									id="senior_grid_search">搜索</div>
+							</div>
+						</div>
+						<div class="js-grid-father grid-father">
+							<table id="manage_grid" class="bsgrid">
+								<tr>
+									<th w_index="id" w_hidden="true" class="hidden"></th>
+									<th w_check="true" width="40"></th>
+									<th w_index="documentNo" width="150">文号</th>
+									<th w_index="title" width="100">标题</th>
+									<th w_index="draftMan">拟稿人</th>
+									<th w_index="task_name">任务状态</th>
+									<th w_index="draftDate" width="150">创建时间</th>
+									<th w_index="operate" width="100">操作</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!--表单、流程，基于jquery的方法-->
+	<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+	<script src="${base}/oa/resource/js/task.js"></script>
+	<script src="${base}/oa/resource/js/instructionUtils.js"></script>
+	<script>
+var gridOne;
+var selectURL = "${base}/admin/instruction/queryByCondition.action?iType=config";
+$(function(){
+    layOut("#common_table","#grid_table");
+
+    //grid初始化
+     gridOne=$.fn.bsgrid.init("manage_grid", {
+        url:selectURL + "?etc="+new Date().getTime(),
+        row_primary_key: "primaryKey",
+        autoLoad: true,
+        pageSizeSelect: true,
+        pageSize:15,
+        complete:function(options, XMLHttpRequest, textStatus){
+        },
+        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+        },
+        additionalAfterRenderGrid:function(){gridOne.initGrid();}
+    });
+
+    //工具条搜索 异步交互
+    $(document).on("click","#grid_search",function(){
+        var clu = $("#search").val();
+        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+        var symbol = "?";
+        if(selectURL.indexOf("?")>0){
+        	symbol = "&";
+        }
+        gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+    });
+
+    //工具条高级搜索 展开
+    $(document).on("click",".js-level-search",function(){
+        girdTable(this);
+    });
+
+    //工具条高级搜索 异步交互
+    $(document).on("click","#senior_grid_search",function(){
+       	var requsetUrl = requestStr(selectURL);
+        gridOne.changeUrl(requsetUrl);
+    });
+    
+});
+</script>
+</body>
+</html>

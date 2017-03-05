@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;" class="statistics">
+
+  <#include "/aufw/page/include/loading.html">
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+
+          <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+            	<div class="form-group statistics-condition header-group">
+
+					<span class="header-title ">来文单位:</span>
+					<select id="incomingFileUnit" datatype="*" class="input margin-left-in statistics-select" style="width: 100px;">
+					<option value="">全部</option>
+					<#list incomingUnit as dataDict>                                                                         
+						<option value="${dataDict.unit_id}">${dataDict.file_unit}</option>
+					</#list>
+					</select>
+					<div  class="button button-main margin-left-out js-statistics">统计</div>
+					<div id="exportButton" class="button button-main js-statistics margin-left-in">导出</div>
+               </div>
+				<div class="statistics-tab">
+					<div class="tab-content-show"><span id="condition"></span><span style="float:right; margin-right: 30px;" id='currtTime'></span></div>
+				</div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th width="40">序号</th>
+                  <th w_index="year" width="100">年度</th>
+                  <th w_index="deal" width="100">办件</th>
+                  <th w_index="read" width="100">阅件</th>
+                  <th w_index="council" width="100">国务院文</th>
+                  <th w_index="telegram" width="100">明传电报</th>
+                  <th w_index="application" width="100">依申请公开</th>
+                  <th w_index="total">总数</th>
+                </tr>
+              </table>
+            </div>
+          </div> 
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script src="${base}/edenui/common/js/jq_plugins/highcharts/highcharts.js"></script>
+  <script>
+	var gridOne;
+	var selectURL = "${base}/admin/documentStatistics/incomingStatisticByYear.action";
+	$(function() {
+		
+		layOut("#common_table", "#grid_table");
+		
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : encodeURI(encodeURI(selectURL + "?etc=" + new Date().getTime()+"&fileUnit="+$('#incomingFileUnit').val())),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				$("#currtTime").text(gridData.currentTime);
+				$("#condition").text(gridData.condition);
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("tr","#manage_grid_bot").each(function(){
+					$("td",this).eq(1).css("padding-left","8px");	
+					$("td",this).css({"text-align":"center","padding-left":"0px"});
+				});
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+	        		$index=parseInt($this.attr("index"));
+	        		$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+ 				//createChart();
+			}
+		});
+
+		//统计功能
+		$(".js-statistics").click(function(){
+			gridOne.changeUrl(encodeURI(encodeURI(selectURL + "?etc=" + new Date().getTime()
+					+"&fileUnit="+$('#incomingFileUnit').val())));
+		});
+		
+		$(document).on("click", "#exportButton", function() {
+	        window.location = encodeURI(encodeURI("${base}/admin/documentStatistics/incomingStatisticByYearExport.action?etc="+new Date().getTime()+"&fileUnit="+$('#incomingFileUnit').val()));
+		});
+	});
+	
+	
+
+
+</script>
+</body>
+</html>

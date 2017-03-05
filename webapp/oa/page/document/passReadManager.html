@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+	<style type="text/css">
+	   .bsgrid td{
+	      padding-left:8px;
+	   }
+	</style>
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="level-searh form-group header-group">
+						<span class="header-title">阅读状态:</span>
+							<select id="status" class="input margin-left-in" style="width: 100px;" name="age">
+								<option value="1">全部</option>
+								<option value="3">已阅</option>
+								<option value="2">未阅</option>
+						    </select>
+						<#if (rtype!)=="oa_incoming_type">
+<!-- 							<span  class="header-title margin-left-out">办理类型:</span> -->
+<!-- 								<select id="wfName" class="input  margin-left-in" style="width: 100px;" name="age"> -->
+<!-- 									<option value="">全部</option> -->
+<!-- 								    <#if wfNameList??> -->
+<!-- 										<#list wfNameList as wfNameList> -->
+<!-- 											<option value="${wfNameList.id}">${wfNameList.bill_name}</option> -->
+<!-- 									   </#list> -->
+<!-- 									</#if> -->
+<!-- 							    </select> -->
+						</#if>
+						<#if (rtype!)=="oa_leader_instruction_form">
+							<span class="header-title margin-left-out">办理类型:</span>
+								<select id="wfName" class="input margin-left-in" style="width: 100px;" name="age">
+									<option value="">---全部---</option>
+								    <#if wfNameList??>
+										<#list wfNameList as wfNameList>
+											<option value="${wfNameList.id}">${wfNameList.bill_name}</option>
+									   </#list>
+									</#if>
+							    </select>
+						</#if>
+					   <#if (rtype!)=="oa_meeting_info">
+							<span  class="header-title margin-left-out">办理类型:</span>
+
+								<select id="wfName" class="input margin-left-in" style="width: 100px;" name="age">
+									<option value="">---全部---</option>
+								    <#if wfNameList??>
+										<#list wfNameList as wfNameList>
+											<option value="${wfNameList.id}">${wfNameList.bill_name}</option>
+									   </#list>
+									</#if>
+							    </select>
+
+						</#if>
+						<span  class="header-title margin-left-out">标题:</span>
+							<input id="pass_title" type="text" class="tool-bar-input margin-left-in" placeholder=" 输入关键字  " />
+						<div class="button margin-left-out button-main"  id="grid_search">搜索</div>
+						<#if (rtype!)=="oa_incoming_type" || (rtype!)=="oa_leader_instruction_form">
+						<div class="button margin-left-out button-main"  id="doingRead">已阅</div>
+						</#if>
+					</div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	            <#if (rtype!)=="oa_incoming_type">
+	                <table id="manage_grid" class="bsgrid">
+	                  <tr>
+		                  <th w_index="id" w_hidden="true" class="hidden"></th>
+		                  <th w_check="true" width="30"></th>
+		                  <th w_index="true" width="40">序号</th>
+		                  <th w_index="billName" width="200">办理类型</th>
+		                  <th w_index="title" width="">公文标题</th>
+	                 </tr>
+	              </table>
+	             <#elseif (rtype!)=="oa_meeting_info">
+	                <table id="manage_grid" class="bsgrid">
+	                  <tr>
+		                  <th w_index="id" w_hidden="true" class="hidden"></th>
+		                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+		                  <th w_index="true" width="40">序号</th>
+		                  <th w_index="billName" width="200">会议类型</th>
+		                  <th w_index="title" width="">会议名称</th>
+	                 </tr>
+	              </table>
+	              <#elseif (rtype!)=="oa_leader_instruction_form">
+	                 <table id="manage_grid" class="bsgrid">
+	                  <tr>
+		                  <th w_index="id" w_hidden="true" class="hidden"></th>
+		                  <th w_check="true" width="30"></th>
+		                  <th w_index="true" width="40">序号</th>
+		                  <th w_index="billName" width="200">批示类型</th>
+		                  <th w_index="title" width="">来文标题</th>
+	                 </tr>
+	              </table>
+	              <#elseif (rtype!)=="oa_sptrain_audit">
+	                 <table id="manage_grid" class="bsgrid">
+	                  <tr>
+		                  <th w_index="id" w_hidden="true" class="hidden"></th>
+		                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+		                  <th w_index="true" width="40">序号</th>
+		                  <th w_index="billName" width="200">事务类型</th>
+		                  <th w_index="title" width="">事务事由</th>
+	                 </tr>
+	              </table>
+	            </#if>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/documentPassRead/select${hasReadFlag}PassRead.action";
+	var version='1';
+  	var hasReadFlag="${hasReadFlag}";
+	$(function(){
+		layOut("#common_table","#grid_table");
+    	if(hasReadFlag=="Has")
+    	{
+    		$('#batchclick').hide();
+    	}
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+			url:selectURL + "?etc="+new Date().getTime()+"&rtype=${rtype!}&status="+$("#status").val()+"&wfName="+$("#wfName").val()+"&title="+$("#pass_title").val(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+	        	$("#manage_grid tbody tr").each(function(){
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+	        	
+	        	$("#manage_grid tbody tr").each(function(){	
+	        		var $this=$(this);
+                     $("td",this).eq(3).css({"text-align":"center","padding-left":"0px"});
+                     $("td",this).eq(2).css({"text-align":"center","padding-left":"0px"});
+                     $("td",this).eq(1).css({"text-align":"center","padding-left":"0px"});
+	        		});
+		      }
+		  });
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	        var clu = $("#status").val();
+	        var wfName = $("#wfName").val();
+	        var title = $("#pass_title").val();
+	        
+	        gridOne.changeUrl(selectURL + "?rtype=${rtype!}&status=" + window.encodeURI(clu) + '&etc='+new Date().getTime()+"&wfName="+wfName+"&title="+encodeURI(window.encodeURI(title)));
+	    });
+	    //批量阅读
+	  $(document).on("click","#doingRead",function(){
+		  var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+		  if(checkedRowsRecoreds.length>0){
+			  var readpassId = "";
+			  var count  = checkedRowsRecoreds.length;
+			  for(var i=0;i < count;i++){
+				  readpassId+=checkedRowsRecoreds[i].id;
+				  if(i != count - 1){
+					  readpassId+=",";  
+				  }
+			  }
+			  var doingClick = "${base}/admin/documentPassRead/clickPassRead.action?readpassId="+readpassId;
+			  $.get(doingClick, function(result){
+				  if("已阅成功！" == result.msg){
+					  window.top.noteTipWaiting();
+					  $("[type='checkbox']").removeAttr("checked");
+					    var clu = $("#status").val();
+				        var wfName = $("#wfName").val();
+				        var title = $("#pass_title").val();
+				        gridOne.changeUrl(selectURL + "?rtype=${rtype!}&status=" + window.encodeURI(clu) + '&etc='+new Date().getTime()+"&wfName="+wfName+"&title="+encodeURI(window.encodeURI(title)));
+				  }
+			  });
+		  }
+	    });
+	    
+	    
+	    //自动查询功能
+	    $(document).on("change","#status",function(){
+	    	var clu = $("#status").val();
+	        var wfName = $("#wfName").val();
+	        var title = $("#pass_title").val();
+	        gridOne.changeUrl(selectURL + "?rtype=${rtype!}&status=" + window.encodeURI(clu) + '&etc='+new Date().getTime()+"&wfName="+wfName+"&title="+title);
+	    });
+	    //选择完办理类型后自动查询数据
+	    $(document).on("change","#wfName",function(){
+	     	var clu = $("#status").val();
+	        var wfName = $("#wfName").val();
+	        var title = $("#pass_title").val();
+	        gridOne.changeUrl(selectURL + "?rtype=${rtype!}&status=" + window.encodeURI(clu) + '&etc='+new Date().getTime()+"&wfName="+wfName+"&title="+title);
+	    });
+	    
+	   /*  $("#pass_title").bind("propertychange input",function(){
+	    	var clu = $("#status").val();
+	        var wfName = $("#wfName").val();
+	        var title = $("#pass_title").val();
+	        gridOne.changeUrl(selectURL + "?rtype=${rtype!}&status=" + window.encodeURI(clu) + '&etc='+new Date().getTime()+"&wfName="+wfName+"&title="+title);
+	    });  */
+	});
+	
+    //执行任务
+        //执行任务
+    function execute(url){
+    	var task_name = "";
+		var project = '${base}';
+		project += url;
+		window.open(project+"&passRead=circulation","_target");
+    }
+//     function execute(id){
+//     	var task_name = "";
+// 		var item = getRecord(id);
+// 		uf_doAction(item.wfId,wf_name,task_name,version,null); 
+//     }
+</script>
+
+</html>

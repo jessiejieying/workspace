@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+	<#include "/aufw/page/include/loading.html">
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<#if fileType?? && fileType=="1">
+					<div class="statistics-condition form-group header-group padding-bottom-0">
+						   <span class="header-title">文种:</span>
+	                       <select id="documentType" datatype="*" class="input  statistics-select margin-left-in" style="width: 139px;margin-left: 28px;">
+	                           <option value="">全部</option>
+	                           <#list fillBills as dataDict>
+	                               <option title="${dataDict.billName}">${dataDict.billName}</option>
+	                           </#list>
+	                       </select>
+						   <span class="header-title margin-left-out">时间段:</span>
+						   <span id="fromStartDateDiv">
+							   <input name="startDate" id="startDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd', maxDate:'#F{$dp.$D(\'endDate\')||\'2025-10-01\'}'})" size="20" type="text">
+		                   	   <span class="header-title " style ='margin-left: 27px;'>至</span>
+		                       <input id="endDate" style="cursor: pointer;height: 26px; margin-left: 28px;" size="20" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startDate\')}',maxDate:'2025-10-01'})" name="endDate" type="text">
+						   </span>
+					   </div>
+					   <div class="header-group form-group">
+						    <span id="search" class="header-title" >公文标题:</span>
+	                        <input id="search_text" type="text" class="tool-bar-input margin-left-in" placeholder="输入关键字" />
+							<span class="header-title margin-left-out" style ='margin-left: 22px;'>字号:</span>
+							<input id="search_file_char" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+							<span class="header-title margin-left-out">主办处室:</span>
+							<input id="search_draftDept" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+	                        <div class="button button-main margin-left-in" id="grid_search">搜索</div>
+                        </div>
+                        <#else>
+                        <div class="form-group header-group">
+							<span id="search" class="header-title" >公文标题:</span>
+	                        <input id="search_text" type="text" class="tool-bar-input margin-left-in" placeholder="输入关键字" />
+	                        <span class="header-title margin-left-out">收文编号:</span>
+							<input id="search_serialNumber" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+							<span class="header-title margin-left-out">字号:</span>
+							<input id="search_file_char" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+	                        <span class="header-title margin-left-out">主办处室:</span>
+							<input id="search_draftDept" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+							<div class="button button-main margin-left-in" id="grid_search">搜索</div>
+						</div>
+				    </#if>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+	                  <th w_index="true" width="35">序号</th>
+	                  <th w_index="fileTitle" width="">公文标题</th>
+	                  <#if fileType?? && fileType=="1">
+	                  <th w_index="draftDept" width="80">拟稿处室</th>
+	                  <th w_index="sendToExchangeTimeStr" width="120">下发时间</th>
+	                  </#if>
+	                  <th w_index="fileChar" width="200">字号</th>
+	                  <#if fileType?? && fileType=="0">
+		                  <th w_index="serialNumber" width="75">收文编号</th>
+	                  </#if>
+	                  <#if fileType?? && fileType=="0">
+	                  <th w_index="ifChaoqi" width="60">是否超期</th>
+	                  <th w_index="archiveTypeName" width="60">是否归档</th>
+	                  <th w_index="archiveTypeStatus" width="60">归档状态</th>
+	                  </#if>
+	                  <th class="hidden" w_hidden="true"></th>
+	                 <!--  <th w_index="operate" width="140">操作</th> -->
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+			
+
+<script>
+
+	var gridOne;
+	var selectURL = "${base}/admin/incoming/queryIncoming.action";
+	var version='1';
+    var wf_name='oa_pg_incoming_message';
+    var wfType="${wfType!}";
+    var fileType = "${fileType!}";
+	$(function(){
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime()+"&wfType="+wfType+"&fileType="+fileType,
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+	        	$("#manage_grid tbody tr").each(function(){
+	        		$("td",this).eq(1).css("padding-left","8px");
+	        		
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+	        	
+	        	$("#manage_grid tbody tr").each(function(){	
+	        		var $this=$(this);
+              		$("td",this).eq(1).css({"text-align":"center","padding-left":"0px"});
+              		$("td",this).eq(2).css({"text-align":"center","padding-left":"0px"});
+	        		$("td",this).eq(4).css({"text-align":"center","padding-left":"0px"});
+	        		$("td",this).eq(5).css({"text-align":"center","padding-left":"0px"});
+	        		$("td",this).eq(6).css({"text-align":"center","padding-left":"0px"});
+	        		$("td",this).eq(7).css({"text-align":"center","padding-left":"0px"});
+	        		$("td",this).eq(8).css({"text-align":"center","padding-left":"0px"});
+	        	});
+		      }
+		  });
+		
+		$("#incoming_add").click(function(){
+			initWorkflow('oa_pg_incoming_document','收文登记','1');
+		});
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	    	var startDate= $("#startDate").val()||"";
+	        var endDate= $("#endDate").val()||"";
+	        var value = $("#search_text").val()=='输入关键字'?'':$("#search_text").val();
+	        var criteriaFileChar = $("#search_file_char").val()=='输入关键字'?'':$("#search_file_char").val();
+	        var serialNumber =$("#search_serialNumber").val()||"";
+	        var draftDept = $("#search_draftDept").val()||"";
+	        var documentType = $("#documentType").val()||"";
+	        gridOne.changeUrl(selectURL + '?fileTitle=' + encodeURI(window.encodeURI(value)) + "&startDate=" + startDate + '&endDate=' + endDate + "&fileType="+ fileType + '&etc='+new Date().getTime()+"&wfType="+wfType+"&documentType="+encodeURI(window.encodeURI(documentType))+"&criteriaFileChar="+encodeURI(window.encodeURI(criteriaFileChar))+"&serialNumber="+serialNumber+"&draftDept="+encodeURI(window.encodeURI(draftDept)));
+	    });
+	    
+	  //工具条搜索
+	    $(document).on("change","#documentType",function(){
+	    	var startDate= $("#startDate").val()||"";
+	        var endDate= $("#endDate").val()||"";
+	        var value = $("#search_text").val()=='输入关键字'?'':$("#search_text").val();
+	        var criteriaFileChar = $("#search_file_char").val()=='输入关键字'?'':$("#search_file_char").val();
+	        var serialNumber =$("#search_serialNumber").val()||"";
+	        var draftDept = $("#search_draftDept").val()||"";
+	        var documentType = $("#documentType").val()||"";
+	        gridOne.changeUrl(selectURL + '?fileTitle=' + encodeURI(window.encodeURI(value)) + "&startDate=" + startDate + '&endDate=' + endDate + "&fileType="+ fileType + '&etc='+new Date().getTime()+"&wfType="+wfType+"&documentType="+encodeURI(window.encodeURI(documentType))+"&criteriaFileChar="+encodeURI(window.encodeURI(criteriaFileChar))+"&serialNumber="+serialNumber+"&draftDept="+encodeURI(window.encodeURI(draftDept)));
+	    });
+	    
+	});
+	
+    //执行任务
+    function execute(id){
+    	var task_name = "";
+		var item = getRecord(id);
+		var project = window.top.base;
+		project += '/form';
+		var surl = "";
+		if("收文"==item.fileType){
+			surl = project + "/fceform/common/run.html?djsn=oa_pg_incoming_form&djtype=eden&actionId=finish&is_oa_bill=true&wfs=finish&wfId="+item.wfId;
+		}else{
+		    surl = project + "/fceform/common/run.html?djsn=oa_send_document&djtype=eden&actionId=finish&is_oa_bill=true&wfs=finish&wfId="+item.wfId;
+		}
+		 window.open(surl,"_target"); 
+    }
+
+</script>
+
+</html>

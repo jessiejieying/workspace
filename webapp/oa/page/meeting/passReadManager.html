@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+	<#include "/aufw/page/include/loading.html">
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="level-searh form-group ">
+						<span>阅读状态:</span>
+						<div class="display-ib">
+							<select id="status" class="input display-ib margin-small-left" style="width: 100px;" name="age">
+								<option value="1">全部</option>
+								<option value="3">已阅</option>
+								<option value="2">未阅</option>
+						    </select>
+						</div>
+						<span>办理类型:</span>
+						<div class="display-ib">
+							<select id="wfName" class="input display-ib margin-small-left" style="width: 100px;" name="age">
+								<option value="">全部</option>
+							    <#if wfNameList??>
+									<#list wfNameList as wfNameList>
+										<option value="${wfNameList.id}">${wfNameList.bill_name}</option>
+								   </#list>
+								</#if>
+						    </select>
+						</div>
+						<span>文件标题:</span>
+						<div class="display-ib">
+							<input id="title" type="text" class="tool-bar-input" placeholder="输入关键字" />
+						</div>
+						<div class="button common-skin-btn-syle01" id="grid_search">搜索</div>
+					</div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="50"></th>
+	                  <th w_index="true" width="50">序号</th>
+	                  <th w_index="billName" width="200">办理类型</th>
+	                  <th w_index="title" width="">公文标题</th>
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/documentPassRead/select${hasReadFlag}PassRead.action";
+	var version='1';
+  	var hasReadFlag="${hasReadFlag}";
+	$(function(){
+		layOut("#common_table","#grid_table");
+    	if(hasReadFlag=="Has")
+    	{
+    		$('#batchclick').hide();
+    	}
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime()+"&rtype=${rtype!}&status="+$("#status").val()+"&wfName="+$("#wfName").val()+"&title="+$("#title").val(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+	        	$("#manage_grid tbody tr").each(function(){
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+	        	
+	        	$("#manage_grid tbody tr").each(function(){	
+	        		var $this=$(this);
+              $("td",this).eq(3).css({"text-align":"center","padding-left":"0px"});
+	        		});
+		      }
+		  });
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	        var clu = $("#status").val();
+	        var wfName = $("#wfName").val();
+	        var title = $("#title").val();
+	        gridOne.changeUrl(selectURL + "?status=" + window.encodeURI(clu) + '&etc='+new Date().getTime()+"&wfName="+wfName+"&title="+title);
+	    });
+	    
+	});
+	
+    //执行任务
+        //执行任务
+    function execute(url){
+    	var task_name = "";
+		var project = '${base}';
+		project += url;
+		window.open(project,"_target"); 
+    }
+//     function execute(id){
+//     	var task_name = "";
+// 		var item = getRecord(id);
+// 		uf_doAction(item.wfId,wf_name,task_name,version,null); 
+//     }
+</script>
+
+</html>

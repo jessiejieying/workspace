@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset = "utf-8">
+	<title>Eden</title>
+	<link rel = "stylesheet" type = "text/css" href = "${base}/aufw/resources/common/css/base.css">
+	<link rel = "stylesheet" type = "text/css" href = "${base}/aufw/resources/skins/default/css/list.css">
+	<link rel = "stylesheet" type = "text/css" href = "${base}/aufw/resources/skins/default/css/icon.css">
+	<link rel = "stylesheet" type = "text/css" href = "${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+	<link rel = "stylesheet" type = "text/css" href = "${base}/aufw/resources/common/artDialog/skins/default.css">
+	<style>
+		.grid_wrap { width: 100%; height: 270px; }
+
+		.chooser_wrap_left { height: 338px; margin-right: 5px;border: 1px solid #64A9D7;}
+		.chooser_wrap { height: 355px; margin: 10px 0 0 10px; }
+
+		.hasAdd { position: absolute; width: 100px; height: 22px; left: 15px; top: 358px; font-weight: bold; cursor: pointer; text-decoration: underline; }
+		.hasAdd div{display: none;}
+		.mask { display: none; position: absolute; width: 100%; z-index: 99; height: 100%; background-color: #202220; top: 0; left: 0; opacity: 0.2; filter: alpha(opacity = 20); }
+
+		.hasAdd_area { display: none; position: absolute; z-index: 100; top: 30px; left: 130px; background-color: #ffffff; width: 400px; height: 330px; padding: 10px; }
+		.hasAdd_area .grid_wrap{display: none;}
+		.showUser .user_area{ display: block;}
+		.showRole .role_area{ display: block;}
+		.showOrg .org_area{ display: block;}
+		.hasAdd_area_title { font-weight: bold; padding-bottom: 5px; width: 100%;}
+		.hasAdd_area_title div{ display: none;}
+
+		.hasAdd_area_button { text-align: center; padding-top: 15px; }
+
+		.search_area { vertical-align: top; height: 20px; }
+
+		.search_area * { float: left; }
+
+		.search_text { width: 80px; border: 0; height: 20px; border-bottom: 1px solid #CCCCCC; padding: 3px 5px 0; }
+
+		.search_icon { border: 0; width: 30px; height: 23px; cursor: pointer; background-position: 5px 6px; }
+	</style>
+</head>
+<body class="showOrg">
+<div style="clear: both;"></div>
+<div class = "chooser_wrap">
+	<div class = "chooser_wrap_left">
+		<div class = "title">所在单位</div>
+		<div id = "tree_search" class="tree_search"></div>
+		<div id = "tree" style = "width:100%; height:255px; padding-top: 3px;"></div>
+	</div>
+	<div id = "main" style = "width: 370px;  height: 350px; border:none ; border-bottom: 1px solid #64A9D7; margin-top: -10px;"></div>
+
+	<div id = "org_div" style = "display: none;" style = "width: 350px; border:none;">
+		<div style = "border: 1px solid #CECECE; border-bottom: none; width: 350px;" class = "title"><span>可选单位</span>
+			<div class = "fn-right search_area"><span>搜索：</span>
+				<input class = "search_text" type = "text"/>
+				<input id = "orgsearch_btn" class = "search_icon" title = "搜索" type = "button" value = "">
+			</div>
+		</div>
+		<div id = "grid_wrap_org" class = "grid_wrap">
+			<div id = "grid_org" style = "width:350px;height: 240px;"></div>
+			<div id = "grid_page_org" class = "grid_page" style = "width:100%;height:18px; padding-top:10px;"></div>
+		</div>
+	</div>
+
+	<div id = "role_div" style = "display: none;" style = "width: 350px; border:none;">
+		<div style = "border: 1px solid #CECECE; border-bottom: none; width: 350px;" class = "title"><span>可选角色</span>
+			<div class = "fn-right search_area"><span>搜索：</span>
+				<input class = "search_text" type = "text"/>
+				<input id = "role_search_btn" class = "search_icon" title = "搜索" type = "button" value = "">
+			</div>
+		</div>
+		<div id = "grid_wrap_role" class = "grid_wrap">
+			<div id = "grid_role" style = "width:350px;height: 240px;"></div>
+			<div id = "grid_page_role" class = "grid_page" style = "width:100%;height:18px; padding-top:10px;"></div>
+		</div>
+	</div>
+
+	<div id = "user_div" style = "display: none;" style = "width: 350px; border:none;">
+		<div style = "border: 1px solid #CECECE; border-bottom: none; width: 350px;" class = "title"><span>可选人员</span>
+			<div class = "fn-right search_area"><span>搜索：</span>
+				<input class = "search_text" type = "text"/>
+				<input id = "user_search_btn" class = "search_icon" title = "搜索" type = "button" value = "">
+			</div>
+		</div>
+		<div id = "grid_wrap_user" class = "grid_wrap">
+			<div id = "grid_user" style = "width:350px;height: 240px;"></div>
+			<div id = "grid_page_user" class = "grid_page" style = "width:100%;height:18px; padding-top:10px;"></div>
+		</div>
+	</div>
+
+	<div onclick = "show_hasAdd()" class = "hasAdd">
+		<div class="org_area">显示已选单位(<span id = "orgHasAddNum">0</span>) </div>
+		<div class="role_area">显示已选角色(<span id = "roleHasAddNum">0</span>) </div>
+		<div class="user_area">显示已选人员(<span id = "userHasAddNum">0</span>) </div>
+	</div>
+</div>
+
+<div class = "bottom_btn_area">
+	<input id = "save_btn" class = "save_btn" type = "button" value = "确定">
+</div>
+<div id = "mask" class = "mask"></div>
+<div id = "hasAdd_area" class = "hasAdd_area">
+	<div class = "hasAdd_area_title"><div class="org_area">已选组织：</div><div class="role_area">已选角色：</div><div class="user_area">已选人员：</div></div>
+
+	<div id = "grid_wrap_org_add" style = "height: 260px;" class = "grid_wrap org_area">
+		<div id = "grid_org_add" style = "width:100%;height: 240px;"></div>
+		<div id = "grid_page_org_add" class = "grid_page" style = "width:100%;height:18px; padding-top:10px;"></div>
+	</div>
+
+	<div id = "grid_wrap_user_add" style = "height: 260px;" class = "grid_wrap user_area">
+		<div id = "grid_user_add" style = "width:100%;height: 240px;"></div>
+		<div id = "grid_page_user_add" class = "grid_page" style = "width:100%;height:18px; padding-top:10px;"></div>
+	</div>
+
+	<div id = "grid_wrap_role_add" style = "height: 260px;" class = "grid_wrap role_area">
+		<div id = "grid_role_add" style = "width:100%;height: 240px;"></div>
+		<div id = "grid_page_role_add" class = "grid_page" style = "width:100%;height:18px; padding-top:10px;"></div>
+	</div>
+
+	<p class = "hasAdd_area_button">
+		<input id = "sure_btn" onclick = "hide_hasAdd()" class = "save_btn" type = "button" value = "确定">
+	</p>
+</div>
+</body>
+<script src = "${base}/aufw/resources/common/js/jquery.js"></script>
+<script src = "${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+<script src = "${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+<script src = "${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+<script src = "${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+<script src = "${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+<script>
+var tabbar, tree, treeSearch, data_org, grid_org, data_role, grid_role, data_user, grid_user, grid_user_add, data_user_add,grid_role_add, data_role_add,grid_org_add, data_org_add;
+var hasAdd_org = {rowId:[], items:[]};
+var hasAdd_role = {rowId:[], items:[]};
+var hasAdd_user = {rowId:[], items:[]};
+var dataId='${dataId}';
+var auType='${auType}';
+function init() {
+
+	tabbar = new dhtmlXTabBar("main", "top");
+	tabbar.setSkin('dhx_web');
+	tabbar.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+	tabbar.addTab("org", "单位权限", "90px");
+	//tabbar.addTab("role", "角色权限", "90px");
+	tabbar.addTab("user", "人员权限", "90px");
+	tabbar.setTabActive("org");
+	tabbar.cells("org").attachObject("org_div");
+	//tabbar.cells("role").attachObject("role_div");
+	tabbar.cells("user").attachObject("user_div");
+	tabbar.attachEvent("onSelect", function(id,last_id){
+		var parent_id = tree.getSelectedItemId();
+		var orgCode = tree.getUserData(parent_id, "orgCode");
+		if(orgCode==undefined) orgCode='001';
+		$('body').removeClass('showUser showRole showOrg');
+		if(id=='org'){
+			$('body').addClass('showOrg');
+	        data_org.clearAll();
+			data_org.data.url= "${base}/admin/org/queryOrgList.action?criteriaOrgCode=" + orgCode+"&etc="+new Date().getTime();
+			data_org.load("${base}/admin/org/queryOrgList.action?criteriaOrgCode=" + orgCode+"&etc="+new Date().getTime(), 'json');
+		}else if(id=='role'){
+			$('body').addClass('showRole');
+			data_role.clearAll();
+			data_role.data.url= "${base}/admin/role/queryRoleList.action?criteriaOrgCode=" + orgCode+"&etc="+new Date().getTime();
+			data_role.load("${base}/admin/role/queryRoleList.action?criteriaOrgCode=" + orgCode+"&etc="+new Date().getTime(), 'json');
+		} else if(id=='user'){
+			$('body').addClass('showUser');
+			data_user.clearAll();
+			data_user.data.url= "${base}/admin/user/queryUserInfo.action?criteriaOrgCode=" + orgCode + "&etc=" + new Date().getTime();
+			data_user.load("${base}/admin/user/queryUserInfo.action?criteriaOrgCode=" + orgCode + "&etc=" + new Date().getTime(), 'json');
+		}
+		return true;
+	});
+
+
+	tree = new dhtmlXTreeObject("tree", "100%", "100%", 'root');
+	tree.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/csh_dhx_terrace/");
+	tree.enableSmartXMLParsing(true);
+	tree.setSkin('dhx_skyblue');
+	tree.enableTreeLines(true);
+	tree.loadJSON("${base}/admin/org/showOrgTree.action");
+	tree.attachEvent("onXLE", function (tree, id) {
+		var rootsAr = tree.getSubItems(id);//.split(",");
+		tree.openItem(rootsAr);
+	});
+
+	tree.attachEvent("onSelect", function (id) {
+		var parent_id = tree.getSelectedItemId();
+		var orgCode = tree.getUserData(parent_id, "orgCode");
+		
+		var nowTabId=tabbar.getActiveTab();
+		if(nowTabId=='org'){
+            data_org.clearAll();
+			data_org.data.url= "${base}/admin/org/queryOrgList.action?criteriaOrgCode=" + orgCode+"&etc="+new Date().getTime();
+			data_org.load("${base}/admin/org/queryOrgList.action?criteriaOrgCode=" + orgCode+"&etc="+new Date().getTime(), 'json');
+		}else if(nowTabId=='role'){
+			data_role.clearAll();
+			data_role.data.url="${base}/admin/role/queryRoleList.action?criteriaOrgCode=" + orgCode+"&etc="+new Date().getTime();
+			data_role.load("${base}/admin/role/queryRoleList.action?criteriaOrgCode=" + orgCode+"&etc="+new Date().getTime(), 'json');
+		} else if(nowTabId=='user'){
+			data_user.clearAll();
+			data_user.data.url= "${base}/admin/user/queryUserInfo.action?criteriaOrgCode=" + orgCode + "&etc=" + new Date().getTime();
+			data_user.load("${base}/admin/user/queryUserInfo.action?criteriaOrgCode=" + orgCode + "&etc=" + new Date().getTime(), 'json');
+		}
+	});
+	treeSearch = new treeSearchBar('tree_search', tree);
+
+
+	data_user = new dhtmlXDataStore({
+		url     :"${base}/admin/user/queryUserInfo.action?etc=" + new Date().getTime(),
+		datatype:"json"
+	});
+
+	data_user.attachEvent("onXLE", function () {
+		for (var i = 0; i < hasAdd_user.rowId.length; i++) {
+			var id = hasAdd_user.rowId[i];
+			var savedItem = hasAdd_user.items[i];
+			var nowItem = data_user.item(id);
+			if (nowItem != undefined) {
+				nowItem = savedItem;
+				data_user.update(id, nowItem);
+			}
+		}
+	});
+
+	grid_user = new dhtmlXGridObject('grid_user');
+	grid_user.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+	grid_user.setHeader("用户名,登录账户名,读,写");
+	grid_user.setColumnIds("userName,accountName,read,write");
+	grid_user.setInitWidths("100,*,30,30");
+	grid_user.setColTypes("ro,ro,ch,ch");
+	grid_user.enablePaging(true, 8, 999, 'grid_page_user', true);
+	grid_user.setPagingSkin("toolbar");
+	grid_user.init();
+	grid_user.attachEvent("onCheck", function (rId, cInd, state) {
+		checkReadWrite(data_user,rId,cInd,state,hasAdd_user)
+	});
+	grid_user.sync(data_user);
+
+	data_org = new dhtmlXDataStore({
+		url     :"${base}/admin/org/queryOrgList.action?etc=" + new Date().getTime(),
+		datatype:"json"
+	});
+
+	data_org.attachEvent("onXLE", function () {
+		for (var i = 0; i < hasAdd_org.rowId.length; i++) {
+			var id = hasAdd_org.rowId[i];
+			var savedItem = hasAdd_org.items[i];
+			var nowItem = data_org.item(id);
+			if (nowItem != undefined) {
+				nowItem = savedItem;
+				data_org.update(id, nowItem);
+			}
+		}
+	});
+
+	grid_org = new dhtmlXGridObject('grid_org');
+	grid_org.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+	grid_org.setHeader("组织名,组织代码,读,写");
+	grid_org.setColumnIds("orgName,orgCode,read,write");
+	grid_org.setInitWidths("100,*,30,30");
+	grid_org.setColTypes("ro,ro,ch,ch");
+	grid_org.enablePaging(true, 8, 999, 'grid_page_org', true);
+	grid_org.setPagingSkin("toolbar");
+	grid_org.init();
+	grid_org.attachEvent("onCheck", function (rId, cInd, state) {
+		checkReadWrite(data_org,rId,cInd,state,hasAdd_org);
+	});
+	grid_org.sync(data_org);
+
+
+	data_role = new dhtmlXDataStore({
+		url     :"${base}/admin/role/queryRoleList.action?etc="+new Date().getTime(),
+		datatype:"json"
+	});
+
+	data_role.attachEvent("onXLE", function () {
+		for (var i = 0; i < hasAdd_role.rowId.length; i++) {
+			var id = hasAdd_role.rowId[i];
+			var savedItem = hasAdd_role.items[i];
+			var nowItem = data_role.item(id);
+			if (nowItem != undefined) {
+				nowItem = savedItem;
+				data_role.update(id, nowItem);
+			}
+		}
+	});
+
+	grid_role = new dhtmlXGridObject('grid_role');
+	grid_role.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+	grid_role.setHeader("角色名称,所属组织,读,写");
+	grid_role.setColumnIds("roleName,orgName,read,write");
+	grid_role.setInitWidths("100,*,30,30");
+	grid_role.setColTypes("ro,ro,ch,ch");
+	grid_role.enablePaging(true, 8, 999, 'grid_page_role', true);
+	grid_role.setPagingSkin("toolbar");
+	grid_role.init();
+	grid_role.attachEvent("onCheck", function (rId, cInd, state) {
+		checkReadWrite(data_role,rId,cInd,state,hasAdd_role);
+	});
+	grid_role.sync(data_role);
+
+
+	data_user_add = new dhtmlXDataStore({
+		datatype:"json"
+	});
+
+	data_user_add.attachEvent("onXLE", function () {
+
+	});
+
+	grid_user_add = new dhtmlXGridObject('grid_user_add');
+	grid_user_add.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+	grid_user_add.setHeader("用户名,登录账户名,读,写");
+	grid_user_add.setColumnIds("userName,accountName,read,write");
+	grid_user_add.setInitWidths("100,*,40,40");
+	grid_user_add.setColTypes("ro,ro,ch,ch");
+	grid_user_add.enablePaging(true, 8, 999, 'grid_page_user_add', true);
+	grid_user_add.setPagingSkin("toolbar");
+	grid_user_add.init();
+	grid_user_add.sync(data_user_add);
+	grid_user_add.attachEvent("onCheck", function (rId, cInd, state) {
+		var item = data_user_add.item(rId);
+		var ds1_item = data_user.item(rId);
+		if (state == true) {
+			if (cInd == 2) {
+				item.read = 1;
+			} else {
+				item.write = 8;
+			}
+		} else {
+			if (cInd == 2) {
+				item.read = 0;
+			} else {
+				item.write = 0;
+			}
+		}
+		if (ds1_item != undefined) {
+			data_user.update(rId, item);       //同步更新到 grid1中
+		}
+		if (item.read + item.write > 0) {
+			var index = $.inArray(rId, hasAdd_user.rowId);
+			if (index == '-1') {
+				hasAdd_user.rowId.push(rId);
+				hasAdd_user.items.push(item);
+			}
+
+		} else {
+			var index = $.inArray(rId, hasAdd_user.rowId);
+			if (index != '-1') {
+				hasAdd_user.rowId.splice(index, 1);
+				hasAdd_user.items.splice(index, 1);
+			}
+		}
+		updateAddNum();
+	});
+
+	data_role_add = new dhtmlXDataStore({
+		datatype:"json"
+	});
+
+	data_role_add.attachEvent("onXLE", function () {
+
+	});
+
+	grid_role_add = new dhtmlXGridObject('grid_role_add');
+	grid_role_add.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+	grid_role_add.setHeader("角色名称,所属组织,读,写");
+	grid_role_add.setColumnIds("roleName,orgName,read,write");
+	grid_role_add.setInitWidths("100,*,40,40");
+	grid_role_add.setColTypes("ro,ro,ch,ch");
+	grid_role_add.enablePaging(true, 8, 999, 'grid_page_role_add', true);
+	grid_role_add.setPagingSkin("toolbar");
+	grid_role_add.init();
+	grid_role_add.sync(data_role_add);
+	grid_role_add.attachEvent("onCheck", function (rId, cInd, state) {
+		var item = data_role_add.item(rId);
+		var ds1_item = data_role.item(rId);
+		if (state == true) {
+			if (cInd == 2) {
+				item.read = 1;
+			} else {
+				item.write = 8;
+			}
+		} else {
+			if (cInd == 2) {
+				item.read = 0;
+			} else {
+				item.write = 0;
+			}
+		}
+		if (ds1_item != undefined) {
+			data_role.update(rId, item);       //同步更新到 grid1中
+		}
+		if (item.read + item.write > 0) {
+			var index = $.inArray(rId, hasAdd_role.rowId);
+			if (index == '-1') {
+				hasAdd_role.rowId.push(rId);
+				hasAdd_role.items.push(item);
+			}
+
+		} else {
+			var index = $.inArray(rId, hasAdd_role.rowId);
+			if (index != '-1') {
+				hasAdd_role.rowId.splice(index, 1);
+				hasAdd_role.items.splice(index, 1);
+			}
+		}
+		updateAddNum();
+	});
+
+	data_org_add = new dhtmlXDataStore({
+		datatype:"json"
+	});
+
+	data_org_add.attachEvent("onXLE", function () {
+
+	});
+
+	grid_org_add = new dhtmlXGridObject('grid_org_add');
+	grid_org_add.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+	grid_org_add.setHeader("组织名,组织代码,读,写");
+	grid_org_add.setColumnIds("orgName,orgCode,read,write");
+	grid_org_add.setInitWidths("100,*,40,40");
+	grid_org_add.setColTypes("ro,ro,ch,ch");
+	grid_org_add.enablePaging(true, 8, 999, 'grid_page_org_add', true);
+	grid_org_add.setPagingSkin("toolbar");
+	grid_org_add.init();
+	grid_org_add.sync(data_org_add);
+	grid_org_add.attachEvent("onCheck", function (rId, cInd, state) {
+		var item = data_org_add.item(rId);
+		var ds1_item = data_org.item(rId);
+		if (state == true) {
+			if (cInd == 2) {
+				item.read = 1;
+			} else {
+				item.write = 8;
+			}
+		} else {
+			if (cInd == 2) {
+				item.read = 0;
+			} else {
+				item.write = 0;
+			}
+		}
+		if (ds1_item != undefined) {
+			data_org.update(rId, item);       //同步更新到 grid1中
+		}
+		if (item.read + item.write > 0) {
+			var index = $.inArray(rId, hasAdd_org.rowId);
+			if (index == '-1') {
+				hasAdd_org.rowId.push(rId);
+				hasAdd_org.items.push(item);
+			}
+
+		} else {
+			var index = $.inArray(rId, hasAdd_org.rowId);
+			if (index != '-1') {
+				hasAdd_org.rowId.splice(index, 1);
+				hasAdd_org.items.splice(index, 1);
+			}
+		}
+		updateAddNum();
+	});
+	
+	
+	myInit();
+
+}
+
+
+function checkReadWrite(data_user,rId,cInd,state,hasAdd_user){
+	var item = data_user.item(rId);
+	if (item.read == undefined) {
+		item.read = 0;
+	}
+	if (item.write == undefined) {
+		item.write = 0;
+	}
+	if (state == true) {          // ch 类型的修改 需手动同步到datastore中
+		if (cInd == 2) {
+			item.read = 1;
+		} else {
+			item.write = 8;
+		}
+	} else {
+		if (cInd == 2) {
+			item.read = 0;
+		} else {
+			item.write = 0;
+		}
+	}
+	if (item.read + item.write > 0) {
+		var index = $.inArray(rId, hasAdd_user.rowId);
+		if (index == '-1') {
+			hasAdd_user.rowId.push(rId);
+			hasAdd_user.items.push(item);
+		}
+
+	} else {
+		var index = $.inArray(rId, hasAdd_user.rowId);
+		if (index != '-1') {
+			hasAdd_user.rowId.splice(index, 1);
+			hasAdd_user.items.splice(index, 1);
+		}
+	}
+	updateAddNum();
+}
+
+function myInit(){
+	jQuery.post("${base}/admin/attachmentInfoManager/attachmentRightAction!selectAttachmentRights.action", {"dataId":dataId,"auType":auType}, function(val){        
+		fillAu(val);
+ 	});
+}
+
+//填充权限
+function fillAu(val){
+	var auUser=val.auUser.au;
+	var auRole=val.auRole.au;
+	var auOrg=val.auOrg.au;
+	
+	for(var i=0,l=auUser.length;i<l;i++){
+		hasAdd_user.rowId.push(auUser[i].id);
+		hasAdd_user.items.push(auUser[i]);
+	}
+	
+	for(var i=0,l=auRole.length;i<l;i++){
+		hasAdd_role.rowId.push(auRole[i].id);
+		hasAdd_role.items.push(auRole[i]);
+	}
+	
+	for(var i=0,l=auOrg.length;i<l;i++){
+		hasAdd_org.rowId.push(auOrg[i].id);
+		hasAdd_org.items.push(auOrg[i]);
+	}
+	updateAddNum();
+    
+}
+
+function show_hasAdd() {
+	$('#mask,#hasAdd_area').show();
+
+	data_org_add.clearAll();
+	for (var i = 0; i < hasAdd_org.rowId.length; i++) {
+		var rowId = hasAdd_org.rowId[i];
+		var item = hasAdd_org.items[i];
+		data_org_add.add(item);
+	}
+
+	data_role_add.clearAll();
+	for (var i = 0; i < hasAdd_role.rowId.length; i++) {
+		var rowId = hasAdd_role.rowId[i];
+		var item = hasAdd_role.items[i];
+		data_role_add.add(item);
+	}
+	data_user_add.clearAll();
+	for (var i = 0; i < hasAdd_user.rowId.length; i++) {
+		var rowId = hasAdd_user.rowId[i];
+		var item = hasAdd_user.items[i];
+		data_user_add.add(item);
+	}
+}
+function hide_hasAdd() {
+	$('#mask,#hasAdd_area').hide();
+}
+
+function updateAddNum() {
+	$('#userHasAddNum').text(hasAdd_user.rowId.length);
+	$('#orgHasAddNum').text(hasAdd_org.rowId.length);
+	$('#roleHasAddNum').text(hasAdd_role.rowId.length);
+}
+
+
+function submitData(arr,name){
+	var auJson = '{au:['
+	for (var i = 0, l = arr.rowId.length; i < l; i++) {
+		var id = arr.rowId[i];
+		var item = arr.items[i];
+
+		auJson = auJson + '{';
+		auJson = auJson + 'auType:"' + auType + '",';
+		auJson = auJson + 'ownerId:"' + item[name] + '",';
+		auJson = auJson + 'dataOperateAu:"' + (item.read + item.write) + '",';
+		auJson = auJson + 'shareId:"' + "" + '"';
+		if (i == l - 1) {
+			auJson = auJson + '}';
+		} else {
+			auJson = auJson + '},';
+		}
+
+	}
+	auUserJson = auJson + ']}';
+	return auUserJson;
+}
+$(function () {
+	init();
+	$('#save_btn').click(function () {
+		var button = $(this);
+		if (hasAdd_org.rowId.length == 0&&hasAdd_role.rowId.length == 0&&hasAdd_user.rowId.length == 0) {
+			$.dialog.tips('请设置一个读写权限！');
+		} else {
+			//button.attr("disabled", "disabled").val("正在提交...");
+			jQuery.post("${base}/admin/knowledgePublish/insertKnowledgeRight.action", { "dataId":dataId,"auUser":submitData(hasAdd_user,'accountName'),"auRole":submitData(hasAdd_role,'id'),"auOrg":submitData(hasAdd_org,'id')}, function (data) {
+				if (data["result"] == "success") {
+					$.dialog.tips(data["message"]);
+					ParentIframe.SimpleSearch();
+					window.top.closeWin("commonSelUser");
+				}else{
+					$.dialog.tips(data["message"]);
+				}	
+			});
+		}
+
+
+//			$.getJSON("${base}/admin/role/assingUserRole.action", obj, function (result) {
+//				button.attr("disabled", false).val("确定");
+//				$.dialog.tips(result.tips);
+//			});
+	});
+})
+</script>
+</html>

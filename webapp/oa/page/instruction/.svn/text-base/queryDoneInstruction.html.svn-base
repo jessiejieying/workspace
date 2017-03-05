@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;">
+
+	<div class="container-layout line">
+		<#include "/aufw/page/include/script.html">
+		<table style="width: 100%;" id="common_table">
+			<tr>
+				<td class="ver-top">
+					<div class="grid-table-top" id="grid_table">
+						<div class="js-tool-bar">
+							<div class="form-group header-group">
+								<span class="header-title">批示领导:</span>
+                                <input id="instructionLeader" type="text" class="tool-bar-input margin-left-in" style="width:130px;" placeholder="" />
+                                <div class="button button-main margin-left-out" id="senior_grid_search">搜索</div>
+								<div class="button js-level-search margin-left-in">高级搜索<i class="li-icon-arrow-down"></i></div>
+							</div>
+							<div class="level-searh form-group header-group" style="display: none;">
+								<span id="receiveDateSpan"class="header-title margin-let-out">来文时间:</span>
+								<div id="receiveDateDiv" class="display-ib margin-top0">
+                                    <input name="fromStartDate" id="fromStartDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height: 26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', maxDate:'#F{$dp.$D(\'fromEndDate\')||\'2025-10-01 00:00:00\'}'})" size="19" type="text">
+                                    <span class="header-title margin-left-in">至</span>
+                                    <input id="fromEndDate" style="cursor: pointer;height: 26px;" size="19" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'fromStartDate\')}',maxDate:'2025-10-01 00:00:00'})" name="fromEndDate" type="text">
+								</div>
+								<span class="header-title margin-left-out">批示内容:</span>
+                                <input id="instructionContent" type="text" class="tool-bar-input margin-left-in" style="width:110px;" placeholder="" />
+                                <span class="header-title margin-left-out">来文标题:</span>
+                                <input id="fromTitle" type="text" style="width:110px;" class="tool-bar-input margin-left-in" placeholder="" />
+                                <span class="header-title margin-left-out">归档情况:</span>
+                                <select id="archiveType" class="input margin-left-in" style="width: 100px;" name="archiveType">
+						            <option value="" ></option>
+						      		<#list archiveTypeDictList as entry>
+						          		<option value="${entry.dictValue!}" >${entry.displayName!}</option>
+						            </#list>
+						            </select>
+							</div>
+						</div>
+						<div class="js-grid-father grid-father">
+							<table id="manage_grid" class="bsgrid">
+								<tr>
+									<th w_index="id" w_hidden="true" class="hidden"></th>
+									<th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+									<th width="40">序号</th>
+									<th w_index="instructionOrder" width="100">批示序号</th>
+									<th w_index="instructionContent" width="200">批示内容</th>
+									<th w_index="sendToExchangeTimeStr" width="130">下发时间</th>
+									<th w_index="fromDept" width="100">来文单位</th>
+									<th w_index="fromTitle2">来文标题</th>
+									<th w_index="archiveType" width="60">归档状态</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!--表单、流程，基于jquery的方法-->
+	<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+	<script src="${base}/oa/resource/js/task.js"></script>
+ 	<script src="${base}/oa/resource/js/instructionUtils.js"></script>
+	<script>
+var gridOne;
+var instType = "${instType}";
+var selectURL = "${base}/admin/instruction/queryByCondition.action?iType=done";
+var showURL = "${base}/form/fceform/common/run.html?djtype=eden&is_oa_bill=true&wfs=finish&actionId=show&djsn=oa_leader_instruction_form&wfId=";
+$(function(){
+    layOut("#common_table","#grid_table");
+
+    //grid初始化
+     gridOne=$.fn.bsgrid.init("manage_grid", {
+        url:selectURL + "?etc="+new Date().getTime(),
+        row_primary_key: "primaryKey",
+        autoLoad: true,
+        pageSizeSelect: true,
+        pageSize:15,
+        complete:function(options, XMLHttpRequest, textStatus){
+        },
+        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+        },
+        additionalAfterRenderGrid:function(){
+        	gridOne.initGrid();
+        	$("#manage_grid tbody tr").each(function(){
+        		var $this=$(this);
+        		    $("td",this).eq(1).css("padding-left","8px");
+        			$index=parseInt($this.attr("index"));
+        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+        			$("td",this).eq(2).css({"text-align":"center","padding-left":"0px"});
+        			$("td",this).eq(3).css({"text-align":"center","padding-left":"0px"});
+        			$("td",this).eq(8).css({"text-align":"center","padding-left":"0px"});
+        	});
+       
+    }});
+
+
+     $("#search").change(function(){
+     	var $this=$(this),
+     		$val=$this.val();
+     		if($val==("isRecord")){
+     				$(".js-search_text").hide();
+     				$("#recordSelect").show();
+     		}
+     		else{
+     			$(".js-search_text").show();
+     			$("#recordSelect").hide();
+     		}
+
+     });
+      
+     $("#instructionLeader").bind("propertychange input",function(){
+    		var requsetUrl = requestStr(selectURL,instType);
+            gridOne.changeUrl(requsetUrl);
+     });
+    //工具条搜索 异步交互
+    $(document).on("click","#grid_search",function(){
+        var clu = $("#search").val();
+        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+        var symbol = "?";
+        if(selectURL.indexOf("?")>0){
+        	symbol = "&";
+        }
+        gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+    });
+
+    //工具条高级搜索 展开
+    $(document).on("click",".js-level-search",function(){
+        girdTable(this);
+		$('.li-icon-arrow-down').toggleClass('li-icon-arrow-top');
+    });
+
+    //工具条高级搜索 异步交互
+    $(document).on("click","#senior_grid_search",function(){
+       	var requsetUrl = requestStr(selectURL,instType);
+        gridOne.changeUrl(requsetUrl);
+    });
+    
+});
+
+//查看任务
+function show(id){
+	var task_name = "";
+	var item = getRecord(id);
+	window.open(showURL + item.wfId);
+}
+</script>
+</body>
+</html>

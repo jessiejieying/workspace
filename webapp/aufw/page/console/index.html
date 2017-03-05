@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html class="index">
+<head>
+	<title>${sysinfo.sysName}</title>
+	<!--以下可以提出放入一个公用页面-->
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=10,chrome=1" />
+	<link rel='shortcut icon' href='${base}/aufw/resources/favicon.ico' type='image/x-icon' />
+
+	<!-- 自定义基础样式 -->
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+
+	<!--<link rel="stylesheet" type="text/css" attr="skins" id="indexCss" href="${base}/aufw/resources/skins/${accountInfo.uiTopic!sysinfo.mySkin}/css/index.css">-->
+
+	<!--<link rel="stylesheet" type="text/css" attr="skins" id="listCss" href="${base}/aufw/resources/skins/${accountInfo.uiTopic!sysinfo.mySkin}/css/list.css">-->
+	<!--<link rel="stylesheet" type="text/css" attr="skins" id="iconCss" href="${base}/aufw/resources/skins/${accountInfo.uiTopic!sysinfo.mySkin}/css/icon.css">-->
+
+	<!--layer css引入-->
+	<!--<link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/layer/skin/layer.css"/>-->
+
+	<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css" id="style_css"/>
+    <script>
+        var project="${base}";
+    </script>
+</head>
+<body>
+<input type='hidden' id='jid' value="eden@rj.openfire.com" />
+<input type='hidden' id='pass' value="1qazxsw2" />
+<button class="button icon-navicon" data-target="#nav-main5">
+</button>
+<div class="ed-header" id="ed_header">
+	<div class="navbar ed-top">
+        <div class="ed-header-title"></div>
+		<div class="ed-header-ul">
+			<ul class="nav nav-menu  clearfix" id="top_nav">
+				<#list root.item as module1>
+					<#if module1.openType == 12>
+						<li class="nav-leftmenu-page js-top-li" module-id="${module1.moduleId!}" parent-id="${module1.parentId!}" open-type="" module-type="${module1.moduleType!}" module-url="<#if module1.link?? && module1.link!="">
+                        <#if module1.link?index_of("http")!=-1>
+                            ${module1.link!}&ticket=${sessionId!}
+                        <#else>
+                            ${base}${module1.link!}
+                        </#if>
+                    </#if>">
+							<a title="${module1.displayName!}" <#if module1.item??>class="dropdown-toggle" data-toggle="dropdown" </#if>>${module1.displayName!}<#if module1.openType != 11></#if></a>
+						</li>
+					<#else>
+						<li class="nav-leftmenu-page js-top-li" module-id="${module1.moduleId!}" parent-id="${module1.parentId!}" open-type="${module1.openType!}" module-type="${module1.moduleType!}" module-url="<#if module1.link?? && module1.link!="">
+                        <#if module1.link?index_of("http")!=-1>
+                            ${module1.link!}&ticket=${sessionId!}
+                            <#else>
+                                ${base}${module1.link!}
+                        </#if>
+                        </#if>">
+							<a title="${module1.displayName!}" <#if module1.item??>class="dropdown-toggle" data-toggle="dropdown" </#if>>${module1.displayName!}<#if module1.openType != 11></#if>
+
+                        </a>
+							<#if module1.item??>
+								<ul class="dropdown-menu">
+									<#list module1.item as module2>
+										<li class="nav-leftmenu-page" module-id="${module2.moduleId!}" parent-id="${module1.parentId!}"  open-type="${module2.openType!}" module-type="${module2.moduleType!}" module-url="<#if module2.link?? && module2.link!="">
+                                        <#if module2.link?index_of("http")!=-1>
+                                            ${module2.link!}&ticket=${sessionId!}
+                                            <#else>
+                                                ${base}${module2.link!}
+                                        </#if>
+                            </#if>">
+											<a <#if module2.item??>tabindex="1"</#if> title="${module2.displayName!}">${module2.displayName!}</a>
+						
+											<#if module2.item??>
+												<ul class="dropdown-menu">
+													<#list module2.item as module3>
+														<li module-id="${module3.moduleId!}" parent-id="${module1.parentId!}"  open-type="${module3.openType!}" module-type="${module3.moduleType!}" module-url="<#if module3.link?? && module3.link!="">
+                                                        <#if module3.link?index_of("http")!=-1>
+                                                            ${module3.link!}&ticket=${sessionId!}
+                                                            <#else>
+                                                                ${base}${module3.link!}
+                                                        </#if>
+                                            </#if>">
+											     			<a title="${module3.displayName!}">${module3.displayName!}</a>
+														</li>
+													</#list>
+												</ul>
+											</#if>
+										</li>
+									</#list>
+								</ul>
+							</#if>
+						</li>
+					</#if>
+				</#list>
+			</ul>
+
+            <!--隐藏搜索框-->
+			<!--<div class="ed-header-search">-->
+				<!--<input type="text" placeholder="输入搜索内容" />-->
+				<!--<i class="icon-search"></i>-->
+			<!--</div>-->
+
+		</div>
+		<ul class="ed-setting-btns" id="ul_setting">
+            <!--<li title="所属部门">-->
+                <!--<i class="icon-university"></i>${(orgInfoView.orgName)!}-->
+            <!--</li>-->
+			<!--<li title="用户名" ><i class="icon-user"></i>${(accountInfo.userId)!}</li>-->
+			<!--<li title="退出系统" id="log_out"><i class="icon-power-off"></i>退出</li>-->
+		</ul>
+	</div>
+</div>
+<div class="ed-main" id="ed_main">
+	<div class="tab-content pull-left"  id="ed_tab_content">
+		<div class="tab-pane ed-content-pane active js-page-index" id="content_todo">
+		</div>
+	</div>
+</div>
+<script id="settingTemplate" type="text/template">
+    <%_.each(settingLiDatas,function(item){%>
+    <li title="<%=item.title%>" id="<%=item.id%>" data-name="<%=item.name%>">
+        <i class="<%=item.style%>"></i><%=item.name%>
+    </li>
+    <%});%>
+</script>
+<!-- jquery 框架v 1.11 -->
+<script src = "${base}/edenui/common/js/jquery.js"></script>
+<!--兼容1.9版本以前的旧方法-->
+<script src = "${base}/edenui/common/js/jquery_migrate.min.js"></script>
+
+<!-- jquery插件：弹出层、提示 -->
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+
+<!-- jquery插件：滚动条 -->
+<!--<script src = "${base}/edenui/common/js/jq_plugins/perfect_scrollbar/perfect_scrollbar.min.js"></script>-->
+
+<script src="${base}/edenui/common/js/jq_plugins/niceScrollBar/jquery.nicescroll.min.js"></script>
+
+<!-- DHX公共部分 -->
+<!--<script src="${base}/edenui/common/js/plugins/dhtmlx/dhtmlxcommon.js"></script>-->
+
+<!-- DHX基础 -->
+<!--<script src="${base}/edenui/common/js/plugins/dhtmlx/dhtmlxLayout/sources/dhtmlxcontainer.js"></script>-->
+
+<!-- 日历插件的js引入-->
+<!--<script src="${base}/edenui/common/js/plugins/My97DatePicker/WdatePicker.js"></script>-->
+
+<!-- 翻页插件的JS引入 -->
+<!--<script src="${base}/edenui/common/js/jq_plugins/page_plus/page_plus.js"></script>-->
+
+<!-- 首页引用 -->
+<script src = "${base}/edenui/common/js/ed_index.js"></script>
+
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<!--respond.js 解决ie8响应式不兼容-->
+
+<script src = "${base}/edenui/common/js/respond.js"></script>
+
+<!-- openfire 消息服务前端调用方法 -->
+<!--<script type="text/javascript" src="${base}/edenui/common/js/plugins/strophe.js"></script>-->
+
+<!--&lt;!&ndash; eden首页消息相关方法 &ndash;&gt;-->
+<!--<script src = "${base}/edenui/common/js/ed_message.js"></script>-->
+<script>
+    var base = '${base}';
+    var indexModule=parseInt('${moduleId!}')?parseInt('${moduleId!}'):0;
+
+    //顶部设置
+    var settingLiDatas=[
+        {
+            "title":"所属部门",
+            "name":"${(orgInfoView.orgName)!}",
+            "id":"",
+            "style":"li-icon-unit"
+        },
+        {
+            "title":"用户名",
+            "name":"${(accountInfo.userId)!}",
+            "id":"",
+            "style":"li-icon-user"
+        },
+        {
+            "title":"退出系统",
+            "name":"退出",
+            "id":"log_out",
+            "style":"li-icon-off"
+        }
+    ];
+    //页面配置项
+    var orgName=["车俊","袁家军","蔡奇","毛光烈","熊建平","王建满","黄旭明","郑继伟","朱从玖","梁黎明","孙景淼","李卫宁","王晓峰"];
+
+    // 首页，姓名组织显示地方。所有副秘书长级别以上，组织都显示省政府。
+    for(var i= 0,max=orgName.length;i<max;i++){
+        if(orgName[i]===settingLiDatas[1].name){
+            settingLiDatas[0].name="省政府";
+            break;
+        }
+    }
+
+    var page={
+        init:function(){
+                var $this=$("#top_nav>li").eq(indexModule);
+                $this.addClass("active");
+                var id = $this.attr('module-id');
+                var text = $this.children().eq(indexModule).text();
+                var openType = $this.attr('open-type');
+                var parentId = $this.attr('parent-id');
+                var parentText = $this.parent().prev().attr('title');
+                var contentType = 1;
+                var url = $this.attr('module-url');
+                createTab({
+                    id: id,
+                    text: text,
+                    openType: openType,
+                    parentId: parentId,
+                    parentText: parentText,
+                    menuObj: $this,
+                    closeType: contentType,
+                    url:url,
+                    scrolling: 'auto'
+                });
+
+                //一开始显示待办公文
+//		$("#oa_daiban_document").addClass("on").siblings("li").removeClass('on');
+//		var iframeUrl=$("#oa_daiban_document a").attr("href");
+//		$("iframe").attr("src",iframeUrl);
+
+                noteTipWaiting();
+                //隐藏左侧滚动条
+                $(".js-ed-left-nav-ul-box").niceScroll({cursoropacitymax:0,cursorborder:"none" });
+                $(".js-ed-left-nav-ul-box").getNiceScroll().hide();
+
+        }
+    }
+	$(function() {
+
+        $('#ul_setting').html(_.template($('#settingTemplate').html()));
+
+		//整体布局
+		setTimeout(function(){
+		pageLayout();
+			}, 0);
+
+		//管理员登入改变nav宽度
+		if($("#ul_setting li").eq(1).data("name") == "管理员"){
+			$(".ed-header-ul ul li").css("width","88px")
+		}
+
+        page.init();
+
+		//退出系统
+
+        $(document).on("click","#log_out",function(){
+			var logOut=layer.confirm('确定退出系统吗？', {icon: 3}, function(index){
+				window.location.href = "${base}/logon/logonOut.action";
+				layer.close(index);
+			});
+		});
+
+
+
+		//顶部菜单点击事件
+		$('#top_nav').find('li').each(function(index, element) {
+
+			$(this).click(function() {
+				$(this).addClass("active").siblings("li").removeClass("active");
+				var id = $(this).attr('module-id');
+				var text = $(this).children().eq(0).text();
+				var openType = $(this).attr('open-type');
+				var parentId = $(this).attr('parent-id');
+				var parentText = $(this).parent().prev().attr('title');
+				var contentType = 1;
+				var menuObj;
+				var url = $(this).attr('module-url');
+				if(this.children.length == 1) {
+					createTab({
+						id: id,
+						text: text,
+						openType: openType,
+						parentId: parentId,
+						parentText: parentText,
+						menuObj: this,
+						closeType: contentType,
+						url: url,
+						scrolling: 'auto'
+					});
+				}
+				else{
+					if(openType==11){
+						menuObj = $(this).parent().parent()[0] ;
+						createTab({
+							id: id,
+							text: text,
+							openType: openType,
+							parentId: parentId,
+							parentText: parentText,
+							menuObj: this,
+							closeType: contentType,
+							url: url,
+							scrolling: 'auto'
+						});
+					}
+				}
+				//隐藏左侧滚动条
+				$(".js-ed-left-nav-ul-box").niceScroll({cursoropacitymax:0,cursorborder:"none" });
+				$(".js-ed-left-nav-ul-box").getNiceScroll().hide();
+				clearInterval(circlrTipPolling);
+				circlrTipPolling=null;
+				noteTipWaiting();
+			});
+			setTimeout(function(){
+				//弹出窗口
+				var setWindow ={
+					show:function(){
+						try{
+							var timer=setTimeout(function () {
+								setWindow.clearSet();
+							},500);//0.5秒执行一次
+						}catch(e){
+							setWindow.show();
+						}
+
+					},
+					clearSet:function(){
+						clearTimeout(setWindow.timer);
+					}
+				}
+
+				setWindow.show();
+
+			},4000);
+		});
+
+
+		//窗口重置后页面重新布局
+		$(window).resize(function() {
+            pageLayout();
+
+            if ($(".ed-left").length>0) {
+
+            var $window = $(window),
+                    $edRight = $(".js-ed-right"),
+                    $edLeft = $(".ed-left");
+            $edRight.width($window.width() - $edLeft.width());
+
+
+            var inframeId = $(".js-ed-left-nav .on a").attr("target");
+
+            //inframe右侧 tablefixed改变宽度
+            var fixedTable = $(window.frames[inframeId].document).find(".bsgrid-header");
+            fixedTable.each(function () {
+                var $this = $(this);
+                var tableGird = $this.closest(".js-fixed-father").find(".bsgrid"),
+                        tableheaderFixed = $this;
+//                var $width = parseInt($(tableGird).width() + 1);
+//                //ie8
+//                if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g, "") != "MSIE8.0") {
+//                    $width = parseInt($(tableGird).width()) - 1;
+//                }
+//                $(tableheaderFixed).width($width);
+
+				var $tableFather=$(tableGird).closest("div");
+
+				$(tableheaderFixed).outerWidth($tableFather[0].scrollWidth);
+            });
+        }
+
+
+		});
+	})
+
+	function loadExtentFile(filePath, fileType){
+		if(fileType == "js"){
+			var oJs = document.createElement('script');
+			oJs.setAttribute("type","text/javascript");
+			oJs.setAttribute("src", filePath);  //文件的地址
+			document.getElementsByTagName("head")[0].appendChild(oJs);//绑定
+		}else if(fileType == "css"){
+			var oCss = document.createElement("link");
+			oCss.setAttribute("rel", "stylesheet");
+			oCss.setAttribute("type", "text/css");
+			oCss.setAttribute("href", filePath);
+			document.getElementsByTagName("head")[0].appendChild(oCss);//绑定
+		}else if(fileType == "less"){
+			var oLess = document.createElement("link");
+			oLess.setAttribute("rel", "stylesheet/less");
+			oLess.setAttribute("type", "text/css");
+			oLess.setAttribute("href", filePath);
+			document.getElementsByTagName("head")[0].appendChild(oLess);//绑定
+		}
+	}
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="/form/resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'></script><script >document.styleSheets[0].addRule("fc\\:fc_code","behavior: url(../../fceform/htc/fc_code.htc)",0);</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib dj_sn="oa_send_document_draft" caption="收发文" type="eden" isfile="是" center="  " posleft postop poswidth posheight toolbar="不带工具栏" window="当前窗口" BLONopen BLONopenBefore BLONclose userType alertType="1" isCheckPermit="否" billtaborder="<root><taborder>dropdownlist2</taborder><taborder>dropdownlist4</taborder><taborder>dropdownlist3</taborder><taborder>dropdownlist5</taborder><taborder>dropdownlist6</taborder><taborder>dropdownlist7</taborder><taborder>dropdownlist8</taborder><taborder>dropdownlist9</taborder></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:2;radio:0;listbox:1;textarea:1;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:4;div:4;DsMain_field:0;a:0;button:4;text:5;hr:0;checkboxlist:0;radiolist:0;dropdownlist:9;grid:0;dataset:1;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0" contxml="<root><tab><id>tab4</id></tab><div><id>outer_wrap</id></div><dropdownlist><id>dropdownlist2</id><id>dropdownlist4</id><id>dropdownlist3</id><id>dropdownlist5</id><id>dropdownlist6</id><id>dropdownlist7</id><id>dropdownlist8</id><id>dropdownlist9</id></dropdownlist><dataset><id>dataset1</id></dataset></root>" AutoResizeXml><DIV style="WIDTH: 760px; HEIGHT: 841px" id=outer_wrap controltype="div">
+<H1>测试流程</H1>
+<DIV style="POSITION: absolute; WIDTH: 750px; HEIGHT: 761px; TOP: 40px; LEFT: 0px" id=tab4 class=tab-pane controltype="tab" IsHideTitle="undefined" showtype="luna">
+<DIV style="WIDTH: 750px; HEIGHT: 743px" class=tab-page>
+<H2 class=tab>基本信息</H2>
+<DIV id=faWen1 c>
+<TABLE class=table_border_1px border=0 borderColor=#808080 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle><STRONG><STRONG>*</STRONG></STRONG>文件标题 </DIV></TD>
+<TD vAlign=center><INPUT style="WIDTH: 97.87%; HEIGHT: 23px" value=AREANAME field="AREANAME" china="AREANAME" dataset="dataset1" controltype="text"></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>内容概述 </DIV></TD>
+<TD style="HEIGHT: 52px"><TEXTAREA style="WIDTH: 98.03%; HEIGHT: 55px" rows=3 name=Summary controltype="textarea"></TEXTAREA></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%" align=center>
+<TBODY>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle><STRONG>*</STRONG>拟稿部门 </DIV></TD>
+<TD vAlign=center width=160><INPUT name=Drafter2 controltype="text"></TD>
+<TD bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle>拟稿日期 </DIV></TD>
+<TD vAlign=center width=160><INPUT name=Drafter3 controltype="text"></TD>
+<TD bgColor=#efefef vAlign=center width=80>
+<DIV class=tdTitle><STRONG>*</STRONG>拟 稿 人 </DIV></TD>
+<TD vAlign=center><INPUT name=Drafter controltype="text"></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>拟稿备注 </DIV></TD>
+<TD vAlign=center><INPUT name=DraftMemo controltype="text"></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle><STRONG>*</STRONG>公开属性 </DIV></TD>
+<TD vAlign=center><?xml:namespace prefix = fc /><fc:fc_code id=dropdownlist2 class=ef_design_dropdownlist visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="<tr height='20px' ><td>sf</td><td>1</td></tr><tr height='20px' ><td>12</td><td>3</td></tr>" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" field="undefined" dataset="undefined" datasourceName="" controltype="dropdownlist" width="141" height="20" top="0" left="0" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>免予公开依据</DIV></TD>
+<TD vAlign=center><INPUT style="WIDTH: 92.95%; HEIGHT: 19px" name=OpenBasis controltype="text"></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>密　　级 </DIV></TD>
+<TD vAlign=center><fc:fc_code id=dropdownlist4 class=ef_design_dropdownlist visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="<tr height='20px' ><td>3</td><td>1</td></tr>" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" field="undefined" dataset="undefined" datasourceName="" controltype="dropdownlist" width="141" height="20" top="0" left="0" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>保密期限 </DIV></TD>
+<TD vAlign=center><fc:fc_code id=dropdownlist3 class=ef_design_dropdownlist visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="<tr height='20px' ><td>4</td><td>1</td></tr>" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" field="undefined" dataset="undefined" datasourceName="" controltype="dropdownlist" width="141" height="20" top="0" left="0" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>定密依据 </DIV></TD>
+<TD vAlign=center><INPUT name=SecLevelBase controltype="text"></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>办理缓急 </DIV></TD>
+<TD vAlign=center><fc:fc_code id=dropdownlist5 class=ef_design_dropdownlist visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="<tr height='20px' ><td>1</td><td>3</td></tr>" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" field="undefined" dataset="undefined" datasourceName="" controltype="dropdownlist" width="141" height="20" top="0" left="0" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>内容缓急 </DIV></TD>
+<TD vAlign=center><fc:fc_code id=dropdownlist6 class=ef_design_dropdownlist visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="<tr height='20px' ><td>2</td><td>4</td></tr>" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" field="undefined" dataset="undefined" datasourceName="" controltype="dropdownlist" width="141" height="20" top="0" left="0" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle><STRONG>*</STRONG>拟稿人电话 </DIV></TD>
+<TD vAlign=center><INPUT name=DraftPhone controltype="text"></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>规 范 性 </DIV></TD>
+<TD><fc:fc_code id=dropdownlist7 class=ef_design_dropdownlist visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="<tr height='20px' ><td>d</td><td>2</td></tr>" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" field="undefined" dataset="undefined" datasourceName="" controltype="dropdownlist" width="141" height="20" top="0" left="0" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>规范编号 </DIV></TD>
+<TD><INPUT name=NormalNo controltype="text"></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle><STRONG>*</STRONG>文件分类 </DIV></TD>
+<TD><fc:fc_code id=dropdownlist8 class=ef_design_dropdownlist visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="<tr height='20px' ><td>c</td><td>1</td></tr>" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" field="undefined" dataset="undefined" datasourceName="" controltype="dropdownlist" width="141" height="20" top="0" left="0" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%">
+<TBODY>
+<TR>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle>主　　送 </DIV></TD>
+<TD><INPUT name=input controltype="text"></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>抄　　送 </DIV></TD>
+<TD><INPUT name=input2 controltype="text"></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>分　　送 </DIV></TD>
+<TD><INPUT name=input3 controltype="text"></TD></TR>
+<TR>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width="1%">
+<DIV class=tdTitle>内部抄送 </DIV></TD>
+<TD bgColor=#ffffff vAlign=center width="100%"><INPUT name=input4 controltype="text"></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle>附件说明 </DIV></TD>
+<TD vAlign=center width=160><INPUT name=DraftMemo2 controltype="text"></TD>
+<TD bgColor=#f7f7f7 vAlign=center width=70>
+<DIV class=tdTitle>附件数量 </DIV></TD>
+<TD vAlign=center width=160><INPUT name=DraftMemo3 controltype="text"></TD>
+<TD bgColor=#f7f7f7 vAlign=center width=80>
+<DIV class=tdTitle><STRONG>*</STRONG>机关代字</DIV></TD>
+<TD bgColor=#ffffff vAlign=center><INPUT name=DraftMemo4 controltype="text"></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle>部门核稿 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center width=160></TD>
+<TD bgColor=#efefef vAlign=center width=70>
+<DIV class=tdTitle>核稿时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center width=160></TD>
+<TD bgColor=#efefef vAlign=center width=80>
+<DIV class=tdTitle><STRONG>*</STRONG>文件种类 </DIV></TD>
+<TD id=DocType vAlign=center><fc:fc_code id=dropdownlist9 class=ef_design_dropdownlist visible="是" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="<tr height='20px' ><td>3</td><td>1</td></tr>" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" field="undefined" dataset="undefined" datasourceName="" controltype="dropdownlist" width="141" height="20" top="0" left="0" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>会　　稿 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>会稿时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>页　　数 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>审　　核 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>审核时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>印刷份数 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>签　　发 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>签发时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>查询级别 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>办公室核稿 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>核稿时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>流 水 号 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD></TR>
+<TR vAlign=top>
+<TD style="LINE-HEIGHT: 20px" bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>校　　对 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>校对时间 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>文　　号 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>印发时间 </DIV></TD>
+<TD bgColor=#f7f7f7></TD>
+<TD bgColor=#efefef></TD>
+<TD bgColor=#f7f7f7></TD>
+<TD bgColor=#efefef></TD>
+<TD bgColor=#f7f7f7></TD></TR></TBODY></TABLE>
+<TABLE class=table_border_1px border=0 cellPadding=0 width="100%">
+<TBODY>
+<TR vAlign=top>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle>发文单位 </DIV></TD>
+<TD bgColor=#f7f7f7></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef vAlign=center>
+<DIV class=tdTitle>分发范围 </DIV></TD>
+<TD bgColor=#f7f7f7 vAlign=center></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>关 联 号 </DIV></TD>
+<TD bgColor=#f7f7f7></TD></TR>
+<TR vAlign=top>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>相关链接 </DIV></TD>
+<TD bgColor=#f7f7f7></TD></TR></TBODY></TABLE></DIV></DIV>
+<DIV style="WIDTH: 750px; HEIGHT: 743px" class=tab-page>
+<H2 class=tab>办理单</H2></DIV></DIV>
+<SCRIPT>var tab4 = new WebFXTabPane( document.getElementById( "tab4" ) );</SCRIPT>
+</DIV><fc:dataset id=dataset1 format="<fields><field><fieldname>AREANAME</fieldname><datatype>字符</datatype><displaylabel>AREANAME</displaylabel><size>50</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>FATHER_ID</fieldname><datatype>字符</datatype><displaylabel>FATHER_ID</displaylabel><size>50</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>NEW_AREAID</fieldname><datatype>字符</datatype><displaylabel>NEW_AREAID</displaylabel><size>50</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" controltype="dataset" isSubGrid="否" pubpara="否" opensortno="1" isaddemptyrec="否" submittype="1" submitno="1" issubds="否" idtype="1" onValid='bill_ondatasetvalid("<dsid><AREANAME></AREANAME><FATHER_ID></FATHER_ID><NEW_AREAID></NEW_AREAID></dsid>")' onGetText='bill_ondatasetgettext("<dsid><AREANAME></AREANAME><FATHER_ID></FATHER_ID><NEW_AREAID></NEW_AREAID></dsid>")' onSetText='bill_ondatasetsettext("<dsid><AREANAME></AREANAME><FATHER_ID></FATHER_ID><NEW_AREAID></NEW_AREAID></dsid>")'></fc:dataset></DIV><div id='addHtml'><style>
+td .ef_design_dropdownlist{margin:3px 0 0 3px;}
+#outer_wrap{ width:760px; height:1000px; margin:0 auto;background-color:#fff; position:relative;}
+#outer_wrap h1{ font-size:20px; text-align:center;padding-top:10px;}
+select,input,textarea{ outline:none;}
+#faWen1 { width: 740px; margin: 10px auto; }
+table.table_border_1px { border-collapse: collapse; table-layout: fixed; margin: 0 auto; margin-top: -1px; }
+table.table_border_1px td { border: 1px solid #808080; line-height: 30px; height:30px; }
+table.table_border_1px tr { border: none; }
+.tdTitle { color: #000080; text-align: center; width: 100%; }
+.tdTitle strong { color: #F00; }
+table.table_border_1px td select, table.table_border_1px td input { width: 90%; margin: 2px; }
+table.table_border_1px td textarea{ width:97%;margin: 2px; overflow:auto;}
+#outer_wrap .tab-pane .tab-page{border:0;}
+</style>
+</div> </body></html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+</head>
+<body style="height: 100%;">
+	<div class="container-layout line">
+		<#include "/aufw/page/include/script.html">
+		<table style="width: 100%;" id="common_table">
+			<tr>
+				<td class="ver-top">
+					<div class="grid-table-top" id="grid_table">
+						<div class="js-tool-bar">
+							<div class="form-group header-group">
+                                <span class="header-title">批示领导:</span>
+                                <input id="instructionLeader" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                                <div class="button button-main margin-left-out" id="senior_grid_search">搜索</div>
+								<div class="button margin-left-in js-level-search ">高级搜索<i class="li-icon-arrow-down"></i></div>
+							</div>
+							<div class="level-searh form-group header-group" style="display: none;">
+								<span class="header-title">来文时间:</span>
+                                <input name="fromStartDate" id="fromStartDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', maxDate:'#F{$dp.$D(\'fromEndDate\')||\'2025-10-01 00:00:00\'}'})" size="20" type="text">
+                                <span class="header-title margin-left-in">至</span>
+                                <input id="fromEndDate" style="cursor: pointer;height: 26px;" size="20" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'fromStartDate\')}',maxDate:'2025-10-01 00:00:00'})" name="fromEndDate" type="text">
+
+							    <span class="header-title margin-left-out">批示内容:</span>
+                                <input id="instructionContent" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                                <span class="header-title margin-left-out">来文标题:</span>
+                                <input id="fromTitle" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+                            </div>
+						</div>
+						<div class="js-grid-father grid-father">
+							<table id="manage_grid" class="bsgrid">
+								<tr>
+									<th w_index="id" w_hidden="true" class="hidden"></th>
+									<th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+									<th width="40">序号</th>
+									<th w_index="instructionOrder" width="120">批示序号</th>
+									<th w_index="fromDept" width="80">来文单位</th>
+									<th w_index="fromTitle2">来文标题</th>
+									<th w_index="instructionContent">批示内容</th>
+									<th w_index="instructionDateNew" width="90">批示时间</th>
+									<th w_index="draftDept" width="100">发送单位</th>
+									<th w_index="feedBackUnit" width="100">反馈单位</th>
+								
+								</tr>
+							</table>
+						</div>
+					</div>
+
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!--表单、流程，基于jquery的方法-->
+	<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+	<script src="${base}/oa/resource/js/task.js"></script>
+	<script src="${base}/oa/resource/js/instructionUtils.js"></script>
+	<script>
+var gridOne;
+var instType = "${instType}";
+var selectURL = "${base}/admin/instruction/queryByCondition.action?iType=doing&showStep=yes";
+var showURL = "${base}/form/fceform/common/run.html?djtype=eden&is_oa_bill=true&actionId=show&wfs=doing&djsn=oa_leader_instruction_form&wfId=";
+$(function(){
+	
+	
+    layOut("#common_table","#grid_table");
+
+    //grid初始化
+     gridOne=$.fn.bsgrid.init("manage_grid", {
+        url:selectURL + "?etc="+new Date().getTime(),
+        row_primary_key: "primaryKey",
+        autoLoad: true,
+        pageSizeSelect: true,
+        pageSize:15,
+        complete:function(options, XMLHttpRequest, textStatus){
+        },
+        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+        },
+        additionalAfterRenderGrid:function(){
+        	gridOne.initGrid();
+        	$("#manage_grid tbody tr").each(function(){
+        		var $this=$(this);
+        		    $("td",this).eq(1).css("padding-left","8px");
+        			$index=parseInt($this.attr("index"));
+        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+        			$("td",this).eq(2).css({"text-align":"center","padding-left":"0px"});
+        			$("td",this).eq(3).css({"text-align":"center","padding-left":"0px"});
+        	});
+       
+    }});
+
+
+    //工具条搜索 异步交互
+    $(document).on("click","#grid_search",function(){
+        var clu = $("#search").val();
+        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+        var symbol = "?";
+        if(selectURL.indexOf("?")>0){
+        	symbol = "&";
+        }
+        gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+    });
+
+    //工具条高级搜索 展开
+    $(document).on("click",".js-level-search",function(){
+        girdTable(this);
+		$('.li-icon-arrow-down').toggleClass('li-icon-arrow-top');
+    });
+
+    //工具条高级搜索 异步交互
+    $(document).on("click","#senior_grid_search",function(){
+       	var requsetUrl = requestStr(selectURL,instType);
+        gridOne.changeUrl(requsetUrl);
+    });
+    
+});
+
+//查看任务
+function show(id){
+	var task_name = "";
+	var item = getRecord(id);
+	window.open(showURL + item.wfId+"&wfName="+item.wfName);
+}
+//查看反馈信息
+function showFeedBack(id){
+	var item = getRecord(id);
+	var win={"text":"显示反馈单位","url":"${base}/admin/instructionFB/instructionFeedbackViewFeedCompany.action?documentId="+item.id,"width":"900","height":"550","parentIfr":window};
+	window.top.createWindow(win);
+}
+</script>
+</body>
+</html>

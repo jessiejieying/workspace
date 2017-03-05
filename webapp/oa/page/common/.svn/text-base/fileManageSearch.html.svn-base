@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+	<link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="form-group header-group">
+					<div class="button common-skin-btn-syle01" id="grid_add">添加</div>
+						<select id="search" class="input display-ib margin-small-left" style="width: 100px;" name="age">							
+					      <#list relateLinkTypeDictList! as entry>
+					          <option value="${entry.dictValue!}" <#if moduleType?? && entry.dictValue=moduleType>selected="selected"</#if>>${entry.displayName!}</option>
+					      </#list>
+						</select>
+						
+						<input id="search_text" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+						
+						<div class="button button-main margin-left-in" id="grid_search">搜索</div>
+					</div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_index="link" w_hidden="true" class="hidden"></th>
+	                  <th w_index="module_type" w_hidden="true" class="hidden"></th>
+	                  <th w_index="module_type_cn" w_hidden="true" class="hidden"></th>
+	                   <th w_index="title" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="40"></th>	               
+	                  <th w_index="title" width="">标题</th>
+	                  <th w_index="module_type_cn" width="100">类别</th>
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>		
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/documentRelateLink/searchRelateDoc.action";
+	var version='1';
+    var wf_name='oa_pb_incoming_message';
+    var wfType="${wfType!}";
+    var docId="${docId!}";
+    var fileManagePage=window.parent.document.getElementById('filePageId').contentWindow;
+    var fileDocId=fileManagePage.$docId;
+    var relateDocIdsData,moduleTypesData,linksData,titlesData,moduleTypeCnsData;
+
+	$(function(){
+		
+		$("#grid_add").click(function(){
+			var gridCheckData=gridOne.getCheckedRowsRecords();
+			var addData=[];
+			var addUrl="${base}/admin/documentRelateLink/addRelateLink.action";
+
+		
+			if(gridCheckData.length>0){
+					gridCheckData.forEach(function(value){
+							addData.push({
+							
+								"relateDocIds":value.id,
+								"moduleTypes":value.module_type,
+								"titles":value.title,
+								"moduleTypeCns":value.module_type_cn,
+								"links":value.link
+
+					});
+					});
+
+				var  addDataTotal="["+addData.join(",")+"]";	
+				
+			}
+			else{
+				window.top.layer.msg("至少选择一个");
+				return
+			}
+			relateDocIdsData=addData.map(function(value){
+				
+					return value.relateDocIds;
+			});
+			moduleTypesData=addData.map(function(value){
+					return value.moduleTypes;
+			});
+			titlesData=addData.map(function(value){
+					return value.titles;
+			});
+			linksData=addData.map(function(value){
+					return value.links;
+			});
+			moduleTypeCnsData=addData.map(function(value){
+					return value.moduleTypeCns;
+			});
+
+			var postData={
+				"docId":fileDocId,
+				"relateDocIds":relateDocIdsData.join(","),
+				"moduleTypes":moduleTypesData.join(","),
+				"links":linksData.join(","),
+				"titles":titlesData.join(","),
+				"moduleTypeCns":moduleTypeCnsData.join(",")
+			}
+			
+			
+			$.post(addUrl,postData, function(data) {					
+					window.top.layer.msg("添加成功");
+					fileManagePage.linkDataShow();
+					setTimeout(function(){
+						window.top.closeWin("dhxPop");
+							}, 200);
+				});	
+
+		});
+
+		layOut("#common_table","#grid_table");
+
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime()+"&moduleType="+$("#search").val()+"&keyword="+($("#search_text").val()),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+
+		    	var getRowData=gridOne.getAllRecords();
+		    
+		    	
+		    	if(getRowData.length>0){
+		    	var gridContent=$("#manage_grid tbody tr");
+	    	
+		    	gridContent.each(function(index){
+
+		    		var $this=$(this);
+		    		var $title=getRowData[index].title;
+		    		var $link="${base}"+getRowData[index].link;
+		    		var html="<a  target='_blank' title="+$title+"  href="+$link+">"+$title+"</a>"
+		    		$this.find("td").eq(6).html(html);
+		    	});
+				}
+
+
+	        	
+		      }
+		  });
+		
+		$("#incoming_add").click(function(){
+			initWorkflow('oa_pg_incoming_document','收文登记','1');
+		});
+		$("#incoming_del").click(function(){
+		
+			initWorkflow('oa_send_document','发文流程','1');
+		});
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	      
+	        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+	       var searchURL =selectURL+ "?etc="+new Date().getTime()+"&moduleType="+$("#search").val()+"&keyword="+value;
+	        gridOne.changeUrl(searchURL);
+	    });
+	    
+	});
+	
+    //执行任务
+    function execute(id){
+    	var task_name = "";
+		var item = getRecord(id);
+		uf_doAction(item.wfId,wf_name,task_name,version,null);
+    }
+
+</script>
+
+</html>

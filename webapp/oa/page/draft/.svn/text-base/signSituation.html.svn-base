@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/apply.css">
+  </head>
+<body style="height: 100%;">
+<#if signList??>
+<#include "/aufw/page/include/loading.html">
+  <div class="container-layout line" style="padding-top: 30px;">
+      <div class="clearfix centerBlock"  style="width: 747px;margin:0 auto;">
+        <h6 class="form-ft-song margin-bottom">未签收单位(<span class="number">${signSituationMap.toSignCount}</span>个) <button class="button common-skin-btn-syle01 margin-left" id="">短信提醒</button></h6>
+        <table  id="common_table" class="border-top-blue">
+          <tr>
+            <!-- 右侧 -->
+            <td class="ver-top">
+              <div class="" id="grid_table">
+                <div class="js-grid-father grid-father">
+                  <table id="manage_grid" class="bsgrid" style="border-top: 2px solid #71b8ec;">
+                    <tr>
+                      <th w_index="id" w_hidden="true" class="hidden"></th>
+                      <th w_check="true" width="45" style="text-align: center !important;"></td>
+                      <th w_index="id" width="40" class="padding-left0" style="text-align: center !important;padding-left:0px !important;">序号</td>
+                      <th w_index="signOrg" width="337" style="padding-left:0px;text-align: center !important;">单位</td>
+                      <th w_index="contact-people" width="162" style="padding-left:0px;text-align: center !important;">联系人</th>
+                      <th w_index="contact-phone" width="150" style="padding-left:0px;text-align: center!important;">联系电话</th>
+                    </tr>
+                    <#list signList! as sign>
+                      <#if sign.signStatus?? && sign.signStatus=0>
+                        <tr>
+                          <td w_check="true" width="40"></td>
+                          <td w_index="id"><span class="js-sequence">${sign_index + 1}</span></td>
+                          <td w_index="signOrg" width="200">${sign.signOrg!}</td>
+                          <td w_index="contact-people" width="100"></td>
+                          <td w_index="contact-phone" width="165"></td>
+                        </tr>
+                      </#if>
+                    </#list>
+                  </table>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="clearfix centerBlock "  style="width: 747px;margin:0 auto;">
+        <h6 class="form-ft-song margin-big-top">已签收单位(<span class="number">${signSituationMap.hasSignCount}</span>个) </h6>
+        <table  id="common_table" class="border-top-blue margin-top">
+          <tr>
+            <!-- 右侧 -->
+            <td class="ver-top">
+              <div class="" style="border-top: 2px solid #71b8ec;">
+                <div class="js-grid-father grid-father">
+                  <table class="bsgrid" style="border-top: 2px solid #71b8ec;">
+                    <tr>
+                      <th w_index="id" width="40"style="text-align: center!important;padding-left:0px!important;">序号</td>
+                      <th w_index="signOrg" width="200" style="padding-left:0px;text-align: center !important;">签收单位</td>
+                      <th w_index="signOrg" width="100" style="padding-left:0px;text-align: center !important;">签收情况</td>
+                      <th w_index="signOrg" width="200" style="padding-left:0px;text-align: center !important;">签收内容</td>
+                      <th w_index="configCode" width="130" style="padding-left:0px;text-align: center !important;">签收时间</td>
+                    </tr>
+                    <#list signList! as sign>
+                      <#if sign.signStatus?? && sign.signStatus!=0>
+                        <tr>
+                          <td w_index="id" style="padding-left:0px;text-align: center !important;"><span class="js-sequence">${sign_index}</span></td>
+                          <td w_index="signOrg" width="200">${sign.signOrg!}</td>
+                          <td w_index="signOrg" style="padding-left:0px;text-align: center !important;" width="200"><#if sign.signStatus=0>未签收</#if><#if sign.signStatus=1>已签收</#if><#if sign.signStatus=2>已退文</#if></td>
+                          <td w_index="signOrg" width="200">${sign.signContent!}</td>
+                          <td w_index="configCode" width="200"><#if sign.signTime??>${sign.signTime?datetime!}</#if></td>
+                        </tr>
+                      </#if>
+                    </#list>
+                  </table>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+  </div>
+  <script>
+  </script>
+  <#else>
+  	documentId错误！
+  </#if>
+<#include "/aufw/page/include/script.html">
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+<script>
+</script>
+</body>
+</html>

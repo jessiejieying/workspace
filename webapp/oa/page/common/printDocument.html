@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <style>
+    .oa-form-line .form-group .field .field-left{width:120px;}
+    .oa-form-line .x12 .field .field-right{width:600px;}
+    </style>
+</head>
+<body>
+<div id="form_add" class="line oa-form-line">
+    <div class="form-group margin-large-top x12 check-success">
+        <div class="field">
+            <label class="field-left text-right">加印单位
+            </label>
+            <div class="field-right" style="position: relative;">
+            <input  type="text" class="input"  value="" id="unit">
+        </div>
+        </div>
+    </div>
+    <div class="form-group margin-large-top x12 check-success">
+        <div class="field">
+            <label class="field-left text-right">加印单位联系信息
+            </label>
+            <div class="field-right" style="position: relative;">
+            <input  type="text" class="input" value="" id="phone">
+        </div>
+        </div>
+    </div>
+    <div class="form-group margin-large-top x12 check-success">
+        <div class="field">
+            <label class="field-left text-right">费用承担单位
+            </label>
+            <div class="field-right" style="position: relative;">
+            <input  type="text" class="input" value="" id="const">
+        </div>
+        </div>
+    </div>
+    <div class="form-group margin-large-top x12 check-success">
+        <div class="field">
+            <label class="field-left text-right">加印份数
+            </label>
+            <div class="field-right" style="position: relative;">
+            <input  type="text" class="input" value="" id="count">
+        </div>
+        </div>
+    </div>
+    <div class="form-group margin-large-top x12 check-success">
+        <div class="field">
+            <label class="field-left text-right">加印日期
+            </label>
+            <div class="field-right" style="position: relative;">
+            <input  type="text" class="input" value="" id="printDttm" readonly="readonly" >
+        </div>
+        </div>
+    </div>
+     <div class="form-group margin-large-top x12 check-success">
+        <div class="field">
+            <label class="field-left text-left">文&nbsp;&nbsp;&nbsp;号
+            </label>
+            <div class="field-right" style="position: relative;">
+            <input  type="text" class="input" value="" id="fileNumber" readonly="readonly">
+        </div>
+        </div>
+    </div>
+     <div class="form-group margin-large-top x12 check-success">
+        <div class="field">
+            <label class="field-left text-right">标&nbsp;&nbsp;&nbsp;题
+            </label>
+            <div class="field-right" style="position: relative;">
+            <input  type="text" class="input" value="" id="fileTitle" readonly="readonly">
+        </div>
+        </div>
+    </div>
+    <div class="form-group form-group-footer x12 text-center">
+        <div id="save_btn" class="button button-main">打印预览</div>
+        <button id="getRecord" class="button button-main margin-left">加印记录</button>
+    </div>
+</div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script>
+
+  var $top = $(window.top.document);
+  var wfid = window.top.globalParams.wfid;
+    $(function(){
+        init();
+        $("#save_btn").click(function(){
+            var unit=$("#unit").val()?$("#unit").val():"",
+                phone=$("#phone").val()||"",
+                constStr=$("#const").val()||"",
+                count=$("#count").val()||"",
+                fileNumber=$("#fileNumber").val()||"",
+                fileTitle=$("#fileTitle").val()||"";
+//             if($bengin.val().length<1){
+//                 layer.msg("初核人不能为空!");
+//                 return;
+//             }
+//             if($issue.val().length<1){
+//                 layer.msg("签发人不能为空!");
+//                 return;
+//             }
+            var param = "&wfId="+wfid+"&unit="+unit+"&phone="+phone+"&const="+constStr+"&count="+count+"&fileNumber="+fileNumber+"&fileTitle="+fileTitle;
+			var url = "${base}/admin/sendDocument/printDocumentPage.action?etc=" + new Date().getTime() +window.encodeURI(encodeURI(param));
+			window.open(url);
+        });
+
+
+
+        $("#getRecord").click(function () {
+
+            var url="${base}/admin/sendDocument/printDocumentRecord.action?wfId="+wfid;
+            window.top.createWindow({
+                text:'加印记录',
+                url: url,
+                id: 'dhxPop',
+                width: '900',
+                height: '550'
+            });
+
+        });
+        
+
+    });
+
+
+    function init(){
+        $("#fileNumber").val($top.find("#DOCUMENT_NO").val());
+        $("#fileTitle").val($top.find("#TITLE").val());
+        $("#printDttm").val(new Date().Format("yyyy-MM-dd"));
+
+    }
+    
+    Date.prototype.Format = function (fmt) { //author: meizz 
+        var o = {
+            "M+": this.getMonth() + 1, //月份 
+            "d+": this.getDate(), //日 
+            "h+": this.getHours(), //小时 
+            "m+": this.getMinutes(), //分 
+            "s+": this.getSeconds(), //秒 
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+            "S": this.getMilliseconds() //毫秒 
+        };
+        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+
+</script>
+</html>

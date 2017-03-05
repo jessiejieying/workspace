@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+    <head>
+    <meta charset="utf-8">
+    <title>资源链接管理</title>
+  
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/style.html">
+
+
+    </head>
+
+    <body style="height:100%;">
+
+<!--  body 的style  应属性加上 height:100%;   是为了计算页面高度   -->
+
+<div id="tree_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+      <div id="tree_search" class="tree_search"></div>
+      <div id="tree" style="width:100%; padding-top: 3px;"></div>
+    </div>
+
+<!-- tree_wrap 这个 div 用于放置 左侧树和搜索树的工具栏 -->
+
+<div id="grid_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+		<!--    <div id="grid_toolbar" style="height:30px; width:100%;"> -->
+   
+     	<div id="toolbar" class="ed-toolbar" style="z-index:8;"> 
+      
+      <div class="input-prepend input-append">
+    
+
+    
+	
+	    </div>
+	    
+        <a btn_id="del" class="btn btn-warning toolbar_btn" href="javascript:void(0)"><i class="icon-download-alt icon-white"></i>删除</a>
+        
+        <div id="advanced_search_bar" class="advanced_search_bar">
+   
+        </div>
+  </div>
+      <div id="grid" style="width:100%;"></div>
+    	  <div class="ed-grid-page">
+    	  <div id="grid_page" class="grid_page" style="width:100%;height:18px; padding-top:10px;"></div>
+      </div>
+    </div>
+</body>
+   <#include "/aufw/page/include/script.html">
+ 
+    
+    
+    <script>
+    var layout,tree,treeSearch,grid,data,form,form2,tabbar,option,sendUrl,knowledgeId;
+    var version='1';
+    var docId="${docId!}";
+   var selectUrl="${base}/admin/documentRelateLink/selectRelateLink.action?hasEdit=1&docId="+docId+"&etc="+ new Date().getTime()+"&";
+    var isFromConsum=false; //是否是从资产领用过来
+    
+	 window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+    <!--    设置dhtmlx各组件用到的图片的的路径-->
+    function init() {       //初始化 方法
+    	
+  
+    	
+        layout = new dhtmlXLayoutObject(document.body, "1C");     //添加一个 3L的layout
+        layout.cells('a').hideHeader();         //隐藏 cell a 的 标题 ， b c 同理
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        <!-- 为layout添加监听事件    -->
+        <!-- onResizeFinish 为在layout大小变了之后触发 -->
+        <!-- onPanelResizeFinish 为在layout中一块区域大小变了之后触发 -->
+		
+        data = new dhtmlXDataStore({
+            url: selectUrl,
+            datatype: "json"
+        });     //添加一个 为DataStore
+	
+        layout.cells('a').attachObject('grid_wrap');
+        // 在 layout的 cell b上添加 ID为 grid_wrap 的div
+        grid = new dhtmlXGridObject('grid');
+        // 把 grid 添加到  ID为 grid的div中
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        
+        grid.setHeader(" ,标题,类别");
+        grid.setColumnIds("check,title,relateTypeCn");
+        grid.setInitWidths("30,*,130");
+        grid.setColTypes("ch,ro,ro");
+        
+     
+
+        grid.init();
+        // 初始化grid
+        grid.enablePaging(true,15,9999, 'grid_page', true);
+        //添加 grid的分页
+        //grid.enablePaging(fl, pageSize, pagesInGrp, parentObj, showRecInfo, recInfoParentObj)
+/*          @参数: fl - true|false - 是否分页
+        *   @参数: pageSize - 每页的行数
+        *   @参数: pagesInGrp - 可见的页面的数量
+        *   @参数: parentObj - 放置分页的 div的ID
+        *   @参数: showRecInfo - true|false - enable|disable showing of additional info about paging state
+        *   @参数: recInfoParentObj - ID or container which will be used for showing paging state
+*/
+
+        grid.setPagingSkin("toolbar");   //设置 分页的皮肤
+        grid.sync(data);                // grid从 DataStore中同步数据
+	
+ 		
+        page_layout();      // 调用page_layout方法   ,方法的声明在下面
+    }
+	
+	function  SimpleSearch(){
+		data.clearAll();
+		var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+		var clu = $("#search_type").val();
+		
+		var url = selectUrl+"&moduleType="+clu+'&keyword='+window.encodeURI(value);
+		window.data.data.url = url;
+		data.load(url);
+    }
+
+ 
+
+   /** 获取url参数**/
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    }
+
+
+
+
+    function toolbar_func(id){           // grid上面 的那些按钮的 功能
+        if (id == 'del') {
+        
+       	  var row_id = grid.getCheckedRows(0);
+          if (row_id == '') {
+              $.dialog.tips('请至少选择一条数据！');
+              return;
+          }
+          row_id = row_id.split(',');
+          if (row_id.length == 0) return;
+          $.dialog.confirm('你确定要批量删除吗？', function () {
+              var idArr = new Array();
+              for (var i = 0; i < row_id.length; i++) {
+                  idArr.push(data.item(row_id[i]).id);
+              }
+              var surl="${base}/admin/documentRelateLink/delRelateLink.action";
+              $.post(surl, {"ids":idArr.join(",")},function(result){
+              	if(result.result="success"){ 
+              		
+              		setTimeout(function(){
+                		
+						 var par_ifr = window.ParentIframe;
+						 if(par_ifr.addRelateLinkLi)
+						 {
+						 par_ifr.addRelateLinkLi();
+					 	} 
+      
+					 window.top.closeWin('relateLinkEditPage');
+					 },500);
+                     
+              	}
+              	 $.dialog.tips(result.message);
+              });
+          });
+ 		        
+        }
+      
+    }
+	
+
+	
+   function openLink(link,isfile)
+   {
+	   if(isfile)  //附件直接下载
+	   {
+		   location.href=link;
+		   return;
+		   
+	   }
+	   var base="${base}";
+	   if(link.indexOf("http")==-1)
+	    {
+		   link=base+link+"&etc="+new Date().getTime();
+		   
+		}
+	   var url=link;
+	  // var url="${base}/admin/solr/editCorePage.action?core="+select_core_name+"&etc="+new Date().getTime();
+		window.top.createWindow({
+					'text':'查看',
+					'id'  :'search_info_page',
+					'url' :url,
+					'width' :'1150',
+					'height':'490',
+					parent_ifr:window
+		});
+	   
+   }
+
+    
+
+	function e(id) {      //编辑 grid中的一行数据
+        w1.show();
+        option = "update";
+        grid.selectRowById(id);
+        form.setItemFocus("title");
+        form.enableItem("send");
+    }
+
+    function page_layout() {                 // page_layout为控制页面布局的方法 ，  用于自适应窗口的大小
+        var grid_wrap_height = $('#grid_wrap').height();  //得到 ID为  grid_wrap 的div的高度
+        $('#grid').height(grid_wrap_height - 33 -65);    //设置  ID为  grid 的div的高度
+        if(grid)    grid.setSizes();                   // 如果grid 存在，则 让 grid 适应下窗口的大小
+
+    }
+    $(function () {
+        setTimeout(init, 0);                        //在 页面加载好后，触发init方法；
+		$('#grid_toolbar_ul li').last().addClass('last');   //为grid上面的一排按钮中的最后一个li添加一个为‘last’的class
+		
+        $('#toolbar .toolbar_btn').click(function () {
+            var id = $(this).attr('btn_id');
+            toolbar_func(id);
+        });
+        
+   
+		
+    })
+</script>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+</head>
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="form-group header-group padding-bottom-0" style="">
+						<@f.operateRight operate="/admin/meeting/meetingImportAdd.action">
+						</@f.operateRight>
+						<@f.operateRight operate="/admin/meeting/provincialMeetingAdd.action">
+							<div class="button button-main margin-left-in js-add-account" id="provincialMeeting_add" onclick="provincialMeeting_add()">全省性会议登记</div>
+						</@f.operateRight>
+						<@f.operateRight operate="/admin/meeting/meetingProgramAdd.action">
+							<div class="button button-main margin-left-in js-add-account" id="meetingProgram_add" onclick="meetingProgram_add()">起草会议方案</div>
+						</@f.operateRight>
+						<@f.operateRight operate="/admin/meeting/meetingNotificationAdd.action">
+							<div class="button button-main margin-left-in js-add-account" id="meetingNotification_add" onclick="meetingNotification_add()">起草会议通知</div>
+						</@f.operateRight>
+                        <@f.operateRight operate="/admin/meeting/delMeetingInfo.action">
+							<div class="button button-main margin-left-in js-add-account" id="meetingInfo_del">退文</div>
+
+						</@f.operateRight>
+            </div>
+           <div class="form-group header-group">
+            <div id="titleGroup" style="margin-top: 0px">
+            <span class="header-title">会议名称:</span>
+            <input id="subject" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+            <span class="header-title margin-left-out">会议类型:</span>
+            <select id="meetingType"	class="input margin-left-in margin-small-left"	style="width: 120px;">
+                <option value="" title="全部类型">全部类型</option>
+                <option value="待收会议" title="待收会议">待收会议</option>
+                <#list meetingTypeDictList! as entry>
+                    <option value="${entry.dictValue!}" title="${entry.displayName!}">${entry.displayName!}</option>
+                </#list>
+            </select>
+            <div class="button button-main margin-left-in" id="senior_grid_search">搜索</div>
+            <div class="button js-level-search  margin-left-in">
+                	高级搜索
+                <i class="li-icon-arrow-down"></i>
+            </div>
+          </div>
+    </div>
+    <div class="level-searh form-group header-group" style="display: none;">
+        <span class="header-title">会议时间:</span>
+            <input name="startDate" id="startDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', maxDate:'#F{$dp.$D(\'endDate\')||\'2025-10-01 00:00:00\'}'})" size="20" type="text">
+        <span class="header-title margin-left-in">至</span>
+        <input id="endDate" style="cursor: pointer;height: 26px;" size="20" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startDate\')}',maxDate:'2025-10-01 00:00:00'})" name="endDate" type="text">
+        <span class="header-title margin-left-out">申报单位/拟稿处室:</span>
+        <input id="mainOrg" type="text" class="tool-bar-input margin-left-in" placeholder="" />
+    </div>
+    </div>
+    <div class="js-grid-father grid-father">
+        <table id="manage_grid" class="bsgrid">
+            <tr>
+                <th w_index="id" w_hidden="true" class="hidden"></th>
+                <th w_check="true" width="30"></th>
+                <th width="40">序号</th>
+                <th w_index="meetingType" width="200" w_align="center" w_type="method" w_method="execute">会议类型</th>
+                <th w_index="subject" width="" w_type="method" w_method="">会议名称</th>
+                <th w_index="sendToExchangeTimeStr" width="120" w_align="center">通知下发时间</th>
+                <th w_index="lastExecutor" width="80" w_align="center">上一办理人</th>
+                <th w_index="taskName" width="150"  w_align="center">办理状态</th>
+            </tr>
+        </table>
+    </div>
+    </div>
+    </td>
+    </tr>
+    </table>
+    </div>
+    <div id="provice_html"  style="display: none!important;"></div>
+    <#include "/aufw/page/include/script.html">
+        <script id="provice_choice" type="text/template">
+            <ul class="pop-choice-small js-pop-ul">
+                <%_.each(proviceData, function(item){%>
+                <li data-name="<%=item.flowName%>"><%=item.flowDescribe%></li>
+                <%});%>
+            </ul>
+        </script>
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+<script src = "${base}/edenui/common/js/underscore.js"></script>
+<script src="${base}/oa/resource/js/oa_common.js"></script>
+<script>
+	//var gridOne;
+	var method="execute";
+	var selectURL = "${base}/admin/meeting/queryMeetingInfo.action?wfType=${wfType!}";
+	var version='1';
+    var wf_name='oa_provincial_meeting';//全省性会议
+    var wf_name2='oa_meeting_program_approval';//省政府会议
+    var wf_name3='oa_meeting_notification_approval';//会议通知
+    var wfType="${wfType!}";
+    var proviceData=[];
+	$(function(){
+        init();
+        initLink();
+        selectURL=selectURL+"&link="+JSON.stringify(link);
+
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "&etc="+new Date().getTime(),
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	  gridOne.initGrid();
+		        	$("#manage_grid tbody tr").each(function(){
+		        		changeTable(this);
+		        		var $this=$(this);
+		        		 $("td",this).eq(1).css("padding-left","8px");
+		        			$index=parseInt($this.attr("index"));
+		        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+		        	});
+		      }
+		  });
+		//选择会议类触发时间START
+		  $(document).on("change","#meetingType",function(){
+		      var subject= $("#subject").val();
+		      var startDate= $("#startDate").val();
+		      var endDate= $("#endDate").val();
+		      var meetingType = $("#meetingType").val();
+		      var mainOrg = $("#mainOrg").val();
+		      var symbol = "?";
+		      if(selectURL.indexOf("?")>0){
+		      	symbol = "&";
+		      }
+		      gridOne.changeUrl(selectURL + symbol + 'subject=' + window.encodeURI(subject) + '&startDate=' + startDate + '&endDate=' + endDate + '&meetingType=' + window.encodeURI(meetingType) + '&mainOrg=' + window.encodeURI(mainOrg) + '&etc='+new Date().getTime());
+		  });
+		//选择会议类型触发时间END
+	});
+
+    //执行任务
+    function execute(id){
+    	var task_name = "";
+		var item = getRecord(id);
+		uf_doAction(item.wfId,item.wfName,task_name,version,null);
+    }
+
+  //全省性会议登记
+  function provincialMeeting_add(){
+
+    var contentHtml=$("#provice_html").html(_.template($('#provice_choice').html()));
+
+      if(proviceData.length<1){
+          window.top.layer.msg("流程没有配置成功！");
+      }
+      else if(proviceData.length==1){
+          initWorkflow(proviceData[0].flowName,"",version);
+      }
+      else if(proviceData.length>1){
+
+      var message = layer.open({
+          type: 1,
+          title: "会议登记",
+          area: ["200px",""],
+          content:contentHtml,
+          success: function (layero, index) {
+              $(".js-pop-ul li").click(function(){
+                  var $name=$(this).data("name");
+                  layer.closeAll('page');
+                  initWorkflow($name,"",version);
+              });
+          }
+      });
+      }
+
+  }
+
+  //省政府会议登记
+  function meetingProgram_add(){
+  	initWorkflow(wf_name2,"",version);
+  }
+
+  //起草会议通知
+  function meetingNotification_add(){
+  	initWorkflow(wf_name3,"",version);
+  }
+
+  //会议导入
+  function meetingImport_add(){
+  	window.open("${base}/admin/meeting/meetingImportAdd.action");
+  }
+
+
+  //待收会议查看
+  function view(id){
+	  var win={text:"全省性会议审批备案详情单",url:"${base}/admin/meeting/meetingImportView.action?meetingId="+id,width:900,height:550,parentIfr:window};
+	  window.top.createWindow(win);
+  }
+
+  //"退回"会议功能
+  $(document).on("click","#meetingInfo_del",function(){
+	  var checkedRowsRecords=gridOne.getCheckedRowsRecords();
+	  if(checkedRowsRecords.length<=0){
+		  window.top.layer.msg("请选择一条数据");
+		  return;
+	  }
+	  var record=checkedRowsRecords[0];
+	 if(record.wfId!="null" && record.wfId!=null && record.wfId.replace("\\s+","")!="" && record.wfId!="undefined"){
+		  layer.msg("此会议不能退文");
+		  return;
+	 }
+	  var win = {text:"退文单", url:"${base}/admin/backMeeting/addBackMeetingInfo.action?meetingInfo.id="+record.id,width:'900',height:'550','parentIfr':window};
+      window.top.createWindow(win);
+  })
+  //隐藏的搜索功能。
+  $(document).on("click","#grid_search",function(){
+      var clu = $("#search").val();
+      var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+      var symbol = "?";
+      if(selectURL.indexOf("?")>0){
+      	symbol = "&";
+      }
+      gridOne.changeUrl(selectURL + symbol + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+  });
+
+  //工具条高级搜索 展开
+  $(document).on("click",".js-level-search",function(){
+      girdTable(this);
+	  $('.li-icon-arrow-down').toggleClass('li-icon-arrow-top');
+  });
+
+  //搜索
+  $(document).on("click","#senior_grid_search",function(){
+      var subject= $("#subject").val();
+      var startDate= $("#startDate").val();
+      var endDate= $("#endDate").val();
+      var meetingType = $("#meetingType").val();
+      var mainOrg = $("#mainOrg").val();
+      var symbol = "?";
+      if(selectURL.indexOf("?")>0){
+      	symbol = "&";
+      }
+      gridOne.changeUrl(selectURL + symbol + 'subject=' + window.encodeURI(subject) + '&startDate=' + startDate + '&endDate=' + endDate + '&meetingType=' + window.encodeURI(meetingType) + '&mainOrg=' + window.encodeURI(mainOrg) + '&etc='+new Date().getTime());
+  });
+
+    function init(){
+        var url="${base}/admin/meetingDict/getProvinceMeetingFlow.action";
+        $.getJSON(url,function(data){
+
+            if(parseInt(data.flag)){
+                var result=data.data;
+                result.forEach(function(value){
+                    proviceData.push({
+                        "flowDescribe":value.flowDescribe,
+                        "flowName":value.flowName
+                    });
+                });
+            }
+
+        });
+
+    }
+  //屏幕分辨率小于1024，右侧排版 
+  if($(window).width() <= 1024){
+    $("#titleGroup").css({"width":"100%","margin-left":"-10px"});
+  }
+</script>
+
+</html>

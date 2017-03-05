@@ -1,0 +1,288 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
+	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+  <!--####################	1.	公共定义部分 (begin) 			####################-->
+	<display-name>eden.oa</display-name>
+	<session-config>
+		<session-timeout>600</session-timeout>
+	</session-config>
+	<!--####################	1.	公共定义部分 (end) 			####################-->
+
+	<!--####################	2.	EDEN平台定义部分 (begin) 	####################-->
+	<listener>
+		<listener-class>com.rj.eden.imple.pluginFramework.RunPluginFrameworkListener</listener-class>
+	</listener>	
+	<!--####################	2.	EDEN平台定义部分 (end) 	    ####################-->
+
+	<!--#################### 3. spring监听（begin） #################### -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:spring/applicationContext*.xml</param-value>
+	</context-param>
+	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<!--#################### 3. spring监听 (end) #################### -->
+	
+	<!--#################### 5. dbSession拦截（begin） #################### -->
+	<filter>
+		<filter-name>dbSessionFilter</filter-name>
+		<filter-class>com.rj.eden.aufw.filter.DbSessionFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>dbSessionFilter</filter-name>
+		<url-pattern>/admin/*</url-pattern>
+	</filter-mapping>
+	
+	<!--#################### 6. 访问控制拦截（begin） #################### -->
+	<filter>
+		<filter-name>adminAccessControl</filter-name>
+		<filter-class>com.rj.eden.aufw.filter.AccessControlFilter</filter-class>
+		<init-param>
+			<param-name>isControl</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+    <filter-mapping>  
+        <filter-name>adminAccessControl</filter-name>  
+        <url-pattern>/admin/*</url-pattern>  
+    </filter-mapping>
+	<!--#################### 6. 访问控制拦截（end） #################### -->
+	
+	<!--#################### 4. strust拦截（begin） #################### -->
+	<filter>   
+        <filter-name>StrutsPrepareAndExecuteFilter </filter-name>   
+        <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter </filter-class>  
+        <init-param>  
+            <param-name>config</param-name>  
+            <param-value>struts-default.xml,struts-plugin.xml,struts/struts.xml</param-value>  
+        </init-param>   
+    </filter>  
+    <filter-mapping>  
+        <filter-name>StrutsPrepareAndExecuteFilter</filter-name>  
+        <url-pattern>*.action</url-pattern>  
+    </filter-mapping>
+    <!--#################### 4. strust拦截（end） #################### -->
+    
+    <!--#################### 6. 缓存数据初始化（begin） #################### -->
+	<listener>
+		<listener-class>com.rj.eden.aufw.listener.CacheInitializeListener</listener-class>
+	</listener>
+    <!--#################### 6. 缓存数据初始化（end） #################### -->    
+    <!--#################### 5. 应用监听器（begin） #################### -->
+	<listener>
+		<listener-class>com.rj.eden.aufw.filter.ApplicationListener</listener-class>
+	</listener>
+	
+    <!--#################### 5. 应用监听器（end） #################### -->
+    
+    <!--#################### 7. 生成验证码servlet（begin） #################### -->
+	<servlet>
+		<servlet-name>jcaptcha</servlet-name>
+		<servlet-class>com.rj.eden.aufw.util.checkcode.ImageCaptchaServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>jcaptcha</servlet-name>
+		<url-pattern>/CheckCode.svl</url-pattern>
+	</servlet-mapping>    
+    <!--#################### 7. 生成验证码servlet（begin） #################### -->
+
+	<!--####################	8.	session监听器 (begin) 	####################-->
+	<listener>
+		<listener-class>com.rj.eden.aufw.filter.SessionListener</listener-class>
+	</listener>	
+	<!--####################	8.	session监听器 (end) 	    ####################-->
+	
+
+  
+  
+  <servlet>
+    <servlet-name>WebBill</servlet-name>
+    <servlet-class>com.rj.eden.form.base.WebBill</servlet-class>
+  </servlet>    
+  <servlet-mapping>
+    <servlet-name>WebBill</servlet-name>
+    <url-pattern>/servlet/WebBill</url-pattern>
+  </servlet-mapping>
+ 
+  <servlet>
+    <servlet-name>DesignerServlet</servlet-name>
+    <servlet-class>com.rj.eden.wf.base.WorkflowDesignerServlet</servlet-class>
+  </servlet>
+    <servlet-mapping>
+    <servlet-name>DesignerServlet</servlet-name>
+    <url-pattern>/servlet/DesignerServlet</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+    <servlet-name>WorkflowPortal</servlet-name>
+    <servlet-class>com.rj.eden.wf.base.WorkflowPortal</servlet-class>
+  </servlet>
+    <servlet-mapping>
+    <servlet-name>WorkflowPortal</servlet-name>
+    <url-pattern>/servlet/WorkflowPortal</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>sealUploadServlet</servlet-name>
+    <servlet-class>com.rj.eden.oa.servlet.SealUploadServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>sealUploadServlet</servlet-name>
+    <url-pattern>/servlet/sealUploadServlet</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>uploadServlet</servlet-name>
+    <servlet-class>com.rj.eden.aufw.util.attachment.UploadServlet</servlet-class>
+  </servlet>
+  
+    <servlet-mapping>
+    <servlet-name>uploadServlet</servlet-name>
+    <url-pattern>/servlet/uploadServlet</url-pattern>
+  </servlet-mapping>
+   <servlet>
+    <servlet-name>downloadServlet</servlet-name>
+    <servlet-class>com.rj.eden.aufw.util.attachment.DownloadServlet</servlet-class>
+  </servlet>
+  
+    <servlet-mapping>
+    <servlet-name>downloadServlet</servlet-name>
+    <url-pattern>/servlet/downloadServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>javaAgentServlet</servlet-name>
+    <servlet-class>com.rj.eden.oa.util.JavaAgentServlet</servlet-class>
+  </servlet>
+  	<servlet>
+		<servlet-name>ReminderServlet</servlet-name>
+		<servlet-class>com.rj.eden.wf.base.ReminderServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ReminderServlet</servlet-name>
+		<url-pattern>/servlet/ReminderServlet</url-pattern>
+	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>javaAgentServlet</servlet-name>
+    <url-pattern>/servlet/javaAgentServlet</url-pattern>
+  </servlet-mapping>
+  	<jsp-config>
+		<taglib>
+			<taglib-uri>/birt.tld</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/birt.tld</taglib-location>
+		</taglib>
+	</jsp-config>		
+    <security-constraint>
+      <web-resource-collection>
+         <web-resource-name>Protected Area</web-resource-name>
+	 <!-- Define the context-relative URL(s) to be protected -->
+         <url-pattern>/jsp/security/protected/*</url-pattern>
+	 <!-- If you list http methods, only those methods are protected -->
+	 <http-method>DELETE</http-method>
+         <http-method>GET</http-method>
+         <http-method>POST</http-method>
+	 <http-method>PUT</http-method>
+      </web-resource-collection>
+      <auth-constraint>
+         <!-- Anyone with one of the listed roles may access this area -->
+         <role-name>tomcat</role-name>
+	 <role-name>role1</role-name>
+      </auth-constraint>
+    </security-constraint>
+
+    <!-- Default login configuration uses BASIC authentication -->
+    <!--
+    <login-config>
+      <auth-method>BASIC</auth-method>
+      <realm-name>Example Basic Authentication Area</realm-name>
+    </login-config>
+    -->
+
+    <!-- Form-based login is enabled by default.  If you wish to
+         try Basic authentication, comment out the <login-config>
+         section below and uncomment the one above. -->
+    <login-config>
+      <auth-method>FORM</auth-method>
+      <realm-name>Example Form-Based Authentication Area</realm-name>
+      <form-login-config>
+        <form-login-page>/jsp/security/login/login.jsp</form-login-page>
+        <form-error-page>/jsp/security/login/error.jsp</form-error-page>
+      </form-login-config>
+    </login-config>
+	
+	<error-page>
+		<error-code>404</error-code>
+		<location>/aufw/page/404.html</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/aufw/page/403.html</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/aufw/page/500.html</location>
+	</error-page>
+		
+<!--#################### axis相关(begin) 	#################### -->
+    <listener>
+        <listener-class>org.apache.axis.transport.http.AxisHTTPSessionListener</listener-class>
+    </listener>
+    
+	  <servlet>
+	    <servlet-name>AxisServlet</servlet-name>
+	    <display-name>Apache-Axis Servlet</display-name>
+	    <servlet-class>
+	        org.apache.axis.transport.http.AxisServlet
+	    </servlet-class>
+	  </servlet>
+	
+	  <servlet>
+	    <servlet-name>AdminServlet</servlet-name>
+	    <display-name>Axis Admin Servlet</display-name>
+	    <servlet-class>
+	        org.apache.axis.transport.http.AdminServlet
+	    </servlet-class>
+	    <load-on-startup>100</load-on-startup>
+	  </servlet>
+	
+	  <servlet>
+	    <servlet-name>SOAPMonitorService</servlet-name>
+	    <display-name>SOAPMonitorService</display-name>
+	    <servlet-class>
+	        org.apache.axis.monitor.SOAPMonitorService
+	    </servlet-class>
+	    <init-param>
+	      <param-name>SOAPMonitorPort</param-name>
+	      <param-value>5001</param-value>
+	    </init-param>
+	    <load-on-startup>100</load-on-startup>
+	  </servlet>
+	
+	  <servlet-mapping>
+	    <servlet-name>AxisServlet</servlet-name>
+	    <url-pattern>/servlet/AxisServlet</url-pattern>
+	  </servlet-mapping>
+	
+	  <servlet-mapping>
+	    <servlet-name>AxisServlet</servlet-name>
+	    <url-pattern>*.jws</url-pattern>
+	  </servlet-mapping>
+	
+	  <servlet-mapping>
+	    <servlet-name>AxisServlet</servlet-name>
+	    <url-pattern>/services/*</url-pattern>
+	  </servlet-mapping>
+	
+	  <servlet-mapping>
+	    <servlet-name>SOAPMonitorService</servlet-name>
+	    <url-pattern>/SOAPMonitor</url-pattern>
+	  </servlet-mapping>
+<!--#################### axis相关(end) 	#################### -->
+</web-app>

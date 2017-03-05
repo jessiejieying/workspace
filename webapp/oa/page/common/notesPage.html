@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html style="height:100%;overflow:hidden;width:100%;">
+<head>
+ <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+   <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+  <link rel="stylesheet" type="text/css" href="${base}/form/resources/skins/default/css/note.css">
+
+	<style type="text/css">
+		.ke-toolbar,.ke-statusbar{
+			display: none!important;
+		}
+		.ke-container{
+			border: 0;
+		}
+		</style>
+  </head>
+<body  class="oa-form-note ">
+<div id="contentHmtl">
+		<div class="note-page-textarea">
+      		<textarea id="message_content_textarea" style="width:670px;height:180px;"></textarea>
+  		</div>
+  		<div class="text-center">
+            <label style="cursor: pointer;">
+                <input style="position: relative;top: 2px;" type="checkbox" <#if (wfNoteTemplate.isPublic!'0')=='1'>checked="checked"</#if> id="is_publish" class="" />公开
+            </label>
+    		<div class="button common-skin-btn-syle01" id="message_send">保存便签</div>
+  		</div>
+	<#if noteList?? && (noteList?size>0)>
+	<div class="note-list js-note-list">
+		<h6>接收消息列表：</h6>
+		<div class="note-list-ul">
+			<ul>
+				<#list noteList as note>
+					<li class="li-other <#if (note.status=='read')>li-open</#if>" id="${note.id}">
+					<div class="li-header clearfix on js-li-header">
+						<span class="float-left">发送人：${note.sender!}</span>
+            <span class="float-left margin-large-left">发送环节：${note.stepName!}</span>
+            <i class="icon-trash-o js-del-list margin-left float-right" style="font-size:21px;" title="删除"></i>
+            <span class="float-right">发送时间：${note.sendTime!}</span>
+
+						<div class="note-tip"></div>
+					</div>
+					<div class="li-content js-li-content">
+						${note.message}
+					</div>
+					</li>
+				</#list>
+			</ul>
+		</div>
+	</div>
+	<#else>
+		<div class="note-list-none js-note-list-none">没有消息！</div>
+	</#if>
+        </div>
+    <!-- jquery 框架 1.11 -->
+    <script src = "${base}/edenui/common/js/jquery.js"></script>
+    <script src = "${base}/edenui/common/js/underscore.js"></script>
+    <script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+    <script src="${base}/edenui/common/js/plugins/kindeditor-4.1.10/kindeditor-min.js"></script>
+    <script src="${base}/edenui/common/js/plugins/kindeditor-4.1.10/lang/zh_CN.js"></script>
+<script>
+	//便签富文本编辑
+	var editor;
+	var notesNumber ='${noteNumber}';
+	var noteId='${wfNoteTemplate.id!}';
+	var messageHtml='${wfNoteTemplate.message!}';
+	var sender='${name!}';
+	var getTime=new Date();
+	var sendTime=getTime.getFullYear()+"-"+getTime.getMonth()+"-"+getTime.getDate();
+
+    var maskShow=window.top.$urlParam("wfs");
+
+    //便签页面参数配置
+    var noteParam={
+        isPublic:$("#is_publish").prop("checked")?1:0
+    }
+	$(function() {
+
+        $("#is_publish").change(function(){
+            var $this=$(this);
+            if($this.prop("checked")){
+                noteParam.isPublic=1;
+            }
+            else{
+                noteParam.isPublic=0;
+            }
+        });
+
+        //只读状态
+        if(maskShow){
+            $("body").prepend("<div class='bill-read-mask'></div>");
+        }
+
+		if(noteId.length>0){
+
+				$(".js-note-list-none").remove();
+                	var noteListHtml='<div class="note-list js-note-list"><h6>发送消息列表：</h6><div class="note-list-ul"><ul><li class="js-add-li li-other li-open" id="'+noteId+'"><div class="li-header clearfix on js-li-header"><span class="float-left">发送人：'+sender+'</span><span class="float-left margin-large-left">发送环节：</span><i class="margin-left icon-trash-o js-del-list float-right" style="font-size: 21px;" title="删除"></i><span class="float-right">发送时间：'+sendTime+'</span><div class="note-tip"></div></div><div class="li-content js-li-content">'+messageHtml+'</div></li></ul></div></div>';
+					$("body").append(noteListHtml);
+
+		}
+
+    $(document).on("click",".js-del-list",function(e){
+
+      e.stopPropagation();
+      var $li=$(this).closest("li");
+
+      var delUrl="${base}/admin/noteManage/deleteNoteTemplate.action?wfNoteTemplate.id="+noteId;
+      $.post(delUrl,function(data){
+
+        $li.remove();
+
+        if($(".js-note-list ul li").length<1){
+
+          $(".js-note-list").remove();
+          $('body').append('<div class="note-list-none js-note-list-none">没有消息！</div>');
+        }
+        noteId="";
+        editor.html("");
+
+        window.top.layer.msg(data.datas);
+
+      });
+
+    });
+
+		 editor=KindEditor.create("#message_content_textarea", {
+             resizeType : 1,
+               afterCreate : function() {
+       }
+           });
+
+		 editor.html(messageHtml);
+		 $("#message_send").click(function(){
+
+			 var father = window.parent;
+			var obj={
+					"wfNoteTemplate.id":noteId,
+					"wfNoteTemplate.message":trimAll(editor.html()),
+					"wfNoteTemplate.actionId":father.$urlParam("actionId"),
+				  "wfNoteTemplate.wfId":father.$urlParam("wfId"),
+					"wfNoteTemplate.isSend":"0",
+					"wfNoteTemplate.dynamicInstanceId":father.$urlParam("dynamicInstanceId"),
+                "wfNoteTemplate.isPublic":noteParam.isPublic
+			}
+
+			$.post('${base}/admin/noteManage/saveNoteTemplate.action',obj,function(data) {
+
+				noteId=data.datas.id;
+				window.top.layer.msg("保存成功");
+				window.location.reload();
+   
+		      });
+
+		});
+		
+		
+		var $father = $(window.parent.document);
+		if(notesNumber>0){
+			$father.find(".js-notes-tab-numbers").show().html(notesNumber);
+		}
+		else{
+			$father.find(".js-notes-tab-numbers").hide();
+		}
+		
+		//展开消息内容
+		$(document).on("click", ".js-li-header", function() {
+			var $this = $(this), $li = $this.closest("li"),
+					$noteId=$li.attr("id");
+			   
+			if (!$li.hasClass("li-open")) {
+				if ($this.hasClass("on")) {
+                    var url="${base}/admin/noteManage/updateUnreadStatus.action?note_id="+$noteId;
+					$.post(url, function(data) {
+						 
+						if(data.datas){
+							notesNumber--;
+							$father.find(".js-notes-tab-numbers").html(notesNumber);
+							$this.removeClass("on");
+							$li.find(".js-li-content").slideDown();
+							$li.find(".note-tip").addClass("note-icon");
+							$li.addClass("li-open");
+							if(notesNumber<1){
+									$father.find(".js-notes-tab-numbers").hide();
+							}
+						}
+
+						});
+
+				}
+				
+			}
+		});
+
+	});
+    $(window).load(function(){
+      //  billAuto();
+        window.top.oneClickLi();
+
+    });
+	
+	function trimAll(str)
+    {
+        var result;
+        var is_global="g";
+        result = str.replace(/(^\s+)|(\s+$)/g,"");
+        if(is_global.toLowerCase()=="g")
+        {
+            result = result.replace(/\s/g,"");
+         }
+        return result;
+}
+
+    function billAuto(){
+        setTimeout(function(){
+            var $father = $(window.parent.document),
+                    billHeight=$("#contentHmtl").height(),
+                    $autoHeight=billHeight+300;
+            $father.find("#div11").height($autoHeight);
+            $father.find("#div11").closest(".tab-page").height($autoHeight);
+        },2000);
+
+    }
+</script>
+</body>
+</html>

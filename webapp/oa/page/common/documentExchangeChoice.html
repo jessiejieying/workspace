@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>Eden</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+    <link rel="stylesheet"  href="${base}/edenui/common/js/jq_plugins/jstree/themes/default/style.min.css" />
+</head>
+<body class="document-exchange-body">
+<div class="clearfix layer-choice-pop">
+    <div id="main_body"></div>
+</div>
+
+<script id="main" type="text/template">
+    <%if(changeObj.isShow){%>
+    <div class=" layer-choice-content margin-top" id="choiceTop">
+        <div class="layer-choice-content-header clearfix" style="position:relative;">
+            <span class="header-left">选群组</span>
+
+            <div class=" float-left">
+                <input id="search_text" type="text" class="tool-bar-input margin-left" placeholder="输入搜索内容" style="width: 338px;">
+            </div>
+            <span class="margin-left padding-left header-left">已选</span>
+            <span class="header-clear" id="select_top_clear">全部清除</span>
+        </div>
+        <div class="layer-choice-content-body clearfix " id="choiceTopBody" style="margin-top:11px;height:166px;">
+            <div class="body-choice-left">
+                <ul id="select_choice_left">
+                </ul>
+            </div>
+            <div class="body-choice-right" style="height: 162px;overflow-y: auto">
+                <div class="choice-content js-choice-content"></div>
+            </div>
+        </div>
+    </div>
+    <%}%>
+    <div class=" layer-choice-content margin-top" id="choiceBot">
+        <div class="layer-choice-content-header unit-header clearfix" style="position:relative;">
+            <span  class="header-left">选单位</span>
+            <select class="float-left input"  id="unit-select">
+            </select>
+            <div class=" float-left" >
+                <input id="other_search_text" type="text" class="tool-bar-input " style="width: 168px;" placeholder="输入搜索内容">
+            </div>
+            <span class="margin-left padding-left header-left" >已选</span>
+            <span class="header-clear" id="select_clear">全部清除</span>
+        </div>
+        <div id="choiceBotBody" class="layer-choice-content-body clearfix <%= (changeObj.mainClass) %>" style="margin-top:11px;height:166px;">
+            <div class="body-choice-left">
+                <ul id="other_select_choice_left">
+                </ul>
+            </div>
+            <div class="body-choice-right" style="height: 162px;overflow-y: auto">
+                <div class="choice-content other-js-choice-content"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layer-choice-footer clearfix">
+        <div class="button common-skin-btn-syle01 float-left" id="select_all">全部选择</div>
+
+        <div class="button common-skin-btn-syle01 float-right" id="select_sure">确定</div>
+    </div>
+</script>
+
+
+<script id="option_data" type="text/template">
+    <%_.each(datas, function(item){%>
+    <li data-id="<%=item.id%>"><%=item.name%></li>
+    <%});%>
+</script>
+
+<script id="other_option_data" type="text/template">
+    <%_.each(otherDatas, function(item){%>
+    <li data-id="<%=item.id%>"><%=item.name%></li>
+    <%});%>
+</script>
+
+<script id="massage_send_data" type="text/template">
+    <%_.each(datasSave, function(item){%>
+    <label><input type="checkbox" checked="checked" name="<%=item.id%>"><%=item.name%></label>
+    <%});%>
+</script>
+<script id="select_data" type="text/template">
+    <%_.each(selectData, function(item){%>
+    <option value="<%=item.id%>"><%=item.name%></option>
+    <%});%>
+</script>
+
+<script id="other_select_data" type="text/template">
+    <%_.each(otherSelectData, function(item){%>
+    <option value="<%=item.id%>"><%=item.name%></option>
+    <%});%>
+</script>
+<script id="massage_data" type="text/template">
+    <div class="message-textarea-box">
+        <div class="sendObj">
+            <h4>发送至：</h4>
+            <div class="send-content">
+                <div id="massage_send_content"></div>
+            </div>
+        </div>
+        <div class="message-textarea">
+      <textarea id="message_textarea">
+      </textarea>
+        </div>
+    </div>
+    <div class="text-center">
+        <div class="button common-skin-btn-syle01"  id="message_edit">保存</div>
+    </div>
+</script>
+<script id="massage_content" type="text/template">
+    <div class="note-textarea">
+        <textarea id="message_content_textarea" style="width:510px;height:180px;"></textarea>
+    </div>
+    <div class="text-center">
+        <div class="button common-skin-btn-syle01"  id="message_send_sure">保存</div>
+    </div>
+</script>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jquery_migrate.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/jstree/jstree.min.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<script src="${base}/form/resources/common/js/tool.js"></script>
+<script src="${base}/form/resources/common/js/edenApi.js"></script>
+<script>
+
+    //存储右侧的数据
+    var rightData = [];
+    var datas = [];
+    var datasSave = [];
+    var note = '';
+    var project ='${base}';
+    var free_flow;
+    var selectData=[];
+
+    var showStyle=2;
+
+
+    //第二个数据源
+    var otherRightData =[];
+    var otherDatas = [];
+    var otherDatasSave = [];
+    var otherSelectData=[];
+    var djsn=window.top.djsn;
+    var $allUnitData;
+    var changeObj={
+        "isShow":true,
+        "mainText":"主送",
+        "mainClass":""
+    }
+
+    var  preChoiceWin;
+
+
+    $(function () {
+
+
+//        if(djsn=="oa_leader_instruction_form"||djsn=="oa_meeting_info"||djsn=="oa_pg_incoming_form"){
+//            changeObj={
+//                "isShow":false,
+//                "mainText":"送往区域",
+//                "mainClass":"main-choice"
+//            }
+//        }
+
+        
+        $("#main_body").html(_.template($('#main').html()));
+        init();
+        loadControlUser();
+       // loadLeftData();
+        otherLoadControlUser();
+      //  loadLeftData();
+       // otherLoadLeftData();
+
+        var to = false;
+        // 搜索
+        $('#search_text').keyup(function () {
+            var $search = $(this),
+                    $val = $search.val();
+            if (to) {
+                clearTimeout(to);
+            }
+            to = setTimeout(function () {
+                //过滤搜索到的数组
+                datas = _.filter(datasSave, function (num) {
+                    return num.name.indexOf($val) > -1
+                });
+                $('#select_choice_left').html(_.template($('#option_data').html(), datas));
+                selectOption();
+            }, 250);
+        });
+
+        var otherTo = false;
+        // 搜索
+        $('#other_search_text').keyup(function () {
+            var $search = $(this),
+                    $val = $search.val();
+            if (otherTo) {
+                clearTimeout(otherTo);
+            }
+            otherTo = setTimeout(function () {
+                //过滤搜索到的数组
+                otherDatas = _.filter(otherDatasSave, function (num) {
+                    return num.name.indexOf($val) > -1
+                });
+                $('#other_select_choice_left').html(_.template($('#other_option_data').html(), otherDatas));
+                selectOption();
+            }, 250);
+        });
+        //选择
+        $(document).on("click", "#select_choice_left li,#other_select_choice_left  li", function () {
+            var $this = $(this);
+            var changeData = $this.text();
+            var $id = $this.data("id");
+            var $ul=$this.closest("ul").attr("id");
+
+
+            if($ul=="select_choice_left"){
+                rightData.push({
+                    "id": $id,
+                    "name": changeData
+                });
+                updateData();
+            }
+
+            else if($ul=="other_select_choice_left"){
+                otherRightData.push({
+                    "id": $id,
+                    "name": changeData
+                });
+                otherUpdateData();
+            }
+
+        });
+
+        $("#unit-select").change(function(){
+            otherLoadLeftData($(this).val());
+
+        });
+
+        //全选
+        $(document).on("click", "#select_all", function () {
+            var option = $("#select_choice_left li");
+
+            var otherOption=$("#other_select_choice_left li");
+//
+//            for (var i = 0, max = option.length; i < max; i++) {
+//                rightData.push({
+//                    "id": option.eq(i).data("id"),
+//                    "name": option.eq(i).text()
+//                });
+//            }
+//            updateData();
+
+
+            for (var i = 0, max = otherOption.length; i < max; i++) {
+                otherRightData.push({
+                    "id": otherOption.eq(i).data("id"),
+                    "name": otherOption.eq(i).text()
+                });
+            }
+            otherUpdateData();
+
+        });
+
+        //清除
+        $(document).on("click", "#select_clear", function () {
+            otherRightData.length=0;
+           // rightData.length = 0;
+          //  updateData();
+            otherUpdateData();
+        });
+        $(document).on("click", "#select_top_clear", function () {
+
+             rightData.length = 0;
+              updateData();
+
+        });
+
+
+        //确定
+        $(document).on("click", "#select_sure", function () {
+
+            var html=[];
+
+
+            var groupData=preChoiceWin.model.wrapMain.choicePop.group;
+            var unitData=preChoiceWin.model.wrapMain.choicePop.unit;
+            var sendRangeData=preChoiceWin.model.wrapMain.sendRange;
+
+
+
+
+            sendRangeData.clear();
+            groupData.clear();
+            unitData.clear();
+
+            var $jsBillInput=window.top.ExchangeChoice;
+
+
+//            rightData.forEach(function(value){
+//                html.push('<div data-id="'+value.id+'" data-name="'+value.name+'" class="choice-content-btn js-group"><i  class="otherLogin icon-users  js-other-person-icon"></i><span>'+value.name+'</span><i class="icon-times js-icon-times-close"></i></div>');
+//            });
+
+
+            rightData.forEach(function(value){
+                groupData.push({
+                    "id":value.id,
+                    "name":value.name
+                });
+            });
+
+
+
+//            otherRightData.forEach(function(value){
+//                html.push('<div data-id="'+value.id+'" data-name="'+value.name+'" class="choice-content-btn js-unit"><i  class="otherLogin icon-user js-other-person-icon"></i><span>'+value.name+'</span><i class="icon-times js-icon-times-close"></i></div>');
+//            });
+
+
+            otherRightData.forEach(function(value){
+                unitData.push({
+                    "id":value.id,
+                    "name":value.name
+                });
+            });
+
+            var grounpName=rightData.map(function(value){
+                return value.name
+            });
+            var grounpId=rightData.map(function(value){
+                return value.id
+            });
+
+            var unitName=otherRightData.map(function(value){
+                return value.name
+            });
+            var unitId=otherRightData.map(function(value){
+                return value.id
+            })
+
+            var obj={
+                "grounpName":grounpName.join(","),
+                "grounpId":grounpId.join(","),
+                "unitName":unitName.join(","),
+                "unitId":unitId.join(",")
+            }
+
+
+
+            var groupUrl="${base}/admin/sendRange/selectOrgInfo.action";
+            $.post(groupUrl,obj,function(data){
+
+                var initSendData=[];
+                var getData=data.data;
+                getData.forEach(function(value){
+                    var inCode="";
+
+
+                    for(var i=0;i<$allUnitData.length;i++){
+
+                        if($allUnitData[i].id==value.emp_id){
+                            inCode=$allUnitData[i].caCode;
+                            break;
+                        }
+                    }
+
+                    initSendData.push({
+                        "id":value.emp_id,
+                        "name":value.emp_name,
+                        "caCode":inCode
+                    })
+
+                });
+
+                sendRangeData=initSendData;
+                preChoiceWin.model.wrapMain.sendRange=initSendData;
+
+                var sendRangeDataName=sendRangeData.map(function(value){
+                    return value.name;
+                });
+
+                var billPageId=$(window.parent.document);
+                preChoiceWin.changeView();
+
+                billPageId.find("#distinguish_text").val(sendRangeDataName.join(","));
+
+                var index = parent.layer.getFrameIndex(window.name); 
+                
+                //先得到当前iframe层的索引
+               parent.layer.close(index); //再执行关闭
+
+                //window.top.layer.closeAll();
+
+
+            });
+
+        });
+
+
+        $(document).on("click","#choiceTop",function(){
+            $("#choiceTopBody").height(333).slideDown();
+            $(".body-choice-right").height(333);
+            $("#choiceBotBody").slideUp();
+        });
+        $(document).on("click","#choiceBot",function(){
+            $("#choiceBotBody").height(333).slideDown();
+            $(".body-choice-right").height(333);
+            $("#choiceTopBody").slideUp();
+        });
+
+        $(document).on("click", ".js-choice-btn", function () {
+            var $this = $(this),
+                    text = $.trim($this.find("span").text().toString());
+            var father=$this.closest(".choice-content");
+
+            if(father.hasClass("js-choice-content")){
+                for (var i = 0, max = rightData.length; i < max; i++) {
+
+                    if (rightData[i].name == text) {
+                        rightData.splice(i, 1);
+                        break;
+                    }
+                }
+                updateData();
+            }
+
+            else if(father.hasClass("other-js-choice-content")){
+                for (var i = 0, max = otherRightData.length; i < max; i++) {
+
+                    if (otherRightData[i].name == text) {
+                        otherRightData.splice(i, 1);
+                        break;
+                    }
+                }
+                otherUpdateData();
+            }
+
+        });
+    });
+
+    function loadControlUser() {
+
+
+        datas.length = 0;
+        var selectURL = "${base}/admin/myGroup/queryMyGroup.action";
+        var url=selectURL + "?etc="+new Date().getTime()+"&myGroup.dataValid=1&myGroup.groupType=1"+"&tag=officeOut";
+
+        $.get(url, function (result) {
+
+            if(result.success="true"){
+                var resultData=result.data;
+                resultData.forEach(function(value){
+
+                    datas.push({
+                        "id":value.groupId,
+                        "name":value.groupName
+                    });
+                });
+
+
+                copyArrayObject(datasSave, datas);
+                $('#select_choice_left').html(_.template($('#option_data').html(), datas));
+            }
+        });
+
+    }
+
+    function otherLoadControlUser(){
+        otherDatas.length = 0;
+        var selectURL = "${base}/admin/myGroup/queryMyGroup.action";
+        var url=selectURL + "?etc="+new Date().getTime()+"&myGroup.dataValid=1&myGroup.groupType=1"+"&tag=officeOut";
+
+        $.get(url, function (result) {
+
+            if(result.success="true"){
+                var resultData=result.data;
+                resultData.forEach(function(value){
+                    otherSelectData.push({
+                        "id":value.groupId,
+                        "name":value.groupName
+                    });
+                });
+                $('#unit-select').html(_.template($('#other_select_data').html(), otherSelectData));
+
+                otherLoadLeftData(resultData[0].groupId);
+            }
+        });
+
+    }
+
+    function updateData() {
+
+        if (rightData.length > 1) {
+            unique(rightData);
+        }
+
+        var contentHtml = '';
+
+        for (var i = 0, max = rightData.length; i < max; i++) {
+
+            contentHtml += "<div class='choice-content-btn js-choice-btn'><span>" + rightData[i].name + "</span><i class='icon-times'></i></div>";
+        }
+        $(".js-choice-content").html(contentHtml);
+        selectOption();
+    }
+
+
+    function otherUpdateData(){
+        if (otherRightData.length > 1) {
+            unique(otherRightData);
+        }
+
+        var contentHtml = '';
+
+        for (var i = 0, max = otherRightData.length; i < max; i++) {
+
+            contentHtml += "<div class='choice-content-btn js-choice-btn'><span>" + otherRightData[i].name + "</span><i class='icon-times'></i></div>";
+        }
+        $(".other-js-choice-content").html(contentHtml);
+        otherSelectOption();
+    }
+
+    function selectOption() {
+
+        $("#select_choice_left li").removeClass("selected");
+        for (var i = 0, max = rightData.length; i < max; i++) {
+
+            var $li = $("#select_choice_left li");
+            $li.each(function () {
+                var $this = $(this);
+                if (rightData[i].name == $this.html()) {
+                    $this.addClass("selected");
+                }
+            });
+        }
+    }
+
+    function  otherSelectOption(){
+        $("#other_select_choice_left li").removeClass("selected");
+        for (var i = 0, max = otherRightData.length; i < max; i++) {
+
+            var $li = $("#other_select_choice_left li");
+            $li.each(function () {
+                var $this = $(this);
+                if (otherRightData[i].name == $this.html()) {
+                    $this.addClass("selected");
+                }
+            });
+        }
+    }
+    //数组拷贝
+    function copyArrayObject(a, b) {
+        a.lenght = 0;
+        for (var i = 0, max = b.length; i < max; i++) {
+            a[i] = {};
+            for (var j in b[i]) {
+                a[i][j] = b[i][j];
+            }
+        }
+    }
+
+    //数组去重
+    function unique(data) {
+        var initData = [];
+        var totalData = [];
+        for (var i = 0, max = data.length; i < max; i++) {
+            initData.push(data[i].id);
+        }
+
+        for (var j = 0, inmax = _.uniq(initData).length; j < inmax; j++) {
+            var name;
+            for (var k = 0, kmax = data.length; k < kmax; k++) {
+                if (data[k].id == _.uniq(initData)[j]) {
+                    name = data[k].name;
+                    break;
+                }
+            }
+            totalData.push({
+                "id": _.uniq(initData)[j],
+                "name": name
+            });
+        }
+        data.length = 0;
+        for (var x = 0, xmax = totalData.length; x < xmax; x++) {
+            data.push({
+                "id": totalData[x].id,
+                "name": totalData[x].name
+            });
+        }
+
+    }
+    //树形json数据解析
+    function jsonTree(result) {
+        for (var i = 0, max = result.length; i < max; i++) {
+            datas.push({
+                "id": result[i].id,
+                "name": result[i].text
+            });
+            var child = result[i].children;
+            if (child) {
+                jsonTree(result[i].children);
+            }
+        }
+    }
+
+    function init(){
+
+        var $jsBillInput=window.top.ExchangeChoice;
+
+
+        preChoiceWin=window.top;
+
+        var groupData=preChoiceWin.model.wrapMain.choicePop.group;
+        var unitData=preChoiceWin.model.wrapMain.choicePop.unit;
+        $allUnitData=preChoiceWin.allUnitData;
+
+        unitData.forEach(function(value){
+            otherRightData.push({
+                "id":value.id,
+                "name":value.name
+            });
+        });
+
+        groupData.forEach(function(value){
+            rightData.push({
+                "id":value.id,
+                "name":value.name
+            });
+        });
+        updateData();
+        otherUpdateData();
+
+//        return;
+//        $($jsBillInput).each(function(){
+//            var $this=$(this);
+//
+//            if($this.hasClass("js-group")){
+//
+//                rightData.push({
+//                    "id":$this.data("id"),
+//                    "name": $this.data("name")
+//                });
+//            }
+//            else if($this.hasClass("js-unit")){
+//                otherRightData.push({
+//                    "id":$this.data("id"),
+//                    "name": $this.data("name")
+//                });
+//            }
+//        });
+//        updateData();
+//        otherUpdateData();
+
+    }
+
+    function loadLeftData(moduleId){
+        datas.length = 0;
+
+        var selectURL = "${base}/admin/myGroup/queryMyGroupEmp.action";
+        var selectLeftURL=selectURL+ "?etc="+new Date().getTime()+"&myGroupEmp.dataValid=1&myGroupEmp.empType="+showStyle+"&myGroupEmp.groupId="+moduleId+"&exchange=1";
+
+        $.get(selectLeftURL, function (result) {
+            var resultData=result.data;
+
+            resultData.forEach(function(value){
+                datas.push({
+                    "id": value.id,
+                    "name":value.empName
+                });
+            });
+            copyArrayObject(datasSave, datas);
+            $('#select_choice_left').html(_.template($('#option_data').html(), datas));
+
+        });
+
+    }
+
+
+    function otherLoadLeftData(moduleId){
+        otherDatas.length = 0;
+        var selectURL = "${base}/admin/myGroup/queryMyGroupEmp.action";
+        var selectLeftURL=selectURL+ "?etc="+new Date().getTime()+"&myGroupEmp.dataValid=1&myGroupEmp.empType=1&myGroupEmp.groupId="+moduleId+"&exchange=1";
+
+        $.get(selectLeftURL, function (result) {
+            var resultData=result.data;
+            resultData.forEach(function(value){
+                otherDatas.push({
+                    "id": value.id,
+                    "name":value.empName
+                });
+            });
+            copyArrayObject(otherDatasSave, otherDatas);
+            $('#other_select_choice_left').html(_.template($('#other_option_data').html(), otherDatas));
+
+        });
+    }
+    //数组拷贝
+    function copyArrayObject(a, b) {
+        a.lenght = 0;
+        for (var i = 0, max = b.length; i < max; i++) {
+            a[i] = {};
+            for (var j in b[i]) {
+                a[i][j] = b[i][j];
+            }
+        }
+    }
+
+    //树形json数据解析
+    function jsonTree(result) {
+        for (var i = 0, max = result.length; i < max; i++) {
+            datas.push({
+                "id": result[i].id,
+                "name": result[i].text
+            });
+            var child = result[i].children;
+            if (child) {
+                jsonTree(result[i].children);
+            }
+        }
+    }
+</script>
+</html>

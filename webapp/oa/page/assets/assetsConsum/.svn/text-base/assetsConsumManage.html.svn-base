@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+    <head>
+	<!--页面共用样式-->
+	<#include "/aufw/page/include/head.html">
+	<style>
+	.ed-advanced-search-bar td label{display:inline;}
+	</style>
+    </head>
+
+    <body style="height:100%;">
+
+<!--  body 的style  应属性加上 height:100%;   是为了计算页面高度   -->
+
+<div id="tree_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+      <div id="tree_search" class="tree_search"></div>
+      <div id="tree" style="width:100%; padding-top: 3px;"></div>
+    </div>
+
+<!-- tree_wrap 这个 div 用于放置 左侧树和搜索树的工具栏 -->
+
+<div id="grid_wrap" style="width:100%; height:100%; overflow: hidden; display:none;">
+      <div id="grid_toolbar" class="ed-toolbar">
+    	 <@f.operateRight operate="/admin/assetsRegister!insert.action">
+          <a btn_id="add" class="btn btn-info">新增</a>
+         </@f.operateRight >
+         <@f.operateRight operate="/admin/assetsRegister!delete.action">
+          <a btn_id="delete" class="btn btn-warning">删除</a>
+           </@f.operateRight >
+
+           	<select name="" id="search">
+        		<option value="assetsName">资产名称</option>
+        		<option value="consumNo">领用编号</option>
+   			</select>
+
+
+        <input id="search_text" class="search_text" value="请输入关键字" name="" type="text">
+
+
+        <input class="btn btn-info" name="" onClick="SimpleSearch()" value="查 找" type="button">
+		  <a id="advanced_search_btn" class="btn">高级查找</a>
+		  
+        <div id="advanced_search_bar" class="ed-advanced-search-bar">
+        <table cellpadding="0" cellspacing="0" border="0" align="center">
+           <tr>
+           	<td><label for="consumNo">领用编号：</label><input  id='consumNo' name="consumNo" type="text" value=""></td>
+            <td colspan="2"><label for="assetsName">资产名称：</label><input  id='assetsName' name="assetsName" type="text" value=""><label for="consumBy">领用人：</label><input  id='consumBy' name="consumBy" type="text" value="" /></td>
+           </tr>
+           <tr>
+            <td><label for="consumDep">领用部门：</label><input  id='consumDep' name="consumDep" type="text" value="" /></td>
+            <td><label for="consumTimeStart">领用时间：</label><input  onfocus="WdatePicker()"  id='consumTimeStart' name="consumTimeStart" type="text" value="" /><span style="padding:0 5px 0 12px;">到</span><input onfocus="WdatePicker()"  id='consumTimeEnd' name="consumTimeEnd" type="text" value="" /></td>
+           
+            <td><input class="btn btn-info" name="advancedSearch" onClick="advancedSearch()" value="查 找" type="button"></td>
+           </tr>
+         </table>
+        </div>
+  </div>
+      <div id="grid" style="width:100%;"></div>
+      <div class="ed-grid-page">
+	    	<div id="grid_page"></div>
+	    </div>
+    </div>
+</body>
+    <#include "/aufw/page/include/script.html">
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+    <script>
+    var layout,tree,treeSearch,grid,data,form,form2,tabbar,option,sendUrl,knowledgeId;
+    var version='1';
+    var wf_name='meeting_manage';
+    
+	 window.dhx_globalImgPath="${base}/aufw/resources/common/dhtmlx/imgs/";
+    <!--    设置dhtmlx各组件用到的图片的的路径-->
+    function init() {       //初始化 方法
+        layout = new dhtmlXLayoutObject(document.body, "1C");     //添加一个 3L的layout
+        layout.cells('a').hideHeader();         //隐藏 cell a 的 标题 ， b c 同理
+        layout.attachEvent('onResizeFinish', page_layout);
+        layout.attachEvent('onPanelResizeFinish', page_layout);
+        <!-- 为layout添加监听事件    -->
+        <!-- onResizeFinish 为在layout大小变了之后触发 -->
+        <!-- onPanelResizeFinish 为在layout中一块区域大小变了之后触发 -->
+		
+        data = new dhtmlXDataStore({
+            url: "${base}/admin/assetsConsum/queryConsumInfos.action?etc="+ new Date().getTime()+"&pageNum=15",
+            datatype: "json"
+        });     //添加一个 为DataStore
+	
+        layout.cells('a').attachObject('grid_wrap');
+        grid = new dhtmlXGridObject('grid');
+        grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+        grid.setHeader(" ,领用编号,领用人,领用部门,领用总数量,领用时间,操作");
+        grid.setColumnIds("check,consumNo,consumBy,consumDep,consumNum,consumDate,operate");
+        grid.setInitWidths("30,150,100,*,100,100,150");
+        grid.setColTypes("ch,ro,ro,co,co,co,link");
+ 
+        grid.init();
+        // 初始化grid
+        grid.enablePaging(true,15,999, 'grid_page', true);
+        //添加 grid的分页
+        //grid.enablePaging(fl, pageSize, pagesInGrp, parentObj, showRecInfo, recInfoParentObj)
+/*          @参数: fl - true|false - 是否分页
+        *   @参数: pageSize - 每页的行数
+        *   @参数: pagesInGrp - 可见的页面的数量
+        *   @参数: parentObj - 放置分页的 div的ID
+        *   @参数: showRecInfo - true|false - enable|disable showing of additional info about paging state
+        *   @参数: recInfoParentObj - ID or container which will be used for showing paging state
+*/
+
+        grid.setPagingSkin("toolbar");   //设置 分页的皮肤
+        grid.sync(data);                // grid从 DataStore中同步数据
+	
+	
+        page_layout();      // 调用page_layout方法   ,方法的声明在下面
+    }
+	
+	function  SimpleSearch(){
+		data.clearAll();
+		var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+		var clu = $("#search").val();
+		var url = '${base}/admin/assetsConsum/queryConsumInfos.action?'+clu+'='+window.encodeURI(value)+'&etc='+new Date().getTime();
+		window.data.data.url = url;
+		data.load(url);
+    }
+
+    function  advancedSearch(){
+    	var flag= timeContrastFun('consumTimeStart','consumTimeEnd');
+    	if(flag==false){
+    		return;	
+    	}
+    	
+		data.clearAll();
+		
+		var assetsName = $("#assetsName").val();
+		var consumNo = $("#consumNo").val();
+		var consumBy = $("#consumBy").val();
+		var consumDep = $("#consumDep").val();
+		var consumStart = $("#consumTimeStart").val();
+		var consumEnd = $("#consumTimeEnd").val();
+		
+		var url = '${base}/admin/assetsConsum/queryConsumInfos.action?'+'assetsName='+assetsName+'&consumNo='+consumNo +
+		'&consumBy='+consumBy+'&consumDep='+consumDep+'&consumStart='+consumStart+'&consumEnd='+consumEnd+'&etc='+new Date().getTime();
+		window.data.data.url = url;
+		data.load(url);
+    }
+
+   
+  	//执行任务
+    function execute(id){
+    	
+    	//$.dialog.tips("未定义");
+    	var item=data.item(id);
+    	
+    	//showWFLatest(wf_name,item.wfId);
+    	
+    	var task_name='';
+   
+    	itsm_doAction(item.wfId,wf_name,task_name,version);
+    }
+
+	//查看流程图
+	function viewFlow(id){
+		var item=data.item(id);
+		showWfHistory(item.wfId);
+	}
+	
+	
+
+	
+	
+	//searchBarCommon('advanced_search_bar',60,'advanced_search_btn','grid_toolbar','grid');
+	searchToggle('advanced_search_btn','advanced_search_bar');
+	function goasWin(title,url) {           //弹出窗口
+		var isWin = window.top.dhxWins.isWindow('goasWin');
+		if (isWin == true) return;
+		window.top.createWindow(
+				{   id      :'goasWin',
+					text    : title,
+					setModal: true,
+					url     : url,
+					width   :'650',
+					height  :'500',
+					parent_ifr : window
+				}
+			);
+		}
+
+
+    function toolbar_func(id){           // grid上面 的那些按钮的 功能
+        if (id == 'add') {
+        	window.top.createWindow(
+    				{   id      :'addAssetsconsul',
+    					text    : '新增资产领用',
+    					setModal: true,
+    					url     : '${base}/admin/assetsConsum/toAddAssetsConsum.action',
+    					width   :'690',
+    					height  :'500',
+    					parent_ifr : window
+    				}
+    			);
+	
+        }
+        if (id == 'delete') {
+            var row_id = grid.getCheckedRows(0);
+            if (row_id == '') {
+                $.dialog.tips('请至少选择一条数据！');
+                return;
+            }
+            row_id = row_id.split(',');
+            if (row_id.length == 0) return;
+			$.dialog.confirm('你确定要删除这些数据吗？', function () {
+				var idArr = new Array();
+				for (var i = 0; i < row_id.length; i++) {
+					idArr.push(data.item(row_id[i]).id);
+				}
+				$.post("${base}/admin/assetsConsum/deleteByConsumNo.action", {"consumIdArrs":idArr.join(",")},function(result){
+					if(result.success=="true"){         
+						for (var i = 0; i < row_id.length; i++) {           
+							data.remove(row_id[i]);
+						}
+					}
+					$.dialog.tips(result.tips);
+				});
+			});
+
+        }
+    }
+	
+	function d(id) {       //删除 grid中的一行数据
+        grid.selectRowById(id);
+        $.dialog.confirm('你确定要删除这条数据？', function () {
+           
+            $.post("${base}/admin/assetsConsum/deleteByConsumNo.action?", {"consumIdArrs":id}, function(result){
+            	if(result.success=="true"){
+            		 data.remove(id);
+            	}
+                    $.dialog.tips(result.tips);
+            });
+        });
+        form.disableItem("send");
+    }
+
+	function e(id) {      //编辑 grid中的一行数据
+		grid.selectRowById(id);
+		window.top.createWindow(
+				{   id      :'editAssetsconsul',
+					text    : '修改资产领用',
+					setModal: true,
+					url     : '${base}/admin/assetsConsum/toEditAssetConsumGroup.action?consumNo='+id+'&etc='+new Date().getTime(),
+					width   :'690',
+					height  :'420',
+					parent_ifr : window
+				}
+			); 
+    }
+
+    function page_layout() {                 // page_layout为控制页面布局的方法 ，  用于自适应窗口的大小
+        var grid_wrap_height = $('#grid_wrap').height();  //得到 ID为  grid_wrap 的div的高度
+        $('#grid').height(grid_wrap_height - 43 -35);    //设置  ID为  grid 的div的高度
+        if(grid)    grid.setSizes();                   // 如果grid 存在，则 让 grid 适应下窗口的大小
+
+    }
+    
+    $(function () {
+        setTimeout(init, 0);                        //在 页面加载好后，触发init方法；
+		//$('#grid_toolbar_ul li').last().addClass('last');   //为grid上面的一排按钮中的最后一个li添加一个为‘last’的class
+        $('#grid_toolbar a').click(function(){       //那些按钮 点击之后 触发 toolbar_func 方法
+            var id=$(this).attr('btn_id');
+            toolbar_func(id);
+        });
+		
+		$("#search_text").focus(function () {
+            if ($(this).val() == this.defaultValue) {
+                $(this).val('');
+            }
+        }).blur(function () {
+            if ($(this).val() == '') {
+                $(this).val(this.defaultValue);
+            }
+        });
+
+		
+    })
+    
+   function refresh_data(){
+    var path="${base}/admin/assetsConsum/queryConsumInfos.action?etc="+ new Date().getTime()+"&pageNum=15";
+    data.clearAll();
+    data.load(path,"json");
+    window.data.data.url=path;
+ } 
+    
+    
+    function timeContrastFun(startTime,endTime){//判断开始时间与结束时间是否合法
+		var startTime=$('#'+startTime).val();
+		var startTimeSp=startTime.split("-");
+		var endTime=$('#'+endTime).val();
+		var endTimeSp=endTime.split("-");
+		if($.trim(startTime)!=""&&$.trim(endTime)!=""){
+			if(endTimeSp[0]>=startTimeSp[0]){
+				if(endTimeSp[0]==startTimeSp[0]){
+					if(endTimeSp[1]>=startTimeSp[1]){
+						if(endTimeSp[1]==startTimeSp[1]){
+							if(endTimeSp[2]>=startTimeSp[2]){
+								
+							}else{
+								$.dialog.tips("开始时间大于结束时间，请重新选择");
+								return false;	
+							}
+						}				
+					}else{
+						$.dialog.tips("开始时间大于结束时间，请重新选择");
+						return false;
+					}
+				}		
+			}else{
+				$.dialog.tips("开始时间大于结束时间，请重新选择");
+				return false;
+			}
+		}
+	}
+
+
+   
+</script>
+</html>

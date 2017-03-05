@@ -1,0 +1,239 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>function changeOrgRole() {
+
+     var roleTreeValue=$('#sel_roleTree').val();
+     if(roleTreeValue==-1)
+    {
+    
+	var id=window.selTree_tree.getSelectedItemId();
+     	var org_code=window.selTree_tree.getUserData(id,'org_code');
+        if(!org_code)
+        {
+          org_code="";
+        }
+	var sql = "SELECT a.account_name, a.account_name user_name FROM ea_account_info a  WHERE a.dep_code LIKE '"+org_code+"%'";
+	 refreshDs1(sql)
+    }else{
+      changeRole()
+
+    }
+}
+
+function refreshDs1(sql)
+{
+     setDsSql('ds1', sql);
+	refreshDsById('ds1');
+}
+
+/*
+//根据角色的配置来显示用户
+function loadRoleUserFromConfig()
+{
+	 var grid=getGrid('grid1');
+	 var pRowIdVal="";
+	 var pRowId = grid.getAllRowIds(',').split(',');
+	 var pre_count=pRowId.length;
+	 alert(pre_count)
+	 for(i=0;i<pRowId.length;i++){ 
+	        	pRowIdVal = pRowIdVal + pRowId[i] + "-";
+	  }
+
+      var ds=getDs('roleDataset');
+   var count = ds.dataCount();
+ 
+   	for (var i = 0; i < count; i++) {
+       var id = ds.idByIndex(i);
+		var dataItem=ds.item(id);
+		var account_name=dataItem.account_name;
+		var user_name=dataItem.user_name;
+		if( pRowIdVal.indexOf(account_name) < 0){  //用来防止重复
+		 alert(account_name);
+			grid.addRow(account_name,[ ,account_name,user_name],i+pre_count); 
+
+		}
+	
+	}
+	
+  
+  
+}
+*/
+
+function changeRole()
+{
+   
+    var roleTreeValue=$('#sel_roleTree').val();
+	if(roleTreeValue!=-1)
+    {
+		var sql="SELECT b.account_name , b.account_name user_name FROM  ea_account_info b  LEFT JOIN ea_account_role_relation c ON c.account_name = b.account_name where c.role_id = '"+roleTreeValue+"'";
+		 var id=window.selTree_tree.getSelectedItemId();
+		 var org_code=window.selTree_tree.getUserData(id,'org_code');
+		if(org_code)
+		{
+		 sql+=" and b.dep_code like '"+org_code+"%' ";
+		}
+		setDsSql('ds1', sql);
+		refreshDsById('ds1');
+	}
+    
+	
+}
+
+function load()
+{
+  
+   //var notSelect= $urlParam('notSelect');
+var notSelect=0;
+   var ds1=getDs('ds1');
+   var count = ds1.dataCount();
+   if(count>=1) //已设置
+   {
+     notSelect=1;
+   }
+
+	
+    var orgTree=window.selTree_tree;
+    var orgId= $urlParam('orgId');
+   var roleId= $urlParam('roleId');
+
+
+    //var id="906e63a30e6f45feb953f14a1ea170a9";
+   // var roleId="18899a95707a429a8189a0fe1df33d8a";
+    if(orgId)
+    {
+       orgTree.selectItem(orgId);
+       var name=orgTree.getAttribute(orgId,"text");
+       $('#selTxt_tree').text(name);
+      
+    }
+    if(roleId)
+    {
+        $('#sel_roleTree').val(roleId);
+    }
+    if(notSelect==1) //不能选择的
+    {
+      $('#sel_roleTree').attr('disabled','disabled');
+	  $('#sel_tree').attr('disabled','disabled');
+	  $('#sel_btn_tree').unbind( "click" );
+	 
+
+   }
+
+     orgTree.insertNewChild("B00001"  ,"allid","所有组织",0);
+    if(count<1)
+    {
+      changeOrgRole()
+     }
+
+    $('#grid_grid1 .hdrcell:first').append('<input style="margin-top:10px;margin-left:-15px;width:16px;height:16px;" type="checkbox"  class="check_all" id="checkAll" onclick="selectAllCheck(this)">');
+   var grid=getGrid('grid1');
+   grid.enableStableSorting(true);
+	grid.attachEvent("onRowDblClicked", function(rId,cInd){
+	  addItemCommon(rId);
+	});  
+
+}
+
+function addItemCommon(id){
+	var grid=getGrid('grid1');
+	var checkedID="";
+	if(id){
+	checkedID=id+"";
+	}else{
+	checkedID=grid.getCheckedRows(0);
+	}
+	
+	var ds=getDs('ds1');
+	var sel=$('#userSel');
+	if(checkedID.length>0){
+		checkedID=checkedID.split(',');
+		for (var i = 0; i < checkedID.length; i++) {
+			var id = checkedID[i];
+			var thisItem=ds.item(id);
+			$('#user_'+thisItem.account_name).remove();
+			sel.append('<option id="user_'+thisItem.account_name+'" value="'+thisItem.account_name+'">'+thisItem.user_name+'</option>');
+
+		}
+	}else{
+		$.dialog.tips('请至少选上一人!',2);
+	}
+
+}
+function delItemCommon(){
+	$("#userSel option:selected").remove();
+}
+
+function btn_ok(){
+	var userId=[];
+	var userName=[];
+	$("#userSel option").each(function(){
+		userId.push($(this).val());
+		userName.push($(this).text());
+	});
+	try{
+		window.edenCallBack(userId,userName);
+	}catch (e){
+
+	}
+	window.parent.edenWins.window('commonSelUser').close();
+}
+
+
+function selectAllCheck(obj){
+	window.event? window.event.cancelBubble = true : e.stopPropagation();
+	var grid=getGrid('grid1');
+		var ids = grid.getAllRowIds();
+    	//console.log(ids);
+    	var idsArr = ids.split(',');
+    	//alert(idsArr.length);
+    	var nowPage = grid.currentPage;
+    	var pageItemsLength = grid.rowsBufferOutSize;
+    	var allItemsLength = grid.rowsBuffer.length;
+    	
+    	var forBigen = pageItemsLength*(nowPage-1);
+    	var forOver = pageItemsLength*(nowPage);
+    	if (forOver>allItemsLength){
+    		forOver = allItemsLength
+    	}
+		if($(obj).is(':checked')){
+		 for(i=forBigen;i<forOver;i++){
+    		var forId = idsArr[i];
+    		var check = grid.cellById(forId, 0).getValue();
+    		grid.cellById(forId, 0).setValue(1);
+    	} 
+		}else{
+			for(i=forBigen;i<forOver;i++){
+    		var forId = idsArr[i];
+    		var check = grid.cellById(forId, 0).getValue();
+    		grid.cellById(forId, 0).setValue(0);
+    	}
+		}	
+}
+</script><script >document.styleSheets[0].addRule("fc\\:fc_code","behavior: url(../../fceform/htc/fc_code.htc)",0);</script><script >document.styleSheets[0].addRule("fc\\:webgrid","behavior: url(../../fceform/htc/webgrid.htc)",0);</script><script src='../../fceform/js/fcwebgrid.js'></script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib contxml="<root><label><id>label2</id><id>label3</id><id>label4</id></label><listbox><id>userSel</id></listbox><button><id>button3</id><id>button4</id><id>button5</id></button><dropdownlist><id>tree</id><id>roleTree</id></dropdownlist><grid><id>grid1</id></grid><dataset><id>ds1</id></dataset></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:5;radio:0;listbox:1;textarea:0;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:6;text:1;hr:0;checkboxlist:0;radiolist:0;dropdownlist:1;grid:0;dataset:0;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" isCheckPermit="否" alertType="1" userType BLONclose BLONopenBefore BLONopen="load()" window="当前窗口" posheight poswidth postop posleft center="  " isfile="是" type="eden_form" caption="公用选择用户" dj_sn="selUser" billtaborder="<root><taborder>grid1</taborder><taborder>userSel</taborder><taborder>button3</taborder><taborder>tree</taborder><taborder>button4</taborder><taborder>button5</taborder><taborder>roleTree</taborder></root>" toolbar="不带工具栏" AutoResizeXml><?xml:namespace prefix = "fc" /><fc:dataset id=ds1 isInAddStatus="是" idtype="1" opensortno="1" isSubGrid="否" issubds="否" submitno="1" submittype="4" isaddemptyrec="否" pubpara="否" controltype="dataset" format="<fields><field><fieldname>account_name</fieldname><datatype>字符</datatype><displaylabel>账户名</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>user_name</fieldname><datatype>字符</datatype><displaylabel>姓名</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><account_name></account_name><user_name></user_name></dsid>")' onGetText='bill_ondatasetgettext("<dsid><account_name></account_name><user_name></user_name></dsid>")' onSetText='bill_ondatasetsettext("<dsid><account_name></account_name><user_name></user_name></dsid>")' sqltrans="%3cfcsql%20djsn%3d%22selUser%22%20djtype%3d%22eden%5fform%22%20widgetId%3d%22ds1%22%20%3e%3cwf%5fid%3e%3a%7b%24urlParam%28%22wf%5fid%22%29%7d%3a%3c%2fwf%5fid%3e%3cstep%5fid%3e%3a%7b%24urlParam%28%22step%5fid%22%29%7d%3a%3c%2fstep%5fid%3e%3caction%5fid%3e%3a%7b%24urlParam%28%22action%5fid%22%29%7d%3a%3c%2faction%5fid%3e%3cwf%5fid%3e%3a%7b%24urlParam%28%22wf%5fid%22%29%7d%3a%3c%2fwf%5fid%3e%3cstep%5fid%3e%3a%7b%24urlParam%28%22step%5fid%22%29%7d%3a%3c%2fstep%5fid%3e%3caction%5fid%3e%3a%7b%24urlParam%28%22action%5fid%22%29%7d%3a%3c%2faction%5fid%3e%3c%2ffcsql%3e"></fc:dataset> <fc:webgrid onclick='bill_ongridclick("<grid1><col></col><col></col></grid1>")' ondblclick='bill_ongriddblclick("<grid1><col></col><col></col></grid1>")' id=grid1 onkeydown='bill_ongridkeydown("<grid1><col></col><col></col></grid1>")' controltype="grid" showCheckbox="是" colSort="str,str" colType="ro,ro" colWidth="200,*" readonly="否" bodyrowheight="-1" bodyrows="20" isPage="是" visible="是" dataset="ds1" format="<cols><col><fname>account_name</fname><cname>账户名</cname><width>50</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col><col><fname>user_name</fname><cname>姓名</cname><width>50</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col></cols>" width="379" height="238" top="42" left="28" autoheight="undefined" autowidth="undefined" autoappend="undefined">
+<TABLE id=t style="BORDER-COLLAPSE: collapse; TABLE-LAYOUT: fixed; LEFT: 0px; TOP: 0px" cellSpacing=0 cellPadding=1 frame=box>
+<TBODY>
+<TR class=fcGridFirstRow>
+<TD></TD></TR></TBODY></TABLE></fc:webgrid><BUTTON id=button3 class=ef_button style="HEIGHT: 25px; POSITION: absolute; LEFT: 310px; TOP: 314px; WIDTH: 75px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("btn_ok()")'>确定</BUTTON><SELECT id=userSel style="HEIGHT: 220px; POSITION: absolute; LEFT: 511px; TOP: 40px; WIDTH: 140px" onmovestart=moveStart() multiple size=8 async="否" datasourceName controltype="listbox" sql check="1" tempvalue temptext sqltrans></SELECT> <fc:fc_code id=tree class=ef_design_dropdownlist onchange='bill_onclick("changeOrgRole()")' datasourceName="" controltype="dropdownlist" visible="是" dataset="undefined" rootNodeId="B00001" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="1" isTreeNewSql="0" FieldNameList="" format="" width="140" height="23" top="14" left="86" sqltrans="%3cfcsql%20djsn%3d%22selUser%22%20djtype%3d%22eden%5fform%22%20widgetId%3d%22tree%22%20%3e%3c%2ffcsql%3e" field="undefined" position="absolute" align="undefined" sql2="undefined" enabled="false"></fc:fc_code><LABEL id=label2 style="HEIGHT: 23px; FONT-FAMILY: 宋体; POSITION: absolute; FONT-WEIGHT: bold; LEFT: 31px; TOP: 14px; WIDTH: 109px" onmovestart=moveStart() controltype="label" inputTag="否">按部门：</LABEL><BUTTON id=button4 title=添加人员 class=ef_button style="HEIGHT: 25px; POSITION: absolute; LEFT: 425px; TOP: 95px; WIDTH: 75px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("addItemCommon()")'>&gt;&gt;</BUTTON><BUTTON id=button5 title=删除人员 class=ef_button style="HEIGHT: 25px; POSITION: absolute; LEFT: 426px; TOP: 142px; WIDTH: 75px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("delItemCommon()")'>&lt;&lt;</BUTTON><LABEL id=label3 style="HEIGHT: 22px; FONT-FAMILY: 宋体; POSITION: absolute; FONT-WEIGHT: bold; LEFT: 513px; TOP: 16px; WIDTH: 128px" onmovestart=moveStart() controltype="label" inputTag="否">已添加的人员：</LABEL><LABEL id=label4 style="HEIGHT: 23px; FONT-FAMILY: 宋体; POSITION: absolute; FONT-WEIGHT: bold; LEFT: 258px; TOP: 14px; WIDTH: 109px" onmovestart=moveStart() controltype="label" inputTag="否">按角色：</LABEL> <fc:fc_code id=roleTree class=ef_design_dropdownlist onchange='bill_onclick("changeOrgRole()")' datasourceName="" controltype="dropdownlist" visible="是" dataset="undefined" rootNodeId="B00001" blninput="是" blnempty="否" addrow="否" multiselect="否" xml="" isShowTree="0" isTreeNewSql="0" FieldNameList="" format="" width="141" height="23" top="14" left="311" sqltrans="%3cfcsql%20djsn%3d%22selUser%22%20djtype%3d%22eden%5fform%22%20widgetId%3d%22roleTree%22%20%3e%3c%2ffcsql%3e" field="undefined" position="absolute" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></DIV><div id='addHtml'><style>
+
+</style>
+</div> </body></html>

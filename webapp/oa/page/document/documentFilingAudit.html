@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+	<#include "/aufw/page/include/loading.html">
+</head>
+
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      <tr>
+	        <!-- 右侧 -->
+	        <td class="ver-top">
+	          <div class="grid-table-top" id="grid_table">
+	            <div class="js-tool-bar">
+					<div class="form-group ">
+						<select id="search"
+							class="input display-ib margin-small-left"
+							style="width: 100px;" name="age">
+							<option value="fileTitle">公文标题</option>
+						</select>
+						<div class="display-ib input-father">
+							<input id="search_text" type="text" class="tool-bar-input"
+								id="grid_input" placeholder="输入关键字" />
+						</div>
+						<div class="button common-skin-btn-syle01" id="grid_search">搜索</div>
+					</div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <th w_check="true" width="30"></th>
+	                  <th w_index="true" width="40">序号</th>
+	                  <th w_index="fileType" width="100">办理类型</th>
+	                  <th w_index="fileTitle" width="">公文标题</th>  
+	                  <th w_index="fileChar" width="200">字号</th>
+	                  <th w_index="finishDateStr" width="100">办结时间</th>
+	                  <th w_index="isRecord" width="100">是否归档</th>
+	                  <th w_index="archiveType" width="100">归档状态</th>
+	                 <!--  <th w_index="operate" width="140">操作</th> -->
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+			
+
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/filingAudit/queryFilingAudit.action";
+	var version='1';
+	$(function(){
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime()+"&wfType="+wfType,
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+	        	$("#manage_grid tbody tr").each(function(){
+	        		$("td",this).eq(1).css("padding-left","8px");
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+		      }
+		  });
+
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	        var clu = $("#search").val();
+	        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+	        gridOne.changeUrl(selectURL + "?" + clu + '=' + window.encodeURI(value) + '&etc='+new Date().getTime());
+	    });
+	    
+	});
+	
+	
+
+</script>
+
+</html>

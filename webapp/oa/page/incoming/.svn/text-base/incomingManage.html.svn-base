@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+	<#include "/aufw/page/include/head.html">
+</head>
+<body style="height:100%;">
+	<div class="container-layout line">
+	    <table style="width: 100%;" id="common_table">
+	      	<tr>
+	        <!-- 右侧 -->
+	        	<td class="ver-top">
+	          		<div class="grid-table-top" id="grid_table">
+	            	<div class="js-tool-bar">
+					<div class="form-group header-group">
+					<#if wfType?? && wfType=="noDo">
+						<@f.operateRight operate="/admin/incoming/incomingManage_add3.action">
+							<div class="button button-main js-add-account" id="incoming_add">收文登记</div>
+						</@f.operateRight> 
+						<@f.operateRight operate="/admin/incoming/sendDocument_add3.action">
+							<div class="button button-main js-add-account margin-left-in margin-right-out" id="incoming_del">公文拟稿</div>
+						</@f.operateRight>
+					 </#if>
+					 <span class="header-title">办理类型:</span>
+					<select id="search_file_type" class="input " style="width: 100px;" name="age">
+						<option value="">全部</option>
+						<option value="0">收文</option>
+						<option value="1">发文</option>
+					</select>
+					<span class="header-title margin-left-out">公文标题:</span>
+					<input id="search_text" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+					<span class="header-title margin-left-out">收文编号:</span>
+					<input id="search_serialNumber" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+					<span class="header-title margin-left-out">字号:</span>
+					<input id="search_file_char" type="text" class="tool-bar-input margin-left-in" id="grid_input" placeholder="输入关键字" />
+                    <div class="button button-main margin-left-in" id="grid_search">搜索</div>
+					</div>
+				</div>
+	            <div class="js-grid-father grid-father">
+	              <table id="manage_grid" class="bsgrid">
+	                <tr>
+	                  <th w_index="id" w_hidden="true" class="hidden"></th>
+	                  <#if wfType?? && wfType=="noDo">
+	                  	<th w_check="true" width="30"></th>
+	                  	<#elseif  wfType?? && wfType=="hasDo">
+	                   <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+	                   </#if>
+	                  <th w_index="true" width="40">序号</th>
+	                  <th w_index="fileTitle" >公文标题</th>
+	                  <th w_index="fileChar" width="120">字号</th>
+	                  <th w_index="serialNumber" width="120">收文编号</th>
+	                  <th w_index="fileType" width="80">办理类型</th>
+	                  <th w_index="taskName" width="130">办理状态</th>
+	                   <#if wfType?? && wfType=="noDo">
+	                  	<th w_index="upperUser" width="100">上一办理人</th>
+	                  	<#elseif  wfType?? && wfType=="hasDo">
+	                  	<th w_index="executor" width="100">当前办理人</th>
+	                  </#if>
+					  <th class="hidden" w_hidden="true"></th>
+	                </tr>
+	              </table>
+	            </div>
+	          </div>
+	        </td>
+	      </tr>
+	    </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+<script>
+	var gridOne;
+	var selectURL = "${base}/admin/incoming/queryIncoming.action";
+	var version='1';
+    var wf_name='oa_pg_incoming_document';
+    var wfType="${wfType!}";
+	$(function(){
+		layOut("#common_table","#grid_table");
+		gridOne=$.fn.bsgrid.init("manage_grid", {
+		      url:selectURL + "?etc="+new Date().getTime()+"&wfType="+wfType,
+		      row_primary_key: "primaryKey",
+		      autoLoad: true,
+		      pageSizeSelect: true,
+		      pageSize:15,
+		      complete:function(options, XMLHttpRequest, textStatus){
+		      },
+		      additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+		      },
+		      additionalAfterRenderGrid:function(){
+		    	gridOne.initGrid();
+		    	
+	        	$("#manage_grid tbody tr").each(function(){
+	        		$("td",this).eq(1).css("padding-left","8px");
+	        		$("td",this).css({"text-align":"center","padding-left":"0px"});
+	        		$("td",this).eq(3).css({"text-align":"left","padding-left":"15px"});
+	        		var $this=$(this),
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+					});
+		      }
+		  });
+		
+		$("#incoming_add").click(function(){
+			initWorkflow('oa_pg_incoming_document','收文登记','1');
+		});
+		$("#incoming_del").click(function(){
+		
+			initWorkflow('oa_send_document','发文流程','1');
+		});
+
+	    //工具条搜索
+	    $(document).on("click","#grid_search",function(){
+	        var clu = $("#search").val();
+	        var value = $("#search_text").val()=='请输入关键字'?'':$("#search_text").val();
+	        var criteriaFileChar = $("#search_file_char").val()=='请输入关键字'?'':$("#search_file_char").val();
+	        var serialNumber =$("#search_serialNumber").val()=='请输入关键字'?'':$("#search_serialNumber").val();
+	        gridOne.changeUrl(selectURL + "?wfType=" +wfType+ "&" + clu + '=' + window.encodeURI(value) + "&fileType=" + $("#search_file_type").val() +'&etc='+new Date().getTime()+"&fileTitle="+encodeURI(window.encodeURI(value))+"&criteriaFileChar="+encodeURI(window.encodeURI(criteriaFileChar))+"&serialNumber="+serialNumber);
+	    });
+	    
+	    $("#search_file_type").change(function(){
+	    	gridOne.changeUrl(selectURL + "?wfType=" +wfType+ "&fileType=" + $(this).val() + '&etc='+new Date().getTime());
+	    });
+	    
+	});
+	
+    //执行任务
+    function execute(id){
+    	var task_name = "";
+		var item = getRecord(id);
+		if("hasDo" == wfType){
+			var project = window.top.base;
+			project += '/form';
+			var surl = "";
+			if("收文"==item.fileType){
+				surl = project + "/fceform/common/run.html?djsn=oa_pg_incoming_form&djtype=eden&actionId=view&wfName=oa_pg_incoming_document&is_oa_bill=true&wfs=doing&wfId="+item.wfId;
+			}else{
+			    surl = project + "/fceform/common/run.html?djsn=oa_send_document&djtype=eden&actionId=view&wfName=oa_send_document&is_oa_bill=true&wfs=doing&wfId="+item.wfId;
+			}
+			 window.open(surl,"_target"); 
+   		 }else{
+   			if("收文"==item.fileType){
+				wf_name="oa_pg_incoming_document";
+			}else{
+			    wf_name="oa_send_document";
+			}
+   			uf_doAction(item.wfId,wf_name,task_name,version,null);
+   		 }
+    }
+</script>
+
+</html>

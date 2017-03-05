@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+<style>
+.bsgridPaging{
+	display:none;
+}
+.bsgridPagingOutTab{border:solid 1px #fff;}
+.js-fixed-father{overflow-y:auto!important;border-bottom:1px solid #fff;}
+.table-fixed-header{display:none;}
+.bsgrid{border: 2px solid #71b8ec;}
+.print-table tbody{border-color:red!important;}
+
+.bsgrid-header.lockscreen,.bsgrid-header.loading_div {  display: none!important;
+}
+</style>
+</head>
+<body style="height: 100%;">
+  <div class="container-layout line" id="print_content">
+    <#include "/aufw/page/include/script.html">
+    <table style="width:743px;margin:0 auto;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+          <div class="grid-table-top" id="grid_table">
+            <div class="js-grid-father grid-father" >
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th w_index="dept" width="150">处（室）</th>
+                  <th w_index="title" width="150">发文标题</th>
+                  <th w_index="bill_name" width="130">文种</th>
+                  <th w_index="sum" width="100">核出错点</th>
+                  <th w_index="total" width="100">合计发文量</th>
+                  <th w_index="reg_person" width="100">核稿人</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script src="${base}/form/resources/common/js/print.js"></script>
+  <script>
+	var gridOne;
+	var selectURL = "${base}/admin/documentStatistics/sendStatisticByNuclearDraft.action";
+	$(function() {
+		layOut("#common_table", "#grid_table");
+		
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?etc=" + new Date().getTime()+"&startDate=${(startDate)!}&endDate=${(endDate)!}",
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+
+				setTimeout(function(){
+					LODOP=getLodop();
+					LODOP.PRINT_INIT("打印");
+					LODOP.SET_PRINT_PAGESIZE(0,0,0,"A4");
+					LODOP.ADD_PRINT_HTM(10,0,"100%","100%",document.documentElement.innerHTML);
+					LODOP.PREVIEW();
+				},800);
+
+			}
+		});
+
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+<head>
+  <#include "/aufw/page/include/head.html">
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+
+  <style type="text/css">
+  .resource-link{
+    margin-left: 0px;
+  }
+  .message-content{
+    height:30px;
+  }
+  .bsgrid td{
+      text-align: center;
+      padding-left: 0;
+     }
+ 
+  </style>
+</head>
+
+<body style="height:100%;">
+  <div class="container-layout line">
+      <table style="width: 100%;" id="common_table">
+        <tr>
+          <!-- 右侧 -->
+          <td class="ver-top">
+            <div class="grid-table-top" id="grid_table">
+              <div class="js-tool-bar">
+          <div class="form-group ">
+          <!--<div class="resource-link ft12 ">短信内容：</div>          -->
+               <!--<p class="message-content margin-top js-message-content"></p>-->
+        </div>
+              <div class="js-grid-father grid-father">
+                <table id="manage_grid" class="bsgrid">
+                  <tr>
+                    <th w_index="id" w_hidden="true" class="hidden"></th>
+                    <th w_index="sender" width="80">发送人</th>
+                    <th w_index="user_name" width="80">接收人</th>
+                     <th w_index="msgType" width="80">发送方式</th>
+                     <th w_index="result" width="70">发送结果</th>
+                    <th w_index="telphone" width="100">电话</th>
+                      <th w_index="content" width="">消息内容</th>
+                    <th w_index="send_time" width="150">发送时间</th>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    
+    <#include "/aufw/page/include/script.html">
+
+        
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>   
+<script src="${base}/form/resources/common/js/tool.js"></script>
+<script src="${base}/form/resources/common/js/edenApi.js"></script>
+<script>
+  var gridOne;
+  var $wfid=window.top.globalParams.wfid;
+  var $step=$urlParam("step");
+  var selectURL = "${base}/admin/noteManage/showMailPage.action?etc="+new Date().getTime()+"&wf_id="+$wfid+"&step_id="+$step;
+  
+  $(function(){
+
+    layOut("#common_table","#grid_table");
+
+    gridOne=$.fn.bsgrid.init("manage_grid", {
+          url:selectURL,
+          row_primary_key: "primaryKey",
+          autoLoad: true,
+          pageSizeSelect: true,
+          pageSize:15,
+          complete:function(options, XMLHttpRequest, textStatus){
+
+
+          },
+          additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+
+
+          },
+          additionalAfterRenderGrid:function(){
+          gridOne.initGrid();
+//            var dataContent=gridOne.getAllRecords();
+//            if(dataContent.length>0){
+//                $(".js-message-content").html(gridOne.getRecord(0).content);
+//
+//            }
+
+          }
+      });
+    
+      
+  });
+
+
+</script>
+
+</html>

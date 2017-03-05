@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html style="overflow:auto;padding-bottom: 20px;">
+<head>
+    <#include "/aufw/page/include/head.html">
+        <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+  </head>
+<body style="height: 100%;">
+<#if signList??>
+  <div class="container-layout line" style="padding-top: 30px;">
+      <div class="clearfix centerBlock"  style="width: 747px;margin:0 auto;">
+        <h6 class="form-ft-song margin-bottom">未签收单位(<span class="number">${signSituationMap.toSignCount}</span>个) 
+        					<button class="button common-skin-btn-syle01 margin-left" id="messageTip">短信提醒</button>
+        					<button class="button common-skin-btn-syle01 margin-left" id="cancelDocument" style="display: none;">撤回</button>
+        </h6>
+        <table  id="common_table" class="border-top-blue">
+          <tr>
+            <!-- 右侧 -->
+            <td class="ver-top">
+              <div class="" id="grid_table">
+                <div class="js-grid-father grid-father">
+                  <table id="manage_grid" class="bsgrid" style="border-top: 2px solid #71b8ec;">
+                    <tr>
+                      <th  width="45">
+                        <input class="standard-checkbox" id="checkbox_all" type="checkbox" />
+                      </td>
+                      <th  width="47" class="padding-left0" style="padding-left:0px;text-align: center!important;">序号</td>
+                      <th  width="337" style="padding-left:0px;text-align: center !important;">单位</td>
+                      <th  width="162" style="padding-left:0px;text-align: center !important;">联系人</th>
+                      <th  width="156" style="padding-left:0px;text-align: center!important;">联系电话</th>
+                    </tr>
+                    <#list signList! as sign>
+                      <#if sign.signStatus?? && sign.signStatus=0>
+                        <tr>
+                          <td width="45" style="text-align: center;padding-left: 0;">
+                            <input class="standard-checkbox js-standard-checkbox" data-name="${sign.signOrg!}" data-id="" type="checkbox"  value="${sign.signOrg!}" />
+                          </td>
+                          <td  style="padding-left:0px;width: 47px;text-align: center!important;"><span class="js-sequence">${sign_index + 1}</span></td>
+                          <td  style="padding-left:0px;text-align: center !important;" width="337">${sign.signOrg!}</td>
+                          <td  style="padding-left:0px;text-align: center !important;" width="162"></td>
+                          <td  style="padding-left:0px;text-align: center !important;" width="156"></td>
+                        </tr>
+                      </#if>
+                    </#list>
+                  </table>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="clearfix centerBlock "  style="width: 747px;margin:0 auto;">
+        <h6 class="form-ft-song margin-big-top">已签收单位(<span class="number">${signSituationMap.hasSignCount}</span>个) </h6>
+        <table  id="common_table" class="border-top-blue margin-top">
+          <tr>
+            <!-- 右侧 -->
+            <td class="ver-top">
+              <div class="" style="border-top: 2px solid #71b8ec;">
+                <div class="js-grid-father grid-father">
+                  <table class="bsgrid" id="second_table">
+                    <tr>
+                      <th  width="47"style="text-align: center!important;padding-left:0px!important;">序号</td>
+                      <th  width="200" style="padding-left:0px;text-align: center !important;">签收单位</td>
+                      <th  width="100" style="padding-left:0px;text-align: center !important;">签收情况</td>
+                      <th  width="200" style="padding-left:0px;text-align: center !important;">签收内容</td>
+                      <th  width="200" style="padding-left:0px;text-align: center !important;">签收时间</td>
+                    </tr>
+                    <#list signList! as sign>
+                      <#if sign.signStatus?? && sign.signStatus!=0>
+                        <tr>
+                          <td  style="padding-left:0px;text-align: center !important;"><span class="js-sequence"></span></td>
+                          <td  style="padding-left:0px;text-align: center !important;" width="200">${sign.signOrg!}</td>
+                          <td  style="padding-left:0px;text-align: center !important;" width="100"><#if sign.signStatus=0>未签收</#if><#if sign.signStatus=1>已签收</#if><#if sign.signStatus=2>已退文</#if></td>
+                          <td  style="padding-left:0px;text-align: center !important;" width="200">${sign.signContent!}</td>
+                          <td  style="padding-left:0px;text-align: center !important;"  width="200"><#if sign.signTime??>${sign.signTime?datetime!}</#if></td>
+                        </tr>
+                      </#if>
+                    </#list>
+                  </table>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+  </div>
+  <script>
+  </script>
+  <#else>
+  	documentId错误！
+  </#if>
+    <script src = "${base}/edenui/common/js/jquery.js"></script>
+    <script src = "${base}/edenui/common/js/underscore.js"></script>
+    <script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+
+<script>
+    //全部的单位数据
+    var allUnitData=[];
+
+    var rightData = [];
+
+    var mailMessageData={
+        'sendRange':[],
+        'telphones':[],
+        'content':''
+    }
+
+  $(function(){
+      messageInit();
+      
+      $(document).on("click","#cancelDocument",function(){
+    	  
+    	  var wfName=(window.top.globalParams.wfName);
+    	  var wfId=(window.top.globalParams.wfid);
+    	  var urlC="";
+    	  if(wfName==="oa_send_document"){
+    		  urlC = "${base}/admin/documentToExchange/sendDocumentCancel.action?wfId=" + wfId;
+          }
+    	  if(wfName==="oa_pg_incoming_document"){
+    		  urlC = "${base}/admin/documentToExchange/incomingDocumentCancel.action?wfId=" + wfId;
+    	  }
+    	  if(wfName==="oa_sptrain_audit"){
+    		  urlC = "${base}/admin/documentToExchange/sptrainAuditCancel.action?wfId=" + wfId;
+    	  }
+    	  $.post(urlC,function(data){
+    		  layer.msg(data.message);
+    		  
+    		  if(data.flag=="1"){
+    			  setTimeout(function(){
+        			  var index = parent.layer.getFrameIndex(window.name);
+        			  parent.layer.close(index);
+        		  }, 600);
+    		  }
+          });
+          
+      });
+
+      $(document).on("click","#messageTip",function(){
+
+        var checked=$(".js-standard-checkbox");
+          rightData.length=0;
+
+          if(checked.length>1){
+
+              checked.each(function(){
+                  var $thisCheked=$(this);
+                  if($thisCheked.prop("checked")){
+                      rightData.push({
+                          "id":"",
+                          "name":$thisCheked.data("name")
+                      });
+                  }
+              });
+          }
+
+          if(rightData.length<1){
+              layer.msg("请至少选择一条数据");
+              return;
+          }
+          mailMessageData.sendRange.length=0;
+          $(".js-standard-checkbox").each(function(){
+
+              var $this=$(this);
+              if($this.prop('checked')){
+                  mailMessageData.sendRange.push({
+                      'name':$this.data('name'),
+                      'id':$this.data('id')
+                  });
+              }
+          });
+
+          var messageUrl='${base}/admin/commonDispatch/sendMessageDirectPop.action';
+          var iframe = layer.open({
+              type: 2,
+              title:'短消息',
+              area: ['810px','474px'],
+              fix: true, //不固定
+              maxmin: true,
+              content:messageUrl,
+              scrollbar: false,
+              fullPage:false,
+              success:function(layero,index){
+
+              }
+          });
+
+      });
+
+    $('#checkbox_all').click(function(){
+        var $this=$(this);
+      if($this.prop("checked")){
+        $('.standard-checkbox').prop('checked',true);
+      }else{
+        $('.standard-checkbox').prop('checked',false);
+      }
+    });
+    
+    var len=$('#second_table tr').length;
+    for(var i=1;i<len;i++){
+       $('#second_table tr:eq('+i+') td:eq(0)').text(i);
+    }
+  });
+
+    // 取消所有空格
+    function trimAll(str)
+    {
+        var result;
+        var is_global="g";
+        result = str.replace(/(^\s+)|(\s+$)/g,"");
+        if(is_global.toLowerCase()=="g")
+        {
+            result = result.replace(/\s/g,"");
+        }
+        return result;
+    }
+
+    function isMobile(mobile){
+        return (/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/).test(mobile);
+
+    }
+
+
+    function messageInit(){
+        var wfid=(window.top.globalParams.wfid);
+        var wfName=(window.top.globalParams.wfName);
+        if((wfName=="oa_send_document"||wfName=="oa_pg_incoming_document"||wfName=="oa_sptrain_audit") 
+        		&& "${signSituationMap.hasSignCount!}"=="0" && "${signSituationMap.toSignCount}"!="0"){
+        	$("#cancelDocument").show();
+        }
+        
+        var url="${base}/admin/sendRange/mailMessage.action?wfId="+wfid+"&wfName="+wfName;
+        $.post(url,function(data){
+            mailMessageData.content=(data.mailMessage);
+        });
+    }
+</script>
+</body>
+</html>

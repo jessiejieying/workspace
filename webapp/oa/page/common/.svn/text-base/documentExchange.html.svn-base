@@ -1,0 +1,2912 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <link rel="shortcut icon" href="${base}/aufw/resources/favicon.ico" type="image/x-icon">
+    <title>公文交换</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+    <link rel="stylesheet"  href="${base}/edenui/skintheme/css/m_default.css"/>
+
+    <style>
+        #hasSign_grid_fixedHeader{
+            width: 797px!important;
+        }
+        #manage_grid_pt_outTab{
+            bottom: 5px;
+        }
+        .msg-type{ display:inline-block;}
+        .msg-quare{
+             border-bottom: 2px solid #76aff6;
+		     display: inline-block;
+		     height: 27px;
+	         padding-top: 6px;
+	         margin-left: 14px;
+			 margin-right: 10px;
+			 margin-top: 9px;
+		}
+		.js-send-type {
+			margin-right: 4px;
+			margin-left: 4px;
+		}
+		
+		.js-send-type1 {
+			margin-right: 4px;
+		}
+    </style>
+    <script>
+	  //发短信时候验证当前人员是否有发送短信的资格
+		var validateFlag = true;
+    	
+        var sendType="${defaultType}";
+    
+        var exceptType;
+        if(0 == "${defaultType}"){
+       	 exceptType = "0";
+        }else{
+       	 exceptType = "1";
+        }
+        
+        var params = {
+            id:getUrlParam("id")
+        }
+
+        var gridOne;
+        var gridFormTop,gridFormBot;
+        var gridHasSin;
+        var project = '${base}';
+        var windowOpener=window.opener;
+        var djsn =windowOpener?(windowOpener.globalParams.djsn):"";
+        var wfId=windowOpener?(windowOpener.globalParams.wfid):"",
+            wfName=windowOpener?(windowOpener.globalParams.wfName):"",
+            billId=getUrlParam("billId");
+        var wfs=windowOpener?(windowOpener.globalParams.wfs):"";
+        var loginName=windowOpener?(windowOpener.globalParams.loginName):"";
+
+        // 获取参数列表
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)return unescape(r[2]);
+            return null;
+        }
+        
+
+    </script>
+</head>
+<body class="ms-controller" ms-controller="wrap" ms-click="@clickAll()">
+<div class="document-exchange-main-only-one">
+    <div class="searchHtml" ms-visible="@searchHtmlShow">
+        <ul>
+            <li ms-click="@searchHtmlDataClick(el)" ms-for="(index,el) in @searchHtmlData">{{el.content}}</li>
+        </ul>
+    </div>
+    <div class="document-exchange-header">
+        <ul class="document-exchange-header-ul js-exchange-header-ul">
+            <li ms-click="@tabClick(0)" ms-class="{on:@indexShow===0}"  ms-if="@sendExist">选择发送范围</li>
+            <li ms-click="@tabClick(1)" ms-class="{on:@indexShow===1}"  ms-if="@formExist">报名表</li>
+            <li ms-click="@tabClick(2)" ms-class="{on:@indexShow===2}"  ms-if="@feedBackExist">签收反馈情况</li>
+            <li ms-click="@tabClick(3)" ms-class="{on:@indexShow===3}">短信记录</li>
+        </ul>
+    </div>
+    <!--发送-->
+    <div class="document-exchange-body default-status " ms-class="{active:@indexShow===0}" ms-if="@sendExist">
+        <div class="document-exchange-body-main">
+            <div class="document-exchange-body-top js-exchange-body" style="padding-top: 6px;">
+                <div class="header clearfix">
+                    <span class="header-left">输入单位</span>
+
+                    <div class="button button-main margin-left float-left" id="distinguish" ms-click="@distinguishClick()">识别
+                    </div>
+                    <div class="button button-main margin-left float-left" id="js-main-send" ms-click="@mainSendClick()">选择</div>
+                    <span ms-if="isShowNumber" class="header-right">共 {{@inputData.length}}家</span>
+                </div>
+                <div class="main-textarea-only">
+                    <textarea id="distinguish_text" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" class="js-textarea-auto" ms-keyup="@distinguishChange()"  value=""></textarea>
+                </div>
+            </div>
+            <div class="document-exchange-body-top js-exchange-body">
+                <div class="header clearfix">
+                    <span class="header-left">未识别单位</span>
+                    <div class="button button-main margin-left float-left" ms-click="@addDistinguishClick()">识别
+                    </div>
+                    <span class="header-left-none" style="position: relative;top: 5px;" ms-if="@wrapMain.isOtherText">（该单位在公文交换分组中不存在）</span>
+                    <span ms-if="isShowNumber" class="header-right header-left-none">共 {{@undistinguishData.length}} 家</span>
+                </div>
+                <div class="main-textarea-only">
+                    <textarea class="js-textarea-auto" style="padding-top: 7px;padding-bottom: 8px;line-height:24px;" id="undistinguish_text" value="" ms-keyup="@undistinguishChange()"></textarea>
+                </div>
+            </div>
+            <div class="document-exchange-body-top js-exchange-body">
+                <div class="header clearfix">
+                    <span class="header-left">发送范围</span>
+                    <button ms-click="@clearSendRange()" class="button button-main margin-left">清空</button>
+                    <span class="header-right">共 {{@wrapMain.sendRange.length}} 家</span>
+                </div>
+                <div class="main js-main-top clearfix">
+
+                    <span ms-for="(index,item) in @wrapMain.sendRange" class="">{{item.name}}<i ms-if="index<(@wrapMain.sendRange.length-1)">,</i>
+                    </span>
+                </div>
+            </div>
+            <div class="document-exchange-body-top js-exchange-body">
+                <div class="header clearfix">
+                    <span class="header-left margin-right">选择文件</span>
+                    <label class="cursor-pointer" style="position: relative;top: 5px;"><input type="checkbox" style="vertical-align:-2px;"  ms-duplex-checked="@fileListCheck" class="margin-small-right" data-duplex-changed="@fileListCheckChange">全选</label>
+                </div>
+                <div class="main main-file">
+                    <ul class="file-ul clearfix" id="fileUl">
+                        <li ms-for="(index,item) in @fileDatas">
+                            <label>
+                                <input ms-duplex-checked="item.check" type="checkbox"  ms-attr="{'data-id':item.id,'data-name':item.name,'data-type':item.type,'data-othername':item.othername,'data-otherid':item.otherid}" data-duplex-changed="@fileListCheckOne" class="js-file-check"/>
+                            </label>
+                            <a ms-attr="{href:item.path}">{{item.name}}</a>
+
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center margin-small-top">
+                <label>
+                    <input type="checkbox" style="display:none;"  checked="checked" id="send_mail" class=" "><!--发送短信  -->
+			      <div class = "msg-type ">
+	     			 <#list msgTypes as msg>
+						<#if msg_index == 3>
+						<div class ="msg-quare">
+						<label style = "cursor: pointer;">
+							<input value="${msg.dictValue!}" <#if msg.dictValue == defaultType>checkval = '1'<#else>checkval = '0'</#if> data-ischeck="0" onclick="setSelectUserNo(this);"  class="js-send-type1"    name="msgInput1" type="radio" id="r_send_mail" <#if msg.dictValue == defaultType>checked="checked"</#if> >
+							<i class="js-link-name">${msg.dictName!}</i>
+						</label>
+						</div>
+						<#else>
+						<#if msg_index == 0>
+							<div class ="msg-quare">
+						</#if>
+						<label style = "cursor: pointer;">
+							<input value="${msg.dictValue!}" <#if msg.dictValue == defaultType>checkval = '1'<#else>checkval = '0'</#if><#if msg_index == 0>style = 'margin-left:0px;'</#if> data-ischeck="0"  class="js-send-type" name="msgInput" type="radio" <#if msg.dictValue == defaultType>checked="checked"</#if> >
+							<i class="js-link-name">${msg.dictName!}</i>		
+						</label>
+						<#if msg_index == 2>
+						</div>
+						</#if>
+						</#if>
+					</#list>
+				  </div>
+                </label>
+                <span id="editMessage" ms-click="@editMessage()" class="margin-left cursor-pointer">编辑短信</span>
+                <button class="button button-main margin-left" style = "position: absolute; margin-top: 8px;" ms-click="@sendSure()" id="sure">发送</button>
+            </div>
+        </div>
+    </div>
+    <!--报名表-->
+    <div class="document-exchange-body default-status" ms-class="{active:@indexShow===1}" ms-if="@formExist">
+
+        <div class="oa-meeting-entry" style="padding-top: 10px;width:814px;">
+        	<span class="float-left h26 font-bold "> 参会人员名单</span>
+            <input type="text" id="MeetingInput" class="tool-bar-input margin-left" style="width:220px;">
+            <button class="button button-main margin-left float-lfet" ms-click="@meetingSearch()">搜索</button>
+            <!--<div class="grid-table-top margin-top document-exchange-body-main" style="padding-left: 0;">-->
+            <!--<div class="js-grid-father grid-father" style="width:100%;height:460px;">-->
+                <!--<table id="form_grid_top" class="bsgrid">-->
+                    <!--<tr>-->
+                        <!--<th w_index="id" w_hidden="true" class="hidden"></th>-->
+                        <!--<th width="40" class="padding-left8">序号</th>-->
+                        <!--<th w_index="name" width="68">姓名</th>-->
+                        <!--<th w_index="sex" width="40" class="padding-left8">性别</th>-->
+                        <!--<th w_index="signOrg" >单位</th>-->
+                        <!--<th w_index="duty" width="76">职务/职称</th>-->
+                        <!--<th w_index="phone" width="93">电话</th>-->
+                        <!--<th w_index="remark" width="72">备注</th>-->
+                        <!--<th w_index="createDttm" width="120">报名时间</th>-->
+                        <!--&lt;!&ndash;<th  width="60">转移位置</th>&ndash;&gt;-->
+
+                    <!--</tr>-->
+                <!--</table>-->
+            <!--</div>-->
+            <!--</div>-->
+            <div class="clearfix meeting-table"  >
+                <!--<table class="table-fixed-header bsgrid-header table-fixed-header-main" style="top:73px;width: 797px;margin-left:-407px;">-->
+                    <!--<tr  class="nodrop nodrag">-->
+                        <!--<th width="40"class="padding-left8">序号</th>-->
+                        <!--<th width="68">姓名</th>-->
+                        <!--<th width="40" class="padding-left8">性别</th>-->
+                        <!--<th width="120">单位</th>-->
+                        <!--<th width="76">职务/职称</th>-->
+                        <!--<th width="93">电话</th>-->
+                        <!--<th width="72">备注</th>-->
+                        <!--<th width="116">报名时间</th>-->
+                        <!--<th width="100">转移位置</th>-->
+                    <!--</tr>-->
+                <!--</table>-->
+                <table id="entry_table" class="bsgrid oa-form-grid  border-top-blue margin-bottom20 centerBlock">
+                    <tr  class="nodrop nodrag">
+                        <th width="40"class="padding-left8">序号</th>
+                        <th width="68">姓名</th>
+                        <th width="40" class="padding-left8">性别</th>
+                        <th >单位</th>
+                        <th width="76">职务/职称</th>
+                        <th width="93">电话</th>
+                        <th width="72">备注</th>
+                        <th width="116">报名时间</th>
+                        <th width="100">转移位置</th>
+                    </tr>
+                    <tr ms-attr="{id:el.id}" ms-class="{findSame:el.color,'js-body-tr':true}"  ms-for="(index,el) in @meetingEntryList.dataJoin">
+                        <td style="width: 40px;"><span class="">{{index+1}}</span></td>
+                        <td  style="width: 68px;"  ms-attr="{title:el.name}">{{el.name}}</td>
+                        <td style="width: 40px;" ms-attr="{title:el.sex}">{{el.sex}}</td>
+                        <td  ms-attr="{title:el.signOrg}" >
+                            <a target="_blank" style="font-size: 13px;"  ms-click="@meetingSignView(el.id,el.signOrg,1)">{{el.signOrg}}</a>
+                        </td>
+                        <td style="width: 76px;" ms-attr="{title:el.duty}">{{el.duty}}</td>
+                        <td  style="width: 93px;" ms-attr="{title:el.phone}">{{el.phone}}</td>
+                        <td style="width: 72px;" ms-attr="{title:el.remark}">{{el.remark}}</td>
+
+                        <td style="width: 116px;" ms-attr="{title:el.time}">{{el.time}}</td>
+                        <td style="width:100px;" title="" class="text-center">
+                            <input class="input js-sequence" style="width:80px;display: inline-block;" type="text" ms-duplex="el.seq">
+                        </td>
+                    </tr>
+                    <tr ms-if="@meetingEntryList.dataJoin.length<1">
+                        <td colspan="9" style="text-align: center;padding-left: 0;">暂无数据</td>
+                    </tr>
+                </table>
+            </div>
+            <table ms-visible="@meetingEntryList.dataJoin.length" class="bsgridPagingOutTab" style="border-top-width:1px;margin-top: 15px;"><tbody><tr>
+                <td align="right">
+                    <table class="bsgridPaging">
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            <td width="150">每页显示:&nbsp;
+                                <select  ms-duplex="@joinSelect">
+                                    <option ms-attr="{value:el}" ms-for="el in @meetingEntryList.pageCount">{{el}}</option>
+                                </select>
+                            </td>
+                            <td width="50">共:&nbsp;
+                                <span >{{@meetingEntryList.joinPage.totalRows}}</span>
+                            </td>
+
+                            <td width="100">
+                                <input class="pagingBtn firstPage " type="button" ms-click="@joinPageStart()" ms-class="{'disabledCls':@meetingEntryList.joinPage.curPage<2}" value="首&nbsp;页">&nbsp;
+                                <input class="pagingBtn prevPage disabledCls" type="button" ms-class="{'disabledCls':@meetingEntryList.joinPage.curPage<2}" ms-click="@joinPagePre()" value="上一页">
+                            </td>
+                            <td width="90">
+                                <div>
+                                    <span>{{@meetingEntryList.joinPage.curPage}}</span>&nbsp;/&nbsp;
+                                    <span>{{@meetingEntryList.joinPage.number}}</span>
+                                </div>
+                            </td>
+                            <td width="100">
+                                <input class="pagingBtn nextPage " type="button" ms-class="{'disabledCls':@meetingEntryList.joinPage.curPage==@meetingEntryList.joinPage.number}" ms-click="@joinPageNext()"  value="下一页">&nbsp;
+                                <input class="pagingBtn lastPage " type="button" ms-class="{'disabledCls':@meetingEntryList.joinPage.curPage==@meetingEntryList.joinPage.number}" ms-click="@joinPageEnd()"  value="末&nbsp;页">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+            </table>
+            <br/>
+            <span class="float-left h26 font-bold "> 请假人员名单</span>
+            <input type="text" id="LeaveInput" class="tool-bar-input margin-left" style="width:220px;">
+            <button class="button button-main margin-left float-lfet" ms-click="@leaveSearch()">搜索</button>
+            
+            <!--<div class="grid-table-top margin-top document-exchange-body-main" style="padding-left: 0;">-->
+            <!--<div class="js-grid-father grid-father" style="width:100%;height:460px;">-->
+                <!--<table id="form_grid_bot" class="bsgrid">-->
+                    <!--<tr>-->
+                        <!--<th w_index="id" w_hidden="true" class="hidden"></th>-->
+                        <!--<th width="40"class="padding-left8">序号</th>-->
+                        <!--<th w_index="name" width="68">姓名</th>-->
+                        <!--<th w_index="sex" width="40" class="padding-left8">性别</th>-->
+                        <!--<th w_index="signOrg">单位</th>-->
+                        <!--<th w_index="duty" width="76">职务/职称</th>-->
+                        <!--<th w_index="phone" width="93">电话</th>-->
+                        <!--<th w_index="remark" width="72">备注</th>-->
+                        <!--<th w_index="createDttm" width="120">报名时间</th>-->
+                        <!--&lt;!&ndash;<th width="60">转移位置</th>&ndash;&gt;-->
+                    <!--</tr>-->
+                <!--</table>-->
+            <!--</div>-->
+                <!--</div>-->
+            <div class="clearfix meeting-table" >
+                <!--<table class="table-fixed-header bsgrid-header table-fixed-header-main" style="top:251px;width: 797px;margin-left:-407px;">-->
+                    <!--<tr  class="nodrop nodrag">-->
+                        <!--<th width="40"class="padding-left8">序号</th>-->
+                        <!--<th width="68">姓名</th>-->
+                        <!--<th width="40" class="padding-left8">性别</th>-->
+                        <!--<th width="120">单位</th>-->
+                        <!--<th width="76">职务/职称</th>-->
+                        <!--<th width="93">电话</th>-->
+                        <!--<th width="72">备注</th>-->
+                        <!--<th width="116">报名时间</th>-->
+                        <!--<th width="100">转移位置</th>-->
+                    <!--</tr>-->
+                <!--</table>-->
+                <table id="leave_table" class="bsgrid oa-form-grid  border-top-blue margin-bottom20 centerBlock"style="">
+                    <tr  class="nodrop nodrag">
+                        <th width="40"class="padding-left8">序号</th>
+                        <th width="68">姓名</th>
+                        <th width="40" class="padding-left8">性别</th>
+                        <th width="120">单位</th>
+                        <th width="76">职务/职称</th>
+                        <th width="93">电话</th>
+                        <th width="72">备注</th>
+                        <th width="116">报名时间</th>
+                        <th width="100">转移位置</th>
+                    </tr>
+                    <tr ms-attr="{id:el.id}" ms-class="{findSame:el.color,'js-body-tr':true}"  ms-for="(index,el) in @meetingEntryList.dataLeave">
+                        <td style="width: 40px;">
+                            <span class="">{{index+1}}</span>
+                        </td>
+                        <td  style="width: 68px;"  ms-attr="{title:el.name}">{{el.name}}</td>
+                        <td style="width: 40px;" ms-attr="{title:el.sex}">{{el.sex}}</td>
+                        <td style="width: 120px;" ms-attr="{title:el.signOrg}" >
+                            <a target="_blank" style="font-size: 13px;"  ms-click="@meetingSignView(el.id,el.signOrg,1)">{{el.signOrg}}</a>
+                        </td>
+                        <td style="width: 76px;" ms-attr="{title:el.duty}">{{el.duty}}</td>
+                        <td  style="width: 93px;" ms-attr="{title:el.phone}">{{el.phone}}</td>
+                        <td style="width: 72px;" ms-attr="{title:el.remark}">{{el.remark}}</td>
+                        <td style="width: 116px;" ms-attr="{title:el.time}">{{el.time}}</td>
+                        <td style="width: 100px;" title="" class="text-center">
+                            <input class="input js-sequence" style="width:80px;display: inline-block;" type="text"ms-duplex="el.seq">
+                        </td>
+                    </tr>
+                    <tr ms-if="@meetingEntryList.dataLeave.length<1">
+                        <td colspan="9" style="text-align: center;padding-left: 0;">暂无数据</td>
+                    </tr>
+                </table>
+
+            </div>
+            <table ms-visible="@meetingEntryList.dataLeave.length" class="bsgridPagingOutTab" style="border-top-width:1px;margin-top: 15px;"><tbody><tr>
+                <td align="right">
+                    <table class="bsgridPaging">
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            <td width="150">每页显示:&nbsp;
+                                <select  ms-duplex="@leaveSelect">
+                                    <option ms-attr="{value:el}" ms-for="el in @meetingEntryList.pageCount">{{el}}</option>
+                                </select>
+                            </td>
+                            <td width="50">共:&nbsp;
+                                <span >{{@meetingEntryList.leavePage.totalRows}}</span>
+                            </td>
+
+                            <td width="100">
+                                <input class="pagingBtn firstPage " type="button" ms-click="@leavePageStart()" ms-class="{'disabledCls':@meetingEntryList.leavePage.curPage<2}" value="首&nbsp;页">&nbsp;
+                                <input class="pagingBtn prevPage disabledCls" type="button" ms-class="{'disabledCls':@meetingEntryList.leavePage.curPage<2}" ms-click="@leavePagePre()" value="上一页">
+                            </td>
+                            <td width="90">
+                                <div>
+                                    <span>{{@meetingEntryList.leavePage.curPage}}</span>&nbsp;/&nbsp;
+                                    <span>{{@meetingEntryList.leavePage.number}}</span>
+                                </div>
+                            </td>
+                            <td width="100">
+                                <input class="pagingBtn nextPage " type="button" ms-class="{'disabledCls':@meetingEntryList.leavePage.curPage==@meetingEntryList.leavePage.number}" ms-click="@leavePageNext()"  value="下一页">&nbsp;
+                                <input class="pagingBtn lastPage " type="button" ms-class="{'disabledCls':@meetingEntryList.leavePage.curPage==@meetingEntryList.leavePage.number}" ms-click="@leavePageEnd()"  value="末&nbsp;页">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+            </table>
+            <div class="clearfix centerBlock"  style="width:814px;margin: 0 auto;margin-top:10px;">
+                <h6 class="form-ft-song margin-bottom font-bold">上报情况</h6>
+                <table id="report_table" class="bsgrid oa-form-grid  border-top-blue margin-bottom20 centerBlock" style="width:814px!important;" >
+                    <tr class="">
+                        <td width="105" class="font-bold">已上报单位<span ms-if="@meetingEntryList.hasSignCount>0">({{@meetingEntryList.hasSignCount}})</span></td>
+                        <td class="td-auto" ms-attr="{title:@meetingEntryList.hasFeedbackOrg}"><div>{{@meetingEntryList.hasFeedbackOrg}}</div></td>
+                    </tr>
+                    <tr class="">
+                        <td width="105" class="font-bold">未上报单位<span ms-if="@meetingEntryList.toSignCount>0">({{@meetingEntryList.toSignCount}})</span></td>
+                        <td class="td-auto" ms-attr="{title:@meetingEntryList.toFeedbackOrg}"><div>{{@meetingEntryList.toFeedbackOrg}}</div></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="text-center margin-top margin-bottom" style="">
+                <div class="button button-main" ms-click="@meetingSave()" id="save">保存</div>
+                <div ms-if="@meetingEntryList.toFeedbackOrg.length>1" class="button button-main margin-left "  id="cuiban_meetingInfo" ms-click="@meetingReminders()">催办</div>
+                <div class="button button-main margin-left" ms-click="@meetingExport()" id="export">导出</div>
+            </div>
+        </div>
+    </div>
+    <!--签收反馈情况-->
+    <div class="document-exchange-body default-status padding-bottom" ms-class="{active:@indexShow===2}" ms-if="@feedBackExist">
+        <div class="clearfix centerBlock " style="margin:0 auto;">
+            <div class="clearfix  padding-top">
+                <span class="float-left h26 font-bold ">已签收单位</span>
+                <button  ms-if="@isWithdraw" class="button button-main margin-left float-lfet" ms-click="@serviceWithdrawal()">撤回</button>
+                <input type="text" id="SignInput" class="tool-bar-input margin-left" style="width:286px;">
+                <button class="button button-main margin-left float-lfet" ms-click="@signSearch()">搜索</button>
+                <span class="float-right h26">共{{@hasSignCount}}家</span>
+            </div>
+            <div class="grid-table-top margin-top document-exchange-body-main" style="padding-left: 0;">
+            <div class="js-grid-father grid-father" style="width:100%;height:460px;">
+                <table id="hasSign_grid" class="bsgrid">
+                    <tr>
+                        <th w_index="valueId" w_hidden="true" class="hidden"></th>
+                        <th width="40" class="padding-left8">序号</th>
+                        <th w_index="unit" width="150">单位</th>
+                        <th w_index="situation" width="200">签收或者反馈情况</th>
+                        <th w_index="content" >反馈内容</th>
+                    </tr>
+                </table>
+            </div>
+                </div>
+    
+        </div>
+        <div class="clearfix centerBlock padding-top document-exchange-body-top " style="margin:0 auto;">
+            <div class="clearfix margin-bottom">
+                <span  class="float-left h26 font-bold">未签收单位</span>
+                <button ms-if="@messageTip" ms-click="@feedBackMessageTip()" class="button button-main margin-left float-lfet">签收提醒</button>
+                <input type="text" id="noSignInput" class="tool-bar-input margin-left" style="width:286px;">
+                <button class="button button-main margin-left float-lfet" ms-click="@noSignSearch()">搜索</button>
+                <span class="float-right h26">共{{@noSignCount}}家</span>
+            </div>
+            <div class="blue-border">
+                <span  ms-class="{'margin-right':true,on:!el.check}" ms-for="(index,el) in @noSignList" ms-attr="{title:el.time}">
+                    {{el.signOrg}}<i ms-visible="index<(@noSignList.length-1)">，</i>
+                </span>
+            </div>
+            <div class="clearfix margin-bottom margin-top">
+                <span  class="float-left h26 font-bold">未识别单位</span>
+                <span class="float-right h26 color-red">共{{@distingNumber}}家</span>
+            </div>
+            <div class="blue-border">
+                <p class="color-red">{{@distingUnit}}</p>
+            </div>
+        </div>
+    </div>
+    <!--短信记录-->
+    <div class="document-exchange-body default-status" ms-class="{active:@indexShow===3}">
+        <div class="grid-table-top margin-top document-exchange-body-main" style="padding-left: 0;">
+        	<span  class="h26 font-bold">接收单位：</span>
+            <div class="display-ib" style="margin-bottom:10px;">
+                <input id="subject" type="text" class="tool-bar-input" style="width: 120px;" placeholder="请输入关键字"/>
+            </div>
+            <span  class="h26 font-bold"> 接收人：</span>
+            <div class="display-ib" style="margin-bottom:10px;">
+                <input id="userName" type="text" class="tool-bar-input" style="width: 90px;" placeholder="请输入关键字"/>
+            </div>
+            <span  class="h26 font-bold"> 电话号码：</span>
+            <div class="display-ib" style="margin-bottom:10px;">
+                <input id="telphone" type="text" class="tool-bar-input" style="width: 120px;" placeholder="请输入关键字"/>
+            </div>
+            <div class="button button-main margin-left" ms-click="@messageSearch()" id="senior_grid_search">搜索</div>
+            <div class="button button-main margin-left" ms-click="@resendMail()" id="resend_mail">失败重发</div>
+            <div class="js-grid-father grid-father" style="width:100%;height:540px;">
+                <table id="manage_grid" class="bsgrid">
+                    <tr>
+                        <th w_index="id" w_hidden="true" class="hidden"></th>
+                        <th w_index="true" width="30">序号</th>
+                        <th w_index="unit" width="100">接收单位</th>
+                        <th w_index="user_name" width="55">接收人</th>
+                        <th w_index="post" width="60">职务</th>
+                        <th w_index="telphone" width="70">电话</th>
+                        <th w_index="msgType" width="70">发送方式</th>
+                        <th w_index="result" width="70">发送结果</th>
+                        <th w_index="content" >消息内容</th>
+                        <th w_index="send_time" width="120">发送时间</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<!--<script src="${base}/edenui/common/js/jq_plugins/cookie/jquery.cookie.js"></script>-->
+<script src="${base}/edenui/common/js/jq_plugins/bsgrid/grid.zh-CN.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/bsgrid/grid.extend.min.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<script src="${base}/edenui/common/js/avalon/avalon2.js"></script>
+
+<script>
+
+    (function ($) {
+        $.fn.autoTextarea = function (options) {
+            var defaults = {
+                maxHeight: null,//文本框是否自动撑高，默认：null，不自动撑高；如果自动撑高必须输入数值，该值作为文本框自动撑高的最大高度
+                minHeight: 0 //默认最小高度，也就是文本框最初的高度，当内容高度小于这个高度的时候，文本以这个高度显示
+            };
+            var opts = $.extend({}, defaults, options);
+            return $(this).each(function () {
+                $(this).bind("paste cut keydown keyup focus blur", function () {
+                    var height, style = this.style;
+                    this.style.height = opts.minHeight + 'px';
+                    if (this.scrollHeight > opts.minHeight) {
+                        if (opts.maxHeight && this.scrollHeight > opts.maxHeight) {
+                            height = opts.maxHeight;
+                            style.overflowY = 'scroll';
+                        } else {
+                            height = this.scrollHeight;
+                            style.overflowY = 'hidden';
+                        }
+                        style.height = height + 'px';
+                    }
+                });
+            });
+        };
+    })(jQuery)
+
+
+    var loadFeedList = true,
+            loadMessageList = true,
+            loadFormList = true;
+
+    //存储当前的发生范围
+    var unitStorageData = [];
+
+    //设置初始的分页数量
+    var startMeetingPageNum = 20;
+    //加密是否成功的回调
+    var paramsKeyBack = "-100",
+            backSet;
+
+    var $advice = getUrlParam('advice');
+    var $moduleT = getUrlParam('moduleT');
+    var undistinguishData = [];
+    var isShowNumber = false;
+
+    var stepParam = 'step100';
+    var encryptionObj = {
+        "pdfUrl": "",
+        "pdfName": "",
+        "key": [],
+        "paperNum": getPaperNum(),
+        "tgwId": "",
+        "tgwSize": "",
+        "tableKeyId": "",
+        "userid": loginName
+    }
+
+    //全部的单位数据
+    var allUnitData = [];
+
+    var messageData = "";
+
+    var mailMessageData = {
+        'sendRange': [],
+        'telphones': [],
+        'content': '',
+        //单次为1，多次为2
+        'taskType': 1,
+        //多次的时间间隔
+        'cycleHour': 1,
+        'messageType': 2,
+    }
+    var mailMessageDataDirect = {
+        'sendRange': [],
+        'telphones': [],
+        'content': '',
+        'messageType': 2
+    }
+
+    //发送短信内容
+    var mailMessage = {
+        "accounts": "",
+        'telphones': "",
+        'content': ""
+    }
+
+
+    //参数配置表
+    avalon.config({
+        debug: false
+    });
+    var model = avalon.define({
+        $id: "wrap",
+        fileDatas: [],
+        indexShow: 0,
+        loading: false,
+        inputData:[],
+        clickAll: function () {
+            model.searchHtmlShow = false;
+        },
+        meetingSearch: function(){
+//         	var url = "${base}/admin/sendRange/meetingJoinPeopleList.action?ect=" + new Date().getTime() + "&meetingId=" + (params.id); ;
+        	page.getJoinList();
+        },
+        leaveSearch:function () {
+        	page.getLeaveList();
+        },  
+        signSearch: function () {
+            if ($advice == 2) {
+                var url = '${base}/admin/sendRange/selectSignFreeList.action?etc=' + new Date().getTime() + '&wfId=' + wfId + '&wfName=' + wfName;
+            } else {
+                var url = '${base}/admin/sendRange/selectSignFreeList.action?etc=' + new Date().getTime() + '&wfId=' + wfId + '&wfName=' + wfName + '&moduleT=' + $moduleT;
+            }
+            url += "&conetnt=" + encodeURI($("#SignInput").val());
+            gridHasSin.changeUrl(url);
+        },
+        noSignSearch: function () {
+
+            var getSearchContent = $.trim($("#noSignInput").val()),
+                    unitNum = 0;
+            if (getSearchContent.length < 1) {
+                layer.msg("请先输入单位名称");
+                return;
+            }
+            model.noSignList.forEach(function (value) {
+                if (value.signOrg.indexOf(getSearchContent) > (-1)) {
+                    value.check = false;
+                    unitNum++;
+                } else {
+                    value.check = true;
+                }
+            });
+
+            if (unitNum < 1) {
+                layer.msg("您所查找的单位不存在");
+            }
+
+        },
+
+        //清空发送范围
+        clearSendRange: function () {
+            layer.confirm('确实删除发送范围中的单位么', {
+                        btn: ['确定', '取消'] //按钮
+                    }, function () {
+                        model.wrapMain.sendRange.clear();
+                        unitStorageData.length = 0;
+                        layer.msg("清空成功!", {time: 1000});
+                    }
+            );
+
+        },
+        messageSearch: function () {
+            var $unit = $("#subject").val();
+            //发文
+            if (djsn == "oa_send_document") {
+                if ($advice == "1") {
+                    stepParam = 'oa_draft_info';
+                }
+            }
+            //收文
+            else if (djsn == "oa_pg_incoming_form") {
+                if ($advice == "1") {
+                    stepParam = 'oa_draft_info';
+                }
+            }
+            //会议
+            else if (djsn == "oa_meeting_info") {
+                if ($advice == "2") {
+                    //会议回执
+                }
+            }
+            //领导批示
+            else if (djsn == "oa_leader_instruction_form") {
+                if (wfName == "oa_leader_instruction_fb") {
+                    stepParam = 'oa_draft_info';
+                }
+            }
+            //专项事务
+            else if (djsn == "oa_sptrain_audit") {
+                if ($advice == "1") {
+                    stepParam = 'oa_draft_info';
+                }
+            }
+            var gridUrl = "${base}/admin/sendRange/showExchangeMailPage.action?etc=" + new Date().getTime()
+                    + "&wf_id=" + wfId + "&step_id=" + stepParam
+                    + "&unitName=" + window.encodeURI($unit) + "&userName=" + window.encodeURI($("#userName").val())
+                    + "&telphone=" + window.encodeURI($("#telphone").val());
+            gridOne.changeUrl(gridUrl);
+        },
+        //加密按钮
+        btnEncryption: function () {
+            //初始化加密数据
+            encryptionObj.pdfUrl = "";
+            encryptionObj.key.length = 0;
+            encryptionObj.pdfName = "";
+
+            var isName = "";
+            var $fileData = model.fileDatas;
+
+            for (var i = 0; i < $fileData.length; i++) {
+                if ($fileData[i].check && $fileData[i].name.indexOf(".tgw") > (-1)) {
+                    isName = $fileData[i].name.replace(".tgw", "");
+
+                    encryptionObj.tableKeyId = $fileData[i].tableKeyId;
+                    encryptionObj.tgwId = $fileData[i].id;
+                    encryptionObj.tgwSize = $fileData[i].size;
+                    break;
+                }
+            }
+
+            if (isName.length > 0) {
+                for (var i = 0; i < $fileData.length; i++) {
+                    if ($fileData[i].name.indexOf("(归档)") > (-1) && $fileData[i].name.indexOf(".pdf") > (-1)) {
+
+                        encryptionObj.pdfUrl = $fileData[i].path.split("path=")[1];
+                        encryptionObj.pdfName = $fileData[i].name.replace("(归档)", "");
+
+                        model.wrapMain.sendRange.$model.forEach(function (val) {
+                            if (val.caCode.length) {
+                                encryptionObj.key.push(val.caCode);
+                            }
+                        });
+                        break;
+                    }
+
+                    if ($fileData[i].name.indexOf("（归档）") > (-1) && $fileData[i].name.indexOf(".pdf") > (-1)) {
+
+                        encryptionObj.pdfUrl = $fileData[i].path.split("path=")[1];
+                        encryptionObj.pdfName = $fileData[i].name.replace("（归档）", "");
+
+                        model.wrapMain.sendRange.$model.forEach(function (val) {
+                            if (val.caCode.length) {
+                                encryptionObj.key.push(val.caCode);
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+
+            //只有归档pdf文件
+            if (encryptionObj.pdfUrl.length < 1) {
+                for (var i = 0; i < $fileData.length; i++) {
+                    if ($fileData[i].name.indexOf("(归档)") > (-1) && $fileData[i].name.indexOf(".pdf") > (-1)) {
+                        encryptionObj.pdfUrl = $fileData[i].path.split("path=")[1];
+                        encryptionObj.pdfName = $fileData[i].name.replace("(归档)", "");
+                        encryptionObj.tableKeyId = $fileData[i].tableKeyId;
+                        encryptionObj.key.length = 0;
+                        model.wrapMain.sendRange.$model.forEach(function (val) {
+                            if (val.caCode.length) {
+                                encryptionObj.key.push(val.caCode);
+                            }
+                        });
+                        break;
+                    }
+                    if ($fileData[i].name.indexOf("（归档）") > (-1) && $fileData[i].name.indexOf(".pdf") > (-1)) {
+                        encryptionObj.pdfUrl = $fileData[i].path.split("path=")[1];
+                        encryptionObj.pdfName = $fileData[i].name.replace("（归档）", "");
+                        encryptionObj.tableKeyId = $fileData[i].tableKeyId;
+                        encryptionObj.key.length = 0;
+                        model.wrapMain.sendRange.$model.forEach(function (val) {
+                            if (val.caCode.length) {
+                                encryptionObj.key.push(val.caCode);
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+
+            if (encryptionObj.pdfUrl.length < 1) {
+                model.sendSureAfter();
+                return
+            }
+
+            layer.msg("加密中...");
+
+            backSet = setInterval(function () {
+                if (paramsKeyBack == "0") {
+                    model.refreshFileList();
+                    layer.msg("加密成功!");
+                    clearInterval(backSet);
+                }
+                else if (paramsKeyBack == "-100") {
+
+                }
+                else {
+                    layer.msg("加密失败，请联系相关单位");
+                    clearInterval(backSet);
+                }
+            }, 200);
+
+            var url = project + '/admin/commonDispatch/encryptionLoading.action';
+            var iframe = layer.open({
+                type: 2,
+                title: false,
+                closeBtn: 0, //不显示关闭按钮
+                shade: [0],
+                area: ['0px', '0px'],
+                fix: true, //不固定
+                maxmin: true,
+                content: [url, "none"],
+                scrollbar: false,
+                fullPage: false,
+                success: function (layero, index) {
+
+                }
+            });
+        },
+        //未识别单位
+        undistinguishData: [],
+        //是否存在报名表
+        formExist: false,
+
+        joinSelect: startMeetingPageNum,
+        leaveSelect: startMeetingPageNum,
+        joinPageStart: function () {
+            if (model.meetingEntryList.joinPage.curPage > 1) {
+                model.meetingEntryList.joinPage.curPage = 1;
+                page.getJoinList();
+            } else {
+                layer.msg("已经是第一页了");
+            }
+
+        },
+        leavePageStart: function () {
+            if (model.meetingEntryList.leavePage.curPage > 1) {
+                model.meetingEntryList.leavePage.curPage = 1;
+                page.getLeaveList();
+            } else {
+                layer.msg("已经是第一页了");
+            }
+
+        },
+        joinPagePre: function () {
+            if (model.meetingEntryList.joinPage.curPage > 1) {
+                model.meetingEntryList.joinPage.curPage--;
+                page.getJoinList();
+            } else {
+                layer.msg("已经是第一页了");
+            }
+
+        },
+        leavePagePre: function () {
+            if (model.meetingEntryList.leavePage.curPage > 1) {
+                model.meetingEntryList.leavePage.curPage--;
+                page.getLeaveList();
+            } else {
+                layer.msg("已经是第一页了");
+            }
+
+        },
+        joinPageNext: function () {
+            if (model.meetingEntryList.joinPage.curPage < model.meetingEntryList.joinPage.number) {
+                model.meetingEntryList.joinPage.curPage++;
+                page.getJoinList();
+            } else {
+                layer.msg("已经是最后一页了");
+            }
+
+        },
+        leavePageNext: function () {
+            if (model.meetingEntryList.leavePage.curPage < model.meetingEntryList.leavePage.number) {
+                model.meetingEntryList.leavePage.curPage++;
+                page.getLeaveList();
+            } else {
+                layer.msg("已经是最后一页了");
+            }
+        },
+        joinPageEnd: function () {
+            if (model.meetingEntryList.joinPage.curPage < model.meetingEntryList.joinPage.number) {
+                model.meetingEntryList.joinPage.curPage = model.meetingEntryList.joinPage.number;
+                page.getJoinList();
+            } else {
+                layer.msg("已经是最后一页了");
+            }
+
+        },
+        leavePageEnd: function () {
+            if (model.meetingEntryList.leavePage.curPage < model.meetingEntryList.leavePage.number) {
+                model.meetingEntryList.leavePage.curPage = model.meetingEntryList.leavePage.number;
+                page.getLeaveList();
+            } else {
+                layer.msg("已经是最后一页了");
+            }
+
+        },
+        meetingEntryList: {
+            pageCount: [5, 10, 20, 25, 50, 50, 100, 200, 500],
+            //参会人员名单
+            dataJoin: [],
+            joinPage: {
+                'curPage': 1,
+                'count': startMeetingPageNum,
+                'totalRows': 0,
+                'number': 0
+            },
+            //请假人员名单
+            dataLeave: [],
+            leavePage: {
+                'curPage': 1,
+                'count': startMeetingPageNum,
+                'totalRows': 0,
+                'number': 0
+            },
+            //已上报单位
+            hasFeedbackOrg: '',
+            hasSignCount: 0,
+            //未上报单位
+            toFeedbackOrg: '',
+            toSignCount: 0
+        },
+        //搜索区域弹出层
+        searchHtmlData: [],
+        searchHtmlShow: false,
+        searchHtmlDataClick: function (obj) {
+
+            var testText = $("#distinguish_text").val();
+            var dataPush = testText.replace(/，/g, ",").replace(/、/g, ",").replace(/;/g, ",").replace(/；/g, ",").split(",");
+
+            dataPush[dataPush.length - 1] = obj.content;
+            $("#distinguish_text").val(dataPush.join(",") + ",").focus();
+
+            model.searchHtmlShow = false;
+        },
+        undistinguishChange: function () {
+            //window.top.globalParams.toExchangeHtmlUndistinguish=$("#undistinguish_text").val();
+
+        },
+        distinguishChange: function () {
+            var testText = $("#distinguish_text").val();
+            var dataPush = testText.replace(/，/g, ",").replace(/、/g, ",").replace(/;/g, ",").replace(/；/g, ",").split(",");
+
+            var $val = dataPush[dataPush.length - 1];
+            var searchData = [];
+            //暂存输入单位
+            // $.cookie('distinguish', $("#distinguish_text").val(), { expires: 1});
+            window.top.toExchangeHtml = $("#distinguish_text").val();
+
+            model.searchHtmlData.length = 0;
+            if ($val.length) {
+                allUnitData.forEach(function (value) {
+
+                    if ((value.name).indexOf($val) > (-1)) {
+
+                        searchData.push({
+                            'content': value.name
+                        })
+                    }
+                });
+
+                model.searchHtmlData = searchData;
+                if (searchData.length) {
+                    model.searchHtmlShow = true;
+                }
+
+            }
+        },
+        sendExist: true,
+        feedBackExist: true,
+        //附件列表全选项
+        fileListCheck: false,
+        fileListCheckChange: function (e) {
+            var checked = e.target.checked;
+
+            if (checked) {
+                model.fileDatas.forEach(function (value) {
+                    value.check = true;
+                });
+            }
+            else {
+                model.fileDatas.forEach(function (value) {
+                    value.check = false;
+                });
+            }
+        },
+        fileListCheckOne: function (e) {
+            var checked = e.target.checked;
+            if (checked === false) {
+                model.fileListCheck = false;
+            }
+            else {
+                model.fileListCheck = model.fileDatas.every(function (value) {
+                    return value.check;
+                });
+            }
+        },
+        //单位选择
+        mainSendClick: function () {
+
+
+
+            //单位识别隐藏
+            model.searchHtmlShow = false;
+
+            isShowNumber = true;
+
+            var url = project + "/admin/commonDispatch/documentExchangeChoice.action";
+            var father = $(this).closest(".js-exchange-body");
+
+            //  window.top.ExchangeChoice = window.name;
+
+            var iframe = layer.open({
+                headerHide: false,
+                type: 2,
+                title: "转公文交换",
+                area: ['900px', '550px'],
+                fix: true, //不固定
+                maxmin: true,
+                content: url,
+                scrollbar: false,
+                fullPage: false,
+                success: function (layero, index) {
+                }
+            });
+
+
+//            window.top.createWindow({
+//                text: '转公文交换',
+//                url: url,
+//                id: 'dhxPop',
+//                width: '900',
+//                height: '550',
+//                callBack: function (val, text) {
+//                }
+//            });
+        },
+        //会议报名表保存
+        meetingSave: function () {
+
+            var joinList = [],
+                    leaveList = [];
+            $("#entry_table .js-body-tr").each(function () {
+                var $this = $(this);
+                joinList.push(JSON.stringify({
+                    "id": $this.attr("id"),
+                    "sequence": $this.find(".js-sequence").val(),
+                    "room": $this.find(".js-room").val(),
+                    "seat": $this.find(".js-seat").val()
+                }));
+            });
+            $("#leave_table .js-body-tr").each(function () {
+                var $this = $(this);
+                leaveList.push(JSON.stringify({
+                    "id": $this.attr("id"),
+                    "sequence": $this.find(".js-sequence").val(),
+                    "room": $this.find(".js-room").val(),
+                    "seat": $this.find(".js-seat").val()
+                }));
+            });
+            var xmlData = '{';
+            xmlData += '"joinList":[' + joinList.join(",") + '],';
+            xmlData += '"leaveList":[' + leaveList.join(",") + ']';
+            xmlData += "}";
+
+            var obj = {
+                'dataJson': xmlData
+            }
+
+            var url = "${base}/admin/meeting/meetingSignManageSave.action";
+            $.post(url, obj, function (data) {
+                layer.msg(data.result);
+            });
+        },
+
+        //会议报名表导出
+        meetingExport: function () {
+
+            window.location = "${base}/admin/meeting/meetingSignExport.action?meetingId=" + (params.id) + "&etc=" + new Date().getTime();
+        },
+
+        addDistinguishClick:function(){
+
+             model.loading = true;
+
+            var mainText = $("#distinguish_text").val();
+            var otherText = $("#undistinguish_text").val();
+
+            model.wrapMain.sendRange.clear();
+
+            var distinguishData = [];
+
+            isShowNumber = true;
+
+            var testText = otherText;
+            
+            var dataPush = testText.replace(/，/g, ",").replace(/、/g, ",").replace(/;/g, ",").replace(/；/g, ",");
+            dataPush = dataPush.replace(/（.+?(）)/g, function (x) {
+                return x.replace(/,/g, "、")
+            }).split(",");
+
+
+            var data = _.uniq(dataPush).filter(function (value) {
+                return value.length
+            });
+
+        
+
+            //获取初始的发送范围数据
+            var $sendRange = [];
+
+            if (unitStorageData.length) {
+                unitStorageData.forEach(function (value) {
+                    $sendRange.push({
+                        "name": value.name,
+                        "id": value.id,
+                        "caCode": value.caCode
+                    });
+                });
+            }
+
+
+            var difference = [];
+
+
+            //单位匹配
+            data.forEach(function (value) {
+                var getResult = page.distinguish(value);
+                if (getResult.result) {
+
+                    $sendRange.push({
+                        "name": getResult.name,
+                        "id": getResult.id,
+                        "caCode": getResult.caCode
+                    });
+
+                    distinguishData.push({
+                        "name": getResult.name,
+                        "id": getResult.id
+                    });
+
+
+                } else {
+                    difference.push(value);
+                }
+
+            });
+
+            var sendRange = page.uniqMore($sendRange, 'name');
+            model.wrapMain.sendRange = sendRange;
+
+
+            var afterData = distinguishData.map(function (value) {
+                return value.name
+            });
+
+
+            model.wrapMain.isOtherText = difference.length ? true : false;
+            model.undistinguishData.length = 0;
+            model.undistinguishData = difference;
+            changeView();
+            $("#distinguish_text").val(mainText);
+            $("#undistinguish_text").val(difference.join(","));
+
+            model.loading = false; 
+        },
+        //识别
+        distinguishClick: function () {
+
+            model.loading = true;
+
+            var mainText = $("#distinguish_text").val();
+            var otherText = $("#undistinguish_text").val();
+
+
+            model.wrapMain.sendRange.clear();
+
+
+            var distinguishData = [];
+
+            isShowNumber = true;
+
+            var testText = mainText + "," + otherText;
+            // var dataPush = testText.replace(/，/g, ",").replace(/、/g, ",").replace(/;/g, ",").replace(/；/g, ",").split(",");
+
+            var dataPush = testText.replace(/，/g, ",").replace(/、/g, ",").replace(/;/g, ",").replace(/；/g, ",");
+            dataPush = dataPush.replace(/（.+?(）)/g, function (x) {
+                return x.replace(/,/g, "、")
+            }).split(",");
+
+
+            var data = _.uniq(dataPush).filter(function (value) {
+                return value.length
+            });
+
+            model.inputData=data;
+
+
+            //获取初始的发送范围数据
+            var $sendRange = [];
+
+            if (unitStorageData.length) {
+                unitStorageData.forEach(function (value) {
+                    $sendRange.push({
+                        "name": value.name,
+                        "id": value.id,
+                        "caCode": value.caCode
+                    });
+                });
+            }
+
+
+            var difference = [];
+
+
+            //单位匹配
+            data.forEach(function (value) {
+                var getResult = page.distinguish(value);
+                if (getResult.result) {
+
+                    $sendRange.push({
+                        "name": getResult.name,
+                        "id": getResult.id,
+                        "caCode": getResult.caCode
+                    });
+
+                    distinguishData.push({
+                        "name": getResult.name,
+                        "id": getResult.id
+                    });
+
+
+                } else {
+                    difference.push(value);
+                }
+
+            });
+
+
+            var sendRange = page.uniqMore($sendRange, 'name');
+            model.wrapMain.sendRange = sendRange;
+
+
+            var afterData = distinguishData.map(function (value) {
+                return value.name
+            });
+
+
+            model.wrapMain.isOtherText = difference.length ? true : false;
+            model.undistinguishData.length = 0;
+            model.undistinguishData = difference;
+            changeView();
+            $("#distinguish_text").val(mainText);
+            $("#undistinguish_text").val(difference.join(","));
+
+            model.loading = false;
+
+           
+
+        },
+        //编辑短信
+        editMessage: function () {
+            var messageUrl = project + '/admin/commonDispatch/sendMessagePop.action';
+            var iframe = layer.open({
+                type: 2,
+                title: '短消息',
+                area: ['810px', '500px'],
+                fix: true, //不固定
+                maxmin: true,
+                content: messageUrl,
+                scrollbar: false,
+                fullPage: false,
+                success: function (layero, index) {
+                }
+            });
+        },
+        //识别未联网单位数量和单位
+        distingNumber: 0,
+        distingUnit: "",
+        //已经签收的
+        hasSignList: [],
+        hasSignCount: 0,
+        hasSignListCheckAll: true,
+        //未签收的
+        noSignList: [],
+        //存储短信联系人
+        noSignListOther: [],
+        noSignCount: 0,
+        isWithdraw: false,
+        messageTip: false,
+        noSignListCheckAll: true,
+        noSignListCheckAllChange: function (e) {
+            var checked = e.target.checked;
+
+            if (checked) {
+                model.noSignList.forEach(function (value) {
+                    value.check = true;
+                });
+
+            }
+            else {
+                model.noSignList.forEach(function (value) {
+                    value.check = false;
+                });
+            }
+
+            page.updateNoSignListOther();
+        },
+        noSignListOneChange: function (e) {
+            var checked = e.target.checked;
+            if (checked === false) {
+                model.noSignListCheckAll = false;
+            }
+            else {
+                model.noSignListCheckAll = model.noSignList.every(function (value) {
+                    return value.check;
+                });
+            }
+            page.updateNoSignListOther();
+        },
+        hasSignListCheckAllChange: function (e) {
+            var checked = e.target.checked;
+
+            if (checked) {
+                model.hasSignList.forEach(function (value) {
+                    value.check = true;
+                });
+            }
+            else {
+                model.hasSignList.forEach(function (value) {
+                    value.check = false;
+                });
+            }
+        },
+        hasSignListOneChange: function (e) {
+            var checked = e.target.checked;
+            if (checked === false) {
+                model.hasSignListCheckAll = false;
+            }
+            else {
+                model.hasSignListCheckAll = model.hasSignList.every(function (value) {
+                    return value.check;
+                });
+            }
+        },
+        instructionToFb: function () {
+            var idData = [];
+
+            model.hasSignList.forEach(function (value) {
+                if (value.check) {
+                    idData.push(value.id);
+                }
+            });
+
+            if (idData.length < 1) {
+                layer.msg('请至少选择一条数据');
+                return;
+            }
+
+
+            var obj = {
+                "ids": idData.join(","),
+                "wfId": wfId,
+                "documentId": params.id
+            };
+
+            var url = "${base}/admin/draftSignFeedBack/summaryAttachment.action";
+            $.post(url, obj, function (result) {
+                layer.msg(result.message);
+            });
+
+        },
+        //撤回
+        serviceWithdrawal: function () {
+
+            mailMessageDataDirect.sendRange.length = 0;
+            var dataDirect = [];
+            model.noSignListOther.forEach(function (value) {
+                if (value.check) {
+                    dataDirect.push({ 
+                        'name': value.person,
+                        'id': "",
+                        'post': value.post,
+                        'tel': value.phone,
+                        'unit': value.signOrg
+                    });
+                }
+            });
+            mailMessageDataDirect.sendRange = dataDirect;
+            if (mailMessageDataDirect.sendRange.length) {
+                var messageUrl = '${base}/admin/commonDispatch/sendMessageCancelPop.action?advice=' + $advice;
+                var iframe = layer.open({
+                    type: 2,
+                    title: '短消息',
+                    area: ['810px', '474px'],
+                    fix: true, //不固定
+                    maxmin: true,
+                    content: messageUrl,
+                    scrollbar: false,
+                    fullPage: false,
+                    success: function (layero, index) {
+
+                    }
+                });
+
+            }
+            else {
+                layer.msg('请至少选择一个单位');
+            }
+
+
+        },
+        //会议报名
+        meetingSignView: function (meetingId, signOrg, type) {
+
+
+            if (meetingId.length < 1) {
+                return;
+            }
+
+            var $type = parseInt(type);
+
+            if ($type == 1) {
+
+                var iframe = layer.open({
+                    type: 2,
+                    title: '查看会议报名',
+                    area: ['900px', '570px'],
+                    fix: true, //不固定
+                    maxmin: true,
+                    content: "${base}/admin/meeting/meetingSignView.action?meetingId=" + (params.id) + "&signOrg=" + (signOrg),
+                    scrollbar: false,
+                    fullPage: false,
+                    success: function (layero, index) {
+
+                    }
+                });
+
+
+            }
+
+            else if ($type == 2) {
+                view(meetingId)
+
+            }
+
+        },
+        meetingReminders: function () {
+
+
+            var obj = {
+                "grounpName": '',
+                "grounpId": '',
+                "unitName": model.meetingEntryList.toFeedbackOrg,
+                "unitId": ''
+            }
+            var groupUrl = "${base}/admin/sendRange/selectOrgInfo.action?etc=" + new Date().getTime();
+            $.post(groupUrl, obj, function (data) {
+
+                if (data.datas.length) {
+
+                    mailMessageDataDirect.sendRange.length = 0;
+                    var dataDirect = [];
+                    data.datas.forEach(function (value) {
+
+                        dataDirect.push({
+                            'name': value.name ? value.name : '',
+                            'id': "",
+                            'post': value.post ? value.post : '',
+                            'tel': value.number ? value.number : '',
+                            'unit': value.unit ? value.unit : ''
+                        });
+
+                    });
+                    mailMessageDataDirect.sendRange = dataDirect;
+
+                    var messageUrl = '${base}/admin/commonDispatch/sendMessageDirectPop.action';
+                    var iframe = layer.open({
+                        type: 2,
+                        title: '短消息',
+                        area: ['810px', '474px'],
+                        fix: true, //不固定
+                        maxmin: true,
+                        content: messageUrl,
+                        scrollbar: false,
+                        fullPage: false,
+                        success: function (layero, index) {
+
+                        }
+                    });
+
+                }
+
+
+            });
+
+        },
+        feedBackMessageTip: function () {
+
+            mailMessageDataDirect.sendRange.length = 0;
+            var dataDirect = [];
+            model.noSignListOther.forEach(function (value) {
+                if (value.check) {
+                    dataDirect.push({
+                        'name': value.person,
+                        'id': "",
+                        'post': value.post,
+                        'tel': value.phone,
+                        'unit': value.signOrg
+                    });
+                }
+            });
+            mailMessageDataDirect.sendRange = dataDirect;
+            if (mailMessageDataDirect.sendRange.length) {
+            	var $wfType = getWfType();
+                var messageUrl = '${base}/admin/commonDispatch/sendMessageDirectPop.action?wfType='+ $wfType;
+                var iframe = layer.open({
+                    type: 2,
+                    title: '短消息',
+                    area: ['810px', '474px'],
+                    fix: true, //不固定
+                    maxmin: true,
+                    content: messageUrl,
+                    scrollbar: false,
+                    fullPage: false,
+                    success: function (layero, index) {
+
+                    }
+                });
+
+            }
+            else {
+                layer.msg('请至少选择一个单位');
+            }
+        },
+        //失败重发
+        resendMail: function () {
+			var url = "${base}/admin/sendRange/showExchangeMailPage.action?etc=" + new Date().getTime() + "&wf_id=" + wfId + "&step_id=" + stepParam+"&fail=1";
+        	$.get(url,function(result){
+        	
+            mailMessageDataDirect.sendRange.length = 0;
+            var dataDirect = [];
+            result.data.forEach(function (value) {
+                dataDirect.push({
+                    'name': value.user_name,
+                    'id': "",
+                    'post': value.post,
+                    'tel': value.telphone,
+                    'unit': value.unit
+                });
+            });
+            mailMessageDataDirect.sendRange = dataDirect;
+            if (mailMessageDataDirect.sendRange.length) {
+            	var $wfType = getWfType();
+                var messageUrl = '${base}/admin/commonDispatch/resendMailPop.action?wfType='+$wfType;
+                var iframe = layer.open({
+                    type: 2,
+                    title: '短消息',
+                    area: ['810px', '474px'],
+                    fix: true, //不固定
+                    maxmin: true,
+                    content: messageUrl,
+                    scrollbar: false,
+                    fullPage: false,
+                    success: function (layero, index) {
+
+                    }
+                });
+
+            }
+            else {
+                layer.msg('请至少选择一个单位');
+            }
+        });
+        },
+        //发送确认
+        sendSure: function () {
+
+
+            var isEnd = layer.confirm('是否发送？', {
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                var isBillData = true;
+                var fileName = [],
+                        fileId = [],
+                        billData = {
+                            "name": "",
+                            "path": ""
+                        },
+                        billDocData = {
+                            "name": "",
+                            "path": ""
+                        }
+
+                var fileUpload = $(".js-file-check");
+
+                if (fileUpload.length) {
+
+                    fileUpload.each(function () {
+                        var $this = $(this);
+
+                        if ($this.prop("checked")) {
+                            if ($this.data("type") == "file") {
+                                fileName.push($this.data("name"));
+                                fileId.push($this.data("id"));
+                            }
+                            else if ($this.data("type") == "bill") {
+                                billData = {
+                                    "name": $this.data("name"),
+                                    "path": $this.data("id")
+                                };
+
+                                billDocData = {
+                                    "name": $this.data("othername"),
+                                    "path": $this.data("otherid")
+                                };
+
+                                isBillData = false;
+                            }
+                        }
+                    });
+                }
+
+                if (fileName.length < 1 && isBillData) {
+                    if (djsn != "oa_send_document") {
+                        layer.msg("请至少选择一个发送文件");
+                        return;
+                    }
+
+                }
+                if (model.wrapMain.sendRange.length < 1) {
+                    layer.msg("请至少选择一个接受单位");
+                    return;
+                }
+
+
+                model.btnEncryption();
+                
+                return;
+
+            }, function () {
+
+            });
+
+
+        },
+        //加密成功后刷新列表
+        refreshFileList: function () {
+
+            paramsKeyBack = "-100";
+
+            var url = project + "/admin/sendRange/allAttachMentByWfId.action?etc=" + new Date().getTime() + "&wfId=" + wfId + "&wfName=" + wfName;
+
+
+            var istgwexist = false;
+
+
+            var exitstNum = 0;
+
+            var $fileData = model.fileDatas.$model;
+
+            for (var i = 0; i < $fileData.length; i++) {
+                if ($fileData[i].name.indexOf(".tgw") > (-1)) {
+                    istgwexist = true;
+                    exitstNum = i;
+
+                    break;
+                }
+            }
+
+            $.post(url, function (result) {
+
+
+                if (result.data) {
+
+                    result.data.forEach(function (value) {
+
+                        if (istgwexist) {
+                            if (value.name.indexOf(".tgw") > (-1)) {
+
+
+                                model.fileDatas[exitstNum].id = value.id;
+                                model.fileDatas[exitstNum].name = value.name;
+                                model.fileDatas[exitstNum].path = value.path;
+                                model.fileDatas[exitstNum].type = "file";
+                                model.fileDatas[exitstNum].size = value.size;
+                                model.fileDatas[exitstNum].tableKeyId = value.tableKeyId;
+                                model.fileDatas[exitstNum].check = true;
+                                model.fileDatas[exitstNum].otherid = "";
+                                model.fileDatas[exitstNum].othername = "";
+
+
+                            }
+
+
+                        }
+                        else {
+
+                            if (value.name.indexOf(".tgw") > (-1)) {
+
+                                model.fileDatas.push({
+                                    "id": value.id,
+                                    "name": value.name,
+                                    "path": value.path,
+                                    "type": "file",
+                                    "size": value.size,
+                                    "tableKeyId": value.tableKeyId,
+                                    "check": true,
+                                    "otherid": "",
+                                    "othername": ""
+                                });
+
+                            }
+
+                        }
+
+
+                    });
+
+
+                    var $fileData = model.fileDatas;
+
+                    for (var i = 0; i < $fileData.length; i++) {
+                        if ($fileData[i].check && $fileData[i].name.indexOf(".tgw") > (-1)) {
+                            isName = $fileData[i].name.replace(".tgw", "");
+
+                            encryptionObj.tableKeyId = $fileData[i].tableKeyId;
+                            encryptionObj.tgwId = $fileData[i].id;
+                            encryptionObj.tgwSize = $fileData[i].size;
+                            break;
+
+                        }
+                    }
+
+
+                    model.sendSureAfter();
+
+                }
+
+            });
+
+          
+        },
+        sendSureAfter: function () {
+            var isBillData = true;
+            var fileName = [],
+                    fileId = [],
+                    billData = {
+                        "name": "",
+                        "path": ""
+                    },
+                    billDocData = {
+                        "name": "",
+                        "path": ""
+                    }
+
+            var fileUpload = $(".js-file-check");
+            if (model.fileDatas.length) {
+
+
+                model.fileDatas.forEach(function (value) {
+                    if (value.check) {
+                        if (value.type == "file") {
+                            fileName.push(value.name);
+                            fileId.push(value.id);
+                        }
+                        else if (value.type == "bill") {
+                            billData = {
+                                "name": value.name,
+                                "path": value.id
+                            };
+
+                            billDocData = {
+                                "name": value.othername,
+                                "path": value.otherid
+                            };
+
+                            isBillData = false;
+                        }
+                    }
+                });
+            }
+
+
+            layer.msg("公文下发中...");
+
+
+            var mainData = [];
+            var ccData = [];
+
+            $(".js-main-top .js-group").each(function () {
+                var $this = $(this);
+                mainData.push({
+                    "status": "group",
+                    "name": $this.data("name")
+                })
+            });
+
+            $(".js-main-top .js-unit").each(function () {
+                var $this = $(this);
+                mainData.push({
+                    "status": "unit",
+                    "name": $this.data("name")
+                })
+            });
+            $(".js-main-bot .js-group").each(function () {
+                var $this = $(this);
+                ccData.push({
+                    "status": "group",
+                    "name": $this.data("name")
+                })
+            });
+            $(".js-main-bot .js-unit").each(function () {
+                var $this = $(this);
+                ccData.push({
+                    "status": "unit",
+                    "name": $this.data("name")
+                })
+            });
+            var unitName = model.wrapMain.sendRange.map(function (item) {
+                return item.name;
+            });
+            var unitId = model.wrapMain.sendRange.map(function (item) {
+                return item.id;
+            });
+
+            //短信发送单位
+            var messageName = mailMessageData.sendRange.map(function (item) {
+                return item.name;
+            });
+
+            var messageUnit = mailMessageData.sendRange.map(function (item) {
+                return item.unit;
+            });
+            var messageTel = mailMessageData.sendRange.map(function (item) {
+                return item.tel;
+            });
+
+
+            var obj = {
+                "unitName": unitName.join(","),
+                "unitId": unitId.join(","),
+                "fileName": fileName.join("|"),
+                "fileId": fileId.join("|"),
+                "billName": billData.name,
+                "billPath": billData.path,
+                "billDocName": billDocData.name,
+                "billDocPath": billDocData.path,
+                "accounts": messageTel.join(","),
+                "orgNames": messageUnit.join(","),
+                "telphones": mailMessageData.telphones.join(","),
+                "content": mailMessageData.content,
+                "sendMailChecked": $("#send_mail").prop("checked"),
+                "stepId": stepParam,
+                "wfId": wfId,
+                "taskType": mailMessageData.taskType,
+                "cycleHour": mailMessageData.cycleHour,
+                "distingUnit": $("#undistinguish_text").val(),
+                "distingNumber": model.undistinguishData.length,
+                "msgType": sendType,
+                'exceptType':exceptType,
+            }
+
+            var url = "";
+            var $id = params.id;
+
+
+            //发文
+            if (djsn == "oa_send_document") {
+                if ($advice == "1") {
+                	//wfType = WF_TYPE_DRAFT_SEND;
+                    url = project + "/admin/draftToExchange/publishDraft.action?ect" + new Date().getTime() + "&id=" + $id + "&isDjsn=" + djsn;
+                } else {
+                	//commonToExchangeMethod.getCurrWfType(contextPvd, wfId);
+                    url = project + "/admin/documentToExchange/sendDocumentToChange.action?ect" + new Date().getTime() + "&id=" + $id;
+                }
+            }
+            //收文
+            else if (djsn == "oa_pg_incoming_form") {
+
+                if ($advice == "1") {
+                	//wfType = WF_TYPE_DRAFT_SEND;
+                    url = project + "/admin/draftToExchange/publishDraft.action?ect" + new Date().getTime() + "&id=" + $id + "&isDjsn=" + djsn;
+                }
+                else {
+                	//wfType = commonToExchangeMethod.getCurrWfType(contextPvd, wfId);
+                    url = project + "/admin/documentToExchange/incomingDocumentToChange.action?ect" + new Date().getTime() + "&id=" + $id;
+                }
+
+            }
+            //会议
+            else if (djsn == "oa_meeting_info") {
+                if ($advice == "2") {
+                	//wfType = commonToExchangeMethod.getCurrWfType(contextPvd, wfId);
+                    url = project + "/admin/meetingToExchange/publishMeetingFeedBackToExchange.action?ect" + new Date().getTime() + "&meetingInfo.id=" + $id;
+                } else {
+                	//wfType = commonToExchangeMethod.getCurrWfType(contextPvd, wfId);
+                    url = project + "/admin/meetingToExchange/publishMeetingToExchange.action?ect" + new Date().getTime() + "&meetingInfo.id=" + $id;
+                }
+
+            }
+            //领导批示
+            else if (djsn == "oa_leader_instruction_form") {
+                if (wfName == "oa_leader_instruction_fb") {
+                	//wfType = WF_TYPE_DRAFT_SEND;
+                    url = project + "/admin/draftToExchange/publishDraft.action?ect" + new Date().getTime() + "&id=" + $id + "&isDjsn=oa_instruction_info";
+                }
+                else {
+                	//wfType = commonToExchangeMethod.getCurrWfType(contextPvd, wfId);
+                    url = project + "/admin/instructionToExchange/publishInstruction.action?ect" + new Date().getTime() + "&instructionId=" + $id;
+                }
+
+            }
+            //专项事务
+            else if (djsn == "oa_sptrain_audit") {
+                if ($advice == "1") {
+                	//wfType = WF_TYPE_DRAFT_SEND;
+                    url = project + "/admin/draftToExchange/publishDraft.action?ect" + new Date().getTime()
+                            + "&id=" + $id + "&isDjsn=" + djsn;
+                }
+                else {
+                	//wfType = commonToExchangeMethod.getCurrWfType(contextPvd, wfId);
+                    url = project + "/admin/documentToExchange/sptrainToChange.action?ect" + new Date().getTime() + "&id=" + $id;
+                }
+            }
+            $.post(url, obj, function (data) {
+
+                layer.msg(data.result);
+                // model.btnEncryption();
+                //从公文交换系统获取数据，延迟相应
+                setTimeout(function () {
+                    //page.getFeedList();
+                    //var index = parent.layer.getFrameIndex(window.name);
+                    //parent.layer.close(index);
+                    window.close();
+                }, 800);
+
+            });
+
+        },
+        tabClick: function (index) {
+            model.indexShow = index;
+            if (index == 1 && loadFormList) {
+                loadFormList = false;
+                page.formGrid();
+            }
+            if (index == 2 && loadFeedList) {
+                loadFeedList = false;
+                page.getFeedList();
+            }
+            if (index == 3 && loadMessageList) {
+                loadMessageList = false;
+                page.getMessageList();
+            }
+        },
+        wrapMain: {
+            sendNum: 10,
+            isOtherText: false,
+            sendRange: [],
+            //用于显示弹出层群组和单位的选择
+            choicePop: {
+                group: [],
+                unit: []
+            },
+            fileDatas: []
+        }
+    })
+
+    //参会人员变更
+    model.$watch('joinSelect', function (a, b) {
+        model.meetingEntryList.joinPage.curPage = 1;
+        model.meetingEntryList.joinPage.count = a;
+        page.getJoinList();
+    })
+
+    //请假人员变更
+    model.$watch('leaveSelect', function (a, b) {
+        model.meetingEntryList.leavePage.curPage = 1;
+        model.meetingEntryList.leavePage.count = a;
+        page.getLeaveList();
+    })
+    var page = (function () {
+
+        var result = {
+            init: function () {
+                this.getMessage();
+                this.getAllUnit();
+                this.getFileList();
+                this.getTextUnit();
+                this.isFormExist();
+
+            },
+            distinguish: function (objName) {
+                var resultObj = {
+                    result: false,
+                    name: '',
+                    id: '',
+                    caCode: ''
+                }
+
+
+                for (var i = 0, max = allUnitData.length; i < max; i++) {
+                    var that = allUnitData[i];
+
+                    var inData = (that.name).replace(/（/g, "|").replace(/）/g, "").replace(/、/g, "|").split("|");
+
+                    //存在括号的情况下
+                    if (inData.length) {
+                        inData.push(that.name);
+                    }
+
+                    if (inData.indexOf(objName) > (-1)) {
+                        resultObj = {
+                            result: true,
+                            name: that.name,
+                            id: that.id,
+                            caCode: that.caCode
+                        }
+                        break;
+                    }
+
+                }
+
+                return resultObj;
+
+            },
+            //对象数组去重,data：传入的数组，main：主键
+            uniqMore: function (data, main) {
+                var destData = [],
+                        getData = data,
+                        testData = [];
+                getData.forEach(function (value) {
+                    //导入未存在的数组
+                    if (testData.indexOf(value[main]) < 0) {
+                        testData.push(value[main]);
+                        var upIndex = destData.length;
+                        destData[upIndex] = {};
+                        for (var i in value) {
+                            destData[upIndex][i] = value[i];
+                        }
+
+                    }
+
+                });
+
+                return destData;
+            },
+
+            //获取参会人员列表
+            getJoinList: function () {
+                var urlTop = "${base}/admin/sendRange/meetingJoinPeopleList.action?ect=" + new Date().getTime() + "&meetingId=" + (params.id);
+               	var para = $("#MeetingInput").val();
+                if(para != null){
+                	urlTop += "&content=" + encodeURI(para);
+                }
+                
+                var obj = {
+                    'page.curPage': model.meetingEntryList.joinPage.curPage,
+                    'page.count': model.meetingEntryList.joinPage.count
+                }
+                result.loadStart();
+                $.post(urlTop, obj, function (data) {
+                    result.loadEnd();
+                    if (data.success) {
+
+                        model.meetingEntryList.joinPage.curPage = data.curPage;
+                        model.meetingEntryList.joinPage.totalRows = data.totalRows;
+
+
+                        //参会人员名单
+                        if (data.data.length) {
+                            var dataJoinInit = [];
+                            data.data.forEach(function (value, index) {
+                                dataJoinInit.push({
+                                    'seq': value.sequence,
+                                    'id': value.id,
+                                    'meetingId': params.id,
+                                    'color': value.color ? 1 : 0,
+                                    'name': value.name,
+                                    'sex': value.sex ? '男' : '女',
+                                    'signOrg': value.signOrg,
+                                    'duty': value.duty,
+                                    'phone': value.phone,
+                                    'remark': value.remark,
+                                    'time': value.createStr
+                                });
+                            });
+                            model.meetingEntryList.dataJoin = dataJoinInit;
+                            model.meetingEntryList.joinPage.number = Math.ceil(parseInt(data.totalRows) / parseInt(model.joinSelect));
+                        } else {
+                            model.meetingEntryList.joinPage.curPage = 0;
+                        }
+                    }
+                });
+            },
+            //获取请假人员列表
+            getLeaveList: function () {
+                var urlBot = "${base}/admin/sendRange/meetingLeavePeopleList.action?ect=" + new Date().getTime() + "&meetingId=" + (params.id);
+            	var para = $("#LeaveInput").val();
+                if(para != null){
+                	urlBot += "&content=" + encodeURI(para);
+                }
+                
+                var obj = {
+                    'page.curPage': model.meetingEntryList.leavePage.curPage,
+                    'page.count': model.meetingEntryList.leavePage.count
+                }
+
+                result.loadStart();
+                $.post(urlBot, obj, function (data) {
+                    result.loadEnd();
+                    if (data.success) {
+                        model.meetingEntryList.leavePage.curPage = data.curPage;
+                        model.meetingEntryList.leavePage.totalRows = data.totalRows;
+                        //请假人员名单
+                        if (data.data.length) {
+                            var dataLeaveInit = [];
+                            data.data.forEach(function (value, index) {
+                                dataLeaveInit.push({
+                                    'seq': value.sequence,
+                                    'id': value.id,
+                                    'meetingId': params.id,
+                                    'color': value.color ? 1 : 0,
+                                    'name': value.name,
+                                    'sex': value.sex ? '男' : '女',
+                                    'signOrg': value.signOrg,
+                                    'duty': value.duty,
+                                    'phone': value.phone,
+                                    'remark': value.remark,
+                                    'time': value.createStr
+                                });
+                            });
+                            model.meetingEntryList.dataLeave = dataLeaveInit;
+
+                            model.meetingEntryList.leavePage.number = Math.ceil(parseInt(data.totalRows) / parseInt(model.leaveSelect));
+                        }
+                    } else {
+                        model.meetingEntryList.leavePage.curPage = 0;
+                    }
+                });
+            },
+            formGrid: function () {
+                result.getJoinList();
+                result.getLeaveList();
+
+                result.getMeetingEntryFormList();
+
+            },
+            loadStart: function () {
+                var index = layer.load(2, {
+                    // shade: [0.5, '#000']
+                    //scrollbar: false //0.1透明度的白色背景
+                });
+                setTimeout(function () {
+                    result.loadEnd();
+                }, 2000);
+            },
+            loadEnd: function () {
+                layer.closeAll('loading');
+            },
+            updateNoSignListOther: function () {
+                //同步noSignListOther和noSignList的数据
+                var checkedData = [];
+                model.noSignList.forEach(function (val) {
+                    if (val.check) {
+                        checkedData.push(val.signOrg);
+                    }
+                });
+                model.noSignListOther.forEach(function (value) {
+                    if (checkedData.indexOf(value.signOrg) > (-1)) {
+                        value.check = true;
+                    } else {
+                        value.check = false;
+                    }
+                });
+            },
+            //获取短信列表
+            getMessageList: function () {
+                //发文
+                if (djsn == "oa_send_document") {
+                    if ($advice == "1") {
+                        stepParam = 'oa_draft_info';
+                    }
+                }
+                //收文
+                else if (djsn == "oa_pg_incoming_form") {
+                    if ($advice == "1") {
+                        stepParam = 'oa_draft_info';
+                    }
+                }
+                //会议
+                else if (djsn == "oa_meeting_info") {
+                    if ($advice == "2") {
+                        //会议回执
+                    }
+                }
+                //领导批示
+                else if (djsn == "oa_leader_instruction_form") {
+                    if (wfName == "oa_leader_instruction_fb") {
+                        stepParam = 'oa_draft_info';
+                    }
+                }
+                //专项事务
+                else if (djsn == "oa_sptrain_audit") {
+                    if ($advice == "1") {
+                        stepParam = 'oa_draft_info';
+                    }
+                }
+
+                var gridUrl = "${base}/admin/sendRange/showExchangeMailPage.action?etc=" + new Date().getTime() + "&wf_id=" + wfId + "&step_id=" + stepParam;
+
+                gridOne = $.fn.bsgrid.init("manage_grid", {
+                    url: gridUrl,
+                    row_primary_key: "primaryKey",
+                    autoLoad: true,
+                    pageSizeSelect: true,
+                    pageSize: 15,
+                    isProcessLockScreen: false,
+                    complete: function (options, XMLHttpRequest, textStatus) {
+                    },
+                    additionalBeforeRenderGrid: function (parseSuccess, gridData, options) {
+                    },
+                    additionalAfterRenderGrid: function () {
+                        gridOne.initGrid();
+                        $("#manage_grid tbody tr").each(function () {
+                            var $this = $(this);
+                            $("td", this).css({"padding-left": "0px", "text-align": "center"});
+                            $index = parseInt($this.attr("index"));
+                            $this.find("td").eq(1).html(parseInt($("#manage_grid_pt_pageSize").val()) * (parseInt($("#undefined").html()) - 1) + $index + 1);
+                        });
+                    }
+                });
+            },
+
+            isFormExist: function () {
+
+
+                //只读状态，查看公文交换
+
+                var readOnlyData = ["doing", "finish", "view", "read"];
+
+                readOnlyData.forEach(function (value) {
+                    //办结，只读状态
+                    if (wfs === value) {
+                        model.sendExist = false;
+                        model.formExist = false;
+                        model.indexShow = 2;
+
+                        //初始只读状态
+                        if (loadFeedList) {
+                            loadFeedList = false;
+                            page.getFeedList();
+                            page.formGrid();
+                        }
+
+
+                    }
+                });
+
+                //会议通知环节显示
+                if (djsn === "oa_meeting_info" && wfName === "oa_meeting_notification_approval") {
+                    model.formExist = true;
+
+                    if (!model.sendExist) {
+                        model.indexShow = 1;
+                    }
+
+                }
+                else {
+                    model.formExist = false;
+                }
+
+            },
+            getTextUnit: function () {
+            
+               if($advice=='2'){
+                var mainUnit=windowOpener?(windowOpener.globalParams.mainUnit):"";
+
+                    $("#distinguish_text").val(mainUnit);
+               }
+               
+
+            },
+            //获取会议报名表
+            getMeetingEntryFormList: function () {
+
+                var meetingUlr = "${base}/admin/sendRange/selectMeetingSignManage.action?ect=" + new Date().getTime() + "&meetingId=" + (params.id);
+
+                $.getJSON(meetingUlr, function (data) {
+
+                    model.meetingEntryList.hasFeedbackOrg = data.hasFeedbackOrg;
+                    model.meetingEntryList.hasSignCount = data.hasSignCount;
+                    model.meetingEntryList.toFeedbackOrg = data.toFeedbackOrg;
+                    model.meetingEntryList.toSignCount = data.toSignCount;
+
+  
+                });
+            },
+            isCheck: function (string) {
+
+
+                //发文流程自由tgw文件默认勾选
+                if (djsn == "oa_send_document") {
+                    if (string.indexOf('tgw') > (-1)) {
+                        return true
+                    }
+                }
+
+                else {
+                    return true;
+
+                }
+
+
+                return false
+            },
+            //对象数组去重,data：传入的数组，main：主键
+            uniqMore: function (data, main) {
+                var destData = [],
+                        getData = data,
+                        testData = [];
+
+                getData.forEach(function (value) {
+                    //导入未存在的数组
+                    if (testData.indexOf(value[main]) < 0) {
+                        testData.push(value[main]);
+                        var upIndex = destData.length;
+                        destData[upIndex] = {};
+                        for (var i in value) {
+                            destData[upIndex][i] = value[i];
+                        }
+
+                    }
+
+                });
+
+                return destData;
+
+            },
+            //获取短信内容
+            getMessage: function () {
+                var wfid = wfId;
+
+                var url = "${base}/admin/sendRange/mailMessage.action?ect=" + new Date().getTime() + "&wfId=" + wfid + "&wfName=" + wfName;
+                $.post(url, function (data) {
+                    messageData = (data.mailMessage).replace(/<br>/g, "").replace(/\n/g, "");
+                    mailMessageData.content = data.mailMessage.replace(/<br>/g, "\n");
+                    mailMessageDataDirect.content = data.mailMessage.replace(/<br>/g, "\n");
+
+                });
+
+            },
+            //获取所有单位
+            getAllUnit: function () {
+                //groupType 1是全部组织，2是全部人员
+                var url = project + "/admin/sendRange/allOrgInfo.action?ect=" + new Date().getTime() + "&groupType=1";
+                $.getJSON(url, function (data) {
+
+                    var getData = data.data;
+
+                    getData.forEach(function (value) {
+
+                        var $code = value.ca_code ? value.ca_code : "";
+                        if ($code.length > 1) {
+                            allUnitData.push({
+                                "id": value.emp_id,
+                                "name": value.emp_name,
+                                "seq": value.org_seq,
+                                "caCode": $code
+                            });
+                        }
+
+                    });
+                    allUnitData.sort(function (a, b) {
+                        return (a.seq) - (b.seq)
+                    });
+
+                });
+            },
+            getFeedList: function () {
+                model.hasSignList.clear();
+                model.noSignList.clear();
+                if ($advice == 2) {
+                    var url = '${base}/admin/sendRange/selectAllSignFreeback.action?etc=' + new Date().getTime() + '&wfId=' + wfId + '&wfName=' + wfName;
+                } else {
+                    var url = '${base}/admin/sendRange/selectAllSignFreeback.action?etc=' + new Date().getTime() + '&wfId=' + wfId + '&wfName=' + wfName + '&moduleT=' + $moduleT;
+                }
+
+                $.getJSON(url, function (data) {
+
+                    var noSignList = [],
+                            hasSignList = [];
+                    model.hasSignCount = data.hasSignCount;
+                    model.noSignCount = data.noSignCount;
+
+
+                    //未识别单位
+                    model.distingNumber = data.distingNumber;
+                    model.distingUnit = data.distingUnit;
+
+
+                    if (data.hasSignList.length > 0 || data.noSignList.length > 0) {
+                        model.isWithdraw = true;
+                    }
+
+                    if (data.hasSignList.length) {
+                        data.hasSignList.forEach(function (value) {
+
+                            value.unit = (value.unit.replace("(", "（").replace(")", "）"));
+
+                            var $unit = $(value.unit).length ? $(value.unit).text() : value.unit;
+                            var $style = $(value.unit).length ? {
+                                "fontSize": "13px",
+                                "cursor": "pointer",
+                                "color": "#5b97e1"
+                            } : {};
+                            var $viewId = $(value.unit).length ? $(value.unit).data("viewid") : "";
+                            var $type = $(value.unit).length ? $(value.unit).data("type") : "";
+                            hasSignList.push({
+                                'content': value.content,
+                                'id': value.id,
+                                'situation': value.situation,
+                                'unit': $unit,
+                                'style': $style,
+                                'viewId': $viewId,
+                                'type': $type,
+                                'check': true
+                            });
+                        });
+                        //已签收单位存在的情况下，撤回按钮不显示
+
+                    }
+
+                    if (data.noSignList.length) {
+                        var noSignPost = [];
+                        var noSignPostList = [];
+                        data.noSignList.forEach(function (value) {
+                            noSignPost.push(value.signOrg);
+                            noSignPostList.push({
+                                'signOrg': value.signOrg,
+                                'check': true,
+                                'time': value.createDttm.replace("T", " ")
+                            });
+                        });
+
+                        model.noSignList = noSignPostList;
+
+                        model.messageTip = noSignPostList.length ? true : false;
+
+                        //只读状态，查看公文交换
+
+                        var readOnlyData = ["doing", "finish", "view", "read"];
+
+                        readOnlyData.forEach(function (value) {
+                            //办结，只读状态
+                            if (wfs === value) {
+                                //未签收单位隐藏
+                                model.isWithdraw = false;
+                                model.messageTip = false;
+                            }
+                        });
+
+                        var obj = {
+                            "grounpName": '',
+                            "grounpId": '',
+                            "unitName": noSignPost.join(","),
+                            "unitId": ''
+                        }
+                        var groupUrl = "${base}/admin/sendRange/selectOrgInfo.action?etc=" + new Date().getTime();
+                        $.post(groupUrl, obj, function (data) {
+
+                            if (data.datas.length) {
+                                data.datas.forEach(function (value) {
+                                    noSignList.push({
+                                        'signOrg': value.unit ? value.unit : '',
+                                        'phone': value.number ? value.number : '',
+                                        'person': value.name ? value.name : '',
+                                        'check': true,
+                                        'post': value.post ? value.post : ''
+                                    });
+                                });
+
+                            }
+                            model.noSignListOther = noSignList;
+
+                        });
+
+                    }
+
+                    model.hasSignList = hasSignList;
+
+                });
+
+                result.getHasSign();
+            },
+
+            getHasSign: function () {
+                if ($advice == 2) {
+                    var url = '${base}/admin/sendRange/selectSignFreeList.action?etc=' + new Date().getTime() + '&wfId=' + wfId + '&wfName=' + wfName;
+                } else {
+                    var url = '${base}/admin/sendRange/selectSignFreeList.action?etc=' + new Date().getTime() + '&wfId=' + wfId + '&wfName=' + wfName + '&moduleT=' + $moduleT;
+                }
+                gridHasSin = $.fn.bsgrid.init("hasSign_grid", {
+                    url: url,
+                    row_primary_key: "primaryKey",
+                    autoLoad: true,
+                    pageSizeSelect: true,
+                    pageSize: 20,
+                    isProcessLockScreen: false,
+                    complete: function (options, XMLHttpRequest, textStatus) {
+                    },
+                    additionalBeforeRenderGrid: function (parseSuccess, gridData, options) {
+                    },
+                    additionalAfterRenderGrid: function () {
+                        gridHasSin.initGrid();
+                        setTimeout(function () {
+                            $("#hasSign_grid tbody tr").each(function () {
+                                var $this = $(this);
+                                $("td", this).css({"padding-left": "0px", "text-align": "center"});
+                                $index = parseInt($this.attr("index"));
+                                $this.find("td").eq(1).text(++$index);
+                                var a = $this.find("td").eq(2).find("a");
+                                if (a.length) {
+                                    a.css({"color": "#71b8ec"});
+
+                                    $this.find("td").eq(2).attr("title", a.text());
+                                }
+
+                            });
+                        }, 800);
+
+                    }
+                });
+
+            },
+            //获取文件列表
+            getFileList: function () {
+
+                var bill = window.top.document.getElementById('billPageId');
+                var $moduleType = "";
+
+                //会议
+                if (djsn == "oa_meeting_info") {
+                    $moduleType = "oa_meeting_info"
+                }
+
+                //收文
+                else if (djsn == "oa_pg_incoming_form") {
+                    $moduleType = "oa_incomming_info"
+                }
+                //发文
+
+                else if (djsn == "oa_send_document") {
+                    $moduleType = "oa_send_document_info"
+                }
+
+                //领导
+                else if (djsn == "oa_leader_instruction_form") {
+                    $moduleType = "oa_instruction_info"
+                }
+
+                //领导
+                else if (djsn == "oa_sptrain_audit") {
+                    $moduleType = "oa_sptrain_info"
+                }
+                //办理单页面
+                var billUrl = project + "/admin/handleToWordPDF/buildPDFByWord.action?ect=" + new Date().getTime() + "&id=" + params.id + "&billId=" + billId + "&moduleType=" + $moduleType;
+                $.post(billUrl, function (result) {
+
+                    if (result.flag == "1") {
+                        var resultData = result.data;
+                        model.fileDatas.push({
+                            "id": resultData.filePath,
+                            "name": resultData.fileName,
+                            "path": resultData.downloadPath,
+                            "check": page.isCheck(resultData.fileName),
+                            "otherid": resultData.fileDocPath,
+                            "othername": resultData.fileDocName,
+                            "size": "",
+                            "tableKeyId": "",
+                            "type": "bill"
+                        });
+                        //是否全选选中
+                        model.fileListCheck = model.fileDatas.every(function (value) {
+                            return value.check;
+                        });
+                    }
+
+                });
+
+                var url = project + "/admin/sendRange/allAttachMentByWfId.action?etc=" + new Date().getTime() + "&wfId=" + wfId + "&wfName=" + wfName;
+
+                $.post(url, function (result) {
+
+                    if (result.data) {
+
+                        result.data.forEach(function (value) {
+                            if (value.remark != "-1") {
+                                model.fileDatas.push({
+                                    "id": value.id,
+                                    "name": value.name,
+                                    "path": value.path,
+                                    "type": "file",
+                                    "size": value.size,
+                                    "tableKeyId": value.tableKeyId,
+                                    "check": page.isCheck(value.name),
+                                    "otherid": "",
+                                    "othername": ""
+                                });
+                            }
+
+                        });
+                        //是否全选选中
+                        model.fileListCheck = model.fileDatas.every(function (value) {
+                            return value.check;
+                        });
+                    }
+
+                });
+
+
+            }
+        }
+        return result
+
+    })();
+
+    $(function () {
+
+        $(".js-textarea-auto").autoTextarea();
+
+        textAuto();
+
+
+        page.init();
+        
+        validateAccount();
+        
+
+//         $(document).on("change",".js-send-type",function(){
+//         	if(validateFlag){
+// 	        	sendType=$(this).val();
+//         	}else{
+//         		layer.msg("对不起，您的电话号码未激活，不能发送钉钉！");
+//         		sendType = "0";
+//         		$(this).attr("checked",false);
+        		
+//         		$("#r_send_mail").attr("checked",true);
+        		
+//         	}
+//         });
+
+
+			$(document).on("click",".js-send-type",function(){
+        	if(validateFlag){
+        		
+        		var $this = $(this);
+        		var radioCheck= $this.attr("checkval");  
+        	      if("1"==radioCheck){  
+        	    	  $this.prop("checked",false);  
+        	    	  $this.attr("checkval","0");  
+        	    	  sendType = "0";      
+        	    	  if(exceptType != "0"){
+        	    		  $("#send_mail").prop("checked",false);  
+        	    	  }
+        	      }else{   
+        	    	  $(".js-send-type").attr("checkval","0");
+        	    	  $this.attr("checkval","1");  
+        	          sendType=$(this).val();
+        	          $("#send_mail").prop("checked",true);  
+        	      }  
+        		
+        		
+        	}else{
+        		layer.msg("对不起，您的电话号码未激活，不能发送钉钉！");
+        		sendType = "0";
+        		$(this).prop("checked",false);
+        		$(".js-send-type1").prop("checked",true);
+        		$(".js-send-type1").attr("checkval","1");  
+        		$("#send_mail").prop("checked",true);  
+        	}
+        });
+
+        
+        $(document).on("change", ".js-datajoin-Change", function (a, b) {
+
+            var $this = $(this),
+                    index = $this.data("index"),
+                    $index = parseInt($(this).val());
+
+            model.meetingEntryList.dataJoin[index].seq = ($index + 1);
+
+            model.meetingEntryList.dataJoin[$index].seq = (index + 1);
+
+            model.meetingEntryList.dataJoin.sort(function (a, b) {
+                return a.seq - b.seq;
+            });
+
+
+        });
+        $(document).on("change", ".js-dataleave-Change", function () {
+
+            var $this = $(this),
+                    index = $this.data("index"),
+                    $index = parseInt($(this).val());
+
+            model.meetingEntryList.dataLeave[index].seq = ($index + 1);
+
+            model.meetingEntryList.dataLeave[$index].seq = (index + 1);
+
+            model.meetingEntryList.dataLeave.sort(function (a, b) {
+                return a.seq - b.seq;
+            });
+
+        });
+
+
+        $(document).on("change", "#selectFrequency", function () {
+            var $this = $(this);
+            $("#selectShow").hide();
+            if ($this.val() === "1") {
+                $("#selectShow").hide();
+            }
+            else {
+                $("#selectShow").show();
+            }
+        })
+
+    })
+
+    function changeView() {
+
+        var showSendRange = model.wrapMain.sendRange.map(function (value) {
+            return value.name;
+        });
+
+
+        unitStorageData.length = 0;
+        model.wrapMain.sendRange.forEach(function (value) {
+            unitStorageData.push({
+                "name": value.name,
+                "id": value.id,
+                "caCode": value.caCode
+            });
+        });
+
+        $("#distinguish_text").val(showSendRange.join(","));
+
+
+        //同步更新发送短信的人
+        mailMessageData.sendRange.length = 0;
+
+        var unitName = [];
+        model.wrapMain.sendRange.forEach(function (value) {
+            unitName.push(value.name);
+        })
+        var obj = {
+            "grounpName": '',
+            "grounpId": '',
+            "unitName": unitName.join(","),
+            "unitId": ''
+        }
+        var groupUrl = "${base}/admin/sendRange/selectOrgInfo.action?etc=" + new Date().getTime();
+        $.post(groupUrl, obj, function (data) {
+
+            if (data.datas.length) {
+                data.datas.forEach(function (value) {
+                    mailMessageData.sendRange.push({
+                        'name': value.name ? value.name : '',
+                        'id': value.id ? value.id : '',
+                        'post': value.post ? value.post : '',
+                        'tel': value.number ? value.number : '',
+                        'unit': value.unit ? value.unit : ''
+                    });
+                });
+
+            }
+        });
+
+        textAuto();
+
+    }
+
+
+    //查看征求意见反馈
+    function view(feedbackId) {
+
+        var iframe = layer.open({
+            type: 2,
+            title: '查看征求意见反馈',
+            area: ['800px', '500px'],
+            fix: true, //不固定
+            maxmin: true,
+            content: "${base}/admin/draftSignFeedBack/viewDraftFeedBackDetail.action?ids=" + feedbackId,
+            scrollbar: false,
+            fullPage: false,
+            success: function (layero, index) {
+
+            }
+        });
+
+
+
+    }
+
+    function validateAccount(){
+  	  $.get("${base}/admin/wfManage/validateDingDing.action",function(result){
+  		  if("-1" == result.msg){
+  			  validateFlag = false;
+  			  if("${defaultType}" != '0'){
+  				  $(".js-send-type").prop("checked",false).attr("checkval","0");  
+  				  if($("#send_mail").prop("checked")){
+  				  	$(".js-send-type1").prop("checked",true).attr("checkval","1");  
+  				  }
+  			  	  sendType = "0";
+  			  }
+  		  }
+  	  });
+    }
+    
+    function getPaperNum() {
+        var $father = $(window.top.document);
+        if ($father.find("#PRINT_NUM").length) {
+            if ($father.find("#PRINT_NUM").val().length) {
+                return $father.find("#PRINT_NUM").val();
+            } else {
+                return 5;
+            }
+
+        }
+        else {
+            return 5;
+        }
+    }
+
+
+    function textAuto() {
+
+        setTimeout(function () {
+            $(".js-textarea-auto").each(function () {
+                $(this).blur();
+            });
+        }, 500);
+
+
+    }
+
+    function titleOnclik(id) {
+
+        var $tr = $("#grid_" + id);
+        var name = "";
+        var $type = "";
+        if ($tr.length) {
+            var $a = $tr.find("td").eq("2").find("a");
+            name = $a.text();
+            $type = $a.data("type");
+        }
+
+        model.meetingSignView(id, name, $type);
+    }
+
+    function setSelectUserNo(radioObj){  
+        var radioCheck= $(radioObj).attr("checkval");  
+        if("1"==radioCheck){  
+            $(radioObj).attr("checked",false);  
+            $(radioObj).attr("checkval","0");  
+            exceptType = "1";   
+            if(sendType == "0"){
+          	  $("#send_mail").prop("checked",false);
+            }
+        }else{   
+            $(radioObj).attr("checkval","1");  
+            $("#send_mail").prop("checked",true);
+            exceptType = "0";
+        }  
+    } 
+    
+    
+    function getWfType(){
+    	var wfType = "";
+    	 if (djsn == "oa_send_document") {
+             if ($advice == "1") {
+             	wfType = "WF_TYPE_DRAFT_SEND";
+             }
+         }
+         //收文
+         else if (djsn == "oa_pg_incoming_form") {
+             if ($advice == "1") {
+            	 wfType = "WF_TYPE_DRAFT_SEND";
+             }
+         }
+         //领导批示
+         else if (djsn == "oa_leader_instruction_form") {
+             if (wfName == "oa_leader_instruction_fb") {
+            	 wfType = "WF_TYPE_DRAFT_SEND";
+             }
+
+         }
+         //专项事务
+         else if (djsn == "oa_sptrain_audit") {
+             if ($advice == "1") {
+            	 wfType = "WF_TYPE_DRAFT_SEND";
+             }
+         }
+    	 return wfType;
+    }
+
+</script>
+</html>

@@ -1,0 +1,127 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>
+var gridOb;
+var gridRowMaxIndex;
+
+function sub()
+{
+  var addAdvices="";
+   var pRowIdArr = gridOb.getAllRowIds(',').split(',');
+  
+    for(i=0;i<pRowIdArr.length;i++){ 
+	  var con= gridOb.cellById(pRowIdArr[i],0).getValue();
+          addAdvices+=";"+con;
+    }
+    if(!addAdvices)
+    {
+        $.dialog.tips("请添加意见!");
+        return;
+    }
+    addAdvices=addAdvices.substring(1);
+   
+$('#text9').val(addAdvices);
+   
+   var op="保存";
+
+   doSubmitData(function () {
+	$.dialog.tips(op+"成功!");
+      
+     try{
+		window.edenCallBack(addAdvices);
+
+	}catch (e){
+
+     }
+  
+    
+
+   });
+
+  
+
+
+}
+
+
+function load()
+{
+    
+   gridOb =getGrid('grid1');
+  
+   var listStr=$('#text9').val();
+     
+     
+   var listArr=listStr.split(';');
+   for(var i=0;i<listArr.length;i++)
+    {
+       var ad=listArr[i];
+        if(ad)
+        {
+          gridOb.addRow(i,[ad],i);  
+        }
+        
+
+    }
+ gridRowMaxIndex=listArr.length;
+  
+
+}
+
+
+function addRow()
+{
+   var addCon=$('#text8').val();
+
+   if(addCon)
+   {
+     
+     //var date=new Date().getTime();
+     gridRowMaxIndex++;
+     gridOb.addRow(gridRowMaxIndex,[addCon],gridRowMaxIndex);  
+      $('#text8').val('');
+
+   }else{
+       $.dialog.tips("添加内容不能为空！   ");
+     
+   }
+   
+    
+}
+
+
+function delRow()
+{
+   var row_id = gridOb.getSelectedRowId();
+	if (row_id === '') {
+           $.dialog.tips('请选择一条意见！');
+            return;
+        }
+	gridOb.deleteRow(row_id);
+	
+
+}
+</script><script >document.styleSheets[0].addRule("fc\\:webgrid","behavior: url(../../fceform/htc/webgrid.htc)",0);</script><script src='../../fceform/js/fcwebgrid.js'></script><script >document.styleSheets[0].addRule("fc\\:fc_code","behavior: url(../../fceform/htc/fc_code.htc)",0);</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib isCheckPermit="否" alertType="1" contxml="<root><button><id>button1</id><id>button5</id><id>button6</id></button><text><id>text8</id><id>text9</id></text><grid><id>grid1</id></grid><dataset><id>dataset1</id><id>dataset2</id></dataset></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:8;radio:2;listbox:1;textarea:2;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:6;text:9;hr:0;checkboxlist:0;radiolist:0;dropdownlist:1;grid:1;dataset:2;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" billtaborder="<root><taborder>button1</taborder><taborder>grid1</taborder><taborder>button5</taborder><taborder>text8</taborder><taborder>text9</taborder><taborder>button6</taborder></root>" isfile="是" posheight poswidth postop posleft window="当前窗口" caption="意见添加" type="eden_wf" dj_sn="oa_myadvice_edit" toolbar="不带工具栏" BLONopen="load()" center="  " BLONclose BLONopenBefore userType AutoResizeXml><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; PADDING-TOP: 0px; TOP: 257px; LEFT: 119px" id=button1 onmovestart=moveStart() class=ef_button controltype="button" onclick='bill_onclick("sub()")'>保存</BUTTON><?xml:namespace prefix = fc /><fc:dataset id=dataset1 controltype="dataset" isSubGrid="否" pubpara="否" isaddemptyrec="否" submittype="1" submitno="1" savetable="oa_document_myselectadvice" idparam="BBB" issubds="否" opensortno="1" idtype="1" isInAddStatus="是" format="<fields><field><fieldname>username</fieldname><datatype>字符</datatype><displaylabel>用户名</displaylabel><size>512</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>GetSessionOne('userid')</defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>否</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>content</fieldname><datatype>字符</datatype><displaylabel>意见内容</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>id</fieldname><datatype>字符</datatype><displaylabel>id</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><username></username><content></content><id></id></dsid>")' onGetText='bill_ondatasetgettext("<dsid><username></username><content></content><id></id></dsid>")' onSetText='bill_ondatasetsettext("<dsid><username></username><content></content><id></id></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6XrnbXrn%DA%F2%EC%E8XrnXrn%EC%D0%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%E8%u0100%F4%D8%E6%D8%D4%F6%D0%D6%FA%E0%D4%D8XrnXrn%FC%DE%D8%F2%D8Xrn%F8%F4%D8%F2%EA%D0%E8%D8Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%F8%F4%D8%F2%EA%D0%E8%D8XrrXr%80X%7C%96Xt%90Xr%7C"></fc:dataset>&nbsp;&nbsp; <fc:webgrid onkeydown='bill_ongridkeydown("<grid1><col></col></grid1>")' id=grid1 ondblclick='bill_ongriddblclick("<grid1><col></col></grid1>")' onclick='bill_ongridclick("<grid1><col></col></grid1>")' dataset="dataset2" controltype="grid" format="<cols><col><fname>content</fname><cname>意见</cname><width>50</width><dtype>字符</dtype><readonly>否</readonly><visible>是</visible><u></u><v></v><s></s><r></r><columnwidth>80</columnwidth><align>left</align></col></cols>" visible="是" readonly="否" isPage="否" bodyrowheight="-1" colWidth="200" colType="co" colSort="str" showCheckbox="否" bodyrows="-1" width="247" height="198" top="45" left="41" autoheight="undefined" autowidth="undefined" autoappend="undefined">
+<TABLE style="BORDER-COLLAPSE: collapse; TABLE-LAYOUT: fixed; TOP: 0px; LEFT: 0px" id=t cellSpacing=0 cellPadding=1 frame=box>
+<TBODY>
+<TR class=fcGridFirstRow>
+<TD></TD></TR></TBODY></TABLE></fc:webgrid><INPUT style="POSITION: absolute; WIDTH: 106px; HEIGHT: 20px; TOP: 11px; LEFT: 40px" id=text8 onmovestart=moveStart() size=19 controltype="text"><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 58px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 22px; PADDING-TOP: 0px; TOP: 11px; LEFT: 163px" id=button5 onmovestart=moveStart() class=ef_button controltype="button" onclick='bill_onclick("addRow()")'>添加</BUTTON><fc:dataset id=dataset2 controltype="dataset" isSubGrid="否" pubpara="否" isaddemptyrec="否" submittype="4" submitno="1" issubds="否" opensortno="1" idtype="1" isInAddStatus="是" format="<fields><field><fieldname>content</fieldname><datatype>字符</datatype><displaylabel>意见</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><content></content></dsid>")' onGetText='bill_ondatasetgettext("<dsid><content></content></dsid>")' onSetText='bill_ondatasetsettext("<dsid><content></content></dsid>")'></fc:dataset><INPUT style="POSITION: absolute; WIDTH: 110px; DISPLAY: none; HEIGHT: 20px; TOP: 305px; LEFT: 101px" id=text9 onmovestart=moveStart() dataset="dataset1" china="意见内容" field="content" controltype="text"><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 59px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 24px; PADDING-TOP: 0px; TOP: 11px; LEFT: 231px" id=button6 onmovestart=moveStart() class=ef_button controltype="button" onclick='bill_onclick("delRow()")'>删除</BUTTON></DIV><div id='addHtml'></div> </body></html>

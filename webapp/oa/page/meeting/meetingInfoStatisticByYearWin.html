@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head>
+<#include "/aufw/page/include/head.html">
+<link href="${base}/form/resources/chosen_v1.2.0/chosen.css" type="text/css" rel="stylesheet" />
+<style type="text/css">
+  .bsgrid td{
+    text-align:center;
+    padding-left:0px;
+  }
+
+</style>
+</head>
+<body style="height: 100%;" class="statistics">
+  <#include "/aufw/page/include/loading.html">
+  <div class="container-layout line">
+    <#include "/aufw/page/include/script.html">
+    <table style="width: 100%;" id="common_table">
+      <tr>
+        <!-- 右侧 -->
+        <td class="ver-top">
+            <div class="grid-table-top" id="grid_table">
+            <div class="js-tool-bar">
+                <div class="form-group statistics-condition header-group">
+                  <span class="span-bold header-title">年度:</span>
+                    <input name="startDate" id="startDate" class="Wdate tool-bar-input margin-left-in" style="cursor: pointer;height:26px;width: 70px;" onclick="WdatePicker({dateFmt:'yyyy', maxDate:'#F{$dp.$D(\'endDate\')||\'2025\'}'})" size="15" type="text">
+                        <span class="header-title margin-left-in">至</span>
+                        <input id="endDate" style="cursor: pointer;height: 26px;width: 70px;" size="19" class="Wdate tool-bar-input margin-left-in" onclick="WdatePicker({dateFmt:'yyyy',minDate:'#F{$dp.$D(\'startDate\')}',maxDate:'2025'})" name="endDate" type="text">
+                    <span class="span-bold header-title margin-left-out">申报单位：</span>
+                    <select class="tool-bar-input chzn-select" id="mainOrg" style="width:150px;height: 26px;" data-placeholder="找不到">
+                        <option value="" style="color:#c2c2c2;">---请选择---</option>
+                    </select>
+                    <div class="button button-main js-statistics margin-left-out">统计</div>
+                    <div id="exportButton" class="button button-main js-statistics margin-left-in" >导出</div>
+              </div>
+                <div class="statistics-tab">
+                    <div class="clearfix">
+                        <div id="exportButton" class="tab-btn" style="display:none;">导出</div>
+                    </div>
+                    <div class="tab-content-show">
+                        <span id="condition" class="float-left" ></span>
+                        <span style="float:right;margin-right:14px;">统计时间： ${.now ?string("yyyy.MM.dd")}</span></div>
+                </div>
+            </div>
+            <div class="js-grid-father grid-father">
+              <table id="manage_grid_bot" class="bsgrid">
+                <tr>
+                  <th w_index="id" w_hidden="true" class="hidden"></th>
+                  <th width="40">序号</th>
+                  <th w_check="true" width="30" w_hidden="true" class="hidden"></th>
+                  <th w_index="year" width="100">年度</th>
+                  <#list meetingLevelDictList as dict>
+                  <th w_index="count${dict_index}" width="100">${dict.dictName}</th>
+                  </#list>
+                  <th w_index="total" width="100">总计</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script src="${base}/form/resources/chosen_v1.2.0/chosen.jquery.js"></script>
+  <script>
+    var arr = []; 
+	var gridOne;
+	var selectURL = "${base}/admin/meeting/meetingInfoStatisticByYear.action";
+	var time = [  ];
+	var chartReadData = [];
+	var chartDealData = [];
+	var chartTotalData = [];
+	var chart;
+	var condition = "";
+	$(function() {
+        layOut("#common_table", "#grid_table");
+	//统计功能
+		$(".js-statistics").click(function(){
+		    var startDate= $("#startDate").val();
+		    var endDate= $("#endDate").val();
+		    var mainOrg=$("#mainOrg").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    } 
+		    gridOne.changeUrl(selectURL + symbol + 'startDate=' + startDate + '&endDate=' + endDate + "&mainOrg="+window.encodeURI(mainOrg)+'&etc='+new Date().getTime());
+		});
+       //选择部门
+
+	    //导出功能
+    	$(document).on("click","#exportButton",function(){
+		    var startDate= $("#startDate").val();
+		    var endDate= $("#endDate").val();
+		    var mainOrg=$("#mainOrg").val();
+		    var symbol = "?";
+		    if(selectURL.indexOf("?")>0){
+		      symbol = "&";
+		    }
+	        window.location = "${base}/admin/meeting/meetingInfoStatisticByYearExport.action" + symbol + 'startDate=' + startDate + '&endDate=' + endDate +"&mainOrg="+window.encodeURI(mainOrg)+ '&etc='+new Date().getTime();
+		});
+
+
+		gridOne = $.fn.bsgrid.init("manage_grid_bot", {
+			url : selectURL + "?etc=" + new Date().getTime(),
+			row_primary_key : "primaryKey",
+			autoLoad : true,
+			pageSizeSelect : true,
+			pageSize : 999,
+			complete : function(options, XMLHttpRequest, textStatus) {
+			},
+			additionalBeforeRenderGrid : function(parseSuccess, gridData, options) {
+				$("#condition").html(gridData.condition);
+			},
+			additionalAfterRenderGrid : function() {
+				gridOne.initGrid();
+				$("tr","#manage_grid_bot").each(function(){
+					$("td",this).eq(1).css("padding-left","0px");					
+				});
+				$("#manage_grid_bot tbody tr").each(function(){
+					var $this=$(this);
+	        		$index=parseInt($this.attr("index"));
+	        		$this.find("td").eq(1).html(parseInt($("#manage_grid_bot_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        	});
+				time = [];
+				chartData = [];
+				var data = gridOne.getAllRecords();
+ 				for(var i = 0,l = data.length; i < l; i++){
+					time[i] = data[i].year;
+					chartReadData[i] = data[i].read;
+					chartDealData[i] = data[i].deal;
+					chartTotalData[i] = data[i].total;
+				} 
+
+			}
+		});
+
+        
+		$(document).on("click", "#print_button", function() {
+	        var win = {text:"打印", url:"${base}/admin/documentStatistics/incomingStatisticByYearPrintWin.action?etc=" + new Date().getTime(),width:'900',height:'550', id:"incomingStatisticByYearPrintWin",'parentIfr':window};
+	        window.top.createWindow(win);
+		});
+
+		$(document).on("click",".selsel",function(){
+			 $(".selinput").val($(".selsel").val());
+		});
+
+		///初始化选择框
+        initData();
+		//初始化选择框
+		 $("#mainOrg").html("<option value='' style='color:#c2c2c2;'>---请选择---</option>");  
+           for(var i=0; i<arr.length; i++ ) {  
+               $("#mainOrg").append("<option value="+arr[i]+">"+arr[i]+"</option>");      
+           } 
+		 $('#mainOrg').chosen({
+			 "no_results_text":"找不到"
+		 });
+            
+	});
+	
+
+	function chartHeight() {
+		var $tableTop = $("#grid_table").height(), $bar = $(".js-tool-bar").height();
+		$("#container").height($tableTop - $bar);
+	}
+	
+
+	//初始化数据
+	function initData(){
+		var url="${base}/admin/department/selectDepartment.action";
+		param="module=oa_meeting_info&type=meeting_pro_unit";
+		$.ajax({
+			type:"POST",
+			url:url,
+			data:param,
+			async: false,
+			success:function(data){
+				for(var i=0;i<data.data.length;i++){
+					arr.push(data.data[i].name);
+				}
+			}
+		});
+		
+		
+		
+	}
+	</script>
+</body>
+</html>

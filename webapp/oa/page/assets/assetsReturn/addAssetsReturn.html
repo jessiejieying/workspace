@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html style="overflow:hidden; height:100%;">
+    <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <script src="${base}/aufw/resources/common/js/setskins.js"></script>
+    <script>
+        setSkinsCss("listCss,iconCss");
+    </script>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/freshtop/css/gice.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+    </head>
+
+<body style="height:100%;overflow:auto;">
+	<div class="consum_wrap">
+	
+	
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="returnNo"><span style="color:red">* </span>归还编号</label><input id="returnNo" type="text" name="returnNo" /></div>
+		<div class="consum_inline_right clearfix"><label for="returnDate"><span style="color:red">* </span>归还时间</label><input onfocus="WdatePicker();" id="returnDate" type="text" name="returnDate" /></div>
+		
+	</div>
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="returnBy"><span style="color:red">* </span>归还人</label><input id="returnBy" type="text" name="returnBy" /></div>
+		<div class="consum_inline_right clearfix"><label for="returnDep">归还部门</label><input id="returnDep" type="text" name="returnDep" /></div>
+	</div>
+	
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix">
+		<div class="consum_inline_right clearfix">
+			<label for="consumAsset"><span style="color:red">* </span>资产</label>
+				<div class="consum_inline_right clearfix"><a class="relnum_a"  style="line-height: 30px;" onclick="selectAsset(2)" href="javascript:void(0)">选择资产</a><a class="relnum_a" onclick="delAsset()" href="javascript:void(0)">删除</a></div>
+		
+		</div>
+	</div>
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix">
+		<div class="consum_inline_right clearfix">
+			<label for="consumAsset">&nbsp;</label>
+			<div id="gridId" style="min-width:542px;height: 150px;margin-bottom: 10px;float: left;">
+			</div>
+		
+		</div>
+	</div>
+	
+<!-- 	
+	<div class="relnum">
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="assetsNumFirst">资产编号</label><input id="assetsNumFirst" type="text"  /></div>
+		<div class="consum_inline_right clearfix"><label for="assetsNameFirst">资产名称</label><input id="assetsNameFirst" type="text" /></div>
+	</div>
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="consumNumFirst">领用数量</label><input id="consumNumFirst" type="text" /></div>
+		<div class="consum_inline_right clearfix"><a class="relnum_a" onclick="addRelnum('assetsNameFirst')" href="javascript:void(0)">增加</a><a class="relnum_a" onclick="delRelnum('assetsNameFirst')" href="javascript:void(0)">删除</a></div>
+	</div>
+	</div> -->
+	
+	<div class="clearfix consum_block">
+		<div class="consum_inline clearfix"><label for="remark">备注</label><textarea id="remark" name="remark"></textarea></div>
+	</div>
+
+	<div class="consum_ablock">
+		<a onclick="formSubmit()" href="javascript:void(0)">确认</a><a onclick="closeWin()" href="javascript:void(0)">取消</a>
+	</div>
+	
+	</div>
+</body>
+    <script src="${base}/aufw/resources/common/js/jquery.js"></script>
+    <script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxtree_srnd.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/dhtmlxgrid_pgn.js"></script>
+    <script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+    <script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+    <script src="${base}/form/fceform/js/MicrosoftAjax.js"></script>
+    <script src="${base}/form/fceform/js/fcpub.js"></script>
+    <script src="${base}/form/fceform/js/fcrundj.js"></script>
+    <script src="${base}/form/fceform/js/tabpane.js"></script>
+    <script src="${base}/aufw/resources/common/js/plupload/plupload.full.js"></script>
+     <script src="${base}/form/resources/common/js/temp.js"></script>
+<script>
+
+	var grid;
+	function init() {  
+		
+		grid = new dhtmlXGridObject('gridId');
+		// 把 grid 添加到  ID为 grid的div中
+		grid.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/");
+		//设置 grid上 图片的路径
+		grid.setHeader(" ,资产编号,资产名称,数量");
+		//设置 grid每列的标题
+		grid.setColumnIds("check,assetsNum,assetsName,consumNum");
+		//设置 grid每列的数据  对应 json中的哪条数据
+		grid.setInitWidths("30,100,200,*");
+		//设置 每列的宽度
+		grid.setColTypes("ch,ro,ro,co");
+		
+		grid.init();
+		
+		 grid.attachEvent("onEditCell", function(stage,rId,cInd,nValue,oValue){
+			 if(stage==2)  //编辑cell时
+			 {
+				 var rowArr = rId.split('$$$');
+	              var maxAmount=parseInt(rowArr[1]);
+	              if(isNaN(nValue))
+	             {
+	            	  alert("修改数量要为数字！");
+	            	  return false;
+	            	}
+	              if(nValue>maxAmount)
+	              {
+	            	
+	            	alert("修改数量不能大于该资产使用数量");
+	                
+	                return false;
+	              }else{
+	            	  return true;
+	              }
+	              
+			 }
+			 return true;
+		 });
+		 
+		 
+		 setRandNums("returnNo","RT");
+	
+	}
+
+
+    $(function(){
+    	init();
+    	layout();
+    	$(window).resize(function(){
+    		layout();
+    	});
+    	
+    	
+    });
+    
+    function layout(){
+    	$('#remark').width($('.consum_wrap').width()-84);	
+    }
+    
+    function closeWin(){
+    	window.top.closeWin('addAssetsReturn');
+    }
+    
+/*     function addRelnum(id){
+    	var newTime=new Date().getTime();
+    	$('#'+id).parent().parent().parent('.relnum').after("<div class='relnum'><div class='clearfix consum_block'>"+
+    			"<div class='consum_inline clearfix'><label for="+"assetsNum"+newTime+
+    			">资产编号</label><input id="+"assetsNum"+newTime+" type='text'  /></div><div class='consum_inline_right clearfix'><label for="+
+    			"assetsName"+newTime+">资产名称</label><input id="+"assetsName"+newTime+" type='text' /></div></div><div class='clearfix consum_block'><div class='consum_inline clearfix'><label for="
+    			+"consumNum"+newTime+">领用数量</label><input id="+"consumNum"+newTime+" type='text' /></div><div class='consum_inline_right clearfix'><a "+"onclick=addRelnum("+"'"+"assetsNum"+newTime
+    					+"'"+") href='javascript:void(0)' class='relnum_a'>增加</a><a "+"onclick=delRelnum("+"'"+"assetsNum"+newTime+"'"+") href='javascript:void(0)' class='relnum_a'>删除</a></div></div></div>");
+    } */
+    
+	function delRelnum(id){
+		if($('.relnum').length==1){
+			$.dialog.tips("资产不能为空！");
+		}else{
+			$('#'+id).parent().parent().parent('.relnum').remove();	
+		}		
+    }
+    
+	//选择资产
+	function selectAsset(amountIndex) {
+		var url =  "${base}/admin/assetsRegister/assetsSelect.action?amountIndex="+amountIndex+"&from=page";
+		window.top.createWindow({
+			id:"assetsSelect",
+			text: "资产选择",
+			width: 670,
+			height: 450,
+			url: url,
+			parent_ifr : window
+		});
+	}
+    
+    function formSubmit(){
+    	var returnNo=$('#returnNo').val();
+    	if(!returnNo)
+    	{
+    		$.dialog.tips("归还编号不能为空！");
+    		return;
+    	}
+    	var returnBy=$.trim($('#returnBy').val());//领用人
+    	if(returnBy==""){
+    		$.dialog.tips("领用人不能为空！");
+    		$("#returnBy").select();
+    		return;
+    	}
+    	var returnDep=$.trim($('#returnDep').val());//领用人部门
+    /* 	if(returnDep==""){
+    		$.dialog.tips("领用人部门不能为空！");
+    		$("#returnDep").select();
+    		return;
+    	} */
+    	var returnDate=$.trim($('#returnDate').val());//领用时间
+    	if(returnDate==""){
+    		$.dialog.tips("领用时间不能为空！");
+    		$("#returnDate").select();
+    		return;
+    	}
+    	
+    	var flage=1;
+    	var assetsNum="";
+    	var assetsName="";
+    	var returnNum="";
+ 	   for ( var index = 1; index < grid.getRowsNum(); index++) {
+ 	   	  
+   	 	   var asset_num = grid.cellByIndex(index,1).getValue();
+   		  var asset_name = grid.cellByIndex(index,2).getValue();
+   		  var amount = grid.cellByIndex(index,3).getValue();
+   	  	  var aid=grid.getRowId(index);
+	   	  	if(index!=1)
+	   		{
+		   	  	assetsNum+=",";
+		   		assetsName+=",";
+		   		returnNum+=",";
+	   		}
+   		 	assetsNum+=asset_num;
+	   		assetsName+=asset_name;
+	   		returnNum+=amount;
+	   		
+   	  }
+    	
+    	
+
+     	var remark = $("#remark").val();
+    $.post("${base}/admin/assetsReturn/insertAssetsReturns.action", 
+    	    {
+ 		      "assetsReturn.returnBy":returnBy,
+ 		      "assetsReturn.returnNo":returnNo,
+ 		     "assetsReturn.returnDep":returnDep,
+ 		      "assetsReturn.returnDate":returnDate,
+ 		      "assetsIdArrs":"",
+ 		      "assetsNumArrs":assetsNum,
+ 		      "assetsNameArrs":assetsName,
+ 		      "returnNumArrs":returnNum, 
+ 		     "assetsReturn.remark":remark
+    	  }, function(result){
+    	       $.dialog.tips(result.tips);
+    	       ParentIframe.refresh_data();
+    	      setTimeout(function(){      			
+    	       closeWin();
+    	  },200);
+    }); 	
+    	
+    	
+    }
+</script>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <title>抄送文件</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css" />
+    <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css" />
+    <style>
+        .bdblue{
+            border: 2px solid #71b8ec!important;
+        }
+        .body-choice-right-only{
+            position: absolute;
+            top: 37px;
+            right: 0px;
+            width: 395px!important;
+            height: 300px!important;
+            overflow: auto;
+            border: 2px solid #71b8ec!important;
+        }
+
+    </style>
+    <script>
+        var params = {
+            id: window.top.data_dataset2.item(window.top.data_dataset2.first()).id
+        }
+    </script>
+</head>
+<body class="ms-controller document-exchange-body" ms-controller="wrap">
+<div class="document-exchange-main layer-choice-pop">
+    <div class="document-exchange-body default-status" ms-class="{active:@indexShow===0}" ms-if="@sendExist" style="position: relative;">
+        <div class=" layer-choice-content" style="margin-top: 10px;" id="choiceBot">
+            <div class="layer-choice-content-header unit-header clearfix" style="position:relative;">
+                <span  class="header-left">所有处室</span>
+                <div class=" float-left margin-left" >
+                    <input id="other_search_text" ms-duplex="@searchGroup" type="text" class="tool-bar-input " style="width: 168px;" placeholder="输入搜索内容">
+                </div>
+                <span class="margin-left padding-left header-left" >已选（{{@choiceList.length}}）处室</span>
+                <span class="header-clear"  ms-click="@clearAll()">全部清除</span>
+            </div>
+            <div id="choiceBotBody" class="layer-choice-content-body clearfix " style="margin-top:11px;height:300px;border: 0;">
+                <div class="body-choice-left bdblue">
+                    <ul>
+                        <li ms-for="(index,el) in @groupList"   ms-click="@choiceClick(el,index)" ms-visible="el.isShow" ms-class="{selected:el.select}">{{el.name}}</li>
+                    </ul>
+
+                </div>
+
+                <div class="body-choice-right-only body-choice-right">
+                    <div class="choice-content other-js-choice-content">
+                        <div class="choice-content-btn js-choice-btn" ms-for="(index,el) in @choiceList" ms-click="@choiceListDel(el)" >
+                            <span>{{el.name}}</span>
+                            <i class="icon-times"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <button class="button button-main margin-small-top" ms-click="@choiceAll()">全部选择</button>
+        <div class="document-exchange-body-main">
+            <div class="document-exchange-body-top js-exchange-body">
+                <div class="header clearfix">
+                    <span class="header-left margin-right">选择文件</span>
+                    <label class="cursor-pointer" style="position: relative;top: 5px;">
+                        <input type="checkbox" style="vertical-align:-2px;" ms-duplex-checked="@fileListCheck" class="margin-small-right" data-duplex-changed="@fileListCheckChange">全选</label>
+                </div>
+                <div class="main main-file">
+                    <ul class="file-ul clearfix" id="fileUl">
+                        <li ms-for="(index,item) in @fileDatas">
+                            <label>
+                                <input ms-duplex-checked="item.check" type="checkbox"  data-duplex-changed="@fileListCheckOne" class="js-file-check" />
+                            </label>
+                            <a ms-attr="{href:item.path}">{{item.name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center margin-top">
+                <button class="button button-main" ms-click="@sendSure()" id="sure">发送</button>
+                <button class="button button-main margin-left" ms-click="@cancel()" >取消</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<script src="${base}/edenui/common/js/avalon/avalon2.js"></script>
+<script>
+    var searchStatus=false,
+        officeStatus=false;
+
+    var dataAttach=[],dataOrg=[];
+    var $wfId=getUrlParam("wfId");
+
+    //参数配置表
+    avalon.config({
+        debug: false
+    });
+    var model = avalon.define({
+        $id: "wrap",
+        //群组列表
+        groupList:[],
+        //群组下拉选项
+        groupOption:[],
+        groupSelect:'',
+        //群组搜索
+        searchGroup:'',
+        //处室列表
+        officeList:[],
+        //群主下拉选项
+        officeOption:[],
+        officeSelect:'',
+        //处室搜索
+        searchOffice:'',
+        //选中的人
+        choiceList:[],
+        //删除右侧人员
+        choiceListDel:function(obj){
+
+            model.choiceList.forEach(function(value,index){
+                if(value.account==obj.account){
+                    model.choiceList.splice(index,1);
+                }
+            });
+
+            //清除左侧的选中状态
+
+            model.groupList.forEach(function(value){
+                if(value.account==obj.account){
+                    value.select=false;
+
+                }
+            });
+
+            model.officeList.forEach(function(value){
+                if(value.account==obj.account){
+                    value.select=false;
+                }
+            });
+
+        },
+
+        //所有处室
+        choiceAll:function(type){
+
+            var choiceListData=model.choiceList.map(function(value){
+                return value.account;
+            });
+
+                model.groupList.forEach(function(value){
+                    if(choiceListData.indexOf(value.account)<0){
+                        model.choiceList.push({
+                            "account":value.account,
+                            "name":value.name
+                        });
+
+                    }
+                    value.select=true;
+                });
+
+        },
+        // obj：传递对象，idnex：索引值，num：1、群组，2、处室
+        choiceClick:function(obj,index,num){
+            var isPush=true;
+            model.choiceList.forEach(function(value){
+                //是否已经存在列表中
+                if(value.account==obj.account){
+                    isPush=false;
+                }
+            });
+            if(isPush){
+                model.choiceList.push({
+                    "account":obj.account,
+                    "name":obj.name
+                });
+
+               model.groupList[index].select=true;
+            }
+        },
+        clearAll:function(){
+
+            model.choiceList.clear();
+
+            model.officeList.forEach(function(value){
+                value.select=false;
+            });
+            model.groupList.forEach(function(value){
+                value.select=false;
+            });
+
+        },
+        fileDatas: [],
+        indexShow: 0,
+
+        sendExist: true,
+        feedBackExist: true,
+        isFinish:true,
+        //附件列表全选项
+        fileListCheck: false,
+        fileListCheckChange: function(e) {
+            var checked = e.target.checked;
+
+            if (checked) {
+                model.fileDatas.forEach(function(value) {
+                    value.check = true;
+                });
+            } else {
+                model.fileDatas.forEach(function(value) {
+                    value.check = false;
+                });
+            }
+        },
+        fileListCheckOne: function(e) {
+            var checked = e.target.checked;
+            if (checked === false) {
+                model.fileListCheck = false;
+            } else {
+                model.fileListCheck = model.fileDatas.every(function(value) {
+                    return value.check;
+                });
+            }
+        },
+        cancel:function () {
+            page.close();
+        },
+        //发送确认
+        sendSure: function() {
+            var objAccounts=model.choiceList.map(function(value){
+                return value.account;
+            });
+            if(objAccounts.length<1){
+                layer.msg("请至少选择一个处室");
+                return;
+            }
+
+            var fileList=model.fileDatas.filter(function (value) {
+                return value.check
+            });
+
+            var objFileList=[];
+            if(fileList.length){
+                objFileList=fileList.map(function (value) {
+                    return value.id
+                });
+            }
+
+            layer.msg("发送中...");
+            var obj = {
+                "accounts": objAccounts.join(","),
+                "wfId": $wfId,
+                "attachIds":objFileList.join("|"),
+                "type": "waitDocument"
+            }
+            var url ="${base}/admin/documentCopySend/saveHallRegist.action?ect=" + new Date().getTime();
+            $.post(url, obj, function(data) {
+                layer.msg(data.message);
+                window.top.noteTipWaiting();
+                setTimeout(function() {
+                	parentIfr.location.reload();
+
+                   page.close();
+                }, 800);
+            });
+        }
+    })
+
+    //群组搜索
+    model.$watch("searchGroup", function (a) {
+        if(searchStatus){
+            clearTimeout(searchStatus);
+        }
+        searchStatus=setTimeout(function () {
+
+            model.groupList.forEach(function(value){
+                if(value.name.indexOf(a)>(-1)){
+                    value.isShow=true;
+                }
+                else{
+                    value.isShow=false;
+                }
+            });
+        },250);
+
+    })
+
+    //处室搜索
+    model.$watch("searchOffice", function (a) {
+
+        if(officeStatus){
+            clearTimeout(officeStatus);
+        }
+
+        officeStatus=setTimeout(function () {
+            model.officeList.forEach(function(value){
+                if(value.name.indexOf(a)>(-1)){
+                    value.isShow=true;
+                }
+                else{
+                    value.isShow=false;
+                }
+            });
+        },250);
+
+    })
+
+    var page = (function() {
+        var result = {
+            init: function() {
+                this.getStatus();
+            },
+            loadStart:function(){
+                var index = layer.load(2,{});
+                setTimeout(function(){
+                    page.loadEnd();
+                },2000);
+            },
+            loadEnd:function(){
+                layer.closeAll('loading');
+            },
+            close:function () {
+                window.top.layer.closeAll();
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+            },
+            getStatus:function () {
+                var wfid = $wfId;
+                var url ="${base}/admin/documentCopySend/queryHasBeenSent.action?etc=" + new Date().getTime() +"&wfId="+wfid;
+                $.getJSON(url,function (data) {
+                    data.dataAttach.forEach(function (value) {
+
+                        dataAttach.push({
+                            "name":value.name,
+                            "size":value.size
+                        });
+                    });
+                    dataOrg=data.dataOrg.map(function (value) {
+                        return value.account
+                    });
+
+                    page.getFileList();
+                    page.getOfficeOption();
+                });
+            },
+            isSelect:function (orgId,orgName) {
+                if(dataOrg.indexOf(orgId)>(-1)){
+                    model.choiceList.push({
+                        "account":orgId,
+                        "name":orgName
+                    });
+                    return true
+                }
+                return false
+
+            },
+            getOfficeOption:function(){
+                var url="${base}/admin/sendRange/allOfficesInfo.action?etc="+new Date().getTime();
+                $.get(url, function (result) {
+                        var resultData=result.data;
+                        var dataInit=[];
+                        resultData.forEach(function(value){
+                            dataInit.push({
+                                "account":value.orgId,
+                                "name":value.orgName,
+                                "isShow":true,
+                                "select":page.isSelect(value.orgId,value.orgName)
+                            });
+                        });
+                        model.groupList=dataInit;
+
+                });
+            },
+            isCheck: function(fileName,fileSize) {
+
+                for(var i=0,max=dataAttach.length;i<max;i++){
+                    if(fileName==dataAttach[i].name&&fileSize==dataAttach[i].size){
+                        return true;
+                        break;
+                    }
+                }
+                return false
+            },
+            //对象数组去重,data：传入的数组，main：主键
+            uniqMore: function(data, main) {
+                var destData = [],
+                        getData = data,
+                        testData = [];
+                getData.forEach(function(value) {
+                    //导入未存在的数组
+                    if (testData.indexOf(value[main]) < 0) {
+                        testData.push(value[main]);
+                        var upIndex = destData.length;
+                        destData[upIndex] = {};
+                        for (var i in value) {
+                            destData[upIndex][i] = value[i];
+                        }
+                    }
+                });
+                return destData;
+            },
+            //获取文件列表
+            getFileList: function() {
+                var url ="${base}/admin/waitDocument/allAttachmentByWaitDocumentId.action?etc=" + new Date().getTime() + "&waitDocumentId=" + $wfId;
+
+                $.post(url, function(result) {
+                    if (result.data) {
+                        result.data.forEach(function(value) {
+                            model.fileDatas.push({
+                                "id": value.id,
+                                "name": value.name,
+                                "path": encodeURI(value.path).replace(/\+/g,"%2B"),
+                                "type": "file",
+                                "check":page.isCheck(value.name,value.size)
+                            });
+                        });
+                        //是否全选选中
+                        model.fileListCheck = model.fileDatas.every(function(value) {
+                            return value.check;
+                        });
+                    }
+                });
+            }
+        }
+        return result
+    })();
+
+    $(function() {
+        page.init();
+    })
+
+    // 获取参数列表
+    function getUrlParam(name) {
+
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null)return unescape(r[2]);
+        return null;
+
+    }
+
+</script>
+
+</html>

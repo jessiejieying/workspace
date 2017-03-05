@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=8,Chrome=1">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/form-table.css">
+    <style type="text/css">
+        .form-pt88 {
+            padding-top: 0px;
+        }
+
+        td {
+            height: 55px;
+            color: #ef655d;
+            vertical-align: middle;
+            text-align: center;
+            font-family: '黑体';
+        }
+
+        td .content {
+            text-align: left;
+            padding-left: 19px;
+            color: #2f2f2f;
+            font-family: '宋体';
+            font-size: 14px;
+        }
+
+        .common-skin-btn-syle01 {
+            color: #fff;
+            border-color: #4786d5;
+            background-color: #5b97e1;
+        }
+
+        .common-skin-btn-syle01:hover {
+            color: #fff;
+            border-color: #3bd;
+            background-color: #3bd;
+        }
+
+        .reason_back_label {
+            font-size: 12px;
+            font-family: 宋体;
+            margin-left: 10px;
+        }
+
+        input[type="checkbox"] {
+            margin-top: 3px;
+            vertical-align: top;
+        }
+
+        .form-print input {
+            color: #2f2f2f;
+        }
+
+        .button {
+            border: 0px solid #ddd;
+            box-shadow: 0 0px 0px #FFF, 0px 0 0px #FFF;
+        }
+
+        .otherReason {
+            font-family: 宋体;
+            font-size: 12px;
+            width: 72%;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+<form action="" class="wait-form" style="padding-top: 17px;margin-top: 0px;">
+    <input type="hidden" id="meetingId" value="${meetingInfo.id!}"/>
+    <h1 class="text-center"
+        style="margin-top:8px;margin-bottom:16px;color:#ef655d;padding-left: 90px;padding-right: 90px;">
+        ${(meetingInfo.subject)!}</span></h1>
+    <div class="form-print-header" style="float:left;margin-left: 100px;margin-bottom: 10px;">
+		<span class="header-right" style="color: #ef655d;">退文编号：
+			<input class="td-text-left" type="text" style="border: none;" id="backNo" value="">
+		</span>
+    </div>
+    <div class="form-print  form-pt88" style="width:724px;margin-left: auto;margin-right: auto;" id="showHtml">
+        <table class="wait-table"
+               style="font-size:15px;width:724px;border: 1px solid #ef655d;color:#ef655d;font-family:'宋体';">
+            <tr style="height:41px;">
+                <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+                    <table style="width:723px;">
+                        <tr>
+                            <td style="width:128px;min-width: 128px;border-right: 1px solid #ef655d;text-align:center;vertical-align:middle;">
+                                申报单位*
+                            </td>
+                            <td class="content" style="width: 215px;"><input value="${(meetingInfo.mainOrg)!}"
+                                                                             type="text" id="meetingInfo_main_org"/>
+                            </td>
+                            <td style="width:80px;color:#ef655d;height: 100%;border-right:1px solid #ef655d;border-left: 1px solid #ef655d;">
+                                联系人
+                            </td>
+                            <td class="content" style="width:100px;min-width: 100px;">${(meetingInfo.linkPeople)!}</td>
+                            <td style="width:100px;border-left: 1px solid #ef655d;border-right: 1px solid #ef655d;color:#ef655d;padding: 0 5px;">
+                                联系电话
+                            </td>
+                            <td class="content" style="width:100px;overflow:hidden;" id="meetingInfo_link_phone">
+                                ${(meetingInfo.linkPhone)!}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+
+            <tr style="height:41px;">
+                <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+                    <table style="width:723px;" height="100%" frame="void">
+                        <tr>
+                            <td style="border-right:1px solid #ef655d;width:128px">会议名称*</td>
+                            <td style="width:595px;" class="content"><input type="text"
+                                                                            value="${(meetingInfo.subject)!}"
+                                                                            style="width:100%;"
+                                                                            id="meetingInfo_subject"/></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr style="height:41px;">
+                <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+                    <table style="width:100%;" height="100%" frame="void">
+                        <tr>
+                            <td style="border-right:1px solid #ef655d;width:128px">附&nbsp;&nbsp;&nbsp;&nbsp;件</td>
+                            <td style="width:595px;" class="content">
+                                <#if attachmentInfoList?? && attachmentInfoList.size()&gt;0>
+                                    <#list attachmentInfoList as attachmentInfo>
+                                        <a class="file-icon" href="${(attachmentInfo.path)!}"
+                                           style="display: block;padding-left: 20px"
+                                           data-name="${(attachmentInfo.name)!}"><font color="blue">${attachmentInfo_index+1}.${(attachmentInfo.name)!}</font></a>
+                                    </#list>
+                                    <#else>
+                                </#if>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr style="height:41px;">
+                <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+                    <table style="width:100%;" height="100%" frame="void">
+                        <tr>
+                            <td style="border-right:1px solid #ef655d;width:128px">退文理由*</td>
+                            <td style="width:595px;padding-top:0px;padding-bottom:15px;" class="content">
+                                <#list  backReasonList as item>
+                                    <#assign flag=0>
+                                        <#list docbackReasonList! as item2>
+                                            <#if item2==item.dictValue>
+                                                <#assign flag=1>
+                                                    <#break>
+                                            </#if>
+                                        </#list>
+                                        <#if (item_index%3)?int=0>
+                                            <br/>
+                                        </#if>
+                                        <#if flag=1>
+                                            <input id="back_reason_${item_index+1}" checked name="backReason"
+                                                   type="checkbox" value="${item.dictValue}" class="backReason"/><label
+                                                for="back_reason_${item_index+1}" class="reason_back_label">${item_index+1}.${item.displayName}</label>
+                                            <#else>
+                                                <input id="back_reason_${item_index+1}" name="backReason"
+                                                       type="checkbox" value="${item.dictValue}"
+                                                       class="backReason"/><label for="back_reason_${item_index+1}"
+                                                                                  class="reason_back_label">${item_index+1}.${item.displayName}</label>
+                                        </#if>
+                                        <#if item.dictValue="其他">
+                                            <input type="text" value="${otherReason!}" placeHolder=""
+                                                   class="otherReason" style="border-bottom:1px solid black;"/>
+                                        </#if>
+                                        <!--<input id="back_reason_${item_index+1}" name="backReason" type="checkbox" value="${item_index+1}.${item.dictValue}"/><label for="back_reason_${item_index+1}" class="reason_back_label">${item_index+1}.${item.displayName}</label>  -->
+                                </#list>
+                                <!-- <input id="back_reason_1" type="checkbox" value="1"/><label for="back_reason_1" class="reason_back_label">1.未加盖单位公章</label>
+                                <input id="back_reason_2" type="checkbox" value="2"/><label for="back_reason_2" class="reason_back_label">2.会议备案未经单位主要主要负责人签字</label>
+                                <input id="back_reason_3" type="checkbox" value="3"/><label for="back_reason_3" class="reason_back_label">3.报(批)材料不全</label> -->
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr style="height:41px;">
+                <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+                    <table style="width:100%;" height="100%" frame="void">
+                        <tr>
+                            <td style="border-right:1px solid #ef655d;width:128px">主办处(室)<br>退文理由</td>
+                            <td style="width:595px;" class="content"><input type="text"
+                                                                            style="color:#2f2f2f;width:400px;"
+                                                                            id="meetingInfo_unitReason"
+                                                                            value="${(meetingInfo.unitReason)!}"/></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr style="height:41px;">
+                <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+                    <table style="width:100%;" height="100%" frame="void">
+                        <tr>
+                            <td style="border-right:1px solid #ef655d;width:128px">备&nbsp;&nbsp;&nbsp;&nbsp;注</td>
+                            <td style="width:595px;" class="content"><input type="text"
+                                                                            style="color:#2f2f2f;width:400px;"
+                                                                            id="meetingInfo_meetingRemark"
+                                                                            value="${(meetingInfo.meetingRemark)!}"/>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr style="height:41px;">
+                <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+                    <table style="width:100%;" height="100%" frame="void">
+                        <tr>
+                            <td style="border-right:1px solid #ef655d;width:128px">联系电话</td>
+                            <td style="width:595px" class="content">0571-87056798</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr style="height:41px;">
+                <td style="border-right: 1px solid #ef655d;border-bottom:1px solid #ef655d;font-family:'黑体';">
+                    <table style="width:100%;" height="100%" frame="void">
+                        <tr>
+                            <td style="border-right:1px solid #ef655d;width:128px">短信内容</td>
+                            <td style="width:595px" class="content"><textarea style="width:100%;border:0px;" type="text"
+                                                                              id="messageContent">${(meetingInfo.messageContent)!}</textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <!-- 完成 -->
+        </table>
+        <div style="text-align:center;width:724px;margin-top:10px;margin-bottom: 10px;">
+            <div class=" js-add-account" id="mesage_record" style="top: 0px;">
+                <input type="checkbox" value="1" style="position: relative;top: 2px;" id="is_send_message" checked/>
+                <label for="is_send_message">是否发送短信</label>
+                <div class="button common-skin-btn-syle01" id="back_reason_meetingInfo">退文</div>
+            </div>
+        </div>
+    </div>
+</form>
+<div id="form_add"></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jquery_migrate.min.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/edenui/common/js/plugins/My97DatePicker/WdatePicker.js"></script>
+
+<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/oa/resource/js/task.js"></script>
+
+<!-- 首页引用 -->
+<script src="${base}/edenui/common/js/ed_index.js"></script>
+
+<!--公用的js文件-->
+<script src="${base}/edenui/common/js/common.js"></script>
+
+
+<script type="text/javascript">
+    window.top.messageContent = "";
+    window.top.sendPhones = "";
+
+    var messageContent = "${(meetingInfo.messageContent)!}";
+    $(function () {
+        var numberUrl = "${base}/admin/documentSerialNumber/createSerialNumber.action?etc=" + new Date().getTime();
+        var data = "wfName=oa_back_meeting&fileType=退文编号";
+        $.ajax({
+            url: numberUrl,
+            type: 'post',
+            data: data,
+            async: false,
+            error: function () {
+                window.top.layer.msg("退文编号生成失败");
+            },
+            success: function (result) {
+                if (result.resultFlag == "true") {
+                    $("#backNo").val(result.message);
+                } else {
+                    window.top.layer.msg("退文编号生成失败");
+                }
+            }
+        });
+
+
+        //处理复选框选定或者未选定时，短信内容的的清除与显示
+        if (!($("#is_send_message").prop("checked"))) {
+            $("#messageContent").val("");
+        }
+        var obj = $("input:checked[name='backReason']");
+        if (obj != null && obj != undefined) {
+            for (var i = 0; i < obj.length; i++) {
+                if ($(obj[i]).val() == "其他") {
+                    $(".otherReason").css("visibility", "visible");
+                }
+            }
+        }
+        var meetingInfo_id = $("#meetingId").val();
+        //触发短信是否发送框按钮时
+        $(document).on("click", "#is_send_message", function () {
+            if (($("#is_send_message").prop("checked"))) {
+               // $("#messageContent").val(messageContent);
+                //弹出催办页面
+                //var meetingInfo_id=$("#meetingId").val();
+
+                var win = {
+                    "text": "发送短信",
+                    "url": "${base}/admin/backMeeting/inComingUrgencyPage.action?id=${meetingInfo.id!}&type=oa_meeting_info_back&show=1",
+                    "width": "813",
+                    "height": "460",
+                    "parentIfr": window
+                };
+              //  window.top.createWindow(win);
+
+                var iframe = layer.open({
+                    type: 2,
+                    title:"发送短信",
+                    area: ['813px','460px'],
+                    content:"${base}/admin/backMeeting/inComingUrgencyPage.action?id=${meetingInfo.id!}&type=oa_meeting_info_back&show=1",
+                    success:function(layero,index){
+                    }
+
+                });
+
+
+
+            } else {
+               // $("#messageContent").val("");
+            }
+        });
+        //删除会议开始
+        $("#meetingInfo_del").on("click", function () {
+            if (meetingInfo_id == null || meetingInfo_id.replace("\\s+", "") == "") {
+                layer.msg("会议ID为空，删除不能完成");
+                return;
+            }
+            //提醒框开始
+            layer.confirm('确定删除会议吗 ?', {title: '提示'}, function (index) {
+                $.post("${base}/admin/backMeeting/deleteBackMeetingInfo.action",
+                        {
+                            "meetingInfo.id": meetingInfo_id
+                        }, function (data) {
+                            if (data.flag == "1") {
+                                layer.msg("删除会议成功");
+                                setTimeout(function () {
+                                    parentIfr.gridOne.refreshPage();
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+                                }, 1000);
+                            } else {
+                                layer.msg("删除会议失败");
+                            }
+                        }, "json")
+            });
+            //提醒框结束
+        });
+        //删除会议结束
+        $(document).on("click", ".backReason[value='其他']", function () {
+            if ($(".otherReason").css("visibility") == "visible") {
+                $(".otherReason").css("visibility", "hidden");
+            } else {
+                $(".otherReason").css("visibility", "visible");
+            }
+            ;
+        });
+        //催办开始
+        $(document).on("click", "#cuiban_meetingInfo", function () {
+            var win = {
+                "text": "发送短信",
+                "url": "${base}/admin/backMeeting/inComingUrgencyPage.action",
+                "width": "813",
+                "height": "445",
+                "parentIfr": window
+            };
+            window.top.createWindow(win);
+        });
+        //催办结束
+
+        //短信记录
+        $(document).on("click", "#mesage_record", function () {
+            var win = {
+                "text": "短信记录",
+                "url": "${base}/admin/backMeeting/inCominMessageRecord.action",
+                "width": "900",
+                "height": "550",
+                "parentIfr": window
+            };
+            //window.top.createWindow(win);
+        });
+        //短信记录
+        //会议退文弹出框  start           jq_gice_index.js
+        $(document).on("click", "#meetingInfo_back", function () {
+            var win = {
+                "text": "会议退文单",
+                "url": "${base}/admin/backMeeting/addBackMeetingInfo.action?meetingInfo.id=" + meetingInfo_id,
+                "width": "900",
+                "height": "640",
+                "parentIfr": window
+            };
+            window.top.createWindow(win);
+        });
+        $(document).on("click", "#meetingInfo_province_register", function () {
+            layer.msg("此功能正在开发");
+            return;
+        });
+        /************************退文处理**************************/
+        $(document).on("click", "#back_reason_meetingInfo", function () {
+            var meetingInfoId = $("#meetingId").val();
+            var meetingInfoBackNo = $("#backNo").val();
+            var meetingInfoUnitReason = $("#meetingInfo_unitReason").val();
+            var meetingInfoOrg = $("#meetingInfo_main_org").val();
+            var meetgingInfoSubject = $("#meetingInfo_subject").val();
+            //var meetingInfoReason=$("#meetingInfo_backReason").val();
+            var meetingInfoReason = "";
+            if (meetingInfoOrg.replace("\\s+", "") == "") {
+                layer.msg("申报单位不能为空!");
+                $("#meetingInfo_main_org").focus();
+                return;
+            }
+            if (meetgingInfoSubject.replace("\\s+", "") == "") {
+                layer.msg("会议名称不能为空");
+                $("#meetingInfo_subject").focus();
+                return;
+            }
+            var meetingInfo_sendMessageFlag = $("#is_send_message").filter(":checked").attr("value");
+            if (meetingInfo_sendMessageFlag == undefined) meetingInfo_sendMessageFlag = "0";
+            var meetingInfo_meetingRemark = $("#meetingInfo_meetingRemark").val();
+            if (meetingInfoId == null || meetingInfoId == "") {
+                layer.msg("当前会议不存在");
+                return;
+            }
+            var obj = $(":checkbox[name='backReason']:checked");
+            if (obj != null && obj != undefined) {
+                for (var i = 0; i < obj.length; i++) {
+                    if ($(obj[i]).val() == "其他") {
+                        if (($(".otherReason").val()).replace("\\s+", "") == "") {
+                            layer.msg("请输入其他理由");
+                            $(".otherReason").focus();
+                            return;
+                        }
+                    }
+                }
+            }
+            $(":checkbox[name='backReason']:checked").each(function () {
+                if ($(this).val() == "其他") {
+                    meetingInfoReason = meetingInfoReason + $(this).val() + ":" + $(".otherReason").val() + ",";
+                } else {
+                    meetingInfoReason += $(this).val() + ",";
+                }
+            });
+            if (meetingInfoReason.length > 0) {
+                meetingInfoReason = meetingInfoReason.substring(0, meetingInfoReason.length - 1);
+            }
+            if (meetingInfoReason.replace("\\s+", "") == "") {
+                if (meetingInfo_meetingRemark.replace("\\s+", "") == "") {
+                    layer.msg("退文理由不能为空，请在备注中填写退文理由");
+                    return;
+                }
+            }
+            if (window.top.messageContent.replace("/\s+/g") == "") {
+                window.top.messageContent = messageContent;
+            }
+            //发送ajax请求。保存退文信息
+            $.post("${base}/admin/backMeeting/saveBackReasonMeetingInfo.action", {
+                "meetingInfo.id": meetingInfoId,
+                "meetingInfo.backNo": meetingInfoBackNo,
+                "meetingInfo.unitReason": meetingInfoUnitReason,
+                "meetingInfo.mainOrg": meetingInfoOrg,
+                "meetingInfo.subject": meetgingInfoSubject,
+                "meetingInfo.backReason": meetingInfoReason,
+                "meetingInfo.sendMessageFlag": meetingInfo_sendMessageFlag,
+                "meetingInfo.meetingRemark": meetingInfo_meetingRemark,
+                "messageContent": window.top.messageContent,
+                "sendPhone": window.top.sendPhones
+            }, function (dataList) {
+                if (dataList.flag == "1") {
+                    layer.msg(dataList.result);
+                    setTimeout(function () {
+                        parentIfr.gridOne.refreshPage();
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    }, 800);
+                } else {
+                    layer.msg(dataList.result);
+                }
+            });
+
+        });
+    });
+
+    //附件信息文件添加图标
+    function classStyle() {
+        var arrSpan = [];
+        for (var i = 0; i < $(".file-icon").length; i++) {
+            arrSpan.push($(".file-icon").eq(i).data("name"))
+        }
+        $.each(arrSpan, function (i, item) {
+            if (item.indexOf(".doc") > -1) {
+                $(".file-icon").eq(i).addClass("file-icon-word");
+            } else if (item.indexOf(".pdf") > -1) {
+                $(".file-icon").eq(i).addClass("file-icon-pdf");
+            } else if (item.indexOf(".tgw") > -1) {
+                $(".file-icon").eq(i).addClass("file-icon-tiangu");
+            } else {
+                return ""
+            }
+        });
+    }
+    classStyle();
+</script>
+</html>

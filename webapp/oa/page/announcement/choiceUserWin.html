@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Eden</title>
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/list.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/icon.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/dhtmlx/dhtmlx.css">
+    <link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+</head>
+<body>
+<div style="height:410px;" class="chooser_wrap">
+    <div class="chooser_wrap_left">
+        <div class="title">所在单位</div>
+        <div id="tree_search" class = "tree_search" style="height:30px; width:100%; background:#6e99d4;"></div>
+        <div id="tree" style="width:100%; height:335px; padding-top: 3px;"></div>
+    </div>
+    <div id="optional_man_search_bar" class="chooser_wrap_middle">
+        <div class="title">可选人员</div>
+        <div class="chooser_search_area">
+            <input class="chooser_search_key" name="" id="optional_man_search" type="text"/>
+            <label for="optional_man_search">
+                <span class="man_search_num">关键字</span>
+            </label>
+            <input name="" title="上一个" class="chooser_search_button search_PrevNode" type="button" value="<"/>
+            <input name="" title="下一个" class="chooser_search_button search_NextNode" type="button" value=">"/>
+        </div>
+        <select id="left_obj" class="chooser_man_list" size="1" multiple>
+        </select>
+    </div>
+    <div class="add_remove_area">
+        <input onclick="swap_obj($('#left_obj option:selected'),$('#right_obj'), 'add')" class="chooser_add_btn" name=""
+               type="button">
+        <input onclick="swap_obj($('#right_obj option:selected'),$('#left_obj'), 'reduce')" class="chooser_remove_btn"
+               name="" type="button">
+    </div>
+    <div id="selected_man_search_bar" class="chooser_wrap_right">
+        <div class="title">已选择人员</div>
+        <div class="chooser_search_area">
+            <input class="chooser_search_key" name="" id="selected_man_search" type="text"/>
+            <label for="selected_man_search">
+                <span class="man_search_num">关键字</span>
+            </label>
+            <input name="" title="上一个" class="chooser_search_button search_PrevNode" type="button" value="<"/>
+            <input name="" title="下一个" class="chooser_search_button search_NextNode" type="button" value=">"/>
+        </div>
+        <select id="right_obj" class="chooser_man_list" size="1" multiple>
+
+        </select>
+    </div>
+</div>
+<div class="bottom_btn_area"><input id="save_btn" class="save_btn" type="button" value="确定"></div>
+</body>
+<script src="${base}/aufw/resources/common/js/jquery.js"></script>
+<script src="${base}/aufw/resources/common/dhtmlx/dhtmlx.js"></script>
+<script src="${base}/aufw/resources/common/dhtmlx/eden.js"></script>
+<script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+<script>
+
+var tree, treeSearch;
+var increase = new Array();
+var increaseObj = new Array();
+
+function init() {
+    tree = new dhtmlXTreeObject("tree", "100%", "100%", 'root');
+    tree.setImagePath("${base}/aufw/resources/common/dhtmlx/imgs/csh_dhx_terrace/");
+    tree.enableSmartXMLParsing(true);
+    tree.setSkin('dhx_skyblue');
+    tree.enableTreeLines(true);
+    tree.loadJSON("${base}/admin/org/showOrgTree.action");
+    tree.attachEvent("onXLE", function (tree, id) {
+        var rootsAr = tree.getSubItems(id);//.split(",");
+        tree.openItem(rootsAr);
+    });
+
+    tree.attachEvent("onSelect", function (id) {
+        var parent_id = tree.getSelectedItemId();
+        var orgCode = tree.getUserData(parent_id, "orgCode");
+
+        var obj = {
+            "criteriaRoleId" :$("#roleId").val(),
+            "criteriaOrgCode":orgCode
+        }
+
+        $.getJSON("${base}/admin/user/queryUserForAjax.action?etc=" + new Date().getTime(), obj, function (result) {
+            if (result.userArr) {
+                $("#left_obj").empty();
+                $("#right_obj").empty();
+                for (var i = 0; i < result.userArr.length; i++) {
+                    if ($.inArray(result.userArr[i].accountName, increase) == -1) {
+                        $("#left_obj").append("<option value='" + result.userArr[i].accountName + "'>" + result.userArr[i].userName + "</option>");
+                    } else {
+                        $("#right_obj").append("<option value='" + result.userArr[i].accountName + "'>" + result.userArr[i].userName + "</option>");
+                    }
+                }
+            }
+        });
+    });
+    treeSearch = new treeSearchBar('tree_search', tree);
+}
+/* 添加选择的项 */
+function swap_obj(objSource, objTarget, type) {
+    if ("add" == type) {
+        objSource.each(function () {
+            increase.push(this.value);
+            increaseObj.push({"accountName":this.value, "userName":this.innerHTML});
+        });
+    } else {
+        objSource.each(function () {
+            deleteFromArray(this.value, increase);
+            deleteObjFromArray(this.value, increaseObj);
+        });
+    }
+
+    objTarget.append(objSource.remove());
+}
+
+
+function match_names(val, id, show_num) {
+    var all_names = [];
+    var match_names = [];
+    $('#' + id + ' option').each(function () {
+        all_names.push($(this).text());
+    });
+
+    for (var i = 0; i < all_names.length; i++) {
+        if (all_names[i].indexOf(val) != '-1') {
+            match_names.push({'index':i, 'name':all_names[i]});
+        }
+    }
+
+    if (match_names.length == 0) {
+        $('#' + id).parent().find('.man_search_num').text('未找到');
+    } else {
+        $('#' + id).parent().find('.man_search_num').text('1/' + match_names.length).attr('now_num', '1');
+        $('#' + id + ' option').attr("selected", false);
+        $('#' + id + ' option').eq(match_names[0].index).attr("selected", true);
+    }
+    if (typeof (show_num) != 'undefined') {
+        if (show_num > match_names.length) show_num = 1;
+        if (show_num == 0) show_num = match_names.length;
+        //console.log(show_num)
+        $('#' + id).parent().find('.man_search_num').text(show_num + '/' + match_names.length).attr('now_num', show_num);
+        $('#' + id + ' option').attr("selected", false);
+        $('#' + id + ' option').eq(match_names[show_num - 1].index).attr("selected", true);
+    }
+
+
+}
+
+function deleteFromArray(text, array) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] == text) {
+            array.splice(i, 1);
+        }
+    }
+}
+
+function deleteObjFromArray(text, array) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i].accountName == text) {
+            array.splice(i, 1);
+        }
+    }
+}
+
+
+$(function () {
+    init();
+
+    $('#optional_man_search').blur(function () {         //可选人员搜索
+        var this_val = $(this).val();
+        if (this_val == '') return;
+        match_names(this_val, 'left_obj');
+    });
+
+    $('#optional_man_search').keyup(function () {      //可选人员搜索
+        var this_val = $(this).val();
+        if (this_val == '') return;
+        match_names(this_val, 'left_obj');
+    });
+    $('#selected_man_search').blur(function () {       //已选人员搜索
+        var this_val = $(this).val();
+        if (this_val == '') return;
+        match_names(this_val, 'right_obj');
+    });
+
+    $('#selected_man_search').keyup(function () {       //已选人员搜索
+        var this_val = $(this).val();
+        if (this_val == '') return;
+        match_names(this_val, 'right_obj');
+    });
+    $('.search_NextNode').click(function () {             //显示人员列表的下一人员
+        var val = $(this).siblings('.chooser_search_key').val();
+        if (val == '') return;
+        var obj = $(this).parent().siblings('.chooser_man_list').attr('id');
+        var index = $(this).siblings('label').find('.man_search_num').attr('now_num');
+        if (!index) index = 0;
+        index = parseInt(index) + 1;
+        match_names(val, obj, index);
+    });
+    $('.search_PrevNode').click(function () {          //显示人员列表的前一人员
+        var val = $(this).siblings('.chooser_search_key').val();
+        if (val == '') return;
+        var obj = $(this).parent().siblings('.chooser_man_list').attr('id');
+        var index = $(this).siblings('label').find('.man_search_num').attr('now_num');
+        if (!index) index = 1;
+        index = parseInt(index) - 1;
+        match_names(val, obj, index);
+    });
+
+    $('#save_btn').click(function () {
+//             var obj=$('#right_obj option');
+//             var obj_ids='';
+//             var obj_name = '';
+//             obj.each(function () {
+//                 obj_ids += $(this).val() + ',';
+//                 obj_name += $(this).text() + ',';
+//             });
+//             obj_ids=obj_ids.substring(0,obj_ids.length-1);
+//             obj_name=obj_name.substring(0,obj_name.length-1);
+//             var parent_iframe=window.location.search;
+//             var tmparray = parent_iframe.substr(1,parent_iframe.length).split("&");
+//             var ss=tmparray[tmparray.length-1];
+//             ss=ss.substring(10);
+//             var array=ss.split(',');
+//             var par_ifr=$(window.top.document);
+//             for(var i=0;i<array.length;i++){
+//                 if(i==array.length-1){
+//                     par_ifr=par_ifr.find('#'+array[i])[0].contentWindow;
+//                 }else{
+//                     par_ifr=par_ifr.find('#'+array[i]).contents();
+//                 }
+
+//             }
+//             par_ifr.form.setItemValue('persons',obj_name);
+//             par_ifr.form.setItemValue('person_ids',obj_ids);
+//             window.top.dhxWins.window('choose_person').close();
+
+        var parent_iframe = window.location.search;
+        var tmparray = parent_iframe.substr(1, parent_iframe.length).split("&");
+        var ss = tmparray[tmparray.length - 1];
+        ss = ss.substring(10);
+        var array = ss.split(',');
+
+        var par_ifr = $(window.top.document);
+     /*    for (var i = 0; i < array.length; i++) {
+            if (i == array.length - 1) {
+                par_ifr = par_ifr.find('#' + array[i])[0].contentWindow;
+            } else {
+                par_ifr = par_ifr.find('#' + array[i]).contents();
+
+            }
+
+        } */
+
+        var button = $(this);
+
+        var accountNames = "";
+        var userNames = "";
+
+        for (var i = 0; i < increaseObj.length; i++) {
+            accountNames += increaseObj[i].accountName + ",";
+            userNames += increaseObj[i].userName + ",";
+        }
+//        accountNames=accountNames.substr(0,accountNames.length-1);
+//        userNames=userNames.substr(0,userNames.length-1);
+    /*     if (modules == "myAttention") {
+            jQuery.post("${base}/admin/panel/addMyAttention.action", {"myGroup.groupMembers":accountNames}, function (data) {
+                $.dialog.tips(data["message"]);
+
+
+                par_ifr.refresh_data1();
+                window.top.dhxWins.window('choose_person').close();
+
+            });
+        } else if (modules == "myGroup") {
+            par_ifr.form.setItemValue('groupMembers', accountNames);
+            par_ifr.form.setItemValue('userNames', userNames);
+            window.top.dhxWins.window('choose_person').close();
+        } */
+        ParentIframe.commonChoiceUserCallback(accountNames,userNames);	
+//         	button.attr("disabled", "disabled").val("正在提交...");
+
+    });
+})
+</script>
+</html>

@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>Eden</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+
+  <style type="text/css">
+
+.layer-choice-pop .layer-choice-content .layer-choice-content-header span {
+    font-size: 12px;
+    color: #2f2f2f;
+    font-weight: 700;
+    width: 33.333333%;
+    float: left;
+}
+
+    .send-search{
+        margin: 15px 0 11px;
+    }
+      .send-search span{
+          font-size: 12px;
+          color: #2f2f2f;
+          font-weight: 700;
+      }
+    .send-search .tool-bar-input{
+        width: 500px;
+    }
+.layer-choice-pop .layer-choice-content .layer-choice-content-body .body-choice-right,.layer-choice-pop .layer-choice-content .layer-choice-content-body .body-choice-left{
+    width: 33.333333%;
+    }
+.js-hidde{
+    display: none;
+}
+.msg-type{ display:inline-block;}
+
+.msg-quare{
+	
+	border-bottom: 2px solid #76aff6;
+
+	 margin-left: 14px;
+     display: inline-block;
+     height: 28px;
+
+}
+  </style>
+
+</head>
+<body ms-controller="wrap">
+<div class="clearfix layer-choice-pop">
+  <div class="layer-choice-header">
+    <div class="">
+      <span>选择下一环节</span>
+      <div class="select-choice-next margin-top">
+        <#list stepList as step>
+          <label ><input value="${step.stepId}" data-content="${step.mailContent!}" data-ischeck="${step.sendMail!}" class="js-next-radio" name="nextSelect" type="radio"   <#if step_index == 0>checked="checked"</#if>  /><i class="js-link-name">${(step.stepName?replace('结束节点','办结'))!}</i></label>
+
+      </#list>
+         <#if hisStepList??>
+            <#list hisStepList as hisStep>
+              <#if hisStep.stepId != -1>
+                <label>
+                  <input value="${hisStep.stepId}" ddata-content="${step.mailContent!}" data-ischeck="${step.sendMail!}" class="js-next-radio" data-type="history" name="nextSelect" type="radio"  />
+                    <i class="js-link-name">历史步骤${hisStep.traceRemark!}</i>
+                </label>
+
+              </#if>
+            </#list>
+          </#if>
+      </div>
+    </div>
+  </div>
+
+    <div class="send-search">
+       <span>搜索 </span><input id="search_text" type="text" class="tool-bar-input " ms-keyup="searchContent()" placeholder="输入搜索内容">
+    </div>
+  <div class=" layer-choice-content" style="margin-top: 0px;">
+    <div class="layer-choice-content-header clearfix" style="position:relative;">
+      <span>可选处室</span>
+      <span class="padding-small-left">可选人员</span>
+        <span class="padding-small-left">已选人员</span>
+    </div>
+    <div class="layer-choice-content-body clearfix" style="">
+        <div class="body-choice-left">
+            <ul id="select_choice_unit" class="js-hidde">
+                <li ms-visible="el.isShow" ms-attr-data-id="el.id" ms-attr-data-seq="el.seq"  ms-repeat="waitUnitData"  ms-attr-data-name="el.name" ms-text="el.name"  ms-click="waitUnitDataClick(el)"></li>
+            </ul>
+        </div>
+      <div class="body-choice-left">
+        <ul id="select_choice_left" class="js-hidde">
+            <li ms-repeat="datas" ms-visible="el.isShow" ms-attr-data-seq="el.seq" ms-attr-data-cellphone="el.cellphone" ms-attr-data-id="el.id" ms-class="selected:isExist(el)" ms-click="datasClick(el)" ms-text="el.name"></li>
+        </ul>
+      </div>
+      <div class="body-choice-right" style="height: 312px;overflow-y: auto">
+        <div class="choice-content js-choice-content js-hidde">
+            <div  ms-attr-title="el.title" ms-attr-data-seq="el.seq" ms-repeat="rightData" class="choice-content-btn js-choice-btn" ms-attr-data-name="el.name" ms-attr-data-cellphone="el.cellphone"  ms-attr-data-id="el.id"  ms-click="closeBtn(el)">
+                <span ms-text="el.name+el.otherPer"></span>
+                    <i ms-visible="el.show" class="otherLogin  js-other-person-icon" ms-click="otherPeoChoiceClick($event,el,$index)"></i>
+                    <i class="icon-times js-icon-times-close"></i>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="layer-choice-footer clearfix">
+    <div ms-click="checkAll()" class="button common-skin-btn-syle01 float-left" id="select_all">全部选择</div>
+    <div class="button common-skin-btn-syle01 float-left margin-little-left" id="select_clear" ms-click="clearAll()">全部清除</div>
+
+    <div class="float-left margin-left message-label" style="display: none;" id="message_step">
+      <label>
+          <input data-id="" data-name="" type="checkbox" id="send_step" class=" "/>
+          <span>此步骤已走纸质流程，</span>
+      </label>
+    </div>
+
+    <button ms-click="sendClick()" class="button common-skin-btn-syle01 float-right" id="select_sure">发送</button>
+
+     <div class="float-right margin-right message-label" id="message_choice">
+     
+      <label><input type="checkbox" id="send_mail" style = 'display:none;' class=" "/><!-- 发送短信 -->
+      <div class = "msg-type " style = 'margin-right: 20px;'>
+		<#list msgTypes as msg>
+			<#if msg_index == 3>
+			<div class ="msg-quare">
+			<label>
+				<input value="${msg.dictValue!}" <#if msg.dictValue == defaultType>checkval = '1'<#else>checkval = '0'</#if> data-ischeck="0" onclick="setSelectUserNo(this);" class="js-send-type1"  style = 'margin-right: 0px;'  name="msgInput1" type="radio" <#if msg.dictValue == defaultType >checked="checked"</#if> >
+				<i class="js-link-name">${msg.dictName!}</i>
+			</label>
+			</div>
+			<#else>
+			<#if msg_index == 0>
+			<div class ="msg-quare">
+			</#if>
+			<label>
+				<input value="${msg.dictValue!}" <#if msg.dictValue == defaultType>checkval = '1'<#else>checkval = '0'</#if> data-ischeck="0" style = 'margin-right: 0px;' class="js-send-type" name="msgInput" type="radio" <#if msg.dictValue == defaultType >checked="checked"</#if> >
+				<i class="js-link-name">${msg.dictName!}</i>		
+			</label>
+			<#if msg_index == 2>
+			</div>
+			</#if>
+			</#if>
+		</#list>
+	</div>
+      
+      </label>
+         <span ms-click="editMessage()" style="cursor: pointer;">编辑短信</span>
+    </div>
+      <div class="float-right margin-right message-label" style="display: none;" id="send_seral_box">
+          <label><input type="checkbox" checked="checked" id="send_seral" />顺序执行</label>
+      </div>
+  </div>
+</div>
+<!--用于显示特殊执行者匹配数据-->
+<ul id="step_html" style="display:none!important;">
+    <#list entrustList as entry>
+    <li>
+        <span class="js-step-name">${entry.step_executor!}</span>
+        <span class="js-step-id">${entry.step_id!}</span>
+        <span class="js-step-otherlogin">${entry.type!}</span>
+        <span class="js-step-executor-name">${entry.step_executor_name!}</span>
+        <span class="js-step-seq">${entry.seq!}</span>
+        <span class="js-step-cellphone">${entry.cellphone!}</span>
+    </li>
+    </#list>
+</ul>
+
+<!--用于匹配数据-->
+<ul id="his_caller_html" style="display: none!important;">
+    <#list hisCaller as entry>
+        <li>
+            <span class="js-call-id">${entry.step_executor.accountName!}</span>
+            <span class="js-call-step-id">${entry.step_id!}</span>
+            <span class="js-call-name">${entry.step_executor.userId!}</span>
+            <span class="js-call-seq">${entry.seq!}</span>
+            <span class="js-call-cellphone">${entry.cellphone!}</span>
+        </li>
+    </#list>
+</ul>
+<div id="otherLoginHtml" style="display: none;"></div>
+<script id="option_data" type="text/template">
+  <%_.each(datas, function(item){%>
+  <li data-id="<%=item.id%>"><%=item.name%></li>
+  <%});%>
+</script>
+<script id="left_option_data" type="text/template">
+    <%_.each(waitUnitData, function(item){%>
+    <li data-id="<%=item.id%>" data-name="<%=item.name%>"><%=item.name%></li>
+    <%});%>
+</script>
+<script id="massage_send_data" type="text/template">
+  <%_.each(messageRigthData, function(item){%>
+  <label><input  type="checkbox" data-id="<%=item.id%>" checked="checked" name="<%=item.id%>"  data-cellphone="<%=item.cellphone%>" data-name="<%=item.name%>"><%=item.name%>
+      <%if(item.cellphone.length<1){%>
+      (暂无号码)
+      <%}else{%>
+      (<%=item.cellphone%>)
+      <%}%>
+
+  </label>
+  <%});%>
+</script>
+<script id="massage_data" type="text/template">
+  <div class="message-textarea-box">
+  <div class="sendObj">
+    <h4>发送至：</h4>
+    <div class="send-content">
+      <div id="massage_send_content"></div>
+    </div>
+  </div>
+    <div class="add-phone">
+      <span>手动增加手机号码，多个手机号以逗号分开</span><input type="text" class="tool-bar-input" id="message_phone" />
+    </div>
+    <div class="message-textarea">
+      <textarea id="message_textarea">
+      </textarea>
+    </div>
+    </div>
+  <div class="text-center">
+    <div class="button common-skin-btn-syle01"  id="message_edit">确定</div>
+  </div>
+</script>
+<script id="loginHtml" type="text/template">
+        <div class="layer-choice-send-pop">
+        <div class="input-search clearfix">
+            <span>搜索</span>
+            <input id="loginKey" type="text" class="tool-bar-input " placeholder="输入搜索内容">
+        </div>
+            <div class="clearfix" id="loginHtmlUlBox"></div>
+            <div class="text-center margin-top">
+                <div class="button common-skin-btn-syle01 js-login-btn" id="">取消</div>
+            </div>
+        </div>
+</script >
+<script id="loginHtmlUlContainer" type="text/template">
+
+    <ul id="loginHtmlUl" class="float-left" style="width:300px;">
+        <%_.each(getOtherActionData, function(item){%>
+        <li data-id="<%=item.id%>" data-cellphone="<%=item.cellphone%>" data-name="<%=item.name%>" class="js-other-login-pop"><%=item.name%>[<%=item.company%><%=item.post%>]</li>
+        <%});%>
+    </ul>
+    <div class="logoin-pop-right">
+        <%_.each(waitLoginPopData, function(item){%>
+        <label class="js-otherLogin-check" data-id="<%=item.id%>" data-cellphone="<%=item.cellphone%>"  data-name="<%=item.name%>">
+            <%=item.preName%>：
+            <%=item.name%></label>
+        <%});%>
+    </div>
+</script>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+
+<script src="${base}/edenui/common/js/jquery_migrate.min.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+
+<script src="${base}/edenui/common/js/underscore.js"></script>
+
+<script src = "${base}/edenui/common/js/avalon/avalon.js"></script>
+
+<script>
+
+	//发短信时候验证当前人员是否有发送短信的资格
+	var validateFlag = true;
+
+     var sendType="${defaultType}";
+	
+     var exceptType;
+     if(0 == "${defaultType}"){
+    	 exceptType = "0";
+     }else{
+    	 exceptType = "1";
+     }
+     
+     
+    //参数配置表
+    var sendParam={
+        isNoOrg:false,
+        //是否会签环节
+        isCountersign:"会签"
+    }
+    //当前用户所在的处室
+    var myOrg=window.top.globalParams.myOrgName;
+
+    //当前要代登的对象
+    var currentloginPop;
+	
+
+    var to = false;
+    // 搜索
+
+  //存储右侧的数据
+  var rightData = [];
+  // 存储右侧短信发送人
+  var messageRigthData=[];
+  var datas = [];
+  var datasSave = [];
+  var note = '';
+  var project =window.top.project;
+  var messageData;
+  var free_flow;
+  //显示选择类型
+  var showStyle=2;
+  //便签富文本编辑
+  var editor;
+
+  //发送短信内容
+  var mailMessage={
+      "accounts":'',
+      'telphones':'',
+      'content':''
+  };
+
+  //获取代登的数据
+  var otherLogin=[];
+
+  // 退回历史步骤执行者
+  var hisCallerData=[];
+
+  //是否代登
+  var isOtherAction=0;
+  var getOtherActionData=[];
+  var isOtherActionData=[];
+
+  var waitLoginPopData=[];
+
+  //委托经办人
+  var manageObj;
+  //校对;
+  var Proofread="";
+
+  //待选处室
+  var waitUnitData=[];
+  var waitUnitDataSave=[];
+
+  //串行初始化数据
+  var seralData=false;
+
+    var page={
+        init:function(){
+            this.getInitGrantUser();
+            this.loadControlUser();
+        },
+        loadStart:function(){
+            var index = layer.load(2,{
+               // shade: [0.5, '#000']
+                //scrollbar: false //0.1透明度的白色背景
+            });
+            setTimeout(function(){
+                page.loadEnd();
+            },2000);
+        },
+        loadEnd:function(){
+            layer.closeAll('loading');
+        },
+        loadControlUser:function(){
+
+                page.loadStart();
+                var $selectVal = showStyle;
+
+                datas.length = 0;
+                waitUnitData.length=0;
+                 if ($selectVal == "2") {
+                    var postUrl="${base}/admin/wfManage/getControlData.action?etc="+new Date().getTime();
+                    //选择范围为人员时
+                    $.getJSON(postUrl, {
+                        'wf_id':'${wf_id}',
+                        'action_id':'${action_id}',
+                        // 'step_id': $('#select_step').val()
+                        'step_id': $("input[name='nextSelect']:radio:checked").val(),
+                         'groupId':'a478267f22944e5c80f412518712ef73'
+                    }, function (result) {
+                        var resultUsers=result.users,
+                            resultOrgs=result.orgs,
+                            resultSelects=result.selected?result.selected:null;
+
+                        page.loadEnd();
+                        //可选人员
+                        if (resultUsers.length>0) {
+                            resultUsers.forEach(function(value){
+                                datas.push({
+                                    "id": value.id,
+                                    "name": value.name?(value.name):(value.id),
+                                    "seq":value.seq,
+                                    "isShow":true,
+                                    "cellphone":value.cellphone?value.cellphone:""
+                                });
+                            });
+                        }
+
+                        //可选处室单位
+                        if(resultOrgs.length>0){
+                            resultOrgs.forEach(function(value){
+                                waitUnitData.push({
+                                    "id": value.id,
+                                    "name":value.empName,
+                                    "seq":value.sequence,
+                                    "isShow":true,
+                                    "cellphone":value.cellphone?value.cellphone:""
+                                });
+                            });
+
+                        }
+
+                        if(resultSelects){
+                            resultSelects.forEach(function(value){
+                                rightData.push({
+                                    "id":value.id,
+                                    "name":value.name,
+                                    "seq":value.seq,
+                                    "otherPer":"",
+                                    "cellphone":value.cellphone?value.cellphone:""
+                                });
+                                messageRigthData.push({
+                                    "id": value.id,
+                                    "name": value.name,
+                                    "cellphone":value.cellphone?value.cellphone:""
+                                });
+                            });
+
+                            unique(messageRigthData);
+
+                            updateData();
+                        }
+                        copyArrayObject(datasSave, datas);
+                        model.datas.clear;
+                        model.datas=datas;
+                        model.waitUnitData.clear;
+                        model.waitUnitData=waitUnitData;
+                        $(".js-hidde").removeClass("js-hidde");
+                    });
+                }
+
+
+        },
+        start:function(){
+            //设置一开始的代登状态
+            var isLoginStatus=false;
+
+            var inputChecked=$("input[name='nextSelect']:radio:checked");
+            var labelChecked=inputChecked.closest("label");
+            var stepId=(inputChecked.attr("value"));
+            var getInitData=$("#step_html li");
+            var getCareData=$("#his_caller_html li");
+            if(getInitData.length>0){
+                getInitData.each(function(){
+                    var $this=$(this);
+                    otherLogin.push({
+                        "step":$this.find(".js-step-id").text(),
+                        "id":$this.find(".js-step-name").text(),
+                        "other":$this.find(".js-step-otherlogin").text(),
+                        "name":$this.find(".js-step-executor-name").text(),
+                        "seq":$this.find(".js-step-seq").text(),
+                        "cellphone":$this.find(".js-step-cellphone").text()
+                    });
+                });
+            }
+
+            if(getCareData.length>0){
+                getCareData.each(function(){
+                    var $this=$(this);
+                    hisCallerData.push({
+                        "name":$this.find(".js-call-name").text(),
+                        "id":$this.find(".js-call-id").text(),
+                        "other":$this.find(".js-call-step-id").text(),
+                        "seq":$this.find(".js-call-seq").text(),
+                        "cellphone":$this.find(".js-call-cellphone").text()
+                    });
+                });
+            }
+
+
+            for(var j= 0,jmax=hisCallerData.length;j<jmax;j++){
+                if(hisCallerData[j].other==stepId){
+
+                    rightData.push({
+                        "id":hisCallerData[j].id,
+                        "name":hisCallerData[j].name,
+                        "seq":hisCallerData[j].seq,
+                        "otherPer":"",
+                        "cellphone":hisCallerData[j].cellphone
+                    });
+                    updateData();
+
+                    messageRigthData.push({
+                        "id": hisCallerData[j].id,
+                        "name": hisCallerData[j].name,
+                        "cellphone":hisCallerData[j].cellphone
+                    });
+                    unique(messageRigthData);
+                }
+            }
+
+            for(var i= 0,max=otherLogin.length;i<max;i++){
+                var $messagepStep=$("#message_step");
+
+                if(otherLogin[i].step==stepId){
+
+                    //是否委托代登
+                     if(otherLogin[i].other=="委托"){
+
+                        isLoginStatus=true;
+                        manageObj={
+                            "id":otherLogin[i].id,
+                            "name":otherLogin[i].name
+                        }
+                    }
+
+
+                    break;
+                }
+            }
+
+            for(var i= 0,max=otherLogin.length;i<max;i++){
+                if(otherLogin[i].other=="串行执行"&&otherLogin[i].step==stepId){
+
+                    seralData=true;
+                  //  isSeral(seralData);
+                    $("#send_seral_box").show();
+                    break;
+                }
+
+            }
+
+            isOtherAction=isLoginStatus?1:0;
+            updateData();
+            messageChecked();
+        },
+        //设置一开始的代登状态
+        getInitGrantUser:function(){
+            //获取初始的代登人数
+                var url="${base}/admin/wfManage/getGrantUser.action";
+                $.post(url,{"creatia":""},function(data){
+                    var getDatas=data.datas;
+
+                    getDatas.forEach(function(value){
+                        if(value.account_name!="eden"){
+                            getOtherActionData.push({
+                                "id":value.account_name,
+                                "name":value.user_id,
+                                "company":value.org_name,
+                                "seq":value.account_seq,
+                                "post":value.post?"-"+value.post:value.post,
+                                "isPost":value.post?true:false,
+                                "cellphone":value.tel
+                            });
+                        }
+
+                    });
+
+                });
+            this.start();
+        }
+
+    }
+
+    var model = avalon.define({
+        $id: "wrap",
+        rightData:[],
+        datas:[],
+        isExist:function(obj){
+            var result=false;
+            model.rightData.forEach(function(value){
+                if(obj.id===(value.id)){
+                    result=true;
+                }
+            });
+            return result
+        },
+        datasClick:function(obj){
+
+            if(parseInt(isOtherAction)){
+                var popObj={
+                    "leader":obj.id,
+                    "wfName":window.top.globalParams.wfName
+                };
+
+                page.loadStart();
+                $.post("${base}/admin/wfManage/getRepresentative.action?etc="+new Date().getTime(),popObj,function (result) {
+                    page.loadEnd();
+                    var $otherPer=result.length?"("+result[0].name+"代登)":"";
+                    rightData.push({
+                        "id": obj.id,
+                        "name": obj.name,
+                        "seq":obj.seq,
+                        "otherPer":$otherPer,
+                        "cellphone":obj.cellphone
+                    });
+                    updateData();
+                    messageRigthData.push({
+                        "id": obj.id,
+                        "name": obj.name,
+                        "cellphone":obj.cellphone
+
+                    });
+
+                    //去重
+                    unique(messageRigthData);
+
+                    //更新代登人数据
+
+                    if(result.length){
+
+                        var isAdd=true;
+
+                        for(var i=0,max=isOtherActionData.length;i<max;i++){
+
+                            if(isOtherActionData[i].id==obj.id){
+                                isAdd=false;
+                                break;
+                            }
+                        }
+
+                        if(isAdd){
+                            isOtherActionData.push({
+                                "id":obj.id,
+                                "content":obj.id+"@@"+result[0].representative,
+                                "otherId":result[0].representative,
+                                "otherName":result[0].name
+                            })
+                        }
+
+                    }
+                    //更新短信发送人
+
+                    var messageNameData=messageRigthData.map(function (value) {
+                        return value.id;
+                    })
+
+                    if(messageNameData.indexOf(result[0].representative)<0){
+                        messageRigthData.push({
+                            "id":result[0].representative,
+                            "name":result[0].name,
+                            "cellphone":result[0].cellphone_number
+                        });
+                    }
+
+                })
+
+
+            }else{
+                rightData.push({
+                    "id": obj.id,
+                    "name": obj.name,
+                    "seq":obj.seq,
+                    "otherPer":"",
+                    "cellphone":obj.cellphone
+                });
+
+                updateData();
+
+                messageRigthData.push({
+                    "id": obj.id,
+                    "name": obj.name,
+                    "cellphone":obj.cellphone
+
+                });
+
+
+                //去重
+                unique(messageRigthData);
+            }
+
+        },
+        waitUnitData:[],
+        //最左侧的选择
+        waitUnitDataClick:function(el){
+            var $this = $(this);
+            var $id = el.id;
+            var $name=el.name;
+
+            $this.addClass("selected").siblings().removeClass("selected");
+
+            var personUrl="${base}/admin/wfManage/getControlUserFormOrg.action";
+            var obj={
+                "orgName":$name,
+                "orgId":$id
+            }
+            page.loadStart();
+            $.post(personUrl,obj,function(result){
+
+                if (result) {
+                    datas.length=0;
+                    for (var i = 0, max = result.length; i < max; i++) {
+                        datas.push({
+                            "id": result[i].id,
+                            "name": result[i].name?(result[i].name):result[i].id,
+                            "seq":result[i].seq,
+                            "isShow":true,
+                            "cellphone":result[i].cellphone
+                        });
+                    }
+                    page.loadEnd();
+                }
+                copyArrayObject(datasSave, datas);
+                model.datas.clear;
+                model.datas=datas;
+            });
+        },
+        //搜索结果
+        searchContent:function(){
+            var $search = $(this),
+                    $val = $search.val();
+            if (to) {
+                clearTimeout(to);
+            }
+            to = setTimeout(function () {
+               
+                //过滤搜索到的数组
+                model.datas.forEach(function(value){
+                    if(value.name.indexOf($val) > -1){
+                        value.isShow=true;
+                    }
+                    else{
+                        value.isShow=false;
+                    }
+                });
+
+                //过滤搜索到的数组
+
+                model.waitUnitData.forEach(function(value){
+                    if(value.name.indexOf($val) > -1){
+                        value.isShow=true;
+                    }
+                    else{
+                        value.isShow=false;
+                    }
+                });
+
+            }, 200);
+        },
+        //清除全部
+        clearAll:function(){
+            rightData.length = 0;
+            messageRigthData.length=0;
+            isOtherActionData.length=0;
+            updateData();
+        },
+        //选择全部,
+        checkAll:function(){
+            model.datas.forEach(function(value){
+                rightData.push({
+                    "id":value.id,
+                    "name":value.name,
+                    "seq":value.seq,
+                    "otherPer":"",
+                    "cellphone":value.cellphone
+                });
+                messageRigthData.push({
+                    "id":value.id,
+                    "name":value.name,
+                    "cellphone":value.cellphone
+                });
+            });
+
+            //去重
+            unique(messageRigthData);
+            updateData();
+        },
+        //编辑短信
+        editMessage:function(){
+               var  $phoneHtml="";
+                var message = layer.open({
+                    type: 1,
+                    title: "短消息",
+                    area: ["810px", "500px"],
+                    content: $("#massage_data").html(),
+                    success: function (layero, index) {
+
+                        $('#massage_send_content').html(_.template($('#massage_send_data').html()));
+
+                        $("#message_textarea").html(messageData).focus();
+
+                        $("#message_edit").click(function () {
+                        	
+                        	
+                            messageData = $("#message_textarea").val().toString();
+
+                            var phoneData= trimAll($("#message_phone").val().replace(/，/g,",")).split(",");
+
+                            var isPhoneTrue=false;
+
+                            if(phoneData[0].length>1){
+
+                                for(var i= 0,max=phoneData.length;i<max;i++){
+
+                                    if(!isMobile(phoneData[i])){
+                                        window.layer.msg(phoneData[i]+"不是正确的手机号码,请输入重新输入");
+                                        isPhoneTrue=true;
+                                        break;
+                                    }
+                                }
+
+                                if(isPhoneTrue){
+                                    return;
+                                }
+
+                                $phoneHtml=_.uniq(phoneData).join(",");
+                            }
+
+                            messageRigthData.length=0;
+
+                            $("#massage_send_content label input").each(function(){
+                                var $this=$(this);
+                                if($this.prop("checked")){
+                                    messageRigthData.push({
+                                        "id":$this.data("id"),
+                                        "name":$this.data("name"),
+                                        "cellphone":$this.data("cellphone")
+                                    });
+                                }
+
+                            });
+
+
+                            var messageId=messageRigthData.map(function(value){
+                                return value.id
+                            });
+
+                            mailMessage={
+                                "accounts":messageId.join(","),
+                                'telphones':$phoneHtml,
+                                'content': $("#message_textarea").val()
+                            };
+
+                            layer.closeAll("page");
+
+                        });
+                    }
+                });
+        },
+        //代登人选择
+        otherPeoChoiceClick:function(event,obj,$index){
+            event.stopPropagation();
+            var $this=$(this),
+                    $father=$this.closest(".js-choice-btn"),
+                    $text=$this.closest(".js-choice-btn").find("span"),
+                    $textName=$father.data("name"),
+                    $otherPerName=obj.otherPer,
+                    $id=$father.data("id");
+            var index = layer.open({
+                type: 1,
+                title:"选择代登人",
+                area: ["634px", "320px"],
+                content:$('#loginHtml').html(),
+                success:function(){
+                    var popObj={
+                        "leader":$id,
+                        "wfName":window.top.globalParams.wfName
+                    };
+                    $.post("${base}/admin/wfManage/getRepresentative.action",popObj,function(result){
+                        waitLoginPopData.length=0;
+
+
+                        result.forEach(function(value){
+                            waitLoginPopData.push({
+                                "id":value.representative,
+                                "name":value.name,
+                                "preName":"代登人",
+                                "cellphone":value.cellphone_number
+                            });
+                        });
+                        //收文登记流程取消经办人
+                        if(window.top.djsn!=="oa_pg_incoming_form"){
+                            waitLoginPopData.push({
+                                "id":manageObj.id,
+                                "name":manageObj.name,
+                                "preName":"经办人"
+                            });
+                        }
+
+
+                        $('#loginHtmlUlBox').html(_.template($('#loginHtmlUlContainer').html()));
+
+
+                        //当前代登人信息
+                        currentloginPop={
+                            "otherPerName":$otherPerName,
+                            "id":$id,
+                            "index":$index
+                        };
+
+
+                    });
+
+                    $(".js-login-btn").click(function(){
+                        layer.closeAll("page");
+                    });
+
+                    var toKey = false;
+                    // 搜索
+                    $('#loginKey').keyup(function () {
+                        var $search = $(this),
+                                $val = $search.val();
+                        if (toKey) {
+                            clearTimeout(toKey);
+                        }
+                        toKey = setTimeout(function () {
+
+                            var url="${base}/admin/wfManage/getGrantUser.action";
+                            $.post(url,{"creatia":$val},function(data){
+                                var getDatas=data.datas;
+                                getOtherActionData.length=0;
+                                getDatas.forEach(function(value){
+                                    if(value.account_name!="eden"){
+                                        getOtherActionData.push({
+                                            "id":value.account_name,
+                                            "name":value.user_id,
+                                            "company":value.org_name,
+                                            "seq":value.account_seq,
+                                            "post":value.post?"-"+value.post:value.post,
+                                            "isPost":value.post?true:false,
+                                            "cellphone":value.tel?value.tel:""
+                                        });
+                                    }
+                                });
+
+                                $('#loginHtmlUlBox').html(_.template($('#loginHtmlUlContainer').html()));
+                            });
+
+                        }, 200);
+                    });
+                }
+            });
+        },
+        closeBtn:function(obj){
+
+            var $this = $(this),
+                    text = $.trim(obj.name),
+                    $id=obj.id,
+                    $otherPerName=obj.otherPer;
+            for (var i = 0, max = rightData.length; i < max; i++) {
+
+                if (rightData[i].name == text) {
+                    //代签
+                    if(rightData[i].id==($("#send_step").data("id"))){
+                        $("#send_step").prop("checked",false);
+                    }
+                    rightData.splice(i, 1);
+                    break;
+                }
+            }
+            for(var j= 0,jmax=isOtherActionData.length;j<jmax;j++){
+                if(isOtherActionData[j].id==$id){
+                    isOtherActionData.splice(j, 1);
+                    break;
+                }
+            }
+
+            //更新编辑短信发送人数据
+            for(var x= 0,xmax=messageRigthData.length;x<xmax;x++){
+
+                if(messageRigthData[x].id==$id){
+                    messageRigthData.splice(x, 1);
+                    break;
+                }
+            }
+            updateData();
+
+        },
+        //发送
+        sendClick:function(){
+		
+        	
+            var $button=$(this);
+
+            //是否继续执行下去
+            var isGoing=false;
+
+            //除最后一个节点可不选人物外，其他均要至少为一个
+            var endStep;
+            var father = window.parent;
+            var lastData=[];
+            var mailData;
+
+            var isEnd=$("input[name='nextSelect']:radio:checked").closest("label").find(".js-link-name").text();
+            if(isEnd=="办结"){
+                endStep=true;
+            }
+
+            if(!endStep){
+
+                if(rightData.length<1){
+                    layer.msg("请至少选择一个");
+                    isGoing=true;
+                }
+            }
+
+            if(isGoing){
+                return
+            }
+
+            
+            
+            
+            
+            
+            
+            for(var i= 0,max=rightData.length;i<max;i++){
+
+                lastData.push(rightData[i].id);
+            }
+
+            isOtherActionData.forEach(function(value){
+                lastData.push(value.otherId);
+            });
+            //顺序执行
+            if($("#send_seral").prop("checked")){
+                lastData.reverse();
+            }
+
+            var $father = $(window.parent.document);
+            var $status = $("input[name='nextSelect']:radio:checked").val();
+
+            var $executor = $father.find("#executor").val(lastData.join(","));
+            var $status = $father.find("#sel_dropdownlist15").val($status);
+            var wfNoteMessage;
+
+            var billId=father.data_dataset2.item(father.data_dataset2.first()).id;
+            var templateId=window.parent.document.getElementById('notePageId').contentWindow.noteId;
+            var isPublic=window.parent.document.getElementById('notePageId').contentWindow.noteParam.isPublic;
+
+
+
+            var messageRightDataId=messageRigthData.map(function(value){
+                return value.id
+            });
+
+            if($("#send_mail").prop("checked")){
+            	
+            	if(sendType != '0' && !validateFlag){
+            		layer.msg("对不起，您的电话号码未激活，不能发送钉钉！");
+            		return;
+            	}
+            	
+                mailData={
+                    "accounts":messageRightDataId.join(","),
+                    "telphones":mailMessage.telphones,
+                    "content":messageData
+                }
+                
+                
+            }
+            else{
+                mailData={
+                    "accounts":"",
+                    "telphones":"",
+                    "content":""
+                }
+            }
+
+            var isOtherActionDataContent=isOtherActionData.map(function(value){
+                return value.content
+            });
+
+          
+
+            var obj = {
+                'wf_id': '${wf_id!}',
+                'action_id': '${action_id!}',
+                'step_id': $("input[name='nextSelect']:radio:checked").val(),
+                'dynamic_instance_id': '${dynamic_instance_id!}',
+                'free_flow': free_flow,
+                'flowXml': father.doSubmitDataOa(),
+                'wfNote.wfId':'${wf_id!}',
+                'wfNote.templateId':templateId,
+                'wfNote.stepId':$("input[name='nextSelect']:radio:checked").val(),
+                'recordId':billId,
+                "mail.accounts":mailData.accounts,
+                'mail.telphones':mailData.telphones,
+                'mail.content':mailData.content,
+                'mail.msgType':sendType,
+                'mail.exceptType':exceptType,
+                'userGrants':isOtherActionDataContent.join(","),
+                'seral':seralData,
+                'wfNote.isPublic':isPublic
+            };
+
+            layer.msg("发送中...");
+            $button.prop("disabled",true);
+
+           // return;
+            $.post('${base}/admin/wfManage/doNextStep.action', obj, function (data) {
+                if (data) {
+                    layer.msg("发送成功");
+                    //设置发送状态
+                    father.global.isSendOut = false;
+                    //刷新父窗口
+                    try{
+                    	
+                    	window.top.refreshIndex();
+                    }catch (e) {
+
+                    }
+                    
+                    setTimeout(function(){
+                        window.top.close();
+                    },500);
+                }
+                else {
+                    layer.msg("发送失败");
+                }
+
+            });
+
+        }
+
+    });
+
+  $(function () {
+      page.init();
+      
+      validateAccount();
+      
+      $("#send_seral").change(function(){
+          seralData=$(this).prop("checked");
+      });
+
+    $("#send_step").change(function(){
+      var $this=$(this);
+
+      if($this.prop("checked")){
+        rightData.push({
+          "id": $this.data("id"),
+          "name": $this.data("name"),
+           "seq":$this.data("seq"),
+            "otherPer":""
+        });
+        updateData();
+      }
+      else{
+
+        for (var i = 0, max = rightData.length; i < max; i++) {
+
+          if (rightData[i].name == ($this.data("name"))) {
+            rightData.splice(i, 1);
+            break;
+          }
+        }
+
+        updateData();
+      }
+    });
+
+        //代登人选择
+      $(document).on("click", ".js-other-login-pop,.js-otherLogin-check",function () {
+
+          choosePerson(currentloginPop.otherPerName,currentloginPop.id,currentloginPop.index,$(this));
+      });
+
+
+        
+//         $(document).on("change",".js-send-type",function(){
+//         	if(validateFlag){
+// 	        	if($(this).prop("check")){
+	        		
+// 	        	}
+//         		sendType=$(this).val();
+        		
+//         	}else{
+//         		layer.msg("对不起，您的电话号码未激活，不能发送钉钉！");
+//         		sendType = "0";
+//         		$(this).prop("checked",false);
+//         		$(".js-send-type1").prop("checked",true);
+//         	}
+//         });
+        
+        $(document).on("click",".js-send-type",function(){
+        	if(validateFlag){
+        		
+        		var $this = $(this);
+        		var radioCheck= $this.attr("checkval");  
+        	      if("1"==radioCheck){  
+        	    	  $this.prop("checked",false);  
+        	    	  $this.attr("checkval","0");  
+        	    	  sendType = "0";      
+        	    	  if(exceptType != "0"){
+        	    		  $("#send_mail").prop("checked",false);  
+        	    	  }
+        	      }else{   
+        	    	  $(".js-send-type").attr("checkval","0");
+        	    	  $this.attr("checkval","1");  
+        	          sendType=$(this).val();
+        	          $("#send_mail").prop("checked",true);  
+        	      }  
+        		
+        		
+        	}else{
+        		layer.msg("对不起，您的电话号码未激活，不能发送钉钉！");
+        		sendType = "0";
+        		$(this).prop("checked",false);
+        		$(".js-send-type1").prop("checked",true);
+        		$(".js-send-type1").attr("checkval","1");  
+        		$("#send_mail").prop("checked",true);  
+        	}
+        });
+        
+
+    //选择下一环节
+    $(".js-next-radio").change(function () {
+      var $this=$(this);
+       var isLoginStatus=false;
+
+        showStyle=2;
+        seralData=false;
+
+        //清空代登人和右侧显示数据
+        rightData.length = 0;
+        isOtherActionData.length=0;
+
+        //清空短信发送人
+        messageRigthData.length=0;
+
+      updateData();
+      var showData=[];
+
+      var option = $this.attr("data-type");
+      var stepId=$this.attr("value");
+        var $label=$this.closest("label");
+
+      option == "history" ? (free_flow = true) : (free_flow = false);
+      $("#message_step").hide();
+        $("#send_seral_box").hide();
+      $("#send_step").prop("checked",false);
+
+      for(var i= 0,max=otherLogin.length;i<max;i++){
+        var $messagepStep=$("#message_step");
+        if(otherLogin[i].step==stepId){
+
+
+
+
+
+            //是否委托代登
+           if(otherLogin[i].other=="委托"){
+              isLoginStatus=true;
+
+
+              manageObj={
+                  "id":otherLogin[i].id,
+                  "name":otherLogin[i].name
+              }
+
+
+          }
+
+            break;
+        }
+      }
+
+        for(var i= 0,max=otherLogin.length;i<max;i++){
+         if(otherLogin[i].other=="串行执行"&&otherLogin[i].step==stepId){
+                seralData=true;
+
+                $("#send_seral_box").show();
+                $("#send_seral").prop("checked",true);
+             break;
+            }
+        }
+
+        hisCallerData.forEach(function(value){
+            if(value.other==stepId){
+                    rightData.push({
+                        "id":value.id,
+                        "name":value.name,
+                        "seq":value.seq,
+                        "otherPer":"",
+                        "cellphone":value.cellphone
+                    });
+                    updateData();
+                messageRigthData.push({
+                    "id": value.id,
+                    "name": value.name,
+                    "cellphone":value.cellphone
+                });
+
+                //去重
+                unique(messageRigthData);
+            }
+        });
+        isOtherAction=isLoginStatus?1:0;
+        page.loadControlUser();
+
+        updateData();
+        messageChecked();
+
+    });
+
+  });
+
+  function validateAccount(){
+	  $.get("${base}/admin/wfManage/validateDingDing.action",function(result){
+		  if("-1" == result.msg){
+			  validateFlag = false;
+			  if("${defaultType}" != '0'){
+				  $(".js-send-type").prop("checked",false).attr("checkval","0"); 
+				  if($("#send_mail").prop("checked")){
+  				  	$(".js-send-type1").prop("checked",true).attr("checkval","1");  
+  				  }  
+			  	  sendType = "0";
+			  }
+		  }
+	  });
+  }
+  
+  function setSelectUserNo(radioObj){  
+      var radioCheck= $(radioObj).attr("checkval");  
+      if("1"==radioCheck){  
+          $(radioObj).prop("checked",false);  
+          $(radioObj).attr("checkval","0");  
+          exceptType = "1";         
+          if(sendType == "0"){
+        	  $("#send_mail").prop("checked",false);
+          }
+      }else{   
+          $(radioObj).attr("checkval","1");  
+          $("#send_mail").prop("checked",true);
+          exceptType = "0";
+      }  
+  }  
+  
+  function updateData() {
+
+    if (rightData.length > 1) {
+      unique(rightData);
+    }
+      var title="";
+      var viewRight=[];
+        var  isSHow=false;
+      //是否代登
+      if(isOtherAction){
+          title="点击代登可选择代登人";
+          isSHow=true;
+      }
+
+      rightData.sort(function(a,b){
+          return a.seq- b.seq
+      });
+    for (var i = 0, max = rightData.length; i < max; i++) {
+
+        viewRight.push({
+            "name":rightData[i].name,
+            "id":rightData[i].id,
+            "title":title,
+            "seq":rightData[i].seq,
+            "show":isSHow,
+            "otherPer":rightData[i].otherPer,
+            "cellphone":rightData[i].cellphone
+        });
+    }
+
+      model.rightData.clear;
+
+      model.rightData=viewRight;
+
+  }
+
+  //检测代登
+  function testOtherLogin(id,name){
+      var str=name;
+
+       for(var i= 0,max=isOtherActionData.length;i<max;i++){
+            if(id==isOtherActionData[i].id){
+
+                str=name+"("+isOtherActionData[i].otherName+"代登)";
+
+            }
+       }
+        return str;
+  }
+
+  //数组拷贝
+  function copyArrayObject(a, b) {
+    a.lenght = 0;
+    for (var i = 0, max = b.length; i < max; i++) {
+      a[i] = {};
+      for (var j in b[i]) {
+        a[i][j] = b[i][j];
+      }
+    }
+  }
+  //数组去重
+  function unique(data) {
+
+    var initData = [];
+    var totalData = [];
+
+    for (var i = 0, max = data.length; i < max; i++) {
+        initData.push(data[i].id);
+    }
+
+
+    for (var j = 0, inmax = _.uniq(initData).length; j < inmax; j++) {
+      var name,
+          seq,
+          otherPer,
+          cellphone;
+      for (var k = 0, kmax = data.length; k < kmax; k++) {
+        if (data[k].id == _.uniq(initData)[j]) {
+          name = data[k].name;
+            seq=data[k].seq;
+            otherPer=data[k].otherPer;
+            cellphone=data[k].cellphone;
+          break;
+        }
+      }
+
+      totalData.push({
+          "id": _.uniq(initData)[j],
+          "name": name,
+          "seq":seq,
+          "otherPer":otherPer,
+          "cellphone":cellphone
+      });
+    }
+    data.length = 0;
+    for (var x = 0, xmax = totalData.length; x < xmax; x++) {
+      data.push({
+        "id": totalData[x].id,
+        "name": totalData[x].name,
+          "seq":totalData[x].seq,
+          "otherPer":totalData[x].otherPer,
+          "cellphone":totalData[x].cellphone
+      });
+    }
+
+  }
+
+  //树形json数据解析
+  function jsonTree(result) {
+    for (var i = 0, max = result.length; i < max; i++) {
+      datas.push({
+        "id": result[i].id,
+        "name": result[i].text
+      });
+      var child = result[i].children;
+      if (child) {
+        jsonTree(result[i].children);
+      }
+
+    }
+  }
+
+  // 秘书处副处长审核默认勾选短信
+  function messageChecked(){
+
+      var $radio=$("input[name='nextSelect']:radio:checked");
+      var ischecked=$radio.data("ischeck");
+      var message=$radio.data("content").toString();
+
+       messageData =message.replace(/<br>/g,"").replace(/\n/g,"");
+      if(ischecked=="0"){
+          $("#send_mail").prop("checked",false);
+          $(".js-send-type1").prop("checked",false).attr("checkval","0");
+          $(".js-send-type").prop("checked",false).attr("checkval","0");
+      }
+      else{
+          $("#send_mail").prop("checked",true);
+         
+          if("0" != "${defaultType}"){
+        	  if(validateFlag){
+        		  $("input[name=msgInput][value=${defaultType}]").prop("checked",true).attr("checkval","1");
+        	  }else{
+        		  $("input[name=msgInput1]").prop("checked",true).attr("checkval","1");	  
+        		  sendType = "0";
+        	  }
+          }else{
+        	  $("input[name=msgInput1][value=${defaultType}]").prop("checked",true).attr("checkval","1");
+          	  sendType = "0";
+          }
+          mailMessage={
+              "accounts":"",
+              "telphones":"",
+              "content":messageData
+          };
+      }
+
+  }
+
+
+// 取消所有空格
+  function trimAll(str)
+  {
+    var result;
+    var is_global="g";
+    result = str.replace(/(^\s+)|(\s+$)/g,"");
+    if(is_global.toLowerCase()=="g")
+    {
+      result = result.replace(/\s/g,"");
+    }
+    return result;
+  }
+
+
+  function isMobile(mobile){
+    return (/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/).test(mobile);
+
+  }
+
+
+    function choosePerson($otherPerName,$id,$index,thisObj){
+
+        var isGoing=false;
+
+        var thisPop=thisObj,
+                PopId=thisPop.data("id"),
+                PopName=thisPop.data("name"),
+                PopCellPhone=thisPop.data("cellphone");
+        var isAleardyLogin=true;
+
+
+       for(var i= 0,max=rightData.length;i<max;i++){
+            if(rightData[i].id===PopId){
+                isGoing=true;
+                break;
+            }
+       }
+
+        for(var i= 0,max=isOtherActionData.length;i<max;i++){
+            if(isOtherActionData[i].otherId===PopId){
+                isGoing=true;
+                break;
+            }
+        }
+
+        if(isGoing){
+            layer.msg('代登人不正确！');
+            return;
+        }
+
+
+        //如果此人已被代登
+        for(var i= 0,max=isOtherActionData.length;i<max;i++){
+            if(isOtherActionData[i].id==$id){
+                isOtherActionData[i]={
+                    "id":$id,
+                    "content":$id+"@@"+PopId,
+                    "otherId":PopId,
+                    "otherName":PopName
+                }
+
+                if($otherPerName.length>0){
+                    var getOtherPerName=$otherPerName.split("(")[1].split("代登")[0];
+                    for(var j= 0,jmax=messageRigthData.length;j<jmax;j++){
+                          if(trimAll(getOtherPerName)==messageRigthData[j].name){
+                              messageRigthData[j].name=PopName;
+                              messageRigthData[j].id=PopId;
+                              messageRigthData[j].cellphone=PopCellPhone;
+                              break;
+                          }
+
+                    }
+                    unique(messageRigthData);
+                }
+
+                isAleardyLogin=false;
+                break;
+            }
+        }
+
+        if(isAleardyLogin){
+            isOtherActionData.push({
+                "id":$id,
+                "content":$id+"@@"+PopId,
+                "otherId":PopId,
+                "otherName":PopName
+            });
+            messageRigthData.push({
+                "id":PopId,
+                "name":PopName,
+                "cellphone":PopCellPhone
+            });
+            unique(messageRigthData);
+        }
+        rightData[$index].otherPer="("+PopName+"代登)";
+        model.rightData[$index].otherPer="("+PopName+"代登)";
+
+        layer.closeAll("page");
+    }
+
+    //是否串行
+    function isSeral(isShow){
+
+
+        waitUnitData.forEach(function(value,index){
+
+            if(isShow){
+                waitUnitData[index].isShow=true;
+            }
+            else{
+
+                if(value.name==myOrg){
+                    waitUnitData[index].isShow=true;
+                }
+                else{
+                    waitUnitData[index].isShow=false;
+                }
+
+            }
+
+        });
+
+        //默认木有匹配到处室的全部展示
+        if(sendParam.isNoOrg){
+            waitUnitData.forEach(function(value,index){
+                value.isShow=true;
+            })
+        }
+        var radioChecked=$("input[name='nextSelect']:radio:checked").closest("label").find(".js-link-name").text();
+
+        //是否为会签环节
+        if(radioChecked.indexOf(sendParam.isCountersign)>-1){
+
+            waitUnitData.forEach(function(value){
+                value.isShow=true;
+            });
+        }
+        model.waitUnitData.clear;
+        model.waitUnitData=waitUnitData;
+    }
+</script>
+</html>

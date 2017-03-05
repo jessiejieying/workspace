@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Eden</title>
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/css/base.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/common/artDialog/skins/default.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/list.css">
+<link rel="stylesheet" type="text/css" href="${base}/aufw/resources/skins/default/css/icon.css">
+</head>
+<body>
+<div id="set_tips_sound" class="fieldset_style set_tips_sound">
+	<div class="area_name">基 本 信 息</div>
+	<form class="register_form" method="post" action="${base}/admin/mealPlaceManager/insert.action">
+
+		<table width="100%" style="table-layout:fixed;">
+			<tr>
+				<td width="133" align="right" valign="middle" style="width:70px;">订餐号<span style="color:red;">*</span>：</td>
+		    <td width="230" align="left" valign="middle" style="width:230px;"><input type="text" id="mealId" value="" name="mealId" class="inputxt" datatype="*" nullmsg="请输入订餐号！" errormsg="" /></td>
+			  <td width="124" align="right" valign="middle" style="width:70px;">用餐地点：</td>
+			  <td width="471" align="left" valign="middle"><input type="text" id="place" value="" name="place" class="inputxt" datatype="" nullmsg="请输入用餐地点！" errormsg=""  /></td>
+			</tr>
+			<tr>
+				<td align="right" valign="middle">用餐人数：</td>
+				<td align="left" valign="middle">
+					<input type="text" id="num" value="" name="num" class="inputxt" datatype="*" nullmsg="请输入用餐人数！" errormsg="" />
+				</td>
+			  <td align="right" valign="middle">用餐标准：</td>
+				<td align="left" valign="middle">
+	<input type="text" id="standard" value="" name="standard" class="inputxt" datatype="*" nullmsg="请输入用餐标准！" errormsg="" />
+				</td>
+			</tr>
+			<tr>
+				<td align="right" valign="middle">菜单：</td>
+				<td align="left" valign="middle">
+					<input type="text" id="mealMenu" value="" name="mealMenu" class="inputxt" datatype="*" nullmsg="请输入菜单！" errormsg="" />
+				</td>
+			  <td align="right" valign="middle" style="width:70px;">鲜花：</td>
+			  <td align="left" valign="middle" style="width:230px;">	<input type="text" id="flower" value="" name="flower" class="inputxt" datatype="*" nullmsg="请输入鲜花！" errormsg="" /></td>
+			</tr>
+			<tr>
+				<td colspan="4" style="padding:10px 0 0 0; text-align:center;"><input class="submit_btn_1" id="save_btn" type="button" value="保 存" />
+			</tr>
+		</table>
+	</form>
+</div>
+<style>
+
+</style>
+</body>
+<script src="${base}/aufw/resources/common/js/jquery.js"></script>
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script src="${base}/aufw/resources/common/artDialog/jquery.artDialog.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+
+<script>
+    function page_layout() {
+        var ifr_width = $(window).width();
+        $('#set_bg_image').width(ifr_width-50);
+    }
+
+    $(function(){
+        setTimeout(page_layout, 0);
+    })
+    
+//         var getInfoObj=function(){
+//             return 	$(this).parents("td").next().find(".info");
+//         }
+
+//         $("[datatype]").focusin(function(){
+//             if(this.timeout){clearTimeout(this.timeout);}
+//             var infoObj=getInfoObj.call(this);
+//             if(infoObj.siblings(".Validform_right").length!=0){
+//                 return;
+//             }
+//             infoObj.show().siblings().hide();
+
+//         }).focusout(function(){
+//                     var infoObj=getInfoObj.call(this);
+//                     this.timeout=setTimeout(function(){
+//                         infoObj.hide().siblings(".Validform_wrong,.Validform_loading").show();
+//                     },0);
+
+//                 });
+
+//         $(".register_form table tr").each(function(){
+//            $(this).find('td:eq(0)').addClass('text_align_right');
+//         });
+
+        
+        
+        $("#save_btn").click(function(){
+	        	$.post("${base}/admin/mealPlaceManager/insert.action",$("form:first").serialize(),function(result){
+	        		$.dialog.tips(result.tips);
+	        		//window.parent.document.SimpleSearch();
+	        		setTimeout("window.top.closeWin('insertPlaceWin');",1000);
+	        	});
+        });
+        
+	 $(window).resize(function(){
+		 setTimeout(page_layout, 0);
+	});
+</script>
+</html>

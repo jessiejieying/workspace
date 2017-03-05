@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+<title>Eden</title>
+<link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+</head>
+<body>
+<div id="form_add"></div>
+</body>
+<script src="${base}/edenui/common/js/jquery.js"></script>
+<script src="${base}/edenui/common/js/jq_plugins/form/jquery.form-builder.js"></script>
+<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>
+<script src="${base}/aufw/resources/common/js/validRule.js"></script>
+
+<script src="${base}/edenui/common/js/jq_plugins/pintuer/pintuer.js"></script>
+
+<script src="${base}/aufw/resources/common/js/Validform_v5.3.1_min.js"></script>
+<script src="${base}/aufw/resources/common/js/My97DatePicker/WdatePicker.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<script>
+	var id = "${documentBill.id!}";
+    $(function(){
+        setTimeout(page_layout, 0);
+    })
+
+    function afterSave(){
+	    setTimeout(function(){
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		},500);  
+    }
+    function init(){
+    	if(id == ""){
+ 			$.ajax({
+ 	  		   type: "POST",
+ 	  		   async: false,
+ 	  		   url: "${base}/admin/commonSeq/commonSeqAction!getSeqNo.action?etc="+new Date().getTime(),
+ 	  		   data: "seqKey=${(documentBill.wfname)!}",
+ 	  		   success: function(msg){
+ 	  			 if(msg.result=="success"){
+ 	  				 $("#billOrder").val(msg.message);
+ 	  			 }
+ 	  		   }
+ 	  		}); 
+ 		}	
+    }
+	$(function(){
+		 $('#form_add').loadForm({
+			 formInputs: [
+				 <#if documentBill.id??>   
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'billId',
+					 value:'${(documentBill.id)!}'
+				 	}
+				 },
+				 </#if>
+				 {type: 'hidden', attr: {
+					 placeholder: '',
+					 style:'hidden',
+					 infor:'',
+					 id: '',
+					 data:'1',
+					 name:'wfname',
+					 value:'${(documentBill.wfname)!}'
+				 	}
+				 },
+				 {type: 'text', attr: {
+						 isRequired:true,
+						 validate:'required:不能为空的,',
+						 placeholder: '',
+						 style:'x6',
+						 infor:'办理单名',
+						 id: 'billNameId',
+						 data:'1',
+						 name:'billName',
+						 value:'${(documentBill.billName)!}'
+				 	}
+				 },
+				 {type: 'text', attr: {
+					 isRequired:true,
+					 validate:'required:不能为空的,',
+					 placeholder: '',
+					 style:'x6',
+					 infor:'顺序',
+					 id: 'billOrder',
+					 data:'1',
+					 name:'billOrder',
+					 value:'${(documentBill.billOrder)!}'
+    			 	}
+    			 },
+				 
+				 {type: 'textarea', attr: {
+					 isRequired:'',
+					 validate:'',
+					 placeholder: '',
+					 style:'x12',
+					 rows: '6',
+					 infor:'数据集代码',
+					 id: 'datasetContent',
+					 data:'1',
+					 name:'datasetContent',
+					 value:'${(documentBill.datasetContent?js_string)!}'
+					 }
+				 },	
+				 {type: 'textarea', attr: {
+					 isRequired:'',
+					 validate:'',
+					 placeholder: '',
+					 style:'x12',
+					 rows: '6',
+					 infor:'办理单节点',
+					 id: 'billContent',
+					 data:'1',
+					 name:'billContent',
+					 value:_.escape('${(documentBill.billContent?js_string)!}')
+					 }
+				 },
+				 {type: 'text', attr: {
+					 isRequired:false,
+					 validate:'',
+					 placeholder: '',
+					 style:'x6',
+					 infor:'模板路径',
+					 id: 'templatePath',
+					 data:'1',
+					 name:'templatePath',
+					 value:'${(documentBill.templatePath)!}'
+			 	}
+			 },
+			 {type: 'text', attr: {
+				 isRequired:true,
+				 validate:'required:不能为空的,',
+				 placeholder: '',
+				 style:'x6',
+				 infor:'模板名称',
+				 id: 'templateName',
+				 data:'1',
+				 name:'templateName',
+				 value:'${(documentBill.templateName)!}'
+		 	}
+		 }
+			 ],
+			 buttons: [
+				 {
+					 type:'button',
+					 size: 'lg',
+					 color:'blue',
+					 validationState: 'success',
+					 id: 'save_btn',
+					 infor: '保存',
+					 onSubmit: function(form) {
+						 submit(form);
+
+					 }
+				 }
+			 ]
+		 })	
+		init();
+	})
+
+	function submit(form) {		
+		var url = "${base}/admin/documentBill/updateDocumentBill.action";
+		if(id == "") {
+			url = "${base}/admin/documentBill/insertDocumentBill.action";
+		}
+		//alert(url);
+		$.post(url, $("form:first").serialize(), function (result) {
+		 	if(result.resultFlag=='true'){					
+				 parentIfr.gridOne.refreshPage();
+				 afterSave();
+		 	}
+		 	layer.msg(result.message);
+		 });
+	}
+	
+	$(window).resize(function(){
+		 setTimeout(page_layout, 0);
+	});
+	
+	function page_layout() {
+	    var ifr_width = $(window).width();
+	    $('#set_bg_image').width(ifr_width-50);
+	}
+	function htmlDecode(content){
+		
+	}
+</script>
+</html>

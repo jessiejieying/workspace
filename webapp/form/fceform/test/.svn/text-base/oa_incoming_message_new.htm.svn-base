@@ -1,0 +1,332 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>$.ajaxSetup({ 
+		cache: true 
+		}); 
+	$.getScript(project + '/form/resources/common/js/incoming.js',function(){
+	
+       });
+$.ajaxSetup({ 
+		cache: true 
+		}); 
+	$.getScript(project + '/form/resources/common/js/ajaxfileupload.js',function(){
+	
+       });
+
+
+includeLinkStyle(project+'/form/fceform/css/income_style.css');
+includeLinkStyle(project+'/form/fceform/css/income_provincial.css');
+
+
+
+function oaAfterLoad()
+{
+	
+
+	//阅者签字
+/*	$('#text53').val(GetSessionOne('userid'));*/
+	//$('#text42').val($('#text9').val());
+	//$('#text43').val($('#text35').val());
+
+	 //下一环节选择
+    putNextSelect("dropdownlist15",null,null);   
+	
+	//流水号增加
+	var no=$('#text15').val(); 
+	if(!no)
+	{
+		putDocumentNo('#text15');
+	}
+	
+	//更多显示
+    var wfType =$urlParam('wfType');
+    if(wfType&&wfType=='hasDo')
+    {
+       $('#moredivId').css('display','block'); 
+    }
+
+    
+    //相关链接可点击
+    putCanClickLink('labelLink');
+   // addTextDClickWin('text27');
+    
+	//加载建议
+	//loadInAdvice();
+//加载办理下拉控件和办理单页面
+	loadDroplistDataAndBillPage('dropdownlist29','billdiv');
+
+
+	//传阅页面，并设阅者签字的值
+	showReadPassInfo("readpassDiv","setSignValue(result)");
+	
+//意见列表放入
+var advicesStr="4:拟办意见,7:承办意见,2:审核意见,5:领导意见";
+addAdviceListTr(advicesStr,"datasetGridAdvice","loadBillPage('dropdownlist29','billdiv')")
+
+	//默认显示 办理单页面
+	//defaultTabSelect("tab4",1);	
+	
+	 //几秒后进行已阅
+    clickPassReadSomeTime();
+
+    //资源关联链接
+    addRelateLinkLi();
+   //资源链接搜索类型
+   putRelateLinkTypes();
+//关联资源动作
+addRelateBind();
+//点击资源框将标题放入
+putRelateSearchText('text17');
+
+
+}
+
+
+/**
+ * 提交时
+ */
+function commitWithChoiceUser() {
+	
+	// 判断有没有选择下一环节
+	   if(!checkHasNextSelect('dropdownlist15'))
+	   {
+	      return;
+	   }
+          var txt=$("#sel_dropdownlist15").find("option:selected").text();
+          if(txt=="结束节点")
+          {
+              if(confirm("要结束流程吗？"))
+             {
+                choiceNoUser();  //直接提交
+               }
+          }else{
+              choiceUsers();
+          }
+	  /*
+	switch (nodeName) {
+		case 'reg':   //登记
+		case 'secretariat_send':   //秘书科送文
+		{	
+			
+			var nextStep=$('#sel_dropdownlist15').val();
+			
+			if(nextStep==1386){
+				choiceNoUser();
+			}else{
+				
+				 choiceUsers();
+
+			}
+		   break;
+		}
+		case 'draft':   //收文拟办	
+		case 'predraft':   //收文预拟办
+		case 'secretariat_deal':   //秘书科办理
+		case 'undertake':   //承办
+		case 'comment':   //领导批示
+		{		
+		   choiceUsers();
+		   break;
+		}
+		default :
+		{
+			alert("nodeName参数不正确");
+		}
+
+	}
+	*/	
+	
+}
+
+
+
+function addRelateBind()
+{
+	layout(true);
+	
+	$('.form-right-header a').each(function(index, element) {
+    $(this).bind('click',function(){
+			slideList($(this)[0],index);	
+		});
+  });
+	
+	
+	$('#change_name input[type="radio"]').each(function(index, element) {
+    $(this).bind('click',function(){
+				$('.dis-change').children().hide();
+				$('.dis-change').children().eq(index).show();
+		})
+  });
+
+}</script><script >document.styleSheets[0].addRule("fc\\:fc_code","behavior: url(../../fceform/htc/fc_code.htc)",0);</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib toolbar="不带工具栏" AutoResizeXml billtaborder="<root><taborder>text9</taborder><taborder>text10</taborder><taborder>text13</taborder><taborder>text15</taborder><taborder>text14</taborder><taborder>text16</taborder><taborder>text17</taborder><taborder>text38</taborder><taborder>text30</taborder><taborder>text29</taborder><taborder>text34</taborder><taborder>text35</taborder><taborder>text31</taborder><taborder>text32</taborder><taborder>text28</taborder><taborder>text18</taborder><taborder>text19</taborder><taborder>text21</taborder><taborder>text22</taborder><taborder>text23</taborder><taborder>text24</taborder><taborder>text25</taborder><taborder>text26</taborder><taborder>dropdownlist10</taborder><taborder>dropdownlist11</taborder><taborder>dropdownlist12</taborder><taborder>executor</taborder><taborder>button39</taborder><taborder>button15</taborder><taborder>dropdownlist15</taborder><taborder>dropdownlist13</taborder><taborder>button21</taborder><taborder>button26</taborder><taborder>button27</taborder><taborder>addAttach</taborder><taborder>button25</taborder><taborder>button13</taborder><taborder>button22</taborder><taborder>button23</taborder><taborder>button20</taborder><taborder>button31</taborder><taborder>button16</taborder><taborder>button32</taborder><taborder>button30</taborder><taborder>takebackButton</taborder><taborder>backButton</taborder><taborder>supplyButton</taborder><taborder>remindButton</taborder><taborder>dropdownlist29</taborder><taborder>button24</taborder><taborder>text51</taborder><taborder>button28</taborder><taborder>buttonExchange</taborder><taborder>HostUnitButton</taborder><taborder>incomingCodeButton</taborder><taborder>printButton</taborder></root>" dj_sn="oa_incoming_message_new" caption="收文表单" type="eden" isfile="是" center="  " posleft postop poswidth posheight window="当前窗口" BLONopen="oaAfterLoad()" BLONopenBefore="putContorlBehaviorFromWfNode()" BLONclose userType alertType="1" isCheckPermit="否" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:11;radio:0;listbox:4;textarea:1;combobox:0;password:0;upload:4;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:4;div:11;DsMain_field:0;a:1;button:29;text:52;hr:0;checkboxlist:0;radiolist:0;dropdownlist:13;grid:1;dataset:7;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" contxml="<root><label><id>label65</id><id>label10</id><id>moreBtnLabel</id><id>labelLink</id></label><tab><id>tab4</id></tab><div><id>div5</id><id>div10</id><id>div9</id><id>moredivId</id><id>outer_wrap</id><id>laiWen1</id><id>leadSugId</id><id>billdiv</id><id>readpassDiv</id><id>div6</id><id>divRelatedLinkEdit</id></div><button><id>button15</id><id>button39</id><id>button13</id><id>button21</id><id>button20</id><id>button31</id><id>addAttach</id><id>button26</id><id>button27</id><id>button22</id><id>button23</id><id>button24</id><id>buttonExchange</id><id>button25</id><id>printButton</id><id>button30</id><id>button32</id><id>button16</id><id>takebackButton</id><id>backButton</id><id>supplyButton</id><id>remindButton</id><id>incomingCodeButton</id><id>HostUnitButton</id><id>button28</id></button><text><id>text10</id><id>text51</id><id>text15</id><id>text9</id><id>text16</id><id>text17</id><id>text38</id><id>text34</id><id>text35</id><id>text19</id><id>text21</id><id>text31</id><id>text32</id><id>text30</id><id>text29</id><id>text13</id><id>text14</id><id>text28</id><id>text18</id><id>text22</id><id>text23</id><id>text24</id><id>text25</id><id>text26</id><id>executor</id></text><dropdownlist><id>dropdownlist15</id><id>dropdownlist10</id><id>dropdownlist13</id><id>dropdownlist11</id><id>dropdownlist12</id><id>dropdownlist29</id></dropdownlist><dataset><id>dataset2</id></dataset></root>"><DIV id=div5 class=ef_div style="BORDER-TOP: 0px; HEIGHT: 38px; BORDER-RIGHT: 0px; BORDER-BOTTOM: 0px; POSITION: relative; FLOAT: none; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 0px; MARGIN: 0px; BORDER-LEFT: 0px; TOP: 0px; PADDING-RIGHT: 0px; WIDTH: 100%; BACKGROUND-COLOR: #e1e1e1" onmovestart=moveStart() controltype="div"><BUTTON id=button15 class="ef_button4 leftbtnc" style="HEIGHT: 35px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_save.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 25px; MARGIN: 0px; TOP: 5px; PADDING-RIGHT: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("oa_tempSave()")'>保存</BUTTON> 
+<DIV id=div10 class="ef_div leftbtnc navlist" style="HEIGHT: 33px; POSITION: static; FLOAT: left; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 0px; MARGIN: 0px; TOP: 0px; PADDING-RIGHT: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="div"><LABEL id=label65 style="HEIGHT: 26px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="label" inputTag="否">正文</LABEL><BUTTON id=button39 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_add.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 13px; MARGIN: 0px; TOP: 3px; PADDING-RIGHT: 0px; WIDTH: 90px" onmovestart=moveStart() controltype="button" onclick="bill_onclick(&quot;operateDocByDatasetName('dataset2',1,'无模版')&quot;)">编辑文档</BUTTON><BUTTON id=button13 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_view.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 245px; MARGIN: 0px; TOP: 6px; PADDING-RIGHT: 0px; WIDTH: 90px" onmovestart=moveStart() controltype="button" onclick="bill_onclick(&quot;operateDocByDatasetName('dataset2',2)&quot;)">查看</BUTTON><BUTTON id=button21 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_edit.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 166px; MARGIN: 0px; TOP: 6px; PADDING-RIGHT: 0px; WIDTH: 90px" onmovestart=moveStart() controltype="button" onclick="bill_onclick(&quot;operateDocByDatasetName('dataset2',5)&quot;)">批阅</BUTTON><BUTTON id=button20 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_edit.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 2px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 441px; MARGIN: 0px; TOP: 3px; PADDING-RIGHT: 0px; WIDTH: 90px" onmovestart=moveStart() controltype="button" onclick="bill_onclick(&quot;operateDocByDatasetName('dataset2',3)&quot;)">修改文档</BUTTON><BUTTON id=button31 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_download.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 2px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 336px; MARGIN: 0px; TOP: 5px; PADDING-RIGHT: 0px; WIDTH: 90px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("downloadDoc()")'>下载</BUTTON> </DIV><BUTTON id=addAttach class="ef_button4 leftbtnc" style="HEIGHT: 35px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_attach.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 2px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 336px; MARGIN: 0px; TOP: 5px; PADDING-RIGHT: 0px; WIDTH: 80px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("openAttachment()")'>附件管理</BUTTON> 
+<DIV id=div9 class="ef_div leftbtnc navlist" style="HEIGHT: 31px; POSITION: static; FLOAT: left; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 469px; MARGIN: 0px; TOP: 21px; PADDING-RIGHT: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="div"><LABEL id=label10 style="HEIGHT: 26px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 83px" onmovestart=moveStart() controltype="label" inputTag="否">分发 </LABEL><BUTTON id=button26 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_share.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 602px; MARGIN: 0px; TOP: 3px; PADDING-RIGHT: 0px; WIDTH: 100px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("insideSendClick()")'>传阅</BUTTON><BUTTON id=button27 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_delete.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 85px; MARGIN: 0px; TOP: 5px; PADDING-RIGHT: 0px; WIDTH: 100px" onmovestart=moveStart() controltype="button" onclick="bill_onclick(&quot;cancelInsideSend('readpassDiv')&quot;)">停止传阅</BUTTON><BUTTON id=button22 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_add.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 602px; MARGIN: 0px; TOP: 3px; PADDING-RIGHT: 0px; WIDTH: 100px" onmovestart=moveStart() controltype="button" onclick="bill_onclick(&quot;readPassAddPasser('readpassDiv')&quot;)">增加传阅人</BUTTON><BUTTON id=button23 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_move.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 25px; MARGIN: 0px; TOP: 5px; PADDING-RIGHT: 0px; WIDTH: 100px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("initToSendDocument()")'>转发文</BUTTON><BUTTON id=button24 class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_move.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 25px; MARGIN: 0px; TOP: 5px; PADDING-RIGHT: 0px; WIDTH: 100px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("initToSupervise()")'>转督办</BUTTON><BUTTON id=buttonExchange class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_issue.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 25px; MARGIN: 0px; TOP: 5px; PADDING-RIGHT: 0px; WIDTH: 100px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("send()")'>公文交换</BUTTON> </DIV><BUTTON id=button25 class="ef_button4 leftbtnc" style="HEIGHT: 35px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_viewflow.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 2px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 691px; MARGIN: 0px; TOP: 3px; PADDING-RIGHT: 0px; WIDTH: 80px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("showWf()")'>查看流程</BUTTON><BUTTON id=printButton class="ef_button4 leftbtnc" style="HEIGHT: 35px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_export.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 2px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 691px; MARGIN: 0px; TOP: 3px; PADDING-RIGHT: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("printBill()")'>打印</BUTTON><BUTTON id=button30 class="ef_button4 leftbtnc" style="HEIGHT: 35px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_issue.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 2px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 691px; MARGIN: 0px; TOP: 3px; PADDING-RIGHT: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("openBackPage()")'>退回</BUTTON><BUTTON id=button32 class="ef_button4 leftbtnc" style="HEIGHT: 35px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_move.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 2px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 691px; MARGIN: 0px; TOP: 3px; PADDING-RIGHT: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("turn()")'>转办</BUTTON><BUTTON id=button16 class="ef_button4 leftbtnc" style="HEIGHT: 35px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_ok.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 110px; MARGIN: 0px; TOP: 5px; PADDING-RIGHT: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("commitWithChoiceUser()")'>发送</BUTTON> 
+<DIV id=moredivId class="ef_div leftbtnc navlist" style="BORDER-TOP: 0px; HEIGHT: 27px; BORDER-RIGHT: 0px; BORDER-BOTTOM: 0px; POSITION: static; FLOAT: left; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 0px; MARGIN: 0px; BORDER-LEFT: 0px; DISPLAY: none; TOP: 0px; PADDING-RIGHT: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="div"><LABEL id=moreBtnLabel style="HEIGHT: 35px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 60px" onmovestart=moveStart() controltype="label" inputTag="否">更多</LABEL><BUTTON id=takebackButton class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_back.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 13px; MARGIN: 0px; TOP: 3px; PADDING-RIGHT: 0px; WIDTH: 90px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("takeback()")'>收回</BUTTON><BUTTON id=backButton class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_back.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 245px; MARGIN: 0px; TOP: 6px; PADDING-RIGHT: 0px; WIDTH: 90px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("revoke()")'>撤回</BUTTON><BUTTON id=supplyButton class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_sign.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 245px; MARGIN: 0px; TOP: 6px; PADDING-RIGHT: 0px; WIDTH: 90px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("supply()")'>补办</BUTTON><BUTTON id=remindButton class="ef_button4 leftbtnc" style="HEIGHT: 30px; BACKGROUND-IMAGE: url(../../resources/common/images/icons/dark_remind.png); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 4px 4px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 22px; LEFT: 245px; MARGIN: 0px; TOP: 6px; PADDING-RIGHT: 0px; WIDTH: 90px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("remind()")'>催办</BUTTON> </DIV><?xml:namespace prefix = "fc" /><fc:fc_code id=dropdownlist15 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset2" field="STATUS" visible="是" format="" FieldNameList="" isTreeNewSql="0" isShowTree="0" xml="<tr height='20px' ><td>选择下一环节</td><td>-2</td></tr>" multiselect="否" addrow="否" blnempty="否" blninput="是" rootNodeId="rootNode" datasourceName="" width="100" height="25" top="5" left="188" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></DIV>
+<DIV class=cent-wrap>
+<DIV id=outer_wrap style="HEIGHT: 841px; WIDTH: 760px" controltype="div">
+<DIV id=tab4 class="tab-pane tab-pane2" style="HEIGHT: 821px; POSITION: absolute; LEFT: 0px; TOP: 20px; WIDTH: 760px" controltype="tab" IsHideTitle="undefined" showtype="luna">
+<DIV class=tab-page style="HEIGHT: 803px; WIDTH: 760px">
+<H2 class=tab>基本信息</H2>
+<DIV id=laiWen1 controltype="div">
+<TABLE class=table_border_1px borderColor=#808080 cellPadding=0 width="100%" align=center border=0>
+<TBODY>
+<TR>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle><STRONG>*</STRONG>文件字号</DIV></TD>
+<TD colSpan=3><INPUT id=text10 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 240px" onmovestart=moveStart() size=40 controltype="text" dataset="dataset2" china="文件字号(基)" field="FILE_CHAR"></TD>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle>收文号</DIV></TD>
+<TD width=120><INPUT id=text51 class=leftbtnc style="HEIGHT: 30px; POSITION: static; LEFT: 444px; TOP: 16px; WIDTH: 54px" onmovestart=moveStart() size=8 controltype="text" dataset="dataset2" china="收文编号(基)" field="incoming_code"><BUTTON id=incomingCodeButton class="ef_button4  leftbtnc" style="HEIGHT: 25px; BACKGROUND-IMAGE: url(none); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 0px 0px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 689px; MARGIN: 0px; TOP: 509px; PADDING-RIGHT: 0px; WIDTH: 42px" onmovestart=moveStart() controltype="button" onclick="bill_onclick(&quot;putDocumentIncomingCode('#text51')&quot;)">提取</BUTTON></TD>
+<TD bgColor=#efefef width=70>
+<DIV class=tdTitle>流 水 号</DIV></TD>
+<TD bgColor=#f7f7f7 width=120><INPUT id=text15 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 110px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="流水号(基)" field="SERIAL_NUMBER"></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle><STRONG>*</STRONG>来文单位</DIV></TD>
+<TD colSpan=3><INPUT id=text9 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 240px" onmovestart=moveStart() size=43 controltype="text" dataset="dataset2" china="来文单位(基)" field="FILE_UNIT"></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>登 记 人</DIV></TD>
+<TD bgColor=#f7f7f7><INPUT disabled id=text16 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 110px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="登记人(基)" field="REGISTER"></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle></DIV></TD>
+<TD></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle><STRONG>*</STRONG>文件标题</DIV></TD>
+<TD colSpan=7><INPUT id=text17 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 669px" onmovestart=moveStart() size=121 controltype="text" dataset="dataset2" china="文件标题(基)" field="FILE_TITLE"></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>紧急程度</DIV></TD>
+<TD><INPUT id=text38 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 90px" onmovestart=moveStart() size=16 controltype="text" dataset="dataset2" china="紧急程度(基)" field="URGENT_DEGREE"></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle><STRONG>*</STRONG>文件密级</DIV></TD>
+<TD><fc:fc_code id=dropdownlist10 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset2" field="FILE_DEGREE" visible="是" format="" FieldNameList="" isTreeNewSql="0" isShowTree="0" xml="" multiselect="否" addrow="否" blnempty="否" blninput="是" rootNodeId="rootNode" datasourceName="" width="89" height="25" top="0" left="0" sqltrans="%3cfcsql%20djsn%3d%22oa%5fincoming%5fmessage%5fnew%22%20djtype%3d%22eden%22%20widgetId%3d%22dropdownlist10%22%20%3e%3c%2ffcsql%3e" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>查询级别</DIV></TD>
+<TD><fc:fc_code id=dropdownlist13 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset2" field="SEARCH_DEGREE" visible="是" format="" FieldNameList="" isTreeNewSql="0" isShowTree="0" xml="<tr height='20px' ><td>无</td><td>0</td></tr>" multiselect="否" addrow="否" blnempty="否" blninput="是" rootNodeId="rootNode" datasourceName="" width="88" height="25" top="0" left="0" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>归档类型</DIV></TD>
+<TD bgColor=#f7f7f7><fc:fc_code id=dropdownlist11 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset2" field="ARCHIVE_TYPE" visible="是" format="" FieldNameList="" isTreeNewSql="0" isShowTree="0" xml="" multiselect="否" addrow="否" blnempty="否" blninput="是" rootNodeId="rootNode" datasourceName="" width="88" height="25" top="0" left="0" sqltrans="%3cfcsql%20djsn%3d%22oa%5fincoming%5fmessage%5fnew%22%20djtype%3d%22eden%22%20widgetId%3d%22dropdownlist11%22%20%3e%3c%2ffcsql%3e" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>
+<DIV class=tdTitle><STRONG>*</STRONG>成文日期</DIV></DIV></TD>
+<TD><INPUT id=text34 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 110px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="成文日期(基)" field="CREATE_DATE" onfocus='bill_onenter("WdatePicker();")'> </TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>收文日期</DIV></TD>
+<TD><INPUT id=text35 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 110px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="收文日期(基)" field="INCOMING_DATE" onfocus='bill_onenter("WdatePicker();")'> </TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>批办领导</DIV></TD>
+<TD colSpan=3><INPUT id=text19 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 294px" onmovestart=moveStart() size=41 controltype="text" dataset="dataset2" china="批办领导(基)" field="LEADER"></TD></TR>
+<TR>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>主办单位</DIV></TD>
+<TD colSpan=3><INPUT id=text21 class=leftbtnc style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 229px" onmovestart=moveStart() size=39 controltype="text" dataset="dataset2" china="主办单位" field="HOST_UNIT"><BUTTON id=HostUnitButton class="ef_button4  leftbtnc" style="HEIGHT: 25px; BACKGROUND-IMAGE: url(none); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 0px 0px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 689px; MARGIN: 0px; TOP: 509px; PADDING-RIGHT: 0px; WIDTH: 47px" onmovestart=moveStart() controltype="button" onclick="bill_onclick(&quot;selectInputOrgs('#text21')&quot;)">提取</BUTTON></TD>
+<TD bgColor=#efefef></TD>
+<TD></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle></DIV></TD>
+<TD bgColor=#f7f7f7><BUTTON id=button28 class=ef_button2 style="HEIGHT: 25px; BACKGROUND-IMAGE: url(none); BACKGROUND-REPEAT: no-repeat; POSITION: static; BACKGROUND-POSITION: 0px 0px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 655px; MARGIN: 0px; TOP: 776px; PADDING-RIGHT: 0px; WIDTH: 75px" onmovestart=moveStart() controltype="button" onclick='bill_onclick("showOrHideMoreSee()")'>更多</BUTTON></TD></TR>
+<TR class=more-see-tr>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>交办日期</DIV></TD>
+<TD bgColor=#f7f7f7><INPUT id=text31 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 90px" onmovestart=moveStart() size=16 controltype="text" dataset="dataset2" china="交办日期(基)" field="ASSIGN_DATE" onfocus='bill_onenter("WdatePicker();")'></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>办理期限</DIV></TD>
+<TD><INPUT id=text32 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 91px" onmovestart=moveStart() size=16 controltype="text" dataset="dataset2" china="办理期限(基)" field="TIME_LIMIT" onfocus='bill_onenter("WdatePicker();")'></TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>份　　数</DIV></TD>
+<TD><INPUT id=text30 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 110px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="份数(基)" field="COPIES"> </TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>页 数</DIV></TD>
+<TD bgColor=#f7f7f7><INPUT id=text29 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 110px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="页数(基)" field="PAGES"> </TD></TR>
+<TR class=more-see-tr>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>办阅件标识</DIV></TD>
+<TD bgColor=#f7f7f7><INPUT id=text13 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 110px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="办阅件标志(基)" field="FILE_MARKING"> </TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>收文表分类</DIV></TD>
+<TD><INPUT id=text14 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 110px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="收文表分类(基)" field="TYPE"> </TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>督办件编号</DIV></TD>
+<TD><INPUT id=text28 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 110px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="督办件编号(基)" field="MANAGE_CODE"> </TD>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>清退类型</DIV></TD>
+<TD bgColor=#f7f7f7><fc:fc_code id=dropdownlist12 class=ef_design_dropdownlist controltype="dropdownlist" dataset="dataset2" field="REPAY_TYPE" visible="是" format="" FieldNameList="" isTreeNewSql="0" isShowTree="0" xml="" multiselect="否" addrow="否" blnempty="否" blninput="是" rootNodeId="rootNode" datasourceName="" width="100" height="25" top="0" left="0" sqltrans="%3cfcsql%20djsn%3d%22oa%5fincoming%5fmessage%5fnew%22%20djtype%3d%22eden%22%20widgetId%3d%22dropdownlist12%22%20%3e%3c%2ffcsql%3e" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></TD></TR>
+<TR class=more-see-tr>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>主 题 词</DIV></TD>
+<TD colSpan=7><INPUT id=text18 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 669px" onmovestart=moveStart() size=121 controltype="text" dataset="dataset2" china="主题词(基)" field="THEME"></TD></TR>
+<TR class=more-see-tr>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>传阅单位</DIV></TD>
+<TD colSpan=7><INPUT id=text22 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 669px" onmovestart=moveStart() size=121 controltype="text" dataset="dataset2" china="传阅单位(基)" field="PASS_UNIT"></TD></TR>
+<TR class=more-see-tr>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>分发范围</DIV></TD>
+<TD colSpan=7><INPUT disabled id=text23 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 669px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="分发单位(基)" field="ISSURE_SCOPE"></TD></TR>
+<TR class=more-see-tr>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>来文摘要</DIV></TD>
+<TD colSpan=7><INPUT id=text24 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 669px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="来文摘要(基)" field="FILE_SUMMARY"></TD></TR>
+<TR class=more-see-tr>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>备　　注</DIV></TD>
+<TD colSpan=7><INPUT id=text25 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 669px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="备注(基)" field="REMARK"></TD></TR>
+<TR class=more-see-tr>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>关 联 号</DIV></TD>
+<TD colSpan=7><INPUT id=text26 style="HEIGHT: 25px; POSITION: static; LEFT: 0px; TOP: 0px; WIDTH: 669px" onmovestart=moveStart() controltype="text" dataset="dataset2" china="关联号(基)" field="RELATION_CODE"></TD></TR>
+<TR class=more-see-tr>
+<TD bgColor=#efefef>
+<DIV class=tdTitle>相关链接</DIV></TD>
+<TD colSpan=7><LABEL disabled id=labelLink style="HEIGHT: 40px; POSITION: static; LEFT: 298px; TOP: 519px; WIDTH: 638px" onmovestart=moveStart() controltype="label" inputTag="否" dataset="dataset2" china="相关链接" field="LINK"></LABEL></TD></TR></TBODY></TABLE></DIV></DIV>
+<DIV class=tab-page style="HEIGHT: 803px; WIDTH: 760px">
+<H2 class=tab>办理单</H2>&nbsp; 
+<DIV id=leadSugId class=opinion style="HEIGHT: 193px; POSITION: absolute; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 73px; MARGIN: 0px; TOP: 323px; PADDING-RIGHT: 0px; WIDTH: 600px" onmovestart=moveStart() controltype="div"></DIV><fc:fc_code id=dropdownlist29 class=ef_design_dropdownlist onchange='bill_onclick("loadBillPage(42dropdownlist2942,42billdiv42)")' controltype="dropdownlist" dataset="undefined" field="undefined" visible="否" format="" FieldNameList="" isTreeNewSql="0" isShowTree="0" xml="<tr height='20px' ><td>选择办理单</td><td>-1</td></tr>" multiselect="否" addrow="否" blnempty="否" blninput="是" rootNodeId="rootNode" datasourceName="" width="100" height="25" top="12" left="670" ParentPos="相对" sqltrans="" position="static" align="undefined" sql2="undefined" enabled="false"></fc:fc_code>
+<DIV id=billdiv class=billdiv style="BORDER-TOP: 0px; HEIGHT: 801px; BORDER-RIGHT: 0px; BORDER-BOTTOM: 0px; POSITION: static; FLOAT: left; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 17px; MARGIN: 0px; BORDER-LEFT: 0px; TOP: 0px; PADDING-RIGHT: 0px; WIDTH: 742px" onmovestart=moveStart() controltype="div"></DIV></DIV>
+<DIV class=tab-page style="HEIGHT: 803px; WIDTH: 760px">
+<H2 class=tab>查看传阅</H2>
+<DIV id=readpassDiv class=ef_div style="BORDER-TOP: 0px; HEIGHT: 741px; BORDER-RIGHT: 0px; BORDER-BOTTOM: 0px; POSITION: absolute; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 20px; MARGIN: 0px; BORDER-LEFT: 0px; TOP: 0px; PADDING-RIGHT: 0px; WIDTH: 697px" onmovestart=moveStart() controltype="div"></DIV></DIV></DIV>
+<SCRIPT>var tab4 = new WebFXTabPane( document.getElementById( "tab4" ) );</SCRIPT>
+</DIV><fc:dataset id=dataset2 controltype="dataset" format="<fields><field><fieldname>ARCHIVE_TYPE</fieldname><datatype>字符</datatype><displaylabel>归档密级</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>ASSIGN_DATE</fieldname><datatype>时间</datatype><displaylabel>交办日期</displaylabel><size>19</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue>GetTime()</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>COPIES</fieldname><datatype>整数</datatype><displaylabel>抄送</displaylabel><size>5</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>CREATE_DATE</fieldname><datatype>时间</datatype><displaylabel>创建时间</displaylabel><size>19</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue>GetTime()</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>FILE_CHAR</fieldname><datatype>字符</datatype><displaylabel>文件字号</displaylabel><size>50</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>FILE_DEGREE</fieldname><datatype>字符</datatype><displaylabel>文件密级</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>FILE_MARKING</fieldname><datatype>字符</datatype><displaylabel>办阅件标志</displaylabel><size>40</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>FILE_PATH</fieldname><datatype>字符</datatype><displaylabel>FILE_PATH</displaylabel><size>200</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>FILE_SUMMARY</fieldname><datatype>字符</datatype><displaylabel>来文摘要</displaylabel><size>1000</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>FILE_TITLE</fieldname><datatype>字符</datatype><displaylabel>文件标题</displaylabel><size>200</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>是</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>FILE_UNIT</fieldname><datatype>字符</datatype><displaylabel>来文单位</displaylabel><size>200</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>是</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>HOST_UNIT</fieldname><datatype>字符</datatype><displaylabel>主办单位</displaylabel><size>200</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>INCOMING_DATE</fieldname><datatype>时间</datatype><displaylabel>收文日期</displaylabel><size>19</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue>GetTime()</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>ISSURE_SCOPE</fieldname><datatype>字符</datatype><displaylabel>分发单位</displaylabel><size>30</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>LEADER</fieldname><datatype>字符</datatype><displaylabel>批办领导</displaylabel><size>15</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>LINK</fieldname><datatype>字符</datatype><displaylabel>相关链接</displaylabel><size>500</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>MANAGE_CODE</fieldname><datatype>字符</datatype><displaylabel>督办件编号</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>PAGES</fieldname><datatype>整数</datatype><displaylabel>页数</displaylabel><size>5</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>PASS_UNIT</fieldname><datatype>字符</datatype><displaylabel>传阅单位</displaylabel><size>200</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>REGISTER</fieldname><datatype>字符</datatype><displaylabel>登记人</displaylabel><size>30</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue>getLocalUserName()</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>是</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>RELATION_CODE</fieldname><datatype>字符</datatype><displaylabel>关联号</displaylabel><size>100</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>REMARK</fieldname><datatype>字符</datatype><displaylabel>备注</displaylabel><size>300</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>REPAY_TYPE</fieldname><datatype>字符</datatype><displaylabel>清退类型</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SEARCH_DEGREE</fieldname><datatype>字符</datatype><displaylabel>查询级别</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>SERIAL_NUMBER</fieldname><datatype>字符</datatype><displaylabel>流水号</displaylabel><size>50</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>STATUS</fieldname><datatype>字符</datatype><displaylabel>STATUS</displaylabel><size>50</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>是</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>THEME</fieldname><datatype>字符</datatype><displaylabel>主题词</displaylabel><size>300</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>TIME_LIMIT</fieldname><datatype>日期</datatype><displaylabel>办理期限</displaylabel><size>19</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue>GetDate()</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>TYPE</fieldname><datatype>字符</datatype><displaylabel>收文表分类</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>URGENT_DEGREE</fieldname><datatype>字符</datatype><displaylabel>紧急程度</displaylabel><size>2</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>WF_ID</fieldname><datatype>整数</datatype><displaylabel>WF_ID</displaylabel><size>32</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue>$urlParam('wfId')</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>id</fieldname><datatype>字符</datatype><displaylabel></displaylabel><size>11</size><precision></precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>否</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>executor</fieldname><datatype>字符</datatype><displaylabel>执行人</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>是</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>incoming_code</fieldname><datatype>字符</datatype><displaylabel>收文编号</displaylabel><size>30</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>sign</fieldname><datatype>字符</datatype><displaylabel>阅者签字</displaylabel><size>500</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>is_sendout</fieldname><datatype>字符</datatype><displaylabel>是否发送出去</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>0</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>dtype</fieldname><datatype>字符</datatype><displaylabel>收文类型</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>outin</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>create_by</fieldname><datatype>字符</datatype><displaylabel>创建者</displaylabel><size>60</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>getOaLocalUserId()</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" pubpara="否" isaddemptyrec="否" submittype="1" submitno="1" savetable="%3cfcsavetable%20djsn%3d%22oa%5fincoming%5fmessage%5fnew%22%20djtype%3d%22eden%22%20widgetId%3d%22dataset2%22%20%3eOA%5fINCOMING%5fMESSAGE%3c%2ffcsavetable%3e" idparam="BBB" issubds="否" isSubGrid="否" opensortno="1" idtype="1" isInAddStatus="是" fieldtrans="<root><field><name>sign</name><trans>addSign%28%24f_value%28%27sign%27%29%29</trans><rtrans></rtrans><sql></sql></field></root>" onValid='bill_ondatasetvalid("<dsid><ARCHIVE_TYPE></ARCHIVE_TYPE><ASSIGN_DATE></ASSIGN_DATE><COPIES></COPIES><CREATE_DATE></CREATE_DATE><FILE_CHAR></FILE_CHAR><FILE_DEGREE></FILE_DEGREE><FILE_MARKING></FILE_MARKING><FILE_PATH></FILE_PATH><FILE_SUMMARY></FILE_SUMMARY><FILE_TITLE></FILE_TITLE><FILE_UNIT></FILE_UNIT><HOST_UNIT></HOST_UNIT><INCOMING_DATE></INCOMING_DATE><ISSURE_SCOPE></ISSURE_SCOPE><LEADER></LEADER><LINK></LINK><MANAGE_CODE></MANAGE_CODE><PAGES></PAGES><PASS_UNIT></PASS_UNIT><REGISTER></REGISTER><RELATION_CODE></RELATION_CODE><REMARK></REMARK><REPAY_TYPE></REPAY_TYPE><SEARCH_DEGREE></SEARCH_DEGREE><SERIAL_NUMBER></SERIAL_NUMBER><STATUS></STATUS><THEME></THEME><TIME_LIMIT></TIME_LIMIT><TYPE></TYPE><URGENT_DEGREE></URGENT_DEGREE><WF_ID></WF_ID><id></id><executor></executor><incoming_code></incoming_code><sign></sign><is_sendout></is_sendout><dtype></dtype><create_by></create_by></dsid>")' onGetText='bill_ondatasetgettext("<dsid><ARCHIVE_TYPE></ARCHIVE_TYPE><ASSIGN_DATE></ASSIGN_DATE><COPIES></COPIES><CREATE_DATE></CREATE_DATE><FILE_CHAR></FILE_CHAR><FILE_DEGREE></FILE_DEGREE><FILE_MARKING></FILE_MARKING><FILE_PATH></FILE_PATH><FILE_SUMMARY></FILE_SUMMARY><FILE_TITLE></FILE_TITLE><FILE_UNIT></FILE_UNIT><HOST_UNIT></HOST_UNIT><INCOMING_DATE></INCOMING_DATE><ISSURE_SCOPE></ISSURE_SCOPE><LEADER></LEADER><LINK></LINK><MANAGE_CODE></MANAGE_CODE><PAGES></PAGES><PASS_UNIT></PASS_UNIT><REGISTER></REGISTER><RELATION_CODE></RELATION_CODE><REMARK></REMARK><REPAY_TYPE></REPAY_TYPE><SEARCH_DEGREE></SEARCH_DEGREE><SERIAL_NUMBER></SERIAL_NUMBER><STATUS></STATUS><THEME></THEME><TIME_LIMIT></TIME_LIMIT><TYPE></TYPE><URGENT_DEGREE></URGENT_DEGREE><WF_ID></WF_ID><id></id><executor></executor><incoming_code></incoming_code><sign></sign><is_sendout></is_sendout><dtype></dtype><create_by></create_by></dsid>")' onSetText='bill_ondatasetsettext("<dsid><ARCHIVE_TYPE></ARCHIVE_TYPE><ASSIGN_DATE></ASSIGN_DATE><COPIES></COPIES><CREATE_DATE></CREATE_DATE><FILE_CHAR></FILE_CHAR><FILE_DEGREE></FILE_DEGREE><FILE_MARKING></FILE_MARKING><FILE_PATH></FILE_PATH><FILE_SUMMARY></FILE_SUMMARY><FILE_TITLE></FILE_TITLE><FILE_UNIT></FILE_UNIT><HOST_UNIT></HOST_UNIT><INCOMING_DATE></INCOMING_DATE><ISSURE_SCOPE></ISSURE_SCOPE><LEADER></LEADER><LINK></LINK><MANAGE_CODE></MANAGE_CODE><PAGES></PAGES><PASS_UNIT></PASS_UNIT><REGISTER></REGISTER><RELATION_CODE></RELATION_CODE><REMARK></REMARK><REPAY_TYPE></REPAY_TYPE><SEARCH_DEGREE></SEARCH_DEGREE><SERIAL_NUMBER></SERIAL_NUMBER><STATUS></STATUS><THEME></THEME><TIME_LIMIT></TIME_LIMIT><TYPE></TYPE><URGENT_DEGREE></URGENT_DEGREE><WF_ID></WF_ID><id></id><executor></executor><incoming_code></incoming_code><sign></sign><is_sendout></is_sendout><dtype></dtype><create_by></create_by></dsid>")' sqltrans="%3cfcsql%20djsn%3d%22oa%5fincoming%5fmessage%5fnew%22%20djtype%3d%22eden%22%20widgetId%3d%22dataset2%22%20%3e%3cwfId%3e%3a%7b%24urlParam%28%22wfId%22%29%7d%3a%3c%2fwfId%3e%3c%2ffcsql%3e"></fc:dataset>&nbsp; 
+<DIV id=div6 class=ef_div style="BORDER-TOP: 0px; HEIGHT: 40px; BORDER-RIGHT: 0px; BORDER-BOTTOM: 0px; POSITION: absolute; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; PADDING-LEFT: 0px; LEFT: 50%; MARGIN: 0px 0px 0px -200px; BORDER-LEFT: 0px; TOP: 700px; PADDING-RIGHT: 0px; WIDTH: 400px" onmovestart=moveStart() controltype="div"></DIV><INPUT id=executor style="HEIGHT: 20px; POSITION: absolute; LEFT: 763px; DISPLAY: none; TOP: 235px; WIDTH: 148px" onmovestart=moveStart() size=26 controltype="text" dataset="dataset2" china="执行人(隐藏)" field="executor">&nbsp; 
+<DIV class=form-right>
+<DIV class="form-right-header clearfix"><SPAN>资源链接</SPAN><A href="javascript:void(0)"></A></DIV>
+<DIV class=form-right-list>
+<UL id=relateLinkDiv class=clearfix></UL></DIV>
+<DIV class="form-right-header clearfix"><SPAN>搜索与维护</SPAN> </DIV>
+<DIV id=divRelatedLinkEdit class=ef_div onmovestart=moveStart() controltype="div">
+<DIV class=form-right-search>
+<DIV class=form-right-warn><SPAN>提示：</SPAN>您可以选择搜索结果或附件的方式添加相关资源，也可以进行维护</DIV>
+<DIV id=change_name class="change-name clearfix"><INPUT CHECKED type=radio name=list_name><SPAN onclick=prevCl(this)>OA搜索</SPAN><INPUT type=radio name=list_name><SPAN onclick=prevCl(this)>附件引入</SPAN></DIV>
+<DIV class=dis-change>
+<DIV>
+<DIV class="change-name clearfix"><SPAN>搜索范围：</SPAN> <SELECT id=searchRelateTypes> <OPTION selected value=1>文件</OPTION> <OPTION value=2>文件2</OPTION></SELECT> </DIV>
+<DIV class="change-name clearfix"><SPAN>搜索条件：</SPAN> <INPUT id=relateSearchText> </DIV>
+<DIV class="form-search clearfix"><A onclick=searchRelateLink() href="javascript:void(0)">搜索</A><A onclick=openRelateLinkEditPage() href="javascript:void(0)">维护</A></DIV></DIV>
+<DIV style="DISPLAY: none">
+<DIV class="change-name clearfix"><SPAN>上传文件：</SPAN> <INPUT onblur=setRelateAttachTitle() id=relateFile type=file name=file> </DIV>
+<DIV class="change-name clearfix"><SPAN>重新命名：</SPAN> <INPUT id=relateFileName> </DIV>
+<DIV class="form-search clearfix"><A onclick=ajaxFileUpload() href="javascript:void(0)">上传</A><A onclick=openRelateLinkEditPage() href="javascript:void(0)">维护</A></DIV></DIV></DIV></DIV></DIV>
+<DIV></DIV></DIV></DIV></DIV><div id='addHtml'><link rel="stylesheet" type="text/css" href="/eden.oa/form/fceform/css/income_style.css">
+</div> </body></html>

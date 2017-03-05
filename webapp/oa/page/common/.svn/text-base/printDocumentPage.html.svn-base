@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+    <link rel="shortcut icon" href="${base}/aufw/resources/favicon.ico" type="image/x-icon">
+    <title>加印单</title>
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+    <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <style>
+        .top-btn{
+            height: 56px;
+        }
+        .top-btn button{
+            display: none;
+        }
+        body:hover .top-btn button{
+            display: inline-block;
+        }
+    </style>
+    <script src="${base}/edenui/common/js/jquery.js"></script>
+    <script src="${base}/edenui/common/js/jq_plugins/layer/layer.v.js"></script>
+    <script src ="${base}/edenui/common/js/avalon/avalon2.js"></script>
+    <script>
+        //参数配置表
+        avalon.config({debug: false});
+        var model = avalon.define({
+            $id: "wrap",
+            content:{
+                'id':'${dataMap.id!}',
+                'fileTitle':'${dataMap.fileTitle!}',
+                'fileNumber':'${dataMap.fileNumber!}',
+                'unit':'${dataMap.unit!}',
+                'phone':'${dataMap.phone!}',
+                'count':'${dataMap.count!}',
+                'const':'${dataMap.const!}'
+            },
+            printContent:function () {
+                $("button").hide();
+                window.print(); //调用浏览器的打印功能打印指定区域
+                $("button").removeAttr("style");
+            },
+            printRecord:function () {
+                var url = "${base}/admin/sendDocument/printDocumentRecord.action?wfId="+getUrlParam("wfId");
+                layer.open({
+                    content:url,
+                    type:2,
+                    fixed:false,
+                    title:'加印记录',
+                    area:['900px','550px'],
+                    success:function () {
+                    }
+                });
+            }
+        });
+
+        // 获取参数列表
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)return unescape(r[2]);
+            return null;
+        }
+    </script>
+</head>
+<body  class="ms-controller" ms-controller="wrap">
+    <div class="text-center padding-large-top top-btn">
+        <button class="button button-main" ms-click="@printContent()">打印</button>
+    </div>
+    <div class="print-document">
+        <div class="print-document-content padding-top bottom-line padding-large-bottom">
+            <h2 class="text-center">加&nbsp;印&nbsp;单</h2>
+            <p class="content-body">现有<span class="bold-content">{{@content.unit}}</span>需加印<span class="bold-content">{{@content.fileNumber}}</span><span class="bold-content">{{@content.fileTitle}}</span>文件<span class="bold-content">{{@content.count}}</span>份，加印单位联系人及联系方式，费用由<span class="bold-content">${dataMap.const!}</span>承担。</p>
+            <p class="content-body">承办处（室）审核：</p>
+            <div class="content-footer">省政府办公厅保密室</div>
+        </div>
+        <div class="print-document-content padding-large-top">
+            <h2 class="text-center">加&nbsp;印&nbsp;单</h2>
+            <p class="content-body">现有<span class="bold-content">{{@content.fileNumber}}</span><span class="bold-content">{{@content.fileTitle}}</span>文件需加印<span class="bold-content">{{@content.count}}</span>份，费用由<span class="bold-content">${dataMap.const!}</span>结算，打印单位联系人及联系方式</p>
+            <p class="content-body">经办人：</p>
+            <div class="content-footer">省政府办公厅保密室</div>
+        </div>
+        <div class="document-tip padding-large-bottom">
+            <div class="document-tip-content">
+                <label><input type="checkbox">文件印刷后可领取</label>
+            </div>
+            <div class="document-tip-content">
+                <label><input type="checkbox">文件印刷后等领取通知</label>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

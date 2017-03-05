@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+  <title>eden</title>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/common/css/base.css">
+  <link rel="stylesheet" href="${base}/edenui/common/js/jq_plugins/bsgrid/bsgrid.all.min.css"/>
+  <link rel="stylesheet" type="text/css" href="${base}/edenui/skintheme/css/m_default.css">
+    <!-- jquery 框架 1.11 -->
+    <script src = "${base}/edenui/common/js/jquery.js"></script>
+
+    <!--<script src = "${base}/form/resources/common/js/tool.js"></script>-->
+    <!--<script src = "${base}/edenui/common/js/underscore.js"></script>-->
+    <!--<script src = "${base}/edenui/common/js/jq_plugins/layer/layer.min.js"></script>-->
+    <script src = "${base}/edenui/common/js/avalon/avalon2.js"></script>
+    <script>
+        var project ="${base}";
+        var url=project+"/admin/attachmentInfo/selectByTable.action";
+        var downloadsrc;
+        var datas=[];
+        var wfid=window.top.globalParams.wfid;
+
+        //参数配置表
+        avalon.config({debug: false});
+        var model = avalon.define({
+            $id: "wrap",
+            dataList:[],
+            newFlow:true,
+            oldFlow:false,
+            oldSend:[],
+            oldDo:[],
+            messageHistory:function(a,b){
+               window.top.messageHistory(a);
+            },
+            noRecord:"加载中..."
+        });
+        $(function() {
+            var sKey = "?operate=get_history_list&wf_id="+wfid;
+            $.ajax({
+                type       :"POST",
+                url        :project + "/servlet/WorkflowPortal" + sKey,
+                processData:false,
+                data       :'<root></root>',
+                contentType:'utf-8',
+                success    :function (msg) {
+
+                    var isSuccess=$($.parseXML(msg)).find("n");
+
+                    if(isSuccess.text()=="true"){
+                        var content= $($.parseXML(msg)).find("text");
+
+                        content.each(function(){
+
+                            var $this=$(this);
+
+                            var dataBefore=$this.text().toString();
+
+                            var data=dataBefore.split("CDATA[")[0];
+
+                            var totalData=$(data);
+
+                            totalData.each(function(){
+
+                                var td=$(this).find("td");
+                                datas.push({
+                                    style:td.eq(0).text()?td.eq(0).text():'',
+                                    name:td.eq(1).text()?td.eq(1).text():'',
+                                    id:td.eq(2).text()?td.eq(2).text():'',
+                                    status:td.eq(6).text()?td.eq(6).text():'',
+                                    person:td.eq(7).text()?td.eq(7).text():'',
+                                    startTime:td.eq(9).text()?td.eq(9).text():'',
+                                    endTime:td.eq(10).text()?td.eq(10).text():''
+                                });
+
+                            });
+                        });
+                    }
+                     model.dataList.clear;
+                    model.dataList=datas;
+                    if(model.dataList.length<1){
+                        model.newFlow=false;
+
+                        var father=window.parent;
+                        var oldUrl="${base}/admin/wfManage/showOldFlow.action?docId="+(father.data_dataset2.item(father.data_dataset2.first()).id);
+                        $.post(oldUrl,function (result) {
+
+                            if(result.datas.length){
+                            	var $oldSend=[],
+                            		$oldDo=[];
+                                result.datas.forEach(function(value){
+
+                                    //分文
+                                    if(value.flowType=="1"){
+                                    	$oldSend.push({
+                                            action:value.action,
+                                            endtime:value.endtime,
+                                            flowType:value.flowType,
+                                            fromperson:value.fromperson,
+                                            id:value.id,
+                                            remark:value.remark,
+                                            seq:value.seq,
+                                            toperson:value.toperson,
+                                            useDataAuControl:value.useDataAuControl
+                                                  
+                                        });
+                                    }
+                                    else if(value.flowType=="2"){
+                                        $oldDo.push({
+                                            action:value.action,
+                                            endtime:value.endtime,
+                                            flowType:value.flowType,
+                                            fromperson:value.fromperson,
+                                            id:value.id,
+                                            remark:value.remark,
+                                            seq:value.seq,
+                                            toperson:value.toperson,
+                                            useDataAuControl:value.useDataAuControl
+                                            
+                                        });
+                                    }
+                                    //办文
+                                    
+                                    
+                                });
+                                $oldSend.sort(function (a,b) {
+                                    return a.seq-b.seq
+                                })
+
+                                $oldDo.sort(function (a,b) {
+                                    return a.seq-b.seq
+                                })
+                                model.oldSend=$oldSend;
+                                model.oldDo=$oldDo;
+                                model.oldFlow=true;
+                                $("#oldFlow").show();
+                            }
+                        });
+
+                        model.noRecord="暂无流程记录";
+
+                    }
+
+                },
+                error:function (msg) {
+
+                }
+            });
+        });
+
+
+        $(window).load(function(){
+          //  billAuto();
+
+            window.top.oneClickLi();
+
+        });
+        function billAuto(){
+            setTimeout(function(){
+                var $father = $(window.parent.document),
+                        billHeight=$("#contentHmtl").height(),
+                        $autoHeight=billHeight+300;
+                $father.find("#recorddiv").height($autoHeight);
+                $father.find("#recorddiv").closest(".tab-page").height($autoHeight);
+            },2000);
+
+        }
+    </script>
+</head>
+<body style="height: 100%;" class="ms-controller" ms-controller="wrap">
+<div id="contentHmtl">
+    <div ms-visible="@newFlow">
+      <table   class="bsgrid oa-form-grid oa-form-attachment" style="width:680px!important;margin: 0 auto!important;margin-top: 60px!important;" >
+          <tr style="border-bottom: 0">
+              <th width="40" >序号</th>
+              <th width="100">环节</th>
+              <th width="80">状态</th>
+              <th width="100">办理人</th>
+              <th>开始时间</th>
+              <th>结束时间</th>
+              <th width="50">消息</th>
+          </tr>
+          <tr  ms-visible="@dataList.length" class="" ms-for="($index,el) in @dataList">
+              <td ms-text="@dataList.length-$index"></td>
+              <td ms-attr="{title:el.name}" ms-text="el.name"></td>
+              <td ms-attr="{title:el.status}" ms-text="el.status"></td>
+              <td ms-attr="{title:el.person}" ms-text="el.person"></td>
+              <td ms-attr="{title:el.startTime}" ms-text="el.startTime"></td>
+              <td ms-attr="{title:el.endTime}" ms-text="el.endTime"></td>
+              <td ><a href="javascript:void(0)" title="查看消息记录" ms-click="@messageHistory(el.id, $event)" class="icon-envelope js-envelope"></a></td>
+          </tr>
+      </table>
+    </div>
+    <div id="oldFlow" style="display: none;">
+        <div style="width: 680px;margin:10px auto;">分文流程</div>
+        <table   class="bsgrid oa-form-grid oa-form-attachment" style="width:680px!important;margin: 0 auto!important;" >
+            <tr style="border-bottom: 0">
+                <th width="40" >序号</th>
+                <th width="80">处理人</th>
+                <th width="150">处理时间</th>
+                <th width="150">节点名称</th>
+                <th >接收人</th>
+
+            </tr>
+            <tr   class="" ms-for="($index,el) in @oldSend">
+                <td ms-attr="{title:$index}" ms-text="$index+1"></td>
+                <td ms-attr="{title:el.fromperson}" ms-text="el.fromperson"></td>
+                <td ms-attr="{title:el.endtime}" ms-text="el.endtime"></td>
+                <td ms-attr="{title:el.action}" ms-text="el.action"></td>
+                <td ms-attr="{title:el.toperson}" ms-text="el.toperson"></td>
+
+            </tr>
+        </table>
+        <div  ms-if="@oldSend.length<1"  class="oa-form-grid-tr-no-data" style="width: 680px;" >暂无数据</div>
+        <div style="width: 680px;margin:10px auto;">办文流程</div>
+        <table   class="bsgrid oa-form-grid oa-form-attachment" style="width:680px!important;margin: 0 auto!important;" >
+            <tr style="border-bottom: 0">
+                <th width="40" >序号</th>
+                <th width="80">处理人</th>
+                <th width="150">处理时间</th>
+                <th width="150">节点名称</th>
+                <th >接收人</th>
+
+            </tr>
+            <tr   class="" ms-for="($index,el) in @oldDo">
+                <td ms-attr="{title:$index}" ms-text="$index+1"></td>
+                <td ms-attr="{title:el.fromperson}" ms-text="el.fromperson"></td>
+                <td ms-attr="{title:el.endtime}" ms-text="el.endtime"></td>
+                <td ms-attr="{title:el.action}" ms-text="el.action"></td>
+                <td ms-attr="{title:el.toperson}" ms-text="el.toperson"></td>
+
+            </tr>
+        </table>
+        <div  ms-if="@oldDo.length<1"  class="oa-form-grid-tr-no-data" style="width: 680px;" >暂无数据</div>
+    </div>
+          <!--<div  ms-if="@dataList.length<1"  class="oa-form-grid-tr-no-data" style="width: 680px;" ms-text="@noRecord"></div>-->
+      </div>
+</div>
+</body>
+</html>

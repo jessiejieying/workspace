@@ -1,0 +1,302 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:fc xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.userData {
+    behavior: url(#default#userData);
+}
+v\:* { Behavior: url(#default#VML) }
+</style>
+<script src="../../resources/common/js/jquery.js"></script>
+<script src="../../fceform/js/MicrosoftAjax.js"></script>
+<script src="../../fceform/js/fcpub.js"></script>
+<script src="../../fceform/js/fcrundj.js"></script>
+<script src="../../fceform/js/tabpane.js"></script>
+</head>
+<body onLoad="pub_window_onload()"
+onkeydown="RunTabindex()" onbeforeunload="pub_window_onbeforeunload()" onkeypress="pub_window_onkeypress()"
+onResize="pub_window_onresize()">
+<script>pub_djhtm();</script> 
+        <script id='userFunc'>var groupId=QueryURL.GetValue('groupId');
+var wfId=QueryURL.GetValue('wfId');
+var oldRecNum=0;
+var oldYear=0;
+function load()
+{
+    var dash=  QueryURL.GetValue('dash');
+	 var noString=  QueryURL.GetValue('noString');
+    var selectDash=$('#textDash').val();
+	 if(dash)   
+    {
+         $('#sel_dropdownlist1').val(dash)
+   }
+	if(selectDash)
+	{
+	    $('#sel_dropdownlist1').val(selectDash)
+		$('#button1').hide();
+	}
+   
+   if(noString)   
+    {
+         $('#text9').val(decodeURI(noString))
+   }
+    oldRecNum=$('#text7').val();
+	oldYear=$('#text6').val();
+	
+	if(!oldRecNum)
+	{
+	   changeDash();
+	   $('#button2').hide();
+	}
+	$('#sel_dropdownlist2').hide();
+}
+
+
+function changeDash()
+{
+
+   var dash= $('#sel_dropdownlist1').val();
+   var year=$('#text6').val();
+   var url = project+"/admin/documentConfig/selectIsHasDocNo.action";
+   	var data="groupId="+groupId+"&wfId="+wfId+"&dashValue="+dash+"&year="+year;
+    $.post(url,data,function(result){
+
+		if(result)
+		{
+	        if(result.result=="hasNo")
+	        {
+			    
+			    alert("当前公文已经编过号，请先删除编号");
+				 var dash=  QueryURL.GetValue('dash');
+			  $('#sel_dropdownlist1').val(dash);
+			}else{
+			   url = project+"/admin/documentConfig/getDocNoInfoWithoutSave.action";
+			   $.post(url,data,function(result){
+
+					if(result)
+					{
+					 $('#text7').val(result.recNum)
+					 $('#text9').val(result.noString)
+					 oldRecNum=result.recNum; 
+					 
+					}
+					
+				});
+			}
+		}else{
+		   alert("访问失败");
+		}
+		
+	});
+  	 $('#sel_dropdownlist2').hide();
+}
+
+
+function checkConflict()
+{
+
+   var dash= $('#sel_dropdownlist1').val();
+   var year=$('#text6').val();
+   var recNum=$('#text7').val();
+   if(isNaN(year)||isNaN(recNum))
+   {
+      alert("序列号或年份要为数字")
+	 resetNum()
+      return;
+   }
+   
+     var url = project+"/admin/documentConfig/selectIsHasDocNo.action";
+   	var data="groupId="+groupId+"&wfId="+wfId+"&dashValue="+dash+"&year="+year;
+    $.post(url,data,function(result){
+
+		if(result)
+		{
+	        if(result.result=="hasNo")
+	        {
+			    
+			    alert("当前公文已经编过号，请先删除编号");
+				 resetNum()
+			}else{
+			   url = project+"/admin/documentConfig/selectCheckOtherHasRecnum.action";
+				data="groupId="+groupId+"&dashValue="+dash+"&year="+year+"&recNum="+recNum;
+				 $.post(url,data,function(result){
+
+					if(result)
+					{
+						if(result.result=="hasConflict")
+						{
+							
+							alert("此序列号其他公文已占用");
+							resetNum()
+						}else if(result.result=="noConflict")
+						{
+						     changeNoString()
+						}
+					}else{
+					   alert("访问失败");
+					}
+		
+				});
+			   
+			   
+			}
+		}else{
+		   alert("访问失败");
+		}
+		
+	});
+	
+
+   
+}
+
+function resetNum()
+{
+   $('#text7').val(oldRecNum);
+	$('#text6').val(oldYear);
+
+}
+
+function sub()
+{
+   var dash= $('#sel_dropdownlist1').val();
+   var year=$('#text6').val();
+    var recNum=$('#text7').val();
+   
+    var url = project+"/admin/documentConfig/doSaveDocNo.action";
+	var data="groupId="+groupId+"&wfId="+wfId+"&dashValue="+dash+"&year="+year+"&recNum="+recNum;
+   $.post(url,data,function(result){
+
+		if(result)
+		{
+		   $.dialog.tips(result.msg);
+		   if(result.result=='success')
+		   {
+		   
+		   	setTimeout(function(){
+			   try{
+					window.edenCallBack();
+
+				}catch (e){
+
+				}
+			 },300);
+		       
+				
+		   }
+		}else{
+			$.dialog.tips("访问失败");
+		}
+		
+	});
+
+
+
+
+}
+
+function del()
+{
+
+ 
+   	var url=project + '/form/fceform/common/run.html?djsn=oa_edit_document_del_no&djtype=eden_wf';
+	url+="&wfId="+wfId+"&groupId="+groupId;
+	createWindow({
+		text    :'删除编号',
+		url     :url,
+		id      :'delDocumentNo',
+		width   :'390',
+		height  :'200',
+		//parent_window:window,
+		callBack:function () {
+		 
+			 window.closeWin('delDocumentNo');
+			parent.location.reload();
+	        
+			
+			
+	     }
+	});
+	
+
+}
+
+/**
+ * 获取断号
+ */
+function putCutNo()
+{
+	   var dash= $('#sel_dropdownlist1').val();
+   var year=$('#text6').val();
+	
+	var url = project+"/admin/documentConfig/getDocCutNo.action";
+	var data="groupId="+groupId+"&wfId="+wfId+"&dashValue="+dash+"&year="+year;
+	$.post(url,data,function(result){
+
+		if(result.data)
+		{
+			var list=result.data;
+			var html="<option value='-1'> </option>";
+			for(var i=0;i<list.length;i++)
+			{
+				 html+="<option value='"+list[i].recnum+"'>"+list[i].recnum+"</option>";
+			}
+			
+			if(list.length==0)
+			{
+			  html="<option value='-1'>无</option>";
+			}
+			$('#sel_dropdownlist2').html(html);
+			$('#sel_dropdownlist2').show();
+		}
+		
+	});
+	
+	
+}
+
+//点击断号时自动填充
+function fillNum()
+{
+    var val=$('#sel_dropdownlist2').val();
+    if(val!=-1)
+	{
+	   $('#text7').val(val) 
+       checkConflict();
+	}
+    
+}
+
+
+function changeNoString()
+{
+    var dash= $('#sel_dropdownlist1').val();
+   var year=$('#text6').val();
+    var recNum=$('#text7').val();
+   
+    var url = project+"/admin/documentConfig/getDocNoStringByMontage.action";
+	var data="groupId="+groupId+"&wfId="+wfId+"&dashValue="+dash+"&year="+year+"&recNum="+recNum;
+   $.post(url,data,function(result){
+
+		if(result)
+		{
+		     $('#text9').val(result.noString)
+			 oldRecNum=recNum;  
+  
+		}else{
+			$.dialog.tips("访问失败");
+		}
+		
+	});
+
+}
+
+function getCurYear()
+{
+   return new Date().getFullYear();
+
+}
+
+</script><script >document.styleSheets[0].addRule("fc\\:fc_code","behavior: url(../../fceform/htc/fc_code.htc)",0);</script><script >document.styleSheets[0].addRule("fc\\:dataset","behavior: url(../../fceform/htc/dataset.htc)",0);</script><script src='../../fceform/js/fcdataset.js'></script>
+<DIV id=SKbillsheet jslib userType BLONopenBefore BLONclose center="  " BLONopen="load()" toolbar="不带工具栏" dj_sn="oa_edit_document_no" type="eden_wf" caption="编号" window="当前窗口" posleft postop poswidth posheight isfile="是" billtaborder="<root><taborder>button1</taborder><taborder>button2</taborder><taborder>text6</taborder><taborder>text7</taborder><taborder>text9</taborder><taborder>dropdownlist1</taborder><taborder>button3</taborder><taborder>textDash</taborder><taborder>dropdownlist2</taborder></root>" controlno="SKButton:0;SKDBedit:0;checkbox:0;label:7;radio:0;listbox:0;textarea:1;combobox:0;password:0;upload:0;SKDBtext:0;chart:0;dbimg:0;img:0;SKBILLgrid:0;shape:0;tab:0;div:0;DsMain_field:0;a:0;button:3;text:10;hr:0;checkboxlist:0;radiolist:0;dropdownlist:2;grid:0;dataset:1;spin:0;excel:0;tree:0;ebshow:0;ebiao:0;layout:0;page:0;editor:0" contxml="<root><label><id>label1</id><id>label2</id><id>label5</id><id>label6</id></label><button><id>button1</id><id>button2</id><id>button3</id></button><text><id>text6</id><id>text7</id><id>text9</id><id>textDash</id></text><dropdownlist><id>dropdownlist1</id><id>dropdownlist2</id></dropdownlist><dataset><id>dataset1</id></dataset></root>" alertType="1" isCheckPermit="否" AutoResizeXml><LABEL style="POSITION: absolute; WIDTH: 65px; HEIGHT: 23px; TOP: 29px; LEFT: 27px" id=label1 onmovestart=moveStart() inputTag="否" controltype="label">机关代字：</LABEL><LABEL style="POSITION: absolute; WIDTH: 65px; HEIGHT: 15px; TOP: 70px; LEFT: 28px" id=label2 onmovestart=moveStart() inputTag="否" controltype="label">编号年份：</LABEL><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 57px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; TOP: 69px; PADDING-TOP: 0px; LEFT: 337px" id=button1 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("putCutNo()")'>漏号</BUTTON><?xml:namespace prefix = fc /><fc:dataset id=dataset1 controltype="dataset" isInAddStatus="是" idtype="1" opensortno="1" issubds="否" idparam="BBB" savetable="oa_count_increase_num" submitno="1" submittype="4" isaddemptyrec="否" pubpara="否" isSubGrid="否" format="<fields><field><fieldname>type_one</fieldname><datatype>字符</datatype><displaylabel>编号类型</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>type_two</fieldname><datatype>字符</datatype><displaylabel>机关代字</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>type_three</fieldname><datatype>字符</datatype><displaylabel>年份</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue>getCurYear()</defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>id</fieldname><datatype>字符</datatype><displaylabel>id</displaylabel><size>50</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>是</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>judge_value</fieldname><datatype>字符</datatype><displaylabel>wfId</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field><field><fieldname>recnum</fieldname><datatype>字符</datatype><displaylabel>序列号</displaylabel><size>10</size><precision>0</precision><fieldkind>数据项</fieldkind><defaultvalue></defaultvalue><displayformat></displayformat><isnull>否</isnull><iskey>否</iskey><valid>是</valid><procvalid>否</procvalid><link>否</link><target></target><href></href><visible>是</visible><primarykey>否</primarykey><fieldvalid></fieldvalid><tag></tag></field></fields>" onValid='bill_ondatasetvalid("<dsid><type_one></type_one><type_two></type_two><type_three></type_three><id></id><judge_value></judge_value><recnum></recnum></dsid>")' onGetText='bill_ondatasetgettext("<dsid><type_one></type_one><type_two></type_two><type_three></type_three><id></id><judge_value></judge_value><recnum></recnum></dsid>")' onSetText='bill_ondatasetsettext("<dsid><type_one></type_one><type_two></type_two><type_three></type_three><id></id><judge_value></judge_value><recnum></recnum></dsid>")' sqltrans="%F4%D8%E6%D8%D4%F6XrnbXrn%DA%F2%EC%E8Xrn%EC%D0%CC%D4%EC%F8%EA%F6%CC%E0%EA%D4%F2%D8%D0%F4%D8%CC%EA%F8%E8Xn%96Xn%90%FC%DE%D8%F2%D8Xrn%F6%u0100%EE%D8%CC%EC%EA%D8Xt%96XrnXr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%DC%F2%EC%F8%EE%A0%D6XrrXr%80X%7C%96Xt%90Xr%7CXrnXrn%D0%EA%D6Xrn%E2%F8%D6%DC%D8%CC%FA%D0%E6%F8%D8Xt%96Xr%7CXt%90X%7C%92Xrv%F8%F2%E6%AE%D0%F2%D0%E8Xr%7EXrr%FC%DA%A0%D6XrrXr%80X%7C%96Xt%90Xr%7CXrn%D0%EA%D6Xrn%D6%D0%F6%D0%CC%FA%D0%E6%E0%D6Xt%96p"></fc:dataset><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 71px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; TOP: 120px; PADDING-TOP: 0px; LEFT: 336px" id=button2 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("del()")'>删除文号</BUTTON> <fc:fc_code id=dropdownlist1 class=ef_design_dropdownlist left="97" onchange='bill_onclick("changeDash()")' controltype="dropdownlist" datasourceName="" FieldNameList="" isTreeNewSql="0" rootNodeId="rootNode" isShowTree="0" xml="" multiselect="否" addrow="否" blnempty="否" blninput="是" visible="是" format="" field="undefined" dataset="undefined" sqltrans="%F4%D8%E6%D8%D4%F6XrnXrnXrn%D6%E0%F4%EE%E6%D0%u0100%CC%EA%D0%E8%D8Xr%94Xrn%D6%E0%D4%F6%CC%FA%D0%E6%F8%D8Xrn%DA%F2%EC%E8Xrn%D8%D0%CC%D6%D0%F6%D0%CC%D6%E0%D4%F6%E0%EC%EA%D0%F2%u0100Xrn%FC%DE%D8%F2%D8Xrn%D6%E0%D4%F6%CC%DC%F2%EC%F8%EE%CC%E0%D6XrnXt%96XrnXr%7C%EC%D0%CC%F4%D8%EA%D6%CC%D6%EC%D4%F8%E8%D8%EA%F6%CC%F4%FC%F8%EA%DC%CC%D6%D0%F4%DEXr%7CXrn%EC%F2%D6%D8%F2Xrn%D2%u0100Xrn%D6%E0%D4%F6%CC%F4%D8%F0" height="26" width="316" top="27" position="absolute" align="undefined" sql2="undefined" enabled="false"></fc:fc_code><INPUT style="POSITION: absolute; WIDTH: 75px; HEIGHT: 21px; TOP: 73px; LEFT: 99px" id=text6 onmovestart=moveStart() onchange='bill_onclick("checkConflict()")' size=12 controltype="text" field="type_three" china="年份" dataset="dataset1"><LABEL style="POSITION: absolute; WIDTH: 65px; HEIGHT: 15px; TOP: 72px; LEFT: 205px" id=label5 onmovestart=moveStart() inputTag="否" controltype="label">序号：</LABEL><INPUT style="POSITION: absolute; WIDTH: 65px; HEIGHT: 24px; TOP: 71px; LEFT: 254px" id=text7 onmovestart=moveStart() onchange='bill_onclick("checkConflict()")' size=11 controltype="text" field="recnum" china="序列号" dataset="dataset1"><LABEL style="POSITION: absolute; WIDTH: 65px; HEIGHT: 15px; TOP: 121px; LEFT: 26px" id=label6 onmovestart=moveStart() inputTag="否" controltype="label">文件字号：</LABEL><INPUT style="POSITION: absolute; WIDTH: 222px; HEIGHT: 25px; TOP: 119px; LEFT: 99px" id=text9 onmovestart=moveStart() readOnly size=38 controltype="text"><BUTTON style="BACKGROUND-IMAGE: url(none); POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 75px; PADDING-RIGHT: 0px; BACKGROUND-REPEAT: no-repeat; BACKGROUND-POSITION: 0px 0px; HEIGHT: 25px; TOP: 207px; PADDING-TOP: 0px; LEFT: 184px" id=button3 class=ef_button onmovestart=moveStart() controltype="button" onclick='bill_onclick("sub()")'>保存编号</BUTTON><INPUT style="POSITION: absolute; WIDTH: 94px; DISPLAY: none; HEIGHT: 20px; TOP: 42px; LEFT: 467px" id=textDash onmovestart=moveStart() size=17 controltype="text" field="type_two" china="机关代字" dataset="dataset1"> <fc:fc_code id=dropdownlist2 class=ef_design_dropdownlist left="338" onchange='bill_onclick("fillNum(this)")' controltype="dropdownlist" datasourceName="" FieldNameList="" isTreeNewSql="0" rootNodeId="rootNode" isShowTree="0" xml="<tr height='20px' ><td>无</td><td>-1</td></tr>" multiselect="否" addrow="否" blnempty="否" blninput="是" visible="否" format="" field="undefined" dataset="undefined" sqltrans="" height="20" width="67" top="96" position="absolute" align="undefined" sql2="undefined" enabled="false"></fc:fc_code></DIV><div id='addHtml'></div> </body></html>

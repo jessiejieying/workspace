@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html style="overflow: hidden; height: 100%;">
+<head><#include "/aufw/page/include/head.html">
+<link rel="stylesheet" attr="skins" href="${base}/edenui/skintheme/css/m_default.css"/>
+</head>
+<body style="height: 100%;">
+	<div class="container-layout line">
+		<#include "/aufw/page/include/script.html">
+		<table style="width: 100%;" id="common_table">
+			<tr>
+				<td class="ver-top">
+					<div class="grid-table-top" id="grid_table">
+						<div class="js-tool-bar">
+							<div class="form-group  header-group">
+								<div class="button common-skin-btn-syle01 js-add-account" id="instructionToFb" 
+								                             onclick="instructionToFb()">汇总征求意见反馈附件</div>
+							</div>
+						</div>
+						<div class="js-grid-father grid-father">
+							<table id="manage_grid" class="bsgrid">
+								<tr>
+									<th w_index="id" w_hidden="true" class="hidden"></th>
+								    <th w_check="true" width="30"></th>
+									<th width="40">序号</th>
+									<th w_index="signOrg" width="150">单位名称</th>
+									<th w_index="feedbackContent">反馈内容</th>
+									<th w_index="feedbackTime" width="150">反馈时间</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+				</td>
+			</tr>
+		</table>
+	</div>
+	<!--表单、流程，基于jquery的方法-->
+<script src="${base}/edenui/common/js/plugins/dhtmlx/eden.js"></script>
+<script src="${base}/edenui/common/js/underscore.js"></script>
+<script src="${base}/form/resources/common/js/edenApi.js"></script>
+<script src="${base}/form/resources/common/js/tool.js"></script>
+<script>
+	var version='1';
+	var documentId=$urlParam("documentId");
+	var wf_name=window.top.wfName;
+	var gridOne;
+	var selectURL = "${base}/admin/draftSignFeedBack/viewDraftFeedBackQuery.action?documentId="+documentId;
+	var idsContent="";
+	$(function(){
+	     layOut("#common_table","#grid_table");
+	     gridOne=$.fn.bsgrid.init("manage_grid", {
+	        url:selectURL + "&etc="+new Date().getTime(),
+	        row_primary_key: "primaryKey",
+	        autoLoad: true,
+	        pageSizeSelect: true,
+	        pageSize:15,
+	        complete:function(options, XMLHttpRequest, textStatus){
+	        },
+	        additionalBeforeRenderGrid:function(parseSuccess, gridData, options){
+	        },
+	        additionalAfterRenderGrid:function(){
+	        	gridOne.initGrid();
+	        	$("#manage_grid tbody tr").each(function(){
+	        		var $this=$(this);
+	        		    $this.find("td").eq(1).css("padding-left","8px");
+	        		    $this.find("td").eq(3).css({"text-align":"center","padding-left":"0px"});
+	        		    $this.find("td").eq(5).css({"text-align":"center","padding-left":"0px"});
+	        			$index=parseInt($this.attr("index"));
+	        			$this.find("td").eq(2).html(parseInt($("#manage_grid_pt_pageSize").val())*(parseInt($("#undefined").html())-1) + $index + 1);
+	        			if($this.find("td").eq(5).html()!=undefined){
+	        				$this.find("td").eq(5).html($this.find("td").eq(5).html().replace("T"," "));
+	        			}
+	        	});
+	       
+	    }});    
+	});
+
+	  function view(feedbackId){
+	      window.top.createWindow({
+	          'text':'查看征求意见反馈',
+	          'id':'documentId',
+	          'url':"${base}/admin/draftSignFeedBack/viewDraftFeedBackDetail.action?ids="+feedbackId,
+	          'width':'800',
+	          'height':'500',
+	          'parent_ifr':window
+	      });
+	
+	  }
+  
+	//批示办理单转批示反馈单
+	function instructionToFb(){
+	    var checkedRowsRecoreds = gridOne.getCheckedRowsRecords();
+	    if(checkedRowsRecoreds.length < 1) {
+	    	layer.msg('请至少选择一条数据');
+	    	return;
+	    }
+	
+	  	var idData=checkedRowsRecoreds.map(function(value){
+	     	return value.id;
+	  	});
+	 	idsContent=idData.join(",");
+	 	
+	 	if('oa_pg_incoming_document'==wf_name){
+	 		
+	 	}
+	 	
+	 	var obj = {};
+		obj["ids"]=idsContent;
+		obj["wfId"]=window.top.wfId;
+		obj["documentId"]=documentId;
+		
+		var url = "${base}/admin/draftSignFeedBack/summaryAttachment.action";
+		$.post(url, obj, function (result) {
+        	layer.msg(result.message);
+        }); 
+		
+	}
+
+</script>
+</body>
+</html>
